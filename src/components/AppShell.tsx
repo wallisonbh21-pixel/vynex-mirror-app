@@ -32,6 +32,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 /** Menu do time comercial (vendedor). */
 const NAV_VENDEDOR = [
   { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
+  { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
