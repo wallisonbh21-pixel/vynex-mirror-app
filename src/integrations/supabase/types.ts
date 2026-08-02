@@ -328,45 +328,66 @@ export type Database = {
       }
       projects: {
         Row: {
+          assigned_at: string | null
           client_id: string | null
           commission: number
+          commission_rate: number
+          commission_status: string
           contract_id: string | null
           created_at: string
           creator_id: string | null
+          delivered_at: string | null
+          delivery_link: string | null
+          delivery_notes: string | null
           description: string | null
           due_date: string | null
           id: string
           owner_id: string
+          site_type: string | null
           status: string
           title: string
           updated_at: string
           value: number
         }
         Insert: {
+          assigned_at?: string | null
           client_id?: string | null
           commission?: number
+          commission_rate?: number
+          commission_status?: string
           contract_id?: string | null
           created_at?: string
           creator_id?: string | null
+          delivered_at?: string | null
+          delivery_link?: string | null
+          delivery_notes?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
           owner_id: string
+          site_type?: string | null
           status?: string
           title: string
           updated_at?: string
           value?: number
         }
         Update: {
+          assigned_at?: string | null
           client_id?: string | null
           commission?: number
+          commission_rate?: number
+          commission_status?: string
           contract_id?: string | null
           created_at?: string
           creator_id?: string | null
+          delivered_at?: string | null
+          delivery_link?: string | null
+          delivery_notes?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
           owner_id?: string
+          site_type?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -534,6 +555,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_project: {
+        Args: { _project_id: string }
+        Returns: {
+          assigned_at: string | null
+          client_id: string | null
+          commission: number
+          commission_rate: number
+          commission_status: string
+          contract_id: string | null
+          created_at: string
+          creator_id: string | null
+          delivered_at: string | null
+          delivery_link: string | null
+          delivery_notes: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          owner_id: string
+          site_type: string | null
+          status: string
+          title: string
+          updated_at: string
+          value: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projects"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
