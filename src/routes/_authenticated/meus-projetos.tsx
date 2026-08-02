@@ -37,8 +37,10 @@ type Client = { id: string; company: string };
 const FILTERS = [
   { value: "todos", label: "Todos" },
   { value: "em_producao", label: "Em produção" },
-  { value: "aguardando_aprovacao", label: "Aguardando aprovação" },
-  { value: "ajustes", label: "Ajustes" },
+  { value: "aguardando_aprovacao", label: "Aguardando aprovação interna" },
+  { value: "aguardando_cliente", label: "Com o cliente" },
+  { value: "ajustes", label: "Ajustes internos" },
+  { value: "ajustes_solicitados", label: "Ajustes do cliente" },
   { value: "aprovado", label: "Aprovado" },
   { value: "entregue", label: "Entregues" },
 ] as const;
@@ -52,7 +54,10 @@ function MeusProjetosPage() {
   const { data: projects = [] } = useMyCreatorProjects();
   const { data: clients = [] } = useRows<Client>("clients");
   const update = useUpdateCreatorProject();
+  const submit = useSubmitForApproval();
+  const resume = useResumeProduction();
   const [filter, setFilter] = useState<string>("todos");
+
 
   const clientName = useMemo(() => {
     const map = new Map(clients.map((c) => [c.id, c.company]));
