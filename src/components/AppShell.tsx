@@ -14,6 +14,7 @@ import {
   BellRing,
   CircleDollarSign,
   Palette,
+  Search,
   ShieldCheck,
   Sparkles,
   Target,
