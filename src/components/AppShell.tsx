@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABEL, useAvatarUrl, useProfile, useRoles, useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/NotificationBell";
 
 /** Menu do time comercial (vendedor). */
 const NAV_VENDEDOR = [
@@ -75,6 +76,7 @@ export function AppShell({
     ...(isAdmin
       ? [
           ...base,
+          { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
           { to: "/criacao", label: "Área do criador", icon: Layers },
           { to: "/admin", label: "Administração", icon: ShieldCheck },
         ]
@@ -170,7 +172,10 @@ export function AppShell({
                 ) : null}
               </div>
             </div>
-            <div className="flex items-center gap-2">{actions}</div>
+            <div className="flex items-center gap-2">
+              {actions}
+              <NotificationBell />
+            </div>
           </div>
 
           <nav className="mt-4 flex gap-1 overflow-x-auto lg:hidden">
