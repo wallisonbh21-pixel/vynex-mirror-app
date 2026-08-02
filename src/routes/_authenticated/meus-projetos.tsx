@@ -130,16 +130,16 @@ function MeusProjetosPage() {
                 <td className="px-4 py-3">{shortDate(project.assigned_at ?? project.created_at)}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
-                    {["em_producao", "ajustes"].includes(project.status) ? (
+                    {project.status === "em_producao" ? (
                       <RecordDialog
                         title="Enviar para aprovação"
                         fields={deliveryFields}
                         initial={project}
                         onSubmit={(values) =>
-                          update.mutate({
-                            id: project.id,
-                            ...values,
-                            status: "aguardando_aprovacao",
+                          submit.mutate({
+                            project: project as unknown as ApprovalProjectRow,
+                            delivery_link: String(values['delivery_link'] ?? ""),
+                            delivery_notes: (values['delivery_notes'] as string) ?? null,
                           })
                         }
                         trigger={
@@ -149,6 +149,15 @@ function MeusProjetosPage() {
                         }
                       />
                     ) : null}
+                    {["ajustes", "ajustes_solicitados"].includes(project.status) ? (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => resume.mutate(project as unknown as ApprovalProjectRow)}
+                      >
+                        Retomar produção
+                      </Button>
+                    ) : null}
                     {project.status === "aprovado" ? (
                       <Button
                         size="sm"
@@ -157,6 +166,7 @@ function MeusProjetosPage() {
                         Marcar como entregue
                       </Button>
                     ) : null}
+
                     {project.delivery_link ? (
                       <a
                         href={project.delivery_link}
