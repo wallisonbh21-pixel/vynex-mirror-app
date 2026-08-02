@@ -59,12 +59,18 @@ export function AppShell({
   const queryClient = useQueryClient();
   const { user } = useSession();
   const { data: profile } = useProfile();
-  const { isAdmin } = useRoles();
+  const { isAdmin, isCriador } = useRoles();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const items = isAdmin
-    ? [...NAV, { to: "/admin" as const, label: "Administração", icon: ShieldCheck }]
-    : NAV;
+  type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
+  const base: NavItem[] = isAdmin
+    ? [...NAV_VENDEDOR]
+    : isCriador
+      ? [...NAV_CRIADOR]
+      : [...NAV_VENDEDOR];
+  const items: NavItem[] = isAdmin
+    ? [...base, { to: "/admin", label: "Administração", icon: ShieldCheck }]
+    : base;
 
   async function signOut() {
     await queryClient.cancelQueries();
