@@ -22,7 +22,9 @@ export const PROJECT_STATUS = [
   "disponivel",
   "em_producao",
   "aguardando_aprovacao",
+  "aguardando_cliente",
   "ajustes",
+  "ajustes_solicitados",
   "aprovado",
   "entregue",
   "cancelado",
@@ -46,8 +48,10 @@ export const STATUS_LABEL: Record<string, string> = {
   disponivel: "Disponível",
   em_producao: "Em produção",
   producao: "Em produção",
-  aguardando_aprovacao: "Aguardando aprovação",
-  ajustes: "Ajustes solicitados",
+  aguardando_aprovacao: "Aguardando aprovação interna",
+  aguardando_cliente: "Aguardando aprovação do cliente",
+  ajustes: "Ajustes internos",
+  ajustes_solicitados: "Ajustes solicitados pelo cliente",
   aprovado: "Aprovado",
   revisao: "Em revisão",
   entregue: "Entregue",
@@ -80,7 +84,7 @@ export const statusTone = (status: string) => {
   if (["fechado", "entregue", "ativo", "pago", "aceita", "aprovado", "disponivel"].includes(status))
     return "success" as const;
   if (["perdido", "cancelado", "recusado", "encerrado"].includes(status)) return "danger" as const;
-  if (["proposta", "negociacao", "producao", "revisao", "pendente", "pausado", "enviada", "interessado", "em_producao", "aguardando_aprovacao", "ajustes"].includes(status))
+  if (["proposta", "negociacao", "producao", "revisao", "pendente", "pausado", "enviada", "interessado", "em_producao", "aguardando_aprovacao", "aguardando_cliente", "ajustes", "ajustes_solicitados"].includes(status))
     return "warning" as const;
   return "neutral" as const;
 };
