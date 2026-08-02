@@ -22,7 +22,8 @@ import { useProfile, useRoles, useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-const NAV = [
+/** Menu do time comercial (vendedor). */
+const NAV_VENDEDOR = [
   { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Pipeline", icon: KanbanSquare },
@@ -34,6 +35,14 @@ const NAV = [
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/metas", label: "Metas", icon: BarChart3 },
 ] as const;
+
+/** Menu do time de criação — sem acesso ao CRM comercial. */
+const NAV_CRIADOR = [
+  { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
+  { to: "/projetos", label: "Projetos", icon: Palette },
+  { to: "/financeiro", label: "Comissões e saques", icon: Wallet },
+] as const;
+
 
 export function AppShell({
   title,
