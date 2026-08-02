@@ -584,6 +584,139 @@ export type Database = {
           },
         ]
       }
+      prospecting_opportunities: {
+        Row: {
+          address: string | null
+          assigned_to: string | null
+          business_name: string
+          category: string | null
+          city: string | null
+          created_at: string
+          created_by: string
+          email: string | null
+          facebook: string | null
+          google_maps_url: string | null
+          has_social_media: boolean
+          has_website: boolean
+          id: string
+          instagram: string | null
+          lead_id: string | null
+          notes: string | null
+          opportunity_level: string
+          phone: string | null
+          place_id: string | null
+          rating: number | null
+          review_count: number
+          source: string
+          state: string | null
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          assigned_to?: string | null
+          business_name: string
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          created_by: string
+          email?: string | null
+          facebook?: string | null
+          google_maps_url?: string | null
+          has_social_media?: boolean
+          has_website?: boolean
+          id?: string
+          instagram?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          opportunity_level?: string
+          phone?: string | null
+          place_id?: string | null
+          rating?: number | null
+          review_count?: number
+          source?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          assigned_to?: string | null
+          business_name?: string
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          facebook?: string | null
+          google_maps_url?: string | null
+          has_social_media?: boolean
+          has_website?: boolean
+          id?: string
+          instagram?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          opportunity_level?: string
+          phone?: string | null
+          place_id?: string | null
+          rating?: number | null
+          review_count?: number
+          source?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_opportunities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_status_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          message: string | null
+          new_status: string
+          opportunity_id: string
+          previous_status: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          new_status: string
+          opportunity_id: string
+          previous_status?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          new_status?: string
+          opportunity_id?: string
+          previous_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_status_events_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           amount: number
