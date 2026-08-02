@@ -3,6 +3,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3,
   Building2,
+  CalendarClock,
+  FileSignature,
+  History,
+  KanbanSquare,
   LayoutDashboard,
   LogOut,
   Palette,
@@ -21,7 +25,11 @@ import { Button } from "@/components/ui/button";
 const NAV = [
   { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Target },
+  { to: "/pipeline", label: "Pipeline", icon: KanbanSquare },
+  { to: "/followups", label: "Follow-ups", icon: CalendarClock },
   { to: "/clientes", label: "Clientes", icon: Building2 },
+  { to: "/contratos", label: "Contratos", icon: FileSignature },
+  { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/metas", label: "Metas", icon: BarChart3 },

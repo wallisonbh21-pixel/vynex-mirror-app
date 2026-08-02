@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useDeleteRow, useRows, useSaveRow } from "@/lib/data";
 import { useSession } from "@/lib/auth";
+import type { Contract } from "@/lib/crm";
 import { currency, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/metas")({
   head: () => ({
     meta: [
       { title: "Metas — VYNEXA" },
-      { name: "description", content: "Defina metas de faturamento e acompanhe o progresso do período." },
+      { name: "description", content: "Metas mensais de vendas e faturamento com progresso real do vendedor." },
       { property: "og:title", content: "Metas — VYNEXA" },
       { property: "og:description", content: "Metas e progresso do time VYNEXA." },
     ],
@@ -22,37 +23,39 @@ export const Route = createFileRoute("/_authenticated/metas")({
 
 type Goal = {
   id: string;
-  title: string;
-  target_value: number;
-  current_value: number;
-  period_start: string | null;
-  period_end: string | null;
+  user_id: string;
+  month: string;
+  sales_target: number;
+  revenue_target: number;
 };
 
 const fields: Field[] = [
-  { name: "title", label: "Título da meta", required: true },
-  { name: "target_value", label: "Objetivo (R$)", type: "number" },
-  { name: "current_value", label: "Realizado (R$)", type: "number" },
-  { name: "period_start", label: "Início", type: "date" },
-  { name: "period_end", label: "Fim", type: "date" },
+  { name: "month", label: "Mês da meta", type: "date", required: true },
+  { name: "sales_target", label: "Meta de contratos", type: "number" },
+  { name: "revenue_target", label: "Meta de faturamento (R$)", type: "number" },
 ];
 
 function MetasPage() {
   const { user } = useSession();
-  const { data = [] } = useRows<Goal>("goals");
+  const { data = [] } = useRows<Goal>("goals", { column: "month" });
+  const { data: contracts = [] } = useRows<Contract>("contracts", { column: "signed_at" });
   const save = useSaveRow("goals");
   const remove = useDeleteRow("goals");
 
   return (
     <AppShell
       title="Metas"
-      description="Objetivos claros para cada ciclo da operação."
+      description="Objetivos mensais comparados com os contratos realmente fechados."
       actions={
         <RecordDialog
           title="Nova meta"
           fields={fields}
-          initial={{ target_value: 0, current_value: 0 }}
-          onSubmit={(values) => save.mutate({ ...values, owner_id: user?.id })}
+          initial={{
+            month: `${new Date().toISOString().slice(0, 7)}-01`,
+            sales_target: 0,
+            revenue_target: 0,
+          }}
+          onSubmit={(values) => save.mutate({ ...values, user_id: user?.id })}
           trigger={
             <Button>
               <Plus className="size-4" /> Nova meta
@@ -63,25 +66,52 @@ function MetasPage() {
     >
       <div className="grid gap-4 md:grid-cols-2">
         {data.map((goal) => {
-          const target = Number(goal.target_value) || 0;
-          const current = Number(goal.current_value) || 0;
-          const percent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+          const monthKey = goal.month.slice(0, 7);
+          const monthContracts = contracts.filter((c) => c.signed_at.slice(0, 7) === monthKey);
+          const revenue = monthContracts.reduce((sum, c) => sum + Number(c.amount), 0);
+          const revenuePercent = Number(goal.revenue_target)
+            ? Math.min(100, Math.round((revenue / Number(goal.revenue_target)) * 100))
+            : 0;
+          const salesPercent = Number(goal.sales_target)
+            ? Math.min(100, Math.round((monthContracts.length / Number(goal.sales_target)) * 100))
+            : 0;
+
           return (
             <article key={goal.id} className="rounded-2xl border border-border bg-card p-5 shadow-panel">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold">{goal.title}</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {shortDate(goal.period_start)} — {shortDate(goal.period_end)}
-                  </p>
+                  <h2 className="font-semibold">
+                    {new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(
+                      new Date(`${monthKey}-01T12:00:00`),
+                    )}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">Início em {shortDate(goal.month)}</p>
                 </div>
-                <span className="text-lg font-semibold text-primary">{percent}%</span>
+                <span className="text-lg font-semibold text-primary">{revenuePercent}%</span>
               </div>
-              <Progress value={percent} className="mt-4" />
-              <p className="mt-3 text-sm text-muted-foreground">
-                {currency(current)} de {currency(target)}
-              </p>
-              <div className="mt-3 flex justify-end gap-1">
+
+              <div className="mt-4 space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm">
+                    <span>Faturamento</span>
+                    <span className="text-muted-foreground">
+                      {currency(revenue)} de {currency(goal.revenue_target)}
+                    </span>
+                  </div>
+                  <Progress value={revenuePercent} className="mt-1.5" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm">
+                    <span>Contratos</span>
+                    <span className="text-muted-foreground">
+                      {monthContracts.length} de {goal.sales_target}
+                    </span>
+                  </div>
+                  <Progress value={salesPercent} className="mt-1.5" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end gap-1">
                 <RecordDialog
                   title="Editar meta"
                   fields={fields}

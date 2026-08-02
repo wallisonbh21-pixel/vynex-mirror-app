@@ -1,5 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Building2, Palette, Target, Wallet } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  Handshake,
+  Percent,
+  Phone,
+  Target,
+  TrendingUp,
+  Wallet,
+  FileText,
+  Trophy,
+} from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -12,9 +21,12 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useProfile, useRoles, useSession } from "@/lib/auth";
+import { useActivities, type Contract, type Lead, type Proposal } from "@/lib/crm";
 import { useRows } from "@/lib/data";
-import { currency, shortDate } from "@/lib/format";
-import { useProfile, useRoles } from "@/lib/auth";
+import { currency, label, LEAD_STATUS, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
@@ -22,49 +34,56 @@ export const Route = createFileRoute("/_authenticated/painel")({
       { title: "Visão geral — VYNEXA" },
       {
         name: "description",
-        content: "Indicadores de receita, recorrência, leads e projetos do seu time na VYNEXA.",
+        content: "Indicadores do vendedor: leads ativos, propostas, contratos, conversão, comissão e meta do mês.",
       },
       { property: "og:title", content: "Visão geral — VYNEXA" },
-      { property: "og:description", content: "Indicadores do seu painel VYNEXA." },
+      { property: "og:description", content: "Dashboard comercial da VYNEXA." },
     ],
   }),
   component: Painel,
 });
 
-type Lead = { id: string; name: string; company: string | null; status: string; estimated_value: number; created_at: string };
-type Client = { id: string; company: string; monthly_fee: number; status: string };
-type Project = { id: string; title: string; status: string; due_date: string | null; commission: number };
-type Transaction = { id: string; amount: number; type: string; occurred_at: string; description: string | null };
+type Goal = { id: string; user_id: string; month: string; sales_target: number; revenue_target: number };
 
 function Painel() {
+  const { user } = useSession();
   const { data: profile } = useProfile();
   const { isAdmin, isCriador } = useRoles();
-  const leads = useRows<Lead>("leads");
-  const clients = useRows<Client>("clients");
-  const projects = useRows<Project>("projects");
-  const transactions = useRows<Transaction>("transactions", { column: "occurred_at" });
+  const { data: leads = [] } = useRows<Lead>("leads");
+  const { data: proposals = [] } = useRows<Proposal>("proposals");
+  const { data: contracts = [] } = useRows<Contract>("contracts", { column: "signed_at" });
+  const { data: goals = [] } = useRows<Goal>("goals", { column: "month" });
+  const { data: activities = [] } = useActivities();
 
-  const leadRows = leads.data ?? [];
-  const clientRows = clients.data ?? [];
-  const projectRows = projects.data ?? [];
-  const transactionRows = transactions.data ?? [];
+  const monthKey = new Date().toISOString().slice(0, 7);
+  const activeLeads = leads.filter((lead) => !["fechado", "perdido"].includes(lead.status));
+  const closed = leads.filter((lead) => lead.status === "fechado");
+  const contacts = activities.filter((activity) => activity.type !== "observacao" && activity.type !== "status");
+  const sentProposals = proposals.filter((proposal) => proposal.status !== "rascunho");
+  const monthContracts = contracts.filter((contract) => contract.signed_at.slice(0, 7) === monthKey);
+  const monthRevenue = monthContracts.reduce((sum, contract) => sum + Number(contract.amount), 0);
+  const conversion = leads.length ? Math.round((closed.length / leads.length) * 100) : 0;
+  const rate = Number(profile?.commission_rate ?? 0);
+  const commission = (monthRevenue * rate) / 100;
+  const goal = goals.find((item) => item.month.slice(0, 7) === monthKey);
+  const goalPercent = goal?.revenue_target
+    ? Math.min(100, Math.round((monthRevenue / Number(goal.revenue_target)) * 100))
+    : 0;
 
-  const recurring = clientRows
-    .filter((c) => c.status === "ativo")
-    .reduce((sum, c) => sum + Number(c.monthly_fee), 0);
-  const balance = transactionRows.reduce((sum, t) => sum + Number(t.amount), 0);
-  const openProjects = projectRows.filter((p) => p.status !== "entregue").length;
-  const wonLeads = leadRows.filter((l) => l.status === "ganho").length;
-
-  const byMonth = new Map<string, number>();
-  transactionRows.forEach((t) => {
-    const key = t.occurred_at.slice(0, 7);
-    byMonth.set(key, (byMonth.get(key) ?? 0) + Number(t.amount));
-  });
-  const chart = [...byMonth.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .slice(-6)
-    .map(([month, total]) => ({ month: month.split("-").reverse().join("/"), total }));
+  const evolution = (() => {
+    const byMonth = new Map<string, number>();
+    contracts.forEach((contract) => {
+      const key = contract.signed_at.slice(0, 7);
+      byMonth.set(key, (byMonth.get(key) ?? 0) + Number(contract.amount));
+    });
+    return [...byMonth.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-6)
+      .map(([month, total]) => ({
+        month: month.split("-").reverse().join("/"),
+        total,
+      }));
+  })();
 
   return (
     <AppShell
@@ -74,32 +93,53 @@ function Painel() {
           ? "Você está vendo os dados de toda a operação."
           : isCriador
             ? "Sua fila de produção e comissões por projeto."
-            : "Seus leads, clientes, comissões e metas."
+            : "Seu funil comercial, metas e comissões previstas."
+      }
+      actions={
+        <Button asChild>
+          <Link to="/pipeline">Abrir pipeline</Link>
+        </Button>
       }
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Leads ativos" value={String(activeLeads.length)} hint={`${leads.length} no funil`} icon={Target} />
+        <StatCard label="Contatos realizados" value={String(contacts.length)} hint="Ligações, WhatsApp, reuniões" icon={Phone} />
+        <StatCard label="Propostas enviadas" value={String(sentProposals.length)} hint={`${proposals.length} criadas`} icon={FileText} />
+        <StatCard label="Contratos fechados" value={String(contracts.length)} hint={`${monthContracts.length} neste mês`} icon={Handshake} />
+        <StatCard label="Taxa de conversão" value={`${conversion}%`} hint={`${closed.length} leads convertidos`} icon={Percent} />
+        <StatCard label="Vendido no mês" value={currency(monthRevenue)} hint={shortDate(`${monthKey}-01`)} icon={TrendingUp} />
+        <StatCard label="Comissão prevista" value={currency(commission)} hint={`${rate}% sobre o mês`} icon={Wallet} />
         <StatCard
-          label="Receita recorrente"
-          value={currency(recurring)}
-          hint={`${clientRows.filter((c) => c.status === "ativo").length} clientes ativos`}
-          icon={Building2}
+          label="Meta do mês"
+          value={goal ? currency(goal.revenue_target) : "Sem meta"}
+          hint={goal ? `${goalPercent}% alcançado` : "Cadastre em Metas"}
+          icon={Trophy}
         />
-        <StatCard label="Saldo em comissões" value={currency(balance)} hint="Transações registradas" icon={Wallet} />
-        <StatCard label="Projetos em aberto" value={String(openProjects)} hint={`${projectRows.length} no total`} icon={Palette} />
-        <StatCard label="Leads ganhos" value={String(wonLeads)} hint={`${leadRows.length} leads no funil`} icon={Target} />
       </div>
+
+      {goal ? (
+        <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-panel">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold">Progresso da meta</span>
+            <span className="text-muted-foreground">
+              {currency(monthRevenue)} de {currency(goal.revenue_target)}
+            </span>
+          </div>
+          <Progress value={goalPercent} className="mt-3" />
+        </div>
+      ) : null}
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <section className="rounded-2xl border border-border bg-card p-5 shadow-panel lg:col-span-2">
-          <h2 className="text-sm font-semibold">Receita dos últimos meses</h2>
+          <h2 className="text-sm font-semibold">Evolução de vendas</h2>
           <div className="mt-4 h-64">
-            {chart.length === 0 ? (
+            {evolution.length === 0 ? (
               <p className="pt-16 text-center text-sm text-muted-foreground">
-                Nenhuma transação registrada ainda.
+                Nenhum contrato fechado ainda.
               </p>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chart}>
+                <BarChart data={evolution}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                   <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
@@ -121,16 +161,21 @@ function Painel() {
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold">Funil de leads</h2>
+          <h2 className="text-sm font-semibold">Funil comercial</h2>
           <ul className="mt-4 space-y-3">
-            {["novo", "contato", "proposta", "ganho", "perdido"].map((status) => {
-              const rows = leadRows.filter((l) => l.status === status);
+            {LEAD_STATUS.map((status) => {
+              const rows = leads.filter((lead) => lead.status === status);
+              const percent = leads.length ? Math.round((rows.length / leads.length) * 100) : 0;
               return (
-                <li key={status} className="flex items-center justify-between text-sm">
-                  <StatusBadge status={status} />
-                  <span className="text-muted-foreground">
-                    {rows.length} · {currency(rows.reduce((s, r) => s + Number(r.estimated_value), 0))}
-                  </span>
+                <li key={status}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{label(status)}</span>
+                    <span className="text-muted-foreground">
+                      {rows.length} ·{" "}
+                      {currency(rows.reduce((sum, lead) => sum + Number(lead.closed_value || lead.estimated_value), 0))}
+                    </span>
+                  </div>
+                  <Progress value={percent} className="mt-1.5 h-1.5" />
                 </li>
               );
             })}
@@ -138,47 +183,36 @@ function Painel() {
         </section>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold">Projetos recentes</h2>
-          <ul className="mt-4 space-y-3">
-            {projectRows.slice(0, 5).map((project) => (
-              <li key={project.id} className="flex items-center justify-between gap-3 text-sm">
-                <span className="min-w-0">
-                  <span className="block truncate">{project.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    Prazo {shortDate(project.due_date)} · {currency(project.commission)}
-                  </span>
+      <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-panel">
+        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold">
+          Minhas oportunidades recentes
+        </h2>
+        <ul className="divide-y divide-border">
+          {leads.slice(0, 6).map((lead) => (
+            <li key={lead.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
+              <span className="min-w-0">
+                <Link
+                  to="/leads/$leadId"
+                  params={{ leadId: lead.id }}
+                  className="block truncate font-medium hover:text-primary"
+                >
+                  {lead.company || lead.name}
+                </Link>
+                <span className="text-xs text-muted-foreground">
+                  {currency(lead.closed_value || lead.estimated_value)} · próximo contato{" "}
+                  {shortDate(lead.next_contact_at)}
                 </span>
-                <StatusBadge status={project.status} />
-              </li>
-            ))}
-            {projectRows.length === 0 ? (
-              <li className="text-sm text-muted-foreground">Nenhum projeto cadastrado.</li>
-            ) : null}
-          </ul>
-        </section>
-
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold">Últimas transações</h2>
-          <ul className="mt-4 space-y-3">
-            {transactionRows.slice(0, 5).map((t) => (
-              <li key={t.id} className="flex items-center justify-between gap-3 text-sm">
-                <span className="min-w-0">
-                  <span className="block truncate">{t.description || "Sem descrição"}</span>
-                  <span className="text-xs text-muted-foreground">{shortDate(t.occurred_at)}</span>
-                </span>
-                <span className={Number(t.amount) < 0 ? "text-destructive" : "text-success"}>
-                  {currency(t.amount)}
-                </span>
-              </li>
-            ))}
-            {transactionRows.length === 0 ? (
-              <li className="text-sm text-muted-foreground">Nenhuma transação registrada.</li>
-            ) : null}
-          </ul>
-        </section>
-      </div>
+              </span>
+              <StatusBadge status={lead.status} />
+            </li>
+          ))}
+          {leads.length === 0 ? (
+            <li className="px-4 py-12 text-center text-sm text-muted-foreground">
+              Nenhuma oportunidade cadastrada ainda.
+            </li>
+          ) : null}
+        </ul>
+      </section>
     </AppShell>
   );
 }

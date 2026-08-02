@@ -81,7 +81,7 @@ function FinanceiroPage() {
             title="Nova transação"
             fields={transactionFields}
             initial={{ type: "comissao", amount: 0, occurred_at: new Date().toISOString().slice(0, 10) }}
-            onSubmit={(values) => saveTransaction.mutate({ ...values, owner_id: user?.id })}
+            onSubmit={(values) => saveTransaction.mutate({ ...values, user_id: user?.id })}
             trigger={
               <Button variant="secondary">
                 <Plus className="size-4" /> Transação
@@ -93,7 +93,7 @@ function FinanceiroPage() {
             fields={withdrawalFields}
             initial={{ amount: 0 }}
             onSubmit={(values) =>
-              saveWithdrawal.mutate({ ...values, owner_id: user?.id, status: "pendente" })
+              saveWithdrawal.mutate({ ...values, user_id: user?.id, status: "pendente" })
             }
             trigger={
               <Button>
