@@ -164,10 +164,10 @@ function AprovacoesPage() {
       description="Revise as entregas dos criadores antes de liberar o acesso do cliente."
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Aguardando revisão" value={String(pendentes.length)} icon={ShieldCheck} />
-        <StatCard title="Com o cliente" value={String(comCliente.length)} icon={ExternalLink} />
-        <StatCard title="Alterações pedidas" value={String(ajustes.length)} icon={Wrench} />
-        <StatCard title="Aprovados" value={String(aprovados.length)} icon={History} />
+        <StatCard label="Aguardando revisão" value={String(pendentes.length)} icon={ShieldCheck} />
+        <StatCard label="Com o cliente" value={String(comCliente.length)} icon={ExternalLink} />
+        <StatCard label="Alterações pedidas" value={String(ajustes.length)} icon={Wrench} />
+        <StatCard label="Aprovados" value={String(aprovados.length)} icon={History} />
       </div>
 
       <Section title="Aguardando sua revisão" items={pendentes} render={renderCard} />
