@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
+import { Route as AuthenticatedCriacaoRouteImport } from './routes/_authenticated/criacao'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFollowupsRouteImport } from './routes/_authenticated/followups'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
@@ -52,6 +53,11 @@ const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
 const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
   id: '/contratos',
   path: '/contratos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCriacaoRoute = AuthenticatedCriacaoRouteImport.update({
+  id: '/criacao',
+  path: '/criacao',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/contratos': typeof AuthenticatedContratosRoute
+  '/criacao': typeof AuthenticatedCriacaoRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/contratos': typeof AuthenticatedContratosRoute
+  '/criacao': typeof AuthenticatedCriacaoRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
+  '/_authenticated/criacao': typeof AuthenticatedCriacaoRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/followups': typeof AuthenticatedFollowupsRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/clientes'
     | '/contratos'
+    | '/criacao'
     | '/financeiro'
     | '/followups'
     | '/historico'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/clientes'
     | '/contratos'
+    | '/criacao'
     | '/financeiro'
     | '/followups'
     | '/historico'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/clientes'
     | '/_authenticated/contratos'
+    | '/_authenticated/criacao'
     | '/_authenticated/financeiro'
     | '/_authenticated/followups'
     | '/_authenticated/historico'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/contratos'
       fullPath: '/contratos'
       preLoaderRoute: typeof AuthenticatedContratosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/criacao': {
+      id: '/_authenticated/criacao'
+      path: '/criacao'
+      fullPath: '/criacao'
+      preLoaderRoute: typeof AuthenticatedCriacaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financeiro': {
@@ -323,6 +342,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
+  AuthenticatedCriacaoRoute: typeof AuthenticatedCriacaoRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFollowupsRoute: typeof AuthenticatedFollowupsRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
@@ -338,6 +358,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
+  AuthenticatedCriacaoRoute: AuthenticatedCriacaoRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFollowupsRoute: AuthenticatedFollowupsRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
