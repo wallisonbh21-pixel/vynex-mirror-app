@@ -127,11 +127,15 @@ function ProjetosPage() {
                     <p className="mt-1 text-xs text-muted-foreground">
                       {clientName(project.client_id)} · prazo {shortDate(project.due_date)}
                     </p>
-                    <p className="mt-2 text-sm font-semibold">{currency(project.commission)}</p>
+                    <p className="mt-2 text-sm font-semibold">{currency(project.value)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Comissão do criador: {currency(project.commission)}
+                      {isAdmin ? null : " (definida pelo administrador)"}
+                    </p>
                     <div className="mt-2 flex justify-end gap-1">
                       <RecordDialog
                         title="Editar projeto"
-                        fields={fields}
+                        fields={editFields}
                         initial={project}
                         onSubmit={(values) => save.mutate({ ...values, id: project.id })}
                         trigger={
