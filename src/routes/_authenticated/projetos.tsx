@@ -6,7 +6,7 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useDeleteRow, useRows, useSaveRow } from "@/lib/data";
-import { useSession } from "@/lib/auth";
+import { useRoles, useSession } from "@/lib/auth";
 import { currency, PROJECT_STATUS, shortDate, STATUS_LABEL } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/projetos")({
@@ -36,6 +36,8 @@ type Client = { id: string; company: string };
 
 function ProjetosPage() {
   const { user } = useSession();
+  const { isAdmin } = useRoles();
+
   const { data = [] } = useRows<Project>("projects");
   const { data: clients = [] } = useRows<Client>("clients");
   const save = useSaveRow("projects");
@@ -45,6 +47,14 @@ function ProjetosPage() {
     const map = new Map(clients.map((client) => [client.id, client.company]));
     return (id: string | null) => (id ? map.get(id) ?? "Cliente removido" : "Sem cliente");
   }, [clients]);
+
+  // Somente administradores/diretores definem comissão.
+  const commissionFields: Field[] = isAdmin
+    ? [
+        { name: "commission_rate", label: "Comissão do criador (%)", type: "number" },
+        { name: "commission", label: "Comissão fixa (R$)", type: "number" },
+      ]
+    : [];
 
   const fields: Field[] = [
     { name: "title", label: "Título do projeto", required: true },
@@ -59,12 +69,12 @@ function ProjetosPage() {
       name: "status",
       label: "Etapa",
       type: "select",
+      required: true,
       options: PROJECT_STATUS.map((s) => ({ value: s, label: STATUS_LABEL[s]! })),
     },
     { name: "due_date", label: "Prazo", type: "date" },
-    { name: "value", label: "Valor do projeto (R$)", type: "number" },
-    { name: "commission_rate", label: "Comissão do criador (%)", type: "number" },
-    { name: "commission", label: "Comissão fixa (R$) — opcional", type: "number" },
+    { name: "value", label: "Valor do projeto (R$)", type: "number", required: true },
+    ...commissionFields,
     { name: "description", label: "Briefing", type: "textarea" },
   ];
 

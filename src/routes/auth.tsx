@@ -40,6 +40,10 @@ const credentials = z.object({
   password: z.string().min(6, "A senha precisa ter ao menos 6 caracteres").max(72),
 });
 
+type RpcClient = {
+  rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+};
+
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -47,12 +51,21 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("vendedor");
+  const [adminExists, setAdminExists] = useState(true);
+  const [mode, setMode] = useState<"login" | "recover">("login");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/painel", replace: true });
     });
   }, [navigate]);
+
+  // Cadastro público de administrador só existe enquanto não houver nenhum.
+  useEffect(() => {
+    (supabase as unknown as RpcClient).rpc("admin_exists").then(({ data, error }) => {
+      if (!error) setAdminExists(data !== false);
+    });
+  }, []);
 
   async function signIn(event: React.FormEvent) {
     event.preventDefault();
@@ -72,6 +85,26 @@ function AuthPage() {
     navigate({ to: "/painel", replace: true });
   }
 
+  async function recoverPassword(event: React.FormEvent) {
+    event.preventDefault();
+    const parsedEmail = z.string().trim().email("Informe um e-mail válido.").safeParse(email);
+    if (!parsedEmail.success) {
+      toast.error(parsedEmail.error.issues[0]!.message);
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(parsedEmail.data, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Enviamos um link de recuperação para o seu e-mail.");
+    setMode("login");
+  }
+
   async function signUp(event: React.FormEvent) {
     event.preventDefault();
     const parsed = credentials.safeParse({ email, password });
@@ -80,7 +113,7 @@ function AuthPage() {
       return;
     }
     if (fullName.trim().length < 2) {
-      toast.error("Informe seu nome completo.");
+      toast.error('Preencha o campo "Nome completo".');
       return;
     }
 
@@ -116,12 +149,13 @@ function AuthPage() {
     navigate({ to: "/painel", replace: true });
   }
 
+  const required = <span className="ml-1 text-destructive">*</span>;
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-12">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-halo" />
       <div className="relative w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center gap-3">
+        <Link to="/" className="mb-8 flex items-center justify-center gap-3 transition-opacity hover:opacity-80">
           <span className="flex size-10 items-center justify-center rounded-full bg-gradient-brand text-primary-foreground">
             <Sparkles className="size-5" />
           </span>
@@ -141,38 +175,81 @@ function AuthPage() {
             </TabsList>
 
             <TabsContent value="entrar" className="mt-6">
-              <form onSubmit={signIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="voce@empresa.com"
-                    autoComplete="email"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="current-password"
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Entrando..." : "Entrar na plataforma"}
-                </Button>
-              </form>
+              {mode === "login" ? (
+                <form onSubmit={signIn} noValidate className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">E-mail{required}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="voce@empresa.com"
+                      autoComplete="email"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Senha{required}</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full transition-transform hover:-translate-y-0.5"
+                    disabled={loading}
+                  >
+                    {loading ? "Entrando..." : "Entrar na plataforma"}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("recover")}
+                    className="w-full text-center text-xs text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Esqueci minha senha
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={recoverPassword} noValidate className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Informe seu e-mail e enviaremos um link para criar uma nova senha.
+                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="recover-email">E-mail{required}</Label>
+                    <Input
+                      id="recover-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full transition-transform hover:-translate-y-0.5"
+                    disabled={loading}
+                  >
+                    {loading ? "Enviando..." : "Enviar link de recuperação"}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("login")}
+                    className="w-full text-center text-xs text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Voltar para o login
+                  </button>
+                </form>
+              )}
             </TabsContent>
 
             <TabsContent value="criar" className="mt-6">
-              <form onSubmit={signUp} className="space-y-4">
+              <form onSubmit={signUp} noValidate className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nome completo</Label>
+                  <Label htmlFor="name">Nome completo{required}</Label>
                   <Input
                     id="name"
                     value={fullName}
@@ -182,7 +259,7 @@ function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">E-mail</Label>
+                  <Label htmlFor="signup-email">E-mail{required}</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -192,7 +269,7 @@ function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Senha</Label>
+                  <Label htmlFor="signup-password">Senha{required}</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -202,7 +279,7 @@ function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Perfil</Label>
+                  <Label>Perfil{required}</Label>
                   <Select value={role} onValueChange={setRole}>
                     <SelectTrigger>
                       <SelectValue />
@@ -210,10 +287,25 @@ function AuthPage() {
                     <SelectContent>
                       <SelectItem value="vendedor">Vendedor</SelectItem>
                       <SelectItem value="criador">Criador</SelectItem>
+                      {!adminExists ? (
+                        <SelectItem value="admin">Administrador (primeiro acesso)</SelectItem>
+                      ) : null}
                     </SelectContent>
                   </Select>
+                  {adminExists ? (
+                    <p className="text-xs text-muted-foreground">
+                      Acessos administrativos são criados pelo administrador da conta.
+                    </p>
+                  ) : null}
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <p className="text-xs text-muted-foreground">
+                  Campos marcados com <span className="text-destructive">*</span> são obrigatórios.
+                </p>
+                <Button
+                  type="submit"
+                  className="w-full transition-transform hover:-translate-y-0.5"
+                  disabled={loading}
+                >
                   {loading ? "Criando..." : "Criar conta"}
                 </Button>
               </form>
@@ -226,7 +318,11 @@ function AuthPage() {
             <span className="h-px flex-1 bg-border" />
           </div>
 
-          <Button variant="secondary" className="w-full" onClick={signInWithGoogle}>
+          <Button
+            variant="secondary"
+            className="w-full transition-transform hover:-translate-y-0.5"
+            onClick={signInWithGoogle}
+          >
             Continuar com Google
           </Button>
         </div>

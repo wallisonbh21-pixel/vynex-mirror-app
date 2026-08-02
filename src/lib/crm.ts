@@ -228,7 +228,7 @@ export function useConvertLead() {
         client_id: (client as { id: string }).id,
         contract_id: contractId,
         title: `Site — ${companyName}`,
-        status: "fila",
+        status: "disponivel",
         value: amount,
       } as never);
       if (projectError) throw projectError;

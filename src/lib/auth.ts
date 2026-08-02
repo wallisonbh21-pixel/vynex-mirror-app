@@ -3,7 +3,34 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "vendedor" | "criador";
+export type AppRole = "admin" | "diretor" | "rh" | "vendedor" | "criador";
+
+/** Nomes em português das funções da plataforma. */
+export const ROLE_LABEL: Record<string, string> = {
+  admin: "Administrador",
+  diretor: "Administrativo (Diretor)",
+  rh: "Administrativo (RH)",
+  vendedor: "Vendedor",
+  criador: "Criador",
+};
+
+export const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
+  { value: "admin", label: ROLE_LABEL['admin']! },
+  { value: "diretor", label: ROLE_LABEL['diretor']! },
+  { value: "rh", label: ROLE_LABEL['rh']! },
+  { value: "vendedor", label: ROLE_LABEL['vendedor']! },
+  { value: "criador", label: ROLE_LABEL['criador']! },
+];
+
+export type Profile = {
+  id: string;
+  full_name: string | null;
+  nickname: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+  pix_key: string | null;
+  commission_rate: number;
+};
 
 export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
@@ -36,7 +63,22 @@ export function useProfile() {
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data as Profile | null;
+    },
+  });
+}
+
+/** Gera uma URL assinada para a foto de perfil guardada no armazenamento privado. */
+export function useAvatarUrl(path: string | null | undefined) {
+  return useQuery({
+    queryKey: ["avatar", path],
+    enabled: !!path,
+    staleTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      if (path!.startsWith("http")) return path!;
+      const { data, error } = await supabase.storage.from("avatars").createSignedUrl(path!, 3600);
+      if (error) return null;
+      return data?.signedUrl ?? null;
     },
   });
 }
@@ -57,11 +99,15 @@ export function useRoles() {
   });
 
   const roles = query.data ?? [];
+  const isDiretor = roles.includes("diretor");
   return {
     roles,
-    isAdmin: roles.includes("admin"),
+    isAdmin: roles.includes("admin") || isDiretor,
+    isDiretor,
+    isRh: roles.includes("rh"),
     isCriador: roles.includes("criador"),
     isVendedor: roles.includes("vendedor"),
+    primaryRole: (roles[0] ?? "vendedor") as AppRole,
     loading: query.isLoading,
   };
 }
