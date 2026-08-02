@@ -2,7 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-type Table = "leads" | "clients" | "projects" | "transactions" | "withdrawals" | "goals";
+export type Table =
+  | "leads"
+  | "clients"
+  | "projects"
+  | "transactions"
+  | "withdrawals"
+  | "goals"
+  | "lead_activities"
+  | "proposals"
+  | "contracts";
 
 export function useRows<T = Record<string, unknown>>(
   table: Table,
@@ -21,7 +30,7 @@ export function useRows<T = Record<string, unknown>>(
   });
 }
 
-export function useSaveRow(table: Table) {
+export function useSaveRow(table: Table, invalidate: Table[] = []) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
@@ -33,14 +42,14 @@ export function useSaveRow(table: Table) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [table] });
+      [table, ...invalidate].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
       toast.success("Registro salvo.");
     },
     onError: (error: Error) => toast.error(error.message),
   });
 }
 
-export function useDeleteRow(table: Table) {
+export function useDeleteRow(table: Table, invalidate: Table[] = []) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
@@ -48,7 +57,7 @@ export function useDeleteRow(table: Table) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [table] });
+      [table, ...invalidate].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
       toast.success("Registro removido.");
     },
     onError: (error: Error) => toast.error(error.message),
