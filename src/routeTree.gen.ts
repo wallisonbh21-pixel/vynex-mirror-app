@@ -26,6 +26,7 @@ import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedMeusProjetosRouteImport } from './routes/_authenticated/meus-projetos'
 import { Route as AuthenticatedMeusSaquesRouteImport } from './routes/_authenticated/meus-saques'
+import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
@@ -120,6 +121,12 @@ const AuthenticatedMeusSaquesRoute = AuthenticatedMeusSaquesRouteImport.update({
   path: '/meus-saques',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificacoesRoute =
+  AuthenticatedNotificacoesRouteImport.update({
+    id: '/notificacoes',
+    path: '/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -174,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/metas': typeof AuthenticatedMetasRoute
   '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/meus-saques': typeof AuthenticatedMeusSaquesRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
@@ -199,6 +207,7 @@ export interface FileRoutesByTo {
   '/metas': typeof AuthenticatedMetasRoute
   '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/meus-saques': typeof AuthenticatedMeusSaquesRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
@@ -226,6 +235,7 @@ export interface FileRoutesById {
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/_authenticated/meus-saques': typeof AuthenticatedMeusSaquesRoute
+  '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/meus-projetos'
     | '/meus-saques'
+    | '/notificacoes'
     | '/painel'
     | '/perfil'
     | '/pipeline'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/meus-projetos'
     | '/meus-saques'
+    | '/notificacoes'
     | '/painel'
     | '/perfil'
     | '/pipeline'
@@ -304,6 +316,7 @@ export interface FileRouteTypes {
     | '/_authenticated/metas'
     | '/_authenticated/meus-projetos'
     | '/_authenticated/meus-saques'
+    | '/_authenticated/notificacoes'
     | '/_authenticated/painel'
     | '/_authenticated/perfil'
     | '/_authenticated/pipeline'
@@ -442,6 +455,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMeusSaquesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notificacoes': {
+      id: '/_authenticated/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof AuthenticatedNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -508,6 +528,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedMeusProjetosRoute: typeof AuthenticatedMeusProjetosRoute
   AuthenticatedMeusSaquesRoute: typeof AuthenticatedMeusSaquesRoute
+  AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
@@ -530,6 +551,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedMeusProjetosRoute: AuthenticatedMeusProjetosRoute,
   AuthenticatedMeusSaquesRoute: AuthenticatedMeusSaquesRoute,
+  AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
