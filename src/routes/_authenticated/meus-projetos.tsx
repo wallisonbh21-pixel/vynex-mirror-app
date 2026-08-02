@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
 import { creatorEarnings, useMyCreatorProjects, useUpdateCreatorProject } from "@/lib/creator";
+import {
+  useResumeProduction,
+  useSubmitForApproval,
+  type ApprovalProjectRow,
+} from "@/lib/approval";
 import { currency, label, shortDate } from "@/lib/format";
+
 
 export const Route = createFileRoute("/_authenticated/meus-projetos")({
   beforeLoad: () => requireCriador(),
