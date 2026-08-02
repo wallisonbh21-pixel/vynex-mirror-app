@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 type Profile = { id: string; full_name: string | null; phone: string | null; commission_rate: number };
 type RoleRow = { user_id: string; role: string };
-type Withdrawal = { id: string; owner_id: string; amount: number; pix_key: string | null; status: string; created_at: string };
+type Withdrawal = { id: string; user_id: string; amount: number; pix_key: string | null; status: string; created_at: string };
 
 const ROLES = ["admin", "vendedor", "criador"] as const;
 
