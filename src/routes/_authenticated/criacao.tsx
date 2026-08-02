@@ -106,7 +106,7 @@ function PainelCriador() {
                 <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-xs" />
                 <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
                 <Tooltip cursor={{ opacity: 0.1 }} />
-                <Bar dataKey="projetos" radius={[6, 6, 0, 0]} fill="hsl(var(--primary))" />
+                <Bar dataKey="projetos" radius={[6, 6, 0, 0]} fill="var(--primary)" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -121,7 +121,7 @@ function PainelCriador() {
                 <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-xs" />
                 <YAxis tickLine={false} axisLine={false} className="text-xs" width={50} />
                 <Tooltip formatter={(v: number) => currency(v)} />
-                <Line type="monotone" dataKey="ganhos" strokeWidth={2} stroke="hsl(var(--primary))" dot={false} />
+                <Line type="monotone" dataKey="ganhos" strokeWidth={2} stroke="var(--accent)" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
