@@ -33,6 +33,7 @@ type Client = {
   city: string | null;
   contact_name: string | null;
   contact_phone: string | null;
+  contact_email: string | null;
   monthly_fee: number;
   status: string;
   lead_id: string | null;
@@ -49,6 +50,7 @@ const fields: Field[] = [
   { name: "city", label: "Cidade" },
   { name: "contact_name", label: "Responsável" },
   { name: "contact_phone", label: "Telefone" },
+  { name: "contact_email", label: "E-mail do cliente", placeholder: "cliente@empresa.com.br" },
   { name: "monthly_fee", label: "Mensalidade (R$)", type: "number" },
   { name: "status", label: "Status", type: "select", options: options(CLIENT_STATUS) },
   { name: "notes", label: "Observações", type: "textarea" },
