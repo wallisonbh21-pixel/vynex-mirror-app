@@ -90,7 +90,7 @@ function AdminPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  if (!isLoading && !isAdmin) {
+  if (!loading && !isAdmin) {
     return (
       <AppShell title="Administração" description="Área restrita.">
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ function AdminPage() {
                 <span className="min-w-0">
                   <span className="block font-medium">{profile.full_name || "Sem nome"}</span>
                   <span className="text-xs text-muted-foreground">
-                    {profile.email} · comissão {Number(profile.commission_rate)}%
+                    {profile.phone || "sem telefone"} · comissão {Number(profile.commission_rate)}%
                   </span>
                 </span>
                 <Select
