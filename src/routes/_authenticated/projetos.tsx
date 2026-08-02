@@ -56,7 +56,7 @@ function ProjetosPage() {
       ]
     : [];
 
-  const fields: Field[] = [
+  const baseFields: Field[] = [
     { name: "title", label: "Título do projeto", required: true },
     { name: "site_type", label: "Tipo de site", placeholder: "Landing page, institucional, e-commerce..." },
     {
@@ -73,10 +73,25 @@ function ProjetosPage() {
       options: PROJECT_STATUS.map((s) => ({ value: s, label: STATUS_LABEL[s]! })),
     },
     { name: "due_date", label: "Prazo", type: "date" },
-    { name: "value", label: "Valor do projeto (R$)", type: "number", required: true },
-    ...commissionFields,
-    { name: "description", label: "Briefing", type: "textarea" },
   ];
+
+  const descriptionField: Field = { name: "description", label: "Briefing", type: "textarea" };
+  const valueField: Field = {
+    name: "value",
+    label: "Valor do projeto (R$)",
+    type: "number",
+    required: true,
+  };
+
+  // Criação: o vendedor informa o valor da venda; comissão nunca é editável por ele.
+  const fields: Field[] = [...baseFields, valueField, ...commissionFields, descriptionField];
+
+  // Edição: valores financeiros ficam bloqueados para quem não é admin/diretor
+  // (o banco também reverte qualquer alteração enviada por requisição direta).
+  const editFields: Field[] = isAdmin
+    ? fields
+    : [...baseFields, descriptionField];
+
 
   return (
     <AppShell
