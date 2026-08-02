@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +11,7 @@ import type { Contract } from "@/lib/crm";
 import { currency, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/metas")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Metas — VYNEXA" },

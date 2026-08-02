@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Search, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { useDeleteRow, useRows, useSaveRow } from "@/lib/data";
 import { currency, LEAD_STATUS, label, options, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/leads/")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Leads — VYNEXA" },

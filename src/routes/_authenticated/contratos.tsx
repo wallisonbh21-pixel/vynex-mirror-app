@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FileSignature, Repeat, Wallet } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -10,6 +11,7 @@ import { useRows, useSaveRow } from "@/lib/data";
 import { CONTRACT_STATUS, currency, options, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/contratos")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Contratos — VYNEXA" },

@@ -8,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ import {
 import { leadFields } from "./leads.index";
 
 export const Route = createFileRoute("/_authenticated/leads/$leadId")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Oportunidade — VYNEXA" },

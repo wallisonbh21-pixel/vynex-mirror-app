@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { useSession } from "@/lib/auth";
 import { useChangeLeadStatus, type Lead } from "@/lib/crm";
 import { useRows } from "@/lib/data";
@@ -8,6 +9,7 @@ import { currency, LEAD_STATUS, label, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Pipeline — VYNEXA" },
