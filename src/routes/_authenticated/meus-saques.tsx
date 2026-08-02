@@ -61,10 +61,15 @@ function MeusSaquesPage() {
           fields={fields}
           initial={{ amount: earnings.balance, pix_key: profile?.pix_key ?? "" }}
           onSubmit={(values) => {
-            const amount = Number(values.amount ?? 0);
-            if (amount <= 0) return toast.error("Informe um valor maior que zero.");
-            if (amount > earnings.balance)
-              return toast.error(`Saldo disponível é de ${currency(earnings.balance)}.`);
+            const amount = Number(values["amount"] ?? 0);
+            if (amount <= 0) {
+              toast.error("Informe um valor maior que zero.");
+              return;
+            }
+            if (amount > earnings.balance) {
+              toast.error(`Saldo disponível é de ${currency(earnings.balance)}.`);
+              return;
+            }
             save.mutate({ ...values, user_id: user?.id, status: "pendente" });
           }}
           trigger={
