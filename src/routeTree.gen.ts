@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
 import { Route as AuthenticatedCriacaoRouteImport } from './routes/_authenticated/criacao'
@@ -28,6 +29,7 @@ import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
+import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 
@@ -53,6 +55,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
+  id: '/aprovacoes',
+  path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
@@ -127,6 +134,11 @@ const AuthenticatedProjetosRoute = AuthenticatedProjetosRouteImport.update({
   path: '/projetos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AprovacaoTokenRoute = AprovacaoTokenRouteImport.update({
+  id: '/aprovacao/$token',
+  path: '/aprovacao/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   id: '/leads/',
   path: '/leads/',
@@ -144,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/criacao': typeof AuthenticatedCriacaoRoute
@@ -158,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/projetos': typeof AuthenticatedProjetosRoute
+  '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
 }
@@ -166,6 +180,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/criacao': typeof AuthenticatedCriacaoRoute
@@ -180,6 +195,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/projetos': typeof AuthenticatedProjetosRoute
+  '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
 }
@@ -190,6 +206,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/criacao': typeof AuthenticatedCriacaoRoute
@@ -204,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
+  '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
 }
@@ -214,6 +232,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/admin'
+    | '/aprovacoes'
     | '/clientes'
     | '/contratos'
     | '/criacao'
@@ -228,6 +247,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/pipeline'
     | '/projetos'
+    | '/aprovacao/$token'
     | '/leads/$leadId'
     | '/leads/'
   fileRoutesByTo: FileRoutesByTo
@@ -236,6 +256,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/admin'
+    | '/aprovacoes'
     | '/clientes'
     | '/contratos'
     | '/criacao'
@@ -250,6 +271,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/pipeline'
     | '/projetos'
+    | '/aprovacao/$token'
     | '/leads/$leadId'
     | '/leads'
   id:
@@ -259,6 +281,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/admin'
+    | '/_authenticated/aprovacoes'
     | '/_authenticated/clientes'
     | '/_authenticated/contratos'
     | '/_authenticated/criacao'
@@ -273,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/pipeline'
     | '/_authenticated/projetos'
+    | '/aprovacao/$token'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/leads/'
   fileRoutesById: FileRoutesById
@@ -282,6 +306,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  AprovacaoTokenRoute: typeof AprovacaoTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -319,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/aprovacoes': {
+      id: '/_authenticated/aprovacoes'
+      path: '/aprovacoes'
+      fullPath: '/aprovacoes'
+      preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clientes': {
@@ -419,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/aprovacao/$token': {
+      id: '/aprovacao/$token'
+      path: '/aprovacao/$token'
+      fullPath: '/aprovacao/$token'
+      preLoaderRoute: typeof AprovacaoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/leads/': {
       id: '/_authenticated/leads/'
       path: '/leads'
@@ -438,6 +477,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedCriacaoRoute: typeof AuthenticatedCriacaoRoute
@@ -458,6 +498,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedCriacaoRoute: AuthenticatedCriacaoRoute,
@@ -484,6 +525,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  AprovacaoTokenRoute: AprovacaoTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

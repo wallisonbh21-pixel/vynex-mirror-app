@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
 import { creatorEarnings, useMyCreatorProjects, useUpdateCreatorProject } from "@/lib/creator";
+import {
+  useResumeProduction,
+  useSubmitForApproval,
+  type ApprovalProjectRow,
+} from "@/lib/approval";
 import { currency, label, shortDate } from "@/lib/format";
+
 
 export const Route = createFileRoute("/_authenticated/meus-projetos")({
   beforeLoad: () => requireCriador(),
@@ -31,8 +37,10 @@ type Client = { id: string; company: string };
 const FILTERS = [
   { value: "todos", label: "Todos" },
   { value: "em_producao", label: "Em produção" },
-  { value: "aguardando_aprovacao", label: "Aguardando aprovação" },
-  { value: "ajustes", label: "Ajustes" },
+  { value: "aguardando_aprovacao", label: "Aguardando aprovação interna" },
+  { value: "aguardando_cliente", label: "Com o cliente" },
+  { value: "ajustes", label: "Ajustes internos" },
+  { value: "ajustes_solicitados", label: "Ajustes do cliente" },
   { value: "aprovado", label: "Aprovado" },
   { value: "entregue", label: "Entregues" },
 ] as const;
@@ -46,7 +54,10 @@ function MeusProjetosPage() {
   const { data: projects = [] } = useMyCreatorProjects();
   const { data: clients = [] } = useRows<Client>("clients");
   const update = useUpdateCreatorProject();
+  const submit = useSubmitForApproval();
+  const resume = useResumeProduction();
   const [filter, setFilter] = useState<string>("todos");
+
 
   const clientName = useMemo(() => {
     const map = new Map(clients.map((c) => [c.id, c.company]));
@@ -119,16 +130,16 @@ function MeusProjetosPage() {
                 <td className="px-4 py-3">{shortDate(project.assigned_at ?? project.created_at)}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
-                    {["em_producao", "ajustes"].includes(project.status) ? (
+                    {project.status === "em_producao" ? (
                       <RecordDialog
                         title="Enviar para aprovação"
                         fields={deliveryFields}
                         initial={project}
                         onSubmit={(values) =>
-                          update.mutate({
-                            id: project.id,
-                            ...values,
-                            status: "aguardando_aprovacao",
+                          submit.mutate({
+                            project: project as unknown as ApprovalProjectRow,
+                            delivery_link: String(values['delivery_link'] ?? ""),
+                            delivery_notes: (values['delivery_notes'] as string) ?? null,
                           })
                         }
                         trigger={
@@ -138,6 +149,15 @@ function MeusProjetosPage() {
                         }
                       />
                     ) : null}
+                    {["ajustes", "ajustes_solicitados"].includes(project.status) ? (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => resume.mutate(project as unknown as ApprovalProjectRow)}
+                      >
+                        Retomar produção
+                      </Button>
+                    ) : null}
                     {project.status === "aprovado" ? (
                       <Button
                         size="sm"
@@ -146,6 +166,7 @@ function MeusProjetosPage() {
                         Marcar como entregue
                       </Button>
                     ) : null}
+
                     {project.delivery_link ? (
                       <a
                         href={project.delivery_link}

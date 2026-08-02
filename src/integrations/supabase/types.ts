@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           city: string | null
           company: string
+          contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
           contract_id: string | null
@@ -34,6 +35,7 @@ export type Database = {
         Insert: {
           city?: string | null
           company: string
+          contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           contract_id?: string | null
@@ -50,6 +52,7 @@ export type Database = {
         Update: {
           city?: string | null
           company?: string
+          contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           contract_id?: string | null
@@ -296,6 +299,50 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          category: string
+          created_at: string
+          id: string
+          link: string | null
+          project_id: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          project_id?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          project_id?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -332,10 +379,59 @@ export type Database = {
         }
         Relationships: []
       }
+      project_approval_events: {
+        Row: {
+          actor_id: string | null
+          actor_label: string
+          created_at: string
+          event_type: string
+          id: string
+          message: string | null
+          new_status: string | null
+          previous_status: string | null
+          project_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_label?: string
+          created_at?: string
+          event_type: string
+          id?: string
+          message?: string | null
+          new_status?: string | null
+          previous_status?: string | null
+          project_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_label?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          message?: string | null
+          new_status?: string | null
+          previous_status?: string | null
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_approval_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
+          approved_to_client_at: string | null
+          approved_to_client_by: string | null
           assigned_at: string | null
+          client_approved_at: string | null
           client_id: string | null
+          client_token: string | null
+          client_token_expires_at: string | null
           commission: number
           commission_rate: number
           commission_status: string
@@ -351,13 +447,19 @@ export type Database = {
           owner_id: string
           site_type: string | null
           status: string
+          submitted_at: string | null
           title: string
           updated_at: string
           value: number
         }
         Insert: {
+          approved_to_client_at?: string | null
+          approved_to_client_by?: string | null
           assigned_at?: string | null
+          client_approved_at?: string | null
           client_id?: string | null
+          client_token?: string | null
+          client_token_expires_at?: string | null
           commission?: number
           commission_rate?: number
           commission_status?: string
@@ -373,13 +475,19 @@ export type Database = {
           owner_id: string
           site_type?: string | null
           status?: string
+          submitted_at?: string | null
           title: string
           updated_at?: string
           value?: number
         }
         Update: {
+          approved_to_client_at?: string | null
+          approved_to_client_by?: string | null
           assigned_at?: string | null
+          client_approved_at?: string | null
           client_id?: string | null
+          client_token?: string | null
+          client_token_expires_at?: string | null
           commission?: number
           commission_rate?: number
           commission_status?: string
@@ -395,6 +503,7 @@ export type Database = {
           owner_id?: string
           site_type?: string | null
           status?: string
+          submitted_at?: string | null
           title?: string
           updated_at?: string
           value?: number
@@ -526,6 +635,66 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_messages: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          error_message: string | null
+          external_message_id: string | null
+          id: string
+          message: string
+          notification_type: string
+          phone: string
+          project_id: string | null
+          send_status: string
+          sent_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          external_message_id?: string | null
+          id?: string
+          message: string
+          notification_type?: string
+          phone: string
+          project_id?: string | null
+          send_status?: string
+          sent_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          external_message_id?: string | null
+          id?: string
+          message?: string
+          notification_type?: string
+          phone?: string
+          project_id?: string | null
+          send_status?: string
+          sent_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       withdrawals: {
         Row: {
           amount: number
@@ -565,8 +734,13 @@ export type Database = {
       claim_project: {
         Args: { _project_id: string }
         Returns: {
+          approved_to_client_at: string | null
+          approved_to_client_by: string | null
           assigned_at: string | null
+          client_approved_at: string | null
           client_id: string | null
+          client_token: string | null
+          client_token_expires_at: string | null
           commission: number
           commission_rate: number
           commission_status: string
@@ -582,6 +756,7 @@ export type Database = {
           owner_id: string
           site_type: string | null
           status: string
+          submitted_at: string | null
           title: string
           updated_at: string
           value: number
