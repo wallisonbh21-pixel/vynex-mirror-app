@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import type { Contract } from "@/lib/crm";
 import { CLIENT_STATUS, currency, options, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/clientes")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Clientes — VYNEXA" },

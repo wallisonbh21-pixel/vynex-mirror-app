@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangle, CalendarClock, CalendarDays } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { useRows } from "@/lib/data";
 import { currency, shortDate, today } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/followups")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Follow-ups — VYNEXA" },

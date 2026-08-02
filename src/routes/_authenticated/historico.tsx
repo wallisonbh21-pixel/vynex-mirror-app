@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { requireVendedor } from "@/lib/guard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import { useRows } from "@/lib/data";
 import { ACTIVITY_TYPES, label, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/historico")({
+  beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
       { title: "Histórico — VYNEXA" },
