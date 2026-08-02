@@ -28,6 +28,7 @@ import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
+import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 
@@ -127,6 +128,11 @@ const AuthenticatedProjetosRoute = AuthenticatedProjetosRouteImport.update({
   path: '/projetos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AprovacaoTokenRoute = AprovacaoTokenRouteImport.update({
+  id: '/aprovacao/$token',
+  path: '/aprovacao/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   id: '/leads/',
   path: '/leads/',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/projetos': typeof AuthenticatedProjetosRoute
+  '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
 }
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/projetos': typeof AuthenticatedProjetosRoute
+  '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
 }
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
+  '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
 }
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/pipeline'
     | '/projetos'
+    | '/aprovacao/$token'
     | '/leads/$leadId'
     | '/leads/'
   fileRoutesByTo: FileRoutesByTo
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/pipeline'
     | '/projetos'
+    | '/aprovacao/$token'
     | '/leads/$leadId'
     | '/leads'
   id:
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/pipeline'
     | '/_authenticated/projetos'
+    | '/aprovacao/$token'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/leads/'
   fileRoutesById: FileRoutesById
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  AprovacaoTokenRoute: typeof AprovacaoTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/aprovacao/$token': {
+      id: '/aprovacao/$token'
+      path: '/aprovacao/$token'
+      fullPath: '/aprovacao/$token'
+      preLoaderRoute: typeof AprovacaoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/leads/': {
       id: '/_authenticated/leads/'
       path: '/leads'
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  AprovacaoTokenRoute: AprovacaoTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
