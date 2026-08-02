@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -23,32 +24,47 @@ export const Route = createFileRoute("/_authenticated/projetos")({
 type Project = {
   id: string;
   title: string;
-  client_name: string | null;
+  client_id: string | null;
   status: string;
   due_date: string | null;
+  value: number;
   commission: number;
-  brief: string | null;
+  description: string | null;
 };
 
-const fields: Field[] = [
-  { name: "title", label: "Título do projeto", required: true },
-  { name: "client_name", label: "Cliente" },
-  {
-    name: "status",
-    label: "Etapa",
-    type: "select",
-    options: PROJECT_STATUS.map((s) => ({ value: s, label: STATUS_LABEL[s]! })),
-  },
-  { name: "due_date", label: "Prazo", type: "date" },
-  { name: "commission", label: "Comissão (R$)", type: "number" },
-  { name: "brief", label: "Briefing", type: "textarea" },
-];
+type Client = { id: string; company: string };
 
 function ProjetosPage() {
   const { user } = useSession();
   const { data = [] } = useRows<Project>("projects");
+  const { data: clients = [] } = useRows<Client>("clients");
   const save = useSaveRow("projects");
   const remove = useDeleteRow("projects");
+
+  const clientName = useMemo(() => {
+    const map = new Map(clients.map((client) => [client.id, client.company]));
+    return (id: string | null) => (id ? map.get(id) ?? "Cliente removido" : "Sem cliente");
+  }, [clients]);
+
+  const fields: Field[] = [
+    { name: "title", label: "Título do projeto", required: true },
+    {
+      name: "client_id",
+      label: "Cliente",
+      type: "select",
+      options: clients.map((client) => ({ value: client.id, label: client.company })),
+    },
+    {
+      name: "status",
+      label: "Etapa",
+      type: "select",
+      options: PROJECT_STATUS.map((s) => ({ value: s, label: STATUS_LABEL[s]! })),
+    },
+    { name: "due_date", label: "Prazo", type: "date" },
+    { name: "value", label: "Valor do projeto (R$)", type: "number" },
+    { name: "commission", label: "Comissão (R$)", type: "number" },
+    { name: "description", label: "Briefing", type: "textarea" },
+  ];
 
   return (
     <AppShell
@@ -58,7 +74,7 @@ function ProjetosPage() {
         <RecordDialog
           title="Novo projeto"
           fields={fields}
-          initial={{ status: "fila", commission: 0 }}
+          initial={{ status: "fila", value: 0, commission: 0 }}
           onSubmit={(values) => save.mutate({ ...values, owner_id: user?.id })}
           trigger={
             <Button>
@@ -82,7 +98,7 @@ function ProjetosPage() {
                   <article key={project.id} className="rounded-xl border border-border bg-card p-3 shadow-panel">
                     <h2 className="text-sm font-medium">{project.title}</h2>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {project.client_name || "Sem cliente"} · prazo {shortDate(project.due_date)}
+                      {clientName(project.client_id)} · prazo {shortDate(project.due_date)}
                     </p>
                     <p className="mt-2 text-sm font-semibold">{currency(project.commission)}</p>
                     <div className="mt-2 flex justify-end gap-1">
