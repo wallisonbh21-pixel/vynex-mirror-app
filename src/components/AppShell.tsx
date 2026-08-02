@@ -7,6 +7,7 @@ import {
   FileSignature,
   History,
   KanbanSquare,
+  Layers,
   LayoutDashboard,
   LogOut,
   Palette,
@@ -38,9 +39,10 @@ const NAV_VENDEDOR = [
 
 /** Menu do time de criação — sem acesso ao CRM comercial. */
 const NAV_CRIADOR = [
-  { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
-  { to: "/projetos", label: "Projetos", icon: Palette },
-  { to: "/financeiro", label: "Comissões e saques", icon: Wallet },
+  { to: "/criacao", label: "Visão geral", icon: LayoutDashboard },
+  { to: "/disponiveis", label: "Projetos disponíveis", icon: Layers },
+  { to: "/meus-projetos", label: "Meus projetos", icon: Palette },
+  { to: "/meus-saques", label: "Meus saques", icon: Wallet },
 ] as const;
 
 
@@ -69,7 +71,11 @@ export function AppShell({
       ? [...NAV_CRIADOR]
       : [...NAV_VENDEDOR];
   const items: NavItem[] = isAdmin
-    ? [...base, { to: "/admin", label: "Administração", icon: ShieldCheck }]
+    ? [
+        ...base,
+        { to: "/criacao", label: "Área do criador", icon: Layers },
+        { to: "/admin", label: "Administração", icon: ShieldCheck },
+      ]
     : base;
 
   async function signOut() {

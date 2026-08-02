@@ -48,6 +48,7 @@ function ProjetosPage() {
 
   const fields: Field[] = [
     { name: "title", label: "Título do projeto", required: true },
+    { name: "site_type", label: "Tipo de site", placeholder: "Landing page, institucional, e-commerce..." },
     {
       name: "client_id",
       label: "Cliente",
@@ -62,7 +63,8 @@ function ProjetosPage() {
     },
     { name: "due_date", label: "Prazo", type: "date" },
     { name: "value", label: "Valor do projeto (R$)", type: "number" },
-    { name: "commission", label: "Comissão (R$)", type: "number" },
+    { name: "commission_rate", label: "Comissão do criador (%)", type: "number" },
+    { name: "commission", label: "Comissão fixa (R$) — opcional", type: "number" },
     { name: "description", label: "Briefing", type: "textarea" },
   ];
 
@@ -74,7 +76,7 @@ function ProjetosPage() {
         <RecordDialog
           title="Novo projeto"
           fields={fields}
-          initial={{ status: "fila", value: 0, commission: 0 }}
+          initial={{ status: "disponivel", value: 0, commission: 0, commission_rate: 30 }}
           onSubmit={(values) => save.mutate({ ...values, owner_id: user?.id })}
           trigger={
             <Button>
@@ -84,7 +86,7 @@ function ProjetosPage() {
         />
       }
     >
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {PROJECT_STATUS.map((status) => {
           const rows = data.filter((p) => p.status === status);
           return (
