@@ -15,10 +15,14 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
+import { Route as AuthenticatedCriacaoRouteImport } from './routes/_authenticated/criacao'
+import { Route as AuthenticatedDisponiveisRouteImport } from './routes/_authenticated/disponiveis'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFollowupsRouteImport } from './routes/_authenticated/followups'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
+import { Route as AuthenticatedMeusProjetosRouteImport } from './routes/_authenticated/meus-projetos'
+import { Route as AuthenticatedMeusSaquesRouteImport } from './routes/_authenticated/meus-saques'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
@@ -54,6 +58,17 @@ const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
   path: '/contratos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCriacaoRoute = AuthenticatedCriacaoRouteImport.update({
+  id: '/criacao',
+  path: '/criacao',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDisponiveisRoute =
+  AuthenticatedDisponiveisRouteImport.update({
+    id: '/disponiveis',
+    path: '/disponiveis',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   id: '/financeiro',
   path: '/financeiro',
@@ -72,6 +87,17 @@ const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
 const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
   id: '/metas',
   path: '/metas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMeusProjetosRoute =
+  AuthenticatedMeusProjetosRouteImport.update({
+    id: '/meus-projetos',
+    path: '/meus-projetos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMeusSaquesRoute = AuthenticatedMeusSaquesRouteImport.update({
+  id: '/meus-saques',
+  path: '/meus-saques',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
@@ -107,10 +133,14 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/contratos': typeof AuthenticatedContratosRoute
+  '/criacao': typeof AuthenticatedCriacaoRoute
+  '/disponiveis': typeof AuthenticatedDisponiveisRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/metas': typeof AuthenticatedMetasRoute
+  '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
+  '/meus-saques': typeof AuthenticatedMeusSaquesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/projetos': typeof AuthenticatedProjetosRoute
@@ -123,10 +153,14 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/contratos': typeof AuthenticatedContratosRoute
+  '/criacao': typeof AuthenticatedCriacaoRoute
+  '/disponiveis': typeof AuthenticatedDisponiveisRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/metas': typeof AuthenticatedMetasRoute
+  '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
+  '/meus-saques': typeof AuthenticatedMeusSaquesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/projetos': typeof AuthenticatedProjetosRoute
@@ -141,10 +175,14 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
+  '/_authenticated/criacao': typeof AuthenticatedCriacaoRoute
+  '/_authenticated/disponiveis': typeof AuthenticatedDisponiveisRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/followups': typeof AuthenticatedFollowupsRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
+  '/_authenticated/meus-projetos': typeof AuthenticatedMeusProjetosRoute
+  '/_authenticated/meus-saques': typeof AuthenticatedMeusSaquesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
@@ -159,10 +197,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/clientes'
     | '/contratos'
+    | '/criacao'
+    | '/disponiveis'
     | '/financeiro'
     | '/followups'
     | '/historico'
     | '/metas'
+    | '/meus-projetos'
+    | '/meus-saques'
     | '/painel'
     | '/pipeline'
     | '/projetos'
@@ -175,10 +217,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/clientes'
     | '/contratos'
+    | '/criacao'
+    | '/disponiveis'
     | '/financeiro'
     | '/followups'
     | '/historico'
     | '/metas'
+    | '/meus-projetos'
+    | '/meus-saques'
     | '/painel'
     | '/pipeline'
     | '/projetos'
@@ -192,10 +238,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/clientes'
     | '/_authenticated/contratos'
+    | '/_authenticated/criacao'
+    | '/_authenticated/disponiveis'
     | '/_authenticated/financeiro'
     | '/_authenticated/followups'
     | '/_authenticated/historico'
     | '/_authenticated/metas'
+    | '/_authenticated/meus-projetos'
+    | '/_authenticated/meus-saques'
     | '/_authenticated/painel'
     | '/_authenticated/pipeline'
     | '/_authenticated/projetos'
@@ -253,6 +303,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContratosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/criacao': {
+      id: '/_authenticated/criacao'
+      path: '/criacao'
+      fullPath: '/criacao'
+      preLoaderRoute: typeof AuthenticatedCriacaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/disponiveis': {
+      id: '/_authenticated/disponiveis'
+      path: '/disponiveis'
+      fullPath: '/disponiveis'
+      preLoaderRoute: typeof AuthenticatedDisponiveisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/financeiro': {
       id: '/_authenticated/financeiro'
       path: '/financeiro'
@@ -279,6 +343,20 @@ declare module '@tanstack/react-router' {
       path: '/metas'
       fullPath: '/metas'
       preLoaderRoute: typeof AuthenticatedMetasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/meus-projetos': {
+      id: '/_authenticated/meus-projetos'
+      path: '/meus-projetos'
+      fullPath: '/meus-projetos'
+      preLoaderRoute: typeof AuthenticatedMeusProjetosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/meus-saques': {
+      id: '/_authenticated/meus-saques'
+      path: '/meus-saques'
+      fullPath: '/meus-saques'
+      preLoaderRoute: typeof AuthenticatedMeusSaquesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/painel': {
@@ -323,10 +401,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
+  AuthenticatedCriacaoRoute: typeof AuthenticatedCriacaoRoute
+  AuthenticatedDisponiveisRoute: typeof AuthenticatedDisponiveisRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFollowupsRoute: typeof AuthenticatedFollowupsRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
+  AuthenticatedMeusProjetosRoute: typeof AuthenticatedMeusProjetosRoute
+  AuthenticatedMeusSaquesRoute: typeof AuthenticatedMeusSaquesRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRoute
@@ -338,10 +420,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
+  AuthenticatedCriacaoRoute: AuthenticatedCriacaoRoute,
+  AuthenticatedDisponiveisRoute: AuthenticatedDisponiveisRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFollowupsRoute: AuthenticatedFollowupsRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
+  AuthenticatedMeusProjetosRoute: AuthenticatedMeusProjetosRoute,
+  AuthenticatedMeusSaquesRoute: AuthenticatedMeusSaquesRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedProjetosRoute: AuthenticatedProjetosRoute,
