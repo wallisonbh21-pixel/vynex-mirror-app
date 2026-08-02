@@ -11,6 +11,8 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  BellRing,
+  CircleDollarSign,
   Palette,
   ShieldCheck,
   Sparkles,
@@ -38,7 +40,9 @@ const NAV_VENDEDOR = [
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/metas", label: "Metas", icon: BarChart3 },
+  { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ] as const;
 
 /** Menu do time de criação — sem acesso ao CRM comercial. */
@@ -46,7 +50,9 @@ const NAV_CRIADOR = [
   { to: "/criacao", label: "Visão geral", icon: LayoutDashboard },
   { to: "/disponiveis", label: "Projetos disponíveis", icon: Layers },
   { to: "/meus-projetos", label: "Meus projetos", icon: Palette },
+  { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/meus-saques", label: "Meus saques", icon: Wallet },
+  { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ] as const;
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };

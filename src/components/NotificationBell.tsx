@@ -84,6 +84,15 @@ export function NotificationBell() {
             })
           )}
         </div>
+        <div className="border-t border-border p-2">
+          <Link
+            to="/notificacoes"
+            onClick={() => setOpen(false)}
+            className="block rounded-lg px-3 py-2 text-center text-xs font-medium text-primary transition-colors hover:bg-secondary/60"
+          >
+            Ver todas
+          </Link>
+        </div>
       </PopoverContent>
     </Popover>
   );
