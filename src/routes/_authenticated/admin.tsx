@@ -15,10 +15,12 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoles } from "@/lib/auth";
+import { requireAdmin } from "@/lib/guard";
 import { useRows } from "@/lib/data";
 import { currency, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: () => requireAdmin(),
   head: () => ({
     meta: [
       { title: "Administração — VYNEXA" },
