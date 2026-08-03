@@ -114,11 +114,16 @@ export const Route = createFileRoute("/api/prospecting/search")({
           stage = "geoapify_call";
           console.log(`[Search][${requestId}] Estágio: geoapify_call`);
           
-          // Construir a query de texto baseada na presença ou não da cidade
+          /**
+           * REGRA DE NEGÓCIO: 
+           * - O erro 400 anterior ocorreu pelo uso de "type=amenity", que não é aceito pela Geoapify no v1/places.
+           * - A melhor estratégia para buscas por nome/nicho é a busca textual (v1/places) 
+           *   com o termo completo "Nicho em Cidade, Estado".
+           */
+          
           const locationText = city && city.trim() ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
           const textQuery = `${niche} em ${locationText}`;
-          
-          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&apiKey=${apiKey}&limit=20&lang=pt&type=amenity`;
+          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&limit=20&lang=pt&apiKey=${apiKey}`;
           
           console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&apiKey=HIDDEN...`);
           
@@ -151,7 +156,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
               return new Response(JSON.stringify({ error: "Limite de consultas da API atingido.", stage }), { status: 429 });
             }
             
-            // Retornar erro detalhado para facilitar o debug do "Formato inválido"
+            // Retornar erro detalhado para facilitar o debug
             return new Response(JSON.stringify({ 
               error: `Erro no provedor (Geoapify ${response.status}): ${typeof errorData === 'object' ? errorData.message || errorData.error || 'Erro desconhecido' : errorData}`,
               stage,
@@ -218,10 +223,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 7. Retornar resultados (Serialization stage)
           stage = "serialization";
           console.log(`[Search][${requestId}] Estágio: serialization`);
-          const jsonResponse = JSON.stringify({ opportunities });
           
           stage = "response";
-          const diagnostic = "prospecting-search-v2.1";
+          const diagnostic = "prospecting-search-v2.2";
           console.log(`[Search][${requestId}] Finalizando com sucesso. Diagnostic: ${diagnostic}`);
           
           return new Response(JSON.stringify({ 
