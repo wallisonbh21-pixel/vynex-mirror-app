@@ -15,25 +15,42 @@ export const Route = createFileRoute("/api/prospecting/search")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          // 1. Validar autenticação (Vendedor, Admin, Diretor)
-          // Em server routes do TanStack Start, precisamos verificar a sessão
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) {
-            return new Response("Não autorizado", { status: 401 });
+          // 1. Validar autenticação e autorização
+          const authHeader = request.headers.get("Authorization");
+          if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return new Response(JSON.stringify({ error: "Não autorizado" }), {
+              status: 401,
+              headers: { "Content-Type": "application/json" },
+            });
           }
 
-          // Verificar papel (o guard requireVendedor redireciona, aqui precisamos de algo que retorne boolean)
+          const token = authHeader.split(" ")[1];
+          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+          if (authError || !user) {
+            return new Response(JSON.stringify({ error: "Sessão inválida ou expirada" }), {
+              status: 401,
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+
+          // Verificar papel
           const { data: roles } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", session.user.id);
+            .eq("user_id", user.id);
           
           const userRoles = (roles ?? []).map(r => r.role);
           const hasAccess = userRoles.some(r => ["admin", "vendedor", "diretor", "rh"].includes(r));
           
           if (!hasAccess) {
-            return new Response("Acesso negado", { status: 403 });
+            return new Response(JSON.stringify({ error: "Acesso negado para o seu perfil" }), {
+              status: 403,
+              headers: { "Content-Type": "application/json" },
+            });
           }
+
+          const userId = user.id;
 
           // 2. Validar input
           const body = await request.json();
@@ -51,7 +68,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           // 4. Registrar a pesquisa no log (Auditoria/Controle)
           // Vamos criar essa tabela se não existir na próxima migração, por enquanto apenas logamos no console ou simulamos
-          console.log(`Pesquisa: ${session.user.id} - ${niche}, ${city}/${state}`);
+          console.log(`Pesquisa: ${userId} - ${niche}, ${city}/${state}`);
 
           // 5. Chamar Geoapify Places API
           // Primeiro, precisamos do Geocoding da cidade para obter as coordenadas se a API de lugares não aceitar string pura de local

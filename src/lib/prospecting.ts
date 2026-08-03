@@ -131,14 +131,29 @@ export function useSaveOpportunity() {
 export function useSearchOpportunities() {
   return useMutation({
     mutationFn: async ({ niche, state, city }: { niche: string; state: string; city: string }) => {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+
       const response = await fetch("/api/prospecting/search", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ niche, state, city }),
       });
 
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Resposta não-JSON do servidor:", text);
+        throw new Error(`Erro no servidor: ${response.status} ${response.statusText}`);
+      }
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Erro ao buscar oportunidades.");
       }
 
