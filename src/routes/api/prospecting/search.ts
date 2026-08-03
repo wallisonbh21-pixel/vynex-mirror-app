@@ -123,6 +123,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
           stage = "mapping";
           const opportunities = data.features?.map((f: any) => {
             const props = f.properties;
+            if (!props) return null;
+
             const website = props.website || null;
             
             let level = "alta";
@@ -132,26 +134,32 @@ export const Route = createFileRoute("/api/prospecting/search")({
               level = "media";
             }
 
+            // Gerar um place_id único se a API não fornecer (necessário para o frontend)
+            const fallbackId = createHmac("sha256", "vynexa-salt")
+              .update(`${props.name}-${props.lat}-${props.lon}`)
+              .digest("hex")
+              .substring(0, 16);
+
             return {
-              business_name: props.name || props.address_line1,
+              business_name: props.name || props.address_line1 || "Empresa sem nome",
               category: niche,
               phone: props.contact?.phone || null,
               email: props.contact?.email || null,
-              address: props.address_line1 || props.formatted,
+              address: props.address_line1 || props.formatted || "Endereço não disponível",
               city: city,
               state: state,
               website: website,
               instagram: props.contact?.instagram || null,
               facebook: props.contact?.facebook || null,
               google_maps_url: props.datasource?.raw?.osm_id ? `https://www.openstreetmap.org/node/${props.datasource.raw.osm_id}` : null,
-              place_id: props.place_id,
+              place_id: props.place_id || fallbackId,
               rating: props.rating || null,
               review_count: props.review_count || 0,
               opportunity_level: level,
               source: "Geoapify",
               status: "nova"
             };
-          }) || [];
+          }).filter(Boolean) || [];
 
           // 7. Retornar resultados
           return new Response(JSON.stringify({ opportunities }), {
