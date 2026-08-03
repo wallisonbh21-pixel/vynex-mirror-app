@@ -14,11 +14,13 @@ export const Route = createFileRoute("/api/prospecting/search")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        let stage = "init";
         try {
           // 1. Validar autenticação e autorização
+          stage = "auth";
           const authHeader = request.headers.get("Authorization");
           if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return new Response(JSON.stringify({ error: "Não autorizado" }), {
+            return new Response(JSON.stringify({ error: "Não autorizado", stage }), {
               status: 401,
               headers: { "Content-Type": "application/json" },
             });
@@ -28,16 +30,15 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
           if (authError || !user) {
-            return new Response(JSON.stringify({ error: "Sessão inválida ou expirada" }), {
+            console.error("Erro auth:", authError);
+            return new Response(JSON.stringify({ error: "Sessão inválida ou expirada", stage }), {
               status: 401,
               headers: { "Content-Type": "application/json" },
             });
           }
 
           // Verificar papel
-          // USAR supabaseAdmin PARA BYPASS RLS NA user_roles
-          // Motivo: RLS da user_roles geralmente restringe leitura ao próprio usuário ou admin,
-          // mas o server route precisa garantir a leitura das roles para autorizar a operação.
+          stage = "roles";
           const { data: roles, error: rolesError } = await supabaseAdmin
             .from("user_roles")
             .select("role")
@@ -45,22 +46,22 @@ export const Route = createFileRoute("/api/prospecting/search")({
           
           if (rolesError) {
             console.error("Erro ao buscar papéis:", rolesError);
-            return new Response(JSON.stringify({ error: "Erro ao verificar permissões" }), { status: 500 });
+            return new Response(JSON.stringify({ error: "Erro ao verificar permissões", stage }), { 
+              status: 500,
+              headers: { "Content-Type": "application/json" }
+            });
           }
 
-          // Normalizamos para minúsculas para evitar discrepâncias (ex: "Vendedor" vs "vendedor")
           const userRoles = (roles ?? []).map(r => String(r.role).toLowerCase());
-          
-          // Debugging log (servidor - visível apenas nos logs internos)
           console.log(`User ${user.id} (${user.email}) has roles:`, userRoles);
 
-          // As roles permitidas conforme a regra de negócio
           const allowedRoles = ["admin", "vendedor", "diretor", "rh"];
           const hasAccess = userRoles.some(r => allowedRoles.includes(r));
           
           if (!hasAccess) {
             return new Response(JSON.stringify({ 
               error: "Acesso negado para o seu perfil",
+              stage,
               debug_roles: userRoles
             }), {
               status: 403,
@@ -71,45 +72,59 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const userId = user.id;
 
           // 2. Validar input
+          stage = "input";
           const body = await request.json();
           const { niche, state, city } = searchSchema.parse(body);
 
           // 3. Obter API Key (Secret)
+          stage = "secrets";
           const apiKey = process.env["GEOAPIFY_API_KEY"];
           if (!apiKey) {
             console.error("GEOAPIFY_API_KEY não configurada.");
             return new Response(
-              JSON.stringify({ error: "Serviço de prospecção ainda não configurado. Entre em contato com o administrador." }),
+              JSON.stringify({ error: "Serviço de prospecção não configurado (API Key ausente).", stage }),
               { status: 500, headers: { "Content-Type": "application/json" } }
             );
           }
 
-          // 4. Registrar a pesquisa no log (Auditoria/Controle)
+          // 4. Registrar a pesquisa no log
           console.log(`Pesquisa: ${userId} - ${niche}, ${city}/${state}`);
 
           // 5. Chamar Geoapify Places API
+          stage = "geoapify_call";
           const text = `${niche} in ${city}, ${state}, Brazil`;
           const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt`;
           
+          console.log("Chamando Geoapify URL (apiKey oculta)");
+          
           const response = await fetch(geoUrl);
+          console.log(`Geoapify status: ${response.status} ${response.statusText}`);
+
           if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Erro Geoapify:", errorData);
-            if (response.status === 429) {
-              return new Response(JSON.stringify({ error: "Limite de consultas da API atingido." }), { status: 429 });
+            let errorData;
+            try {
+              errorData = await response.json();
+            } catch (e) {
+              errorData = "Resposta não-JSON da Geoapify";
             }
-            return new Response(JSON.stringify({ error: "Erro ao consultar provedor de dados." }), { status: 502 });
+            console.error("Erro Geoapify response:", errorData);
+            
+            if (response.status === 429) {
+              return new Response(JSON.stringify({ error: "Limite de consultas da API atingido.", stage }), { status: 429 });
+            }
+            return new Response(JSON.stringify({ error: "Erro ao consultar provedor de dados externo.", stage, status: response.status }), { status: 502 });
           }
 
+          stage = "geoapify_parse";
           const data = await response.json();
 
-          // 6. Mapear resultados para o formato da VYNEXA
+          // 6. Mapear resultados
+          stage = "mapping";
           const opportunities = data.features?.map((f: any) => {
             const props = f.properties;
             const website = props.website || null;
             
-            // Lógica de classificação
-            let level = "alta"; // Padrão: sem site
+            let level = "alta";
             if (website) {
               level = "baixa";
             } else if (props.contact?.social_media || props.datasource?.sourcename?.includes("facebook") || props.datasource?.sourcename?.includes("instagram")) {
@@ -144,9 +159,13 @@ export const Route = createFileRoute("/api/prospecting/search")({
           });
 
         } catch (error: any) {
-          console.error("Erro na busca de prospecção:", error);
+          console.error(`Erro na busca de prospecção (stage: ${stage}):`, error);
           return new Response(
-            JSON.stringify({ error: error.message || "Erro interno no servidor." }),
+            JSON.stringify({ 
+              error: "Falha ao processar solicitação de prospecção.", 
+              stage,
+              detail: error.message || "Unknown error"
+            }),
             { status: 500, headers: { "Content-Type": "application/json" } }
           );
         }
