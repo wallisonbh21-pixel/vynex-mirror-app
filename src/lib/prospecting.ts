@@ -143,10 +143,10 @@ export function useSearchOpportunities() {
         body: JSON.stringify({ niche, state, city }),
       });
 
-      let data;
+      let responseData;
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
+        responseData = await response.json();
       } else {
         const text = await response.text();
         console.error("Resposta não-JSON do servidor:", text);
@@ -154,11 +154,10 @@ export function useSearchOpportunities() {
       }
 
       if (!response.ok) {
-        throw new Error(data.error || "Erro ao buscar oportunidades.");
+        throw new Error(responseData.error || "Erro ao buscar oportunidades.");
       }
 
-      const data = await response.json();
-      return data.opportunities as Partial<Opportunity>[];
+      return responseData.opportunities as Partial<Opportunity>[];
     },
     onError: (error: Error) => toast.error(error.message),
   });
