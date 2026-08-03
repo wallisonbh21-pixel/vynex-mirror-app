@@ -113,9 +113,10 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 5. Chamar Geoapify Places API
           stage = "geoapify_call";
           console.log(`[Search][${requestId}] Estágio: geoapify_call`);
-          const text = `${niche} in ${city}, ${state}, Brazil`;
-          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt`;
+          const text = `${niche} em ${city}, ${state}, Brasil`;
+          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt&type=amenity`;
           
+          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=HIDDEN...`);
           const response = await fetch(geoUrl);
           console.log(`[Search][${requestId}] Geoapify status: ${response.status} ${response.statusText}`);
 
@@ -137,6 +138,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           stage = "geoapify_parse";
           console.log(`[Search][${requestId}] Estágio: geoapify_parse`);
           const data = await response.json();
+          console.log(`[Search][${requestId}] Dados Geoapify parseados. Status: ${data.status || 'OK'}`);
 
           // 6. Mapear resultados
           stage = "mapping";
