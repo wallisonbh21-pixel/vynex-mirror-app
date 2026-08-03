@@ -35,12 +35,17 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // Verificar papel
-          const { data: roles } = await supabase
+          const { data: roles, error: rolesError } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
           
-          const userRoles = (roles ?? []).map(r => r.role as string);
+          if (rolesError) {
+            console.error("Erro ao buscar papéis:", rolesError);
+            return new Response(JSON.stringify({ error: "Erro ao verificar permissões" }), { status: 500 });
+          }
+
+          const userRoles = (roles ?? []).map(r => String(r.role).toLowerCase());
           
           // Debugging log (servidor)
           console.log(`User ${user.id} (${user.email}) has roles:`, userRoles);
