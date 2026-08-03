@@ -473,6 +473,76 @@ function ProspeccaoPage() {
   );
 }
 
+function ExternalOpportunityCard({
+  opportunity,
+  onAdd,
+}: {
+  opportunity: Partial<Opportunity>;
+  onAdd: () => void;
+}) {
+  return (
+    <article className="rounded-2xl border border-primary/20 bg-card p-5 shadow-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <LevelBadge level={opportunity.opportunity_level || "alta"} />
+        <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+          GEOAPIFY
+        </span>
+      </div>
+
+      <h3 className="mt-3 text-lg font-semibold tracking-tight">{opportunity.business_name}</h3>
+      <p className="text-sm text-muted-foreground">
+        {opportunity.category ?? "Sem categoria"}
+        {opportunity.city ? ` · ${opportunity.city}` : ""}
+        {opportunity.state ? ` - ${opportunity.state}` : ""}
+      </p>
+
+      <ul className="mt-3 space-y-1.5 text-sm">
+        {opportunity.phone && (
+          <li className="flex items-center gap-2">
+            <Phone className="size-4 text-muted-foreground" />
+            {opportunity.phone}
+          </li>
+        )}
+        <li className="flex items-center gap-2">
+          <Globe className="size-4 text-muted-foreground" />
+          {opportunity.website ? (
+            <a href={opportunity.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
+              {opportunity.website} <ExternalLink className="size-3" />
+            </a>
+          ) : (
+            <span className="text-muted-foreground">Site: Não encontrado</span>
+          )}
+        </li>
+        {opportunity.address && (
+          <li className="flex items-center gap-2">
+            <MapPin className="size-4 text-muted-foreground" />
+            <span className="line-clamp-1">{opportunity.address}</span>
+          </li>
+        )}
+        {(opportunity.rating !== null && opportunity.rating !== undefined) && (
+          <li className="flex items-center gap-2">
+            <Star className="size-4 text-warning fill-warning" />
+            <span>{opportunity.rating} ({opportunity.review_count || 0} avaliações)</span>
+          </li>
+        )}
+      </ul>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <Button className="gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow" onClick={onAdd}>
+          <Plus className="size-4" /> Salvar em oportunidades
+        </Button>
+        {opportunity.google_maps_url && (
+          <Button variant="outline" size="sm" asChild>
+            <a href={opportunity.google_maps_url} target="_blank" rel="noopener noreferrer" className="gap-1">
+              Ver no mapa <ExternalLink className="size-3" />
+            </a>
+          </Button>
+        )}
+      </div>
+    </article>
+  );
+}
+
 function OpportunityCard({
   opportunity,
   ownerName,
