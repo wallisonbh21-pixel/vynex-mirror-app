@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -120,6 +122,28 @@ export function useSaveOpportunity() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
       toast.success("Oportunidade salva.");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+}
+
+/** Busca externa de oportunidades via API (Geoapify). */
+export function useSearchOpportunities() {
+  return useMutation({
+    mutationFn: async ({ niche, state, city }: { niche: string; state: string; city: string }) => {
+      const response = await fetch("/api/prospecting/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ niche, state, city }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Erro ao buscar oportunidades.");
+      }
+
+      const data = await response.json();
+      return data.opportunities as Partial<Opportunity>[];
     },
     onError: (error: Error) => toast.error(error.message),
   });
