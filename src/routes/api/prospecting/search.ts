@@ -195,9 +195,20 @@ export const Route = createFileRoute("/api/prospecting/search")({
           stage = "response";
           const diagnostic = "prospecting-search-v2.1";
           console.log(`[Search][${requestId}] Finalizando com sucesso. Diagnostic: ${diagnostic}`);
-          return new Response(JSON.stringify({ opportunities, diagnostic, requestId }), {
+          
+          return new Response(JSON.stringify({ 
+            opportunities, 
+            diagnostic, 
+            requestId,
+            stage: "success",
+            status: 200
+          }), {
             status: 200,
-            headers: { "Content-Type": "application/json" }
+            headers: { 
+              "Content-Type": "application/json",
+              "X-Diagnostic": diagnostic,
+              "X-Request-ID": requestId
+            }
           });
 
         } catch (error: any) {
