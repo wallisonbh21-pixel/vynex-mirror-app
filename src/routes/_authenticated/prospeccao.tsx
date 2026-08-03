@@ -12,6 +12,8 @@ import {
   Star,
   Target,
   UserRound,
+  Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -40,6 +42,7 @@ import {
   useChangeOpportunityStatus,
   useOpportunities,
   useSaveOpportunity,
+  useSearchOpportunities,
   type Opportunity,
 } from "@/lib/prospecting";
 import { cn } from "@/lib/utils";
@@ -118,6 +121,8 @@ function ProspeccaoPage() {
   const save = useSaveOpportunity();
   const addToLeads = useAddOpportunityToLeads();
   const changeStatus = useChangeOpportunityStatus();
+  const searchExternal = useSearchOpportunities();
+  const [externalResults, setExternalResults] = useState<Partial<Opportunity>[]>([]);
 
   // Formulário de busca (a fonte de dados externa chega na FASE 5.2).
   const [niche, setNiche] = useState("");
@@ -218,24 +223,30 @@ function ProspeccaoPage() {
         <StatCard label="Contatos realizados" value={String(contatos)} icon={Phone} />
       </div>
 
-      {/* Busca — preparada para receber dados externos na FASE 5.2 */}
+      {/* Busca externa via Geoapify */}
       <section className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-panel">
-        <div className="flex items-center gap-2">
-          <Sparkles className="size-4 text-primary" />
-          <h2 className="text-lg font-semibold tracking-tight">Encontrar novas oportunidades</h2>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4 text-primary" />
+            <h2 className="text-lg font-semibold tracking-tight">Encontrar novas oportunidades</h2>
+          </div>
+          {externalResults.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setExternalResults([])}>
+              Limpar resultados da busca
+            </Button>
+          )}
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Escolha nicho, estado e cidade para filtrar a base de prospecção.
+          Encontre empresas reais via Geoapify filtrando por nicho e localização.
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
             <Label>Nicho / categoria</Label>
-            <Select value={niche || "all"} onValueChange={(v) => setNiche(v === "all" ? "" : v)}>
+            <Select value={niche} onValueChange={setNiche}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o nicho" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os nichos</SelectItem>
                 {NICHOS.map((n) => (
                   <SelectItem key={n} value={n}>
                     {n}
@@ -246,12 +257,11 @@ function ProspeccaoPage() {
           </div>
           <div className="space-y-2">
             <Label>Estado</Label>
-            <Select value={state || "all"} onValueChange={(v) => setState(v === "all" ? "" : v)}>
+            <Select value={state} onValueChange={setState}>
               <SelectTrigger>
                 <SelectValue placeholder="UF" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os estados</SelectItem>
                 {ESTADOS.map((uf) => (
                   <SelectItem key={uf} value={uf}>
                     {uf}
@@ -267,17 +277,26 @@ function ProspeccaoPage() {
           <div className="flex items-end">
             <Button
               className="w-full gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow"
-              onClick={() => setSearched(true)}
+              disabled={!niche || !state || !city || searchExternal.isPending}
+              onClick={() => {
+                setSearched(true);
+                searchExternal.mutate(
+                  { niche, state, city },
+                  { onSuccess: (data) => setExternalResults(data) }
+                );
+              }}
             >
-              <Search className="size-4" /> Buscar oportunidades
+              {searchExternal.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Search className="size-4" />
+              )}
+              Encontrar oportunidades
             </Button>
           </div>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          A busca automática de empresas por Google Maps será ativada na próxima etapa. Por enquanto, os
-          resultados vêm da sua base de prospecção.
-        </p>
       </section>
+
 
       {/* Filtros */}
       <section className="mt-6 grid gap-4 md:grid-cols-3">
@@ -331,10 +350,35 @@ function ProspeccaoPage() {
         ) : null}
       </section>
 
-      {/* Resultados */}
-      <section className="mt-6">
+      {/* Resultados da busca externa */}
+      {externalResults.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-semibold tracking-tight text-primary">
+            Resultados da busca externa <span className="text-muted-foreground">({externalResults.length})</span>
+          </h2>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            {externalResults.map((opt, i) => (
+              <ExternalOpportunityCard
+                key={i}
+                opportunity={opt}
+                onAdd={() => {
+                  user && save.mutate({
+                    ...opt,
+                    created_by: user.id,
+                    assigned_to: user.id,
+                  });
+                  setExternalResults(prev => prev.filter((_, idx) => idx !== i));
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Base de prospecção salva */}
+      <section className="mt-8">
         <h2 className="text-lg font-semibold tracking-tight">
-          {isAdmin ? "Todas as oportunidades" : "Minhas oportunidades"}{" "}
+          {isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas"}{" "}
           <span className="text-muted-foreground">({filtered.length})</span>
         </h2>
 
@@ -342,11 +386,11 @@ function ProspeccaoPage() {
           <p className="mt-4 text-sm text-muted-foreground">Carregando oportunidades…</p>
         ) : filtered.length === 0 ? (
           <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center">
-            <p className="text-base font-medium">Nenhuma oportunidade encontrada.</p>
+            <p className="text-base font-medium">Nenhuma oportunidade salva encontrada.</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {searched || niche || state || city
-                ? "Ajuste os filtros ou cadastre uma nova oportunidade."
-                : "Comece escolhendo um nicho, estado e cidade."}
+                ? "Ajuste os filtros ou use a busca para encontrar novas empresas."
+                : "Comece escolhendo um nicho, estado e cidade para buscar."}
             </p>
           </div>
         ) : (
@@ -367,6 +411,7 @@ function ProspeccaoPage() {
           </div>
         )}
       </section>
+
 
       {/* Painel administrativo */}
       {isAdmin ? (
