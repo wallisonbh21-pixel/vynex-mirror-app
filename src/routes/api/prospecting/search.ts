@@ -117,7 +117,18 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt&type=amenity`;
           
           console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=HIDDEN...`);
-          const response = await fetch(geoUrl);
+          
+          // Usando um timeout explícito para o fetch externo
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          
+          let response;
+          try {
+            response = await fetch(geoUrl, { signal: controller.signal });
+          } finally {
+            clearTimeout(timeoutId);
+          }
+          
           console.log(`[Search][${requestId}] Geoapify status: ${response.status} ${response.statusText}`);
 
           if (!response.ok) {
