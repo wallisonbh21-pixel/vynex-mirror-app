@@ -40,11 +40,18 @@ export const Route = createFileRoute("/api/prospecting/search")({
             .select("role")
             .eq("user_id", user.id);
           
-          const userRoles = (roles ?? []).map(r => r.role);
+          const userRoles = (roles ?? []).map(r => r.role as string);
+          
+          // Debugging log (servidor)
+          console.log(`User ${user.id} (${user.email}) has roles:`, userRoles);
+
           const hasAccess = userRoles.some(r => ["admin", "vendedor", "diretor", "rh"].includes(r));
           
           if (!hasAccess) {
-            return new Response(JSON.stringify({ error: "Acesso negado para o seu perfil" }), {
+            return new Response(JSON.stringify({ 
+              error: "Acesso negado para o seu perfil",
+              debug_roles: userRoles // Ajudará a identificar se a role está vindo diferente (ex: VENDEDOR vs vendedor)
+            }), {
               status: 403,
               headers: { "Content-Type": "application/json" },
             });
