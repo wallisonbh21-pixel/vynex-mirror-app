@@ -28,11 +28,13 @@ export const Route = createFileRoute("/api/prospecting/search")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const requestId = Math.random().toString(36).substring(2, 15);
         let stage = "init";
+        console.log(`[Search][${requestId}] Request iniciada: ${request.method} ${request.url}`);
         try {
           // 1. Validar autenticação e autorização
           stage = "auth";
-          console.log("[Search] Iniciando estágio: auth");
+          console.log(`[Search][${requestId}] Estágio: auth`);
           const authHeader = request.headers.get("Authorization");
           if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return new Response(JSON.stringify({ error: "Não autorizado", stage }), {
@@ -45,7 +47,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
           if (authError || !user) {
-            console.error("[Search] Erro auth:", authError);
+            console.error(`[Search][${requestId}] Erro auth:`, authError);
             return new Response(JSON.stringify({ error: "Sessão inválida ou expirada", stage }), {
               status: 401,
               headers: { "Content-Type": "application/json" },
@@ -54,14 +56,14 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           // Verificar papel
           stage = "roles";
-          console.log("[Search] Iniciando estágio: roles para usuário", user.id);
+          console.log(`[Search][${requestId}] Estágio: roles para usuário`, user.id);
           const { data: roles, error: rolesError } = await supabaseAdmin
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
           
           if (rolesError) {
-            console.error("[Search] Erro ao buscar papéis:", rolesError);
+            console.error(`[Search][${requestId}] Erro ao buscar papéis:`, rolesError);
             return new Response(JSON.stringify({ error: "Erro ao verificar permissões", stage }), { 
               status: 500,
               headers: { "Content-Type": "application/json" }
@@ -69,7 +71,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           const userRoles = (roles ?? []).map(r => String(r.role).toLowerCase());
-          console.log(`[Search] Usuário ${user.id} possui roles:`, userRoles);
+          console.log(`[Search][${requestId}] Usuário ${user.id} possui roles:`, userRoles);
 
           const allowedRoles = ["admin", "vendedor", "diretor", "rh"];
           const hasAccess = userRoles.some(r => allowedRoles.includes(r));
@@ -89,16 +91,16 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           // 2. Validar input
           stage = "input";
-          console.log("[Search] Iniciando estágio: input");
+          console.log(`[Search][${requestId}] Estágio: input`);
           const body = await request.json();
           const { niche, state, city } = searchSchema.parse(body);
 
           // 3. Obter API Key (Secret)
           stage = "secrets";
-          console.log("[Search] Iniciando estágio: secrets");
+          console.log(`[Search][${requestId}] Estágio: secrets`);
           const apiKey = process.env["GEOAPIFY_API_KEY"];
           if (!apiKey) {
-            console.error("[Search] GEOAPIFY_API_KEY não configurada.");
+            console.error(`[Search][${requestId}] GEOAPIFY_API_KEY não configurada.`);
             return new Response(
               JSON.stringify({ error: "Serviço de prospecção não configurado (API Key ausente).", stage }),
               { status: 500, headers: { "Content-Type": "application/json" } }
@@ -106,16 +108,28 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // 4. Registrar a pesquisa no log
-          console.log(`[Search] Executando: ${userId} - ${niche}, ${city}/${state}`);
+          console.log(`[Search][${requestId}] Executando: ${userId} - ${niche}, ${city}/${state}`);
 
           // 5. Chamar Geoapify Places API
           stage = "geoapify_call";
-          console.log("[Search] Iniciando estágio: geoapify_call");
-          const text = `${niche} in ${city}, ${state}, Brazil`;
-          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt`;
+          console.log(`[Search][${requestId}] Estágio: geoapify_call`);
+          const text = `${niche} em ${city}, ${state}, Brasil`;
+          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt&type=amenity`;
           
-          const response = await fetch(geoUrl);
-          console.log(`[Search] Geoapify status: ${response.status} ${response.statusText}`);
+          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=HIDDEN...`);
+          
+          // Usando um timeout explícito para o fetch externo
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          
+          let response;
+          try {
+            response = await fetch(geoUrl, { signal: controller.signal });
+          } finally {
+            clearTimeout(timeoutId);
+          }
+          
+          console.log(`[Search][${requestId}] Geoapify status: ${response.status} ${response.statusText}`);
 
           if (!response.ok) {
             let errorData;
@@ -124,7 +138,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
             } catch (e) {
               errorData = "Resposta não-JSON da Geoapify";
             }
-            console.error("[Search] Erro Geoapify response:", errorData);
+            console.error(`[Search][${requestId}] Erro Geoapify response:`, errorData);
             
             if (response.status === 429) {
               return new Response(JSON.stringify({ error: "Limite de consultas da API atingido.", stage }), { status: 429 });
@@ -133,15 +147,16 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           stage = "geoapify_parse";
-          console.log("[Search] Iniciando estágio: geoapify_parse");
+          console.log(`[Search][${requestId}] Estágio: geoapify_parse`);
           const data = await response.json();
+          console.log(`[Search][${requestId}] Dados Geoapify parseados. Status: ${data.status || 'OK'}`);
 
           // 6. Mapear resultados
           stage = "mapping";
-          console.log("[Search] Iniciando estágio: mapping. Resultados brutos:", data.features?.length || 0);
+          console.log(`[Search][${requestId}] Estágio: mapping. Resultados brutos:`, data.features?.length || 0);
           
           if (!data.features || !Array.isArray(data.features)) {
-             console.warn("[Search] Geoapify retornou features inválido ou vazio.");
+             console.warn(`[Search][${requestId}] Geoapify retornou features inválido ou vazio.`);
           }
 
           const opportunities = (data.features || []).map((f: any) => {
@@ -181,26 +196,40 @@ export const Route = createFileRoute("/api/prospecting/search")({
             };
           }).filter(Boolean);
 
-          console.log(`[Search] Estágio mapping finalizado. Oportunidades processadas: ${opportunities.length}`);
+          console.log(`[Search][${requestId}] Estágio mapping finalizado. Oportunidades processadas: ${opportunities.length}`);
 
           // 7. Retornar resultados (Serialization stage)
           stage = "serialization";
-          console.log("[Search] Iniciando estágio: serialization");
+          console.log(`[Search][${requestId}] Estágio: serialization`);
           const jsonResponse = JSON.stringify({ opportunities });
           
           stage = "response";
-          return new Response(jsonResponse, {
+          const diagnostic = "prospecting-search-v2.1";
+          console.log(`[Search][${requestId}] Finalizando com sucesso. Diagnostic: ${diagnostic}`);
+          
+          return new Response(JSON.stringify({ 
+            opportunities, 
+            diagnostic, 
+            requestId,
+            stage: "success",
+            status: 200
+          }), {
             status: 200,
-            headers: { "Content-Type": "application/json" }
+            headers: { 
+              "Content-Type": "application/json",
+              "X-Diagnostic": diagnostic,
+              "X-Request-ID": requestId
+            }
           });
 
         } catch (error: any) {
-          console.error(`[Search] CRASH no stage: ${stage}:`, error);
+          console.error(`[Search][${requestId}] CRASH no stage: ${stage}:`, error);
           return new Response(
             JSON.stringify({ 
               error: "Falha ao processar solicitação de prospecção.", 
               stage,
-              detail: error.message || "Unknown error"
+              detail: error.message || "Unknown error",
+              requestId
             }),
             { status: 500, headers: { "Content-Type": "application/json" } }
           );
