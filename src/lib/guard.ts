@@ -30,7 +30,7 @@ export async function requireRole(allowed: AppRole[]) {
 }
 
 /** Rotas exclusivas do time comercial (CRM). */
-export const requireVendedor = () => requireRole(["vendedor"]);
+export const requireVendedor = () => requireRole(["vendedor", "diretor", "admin", "rh"]);
 
 /** Rotas exclusivas do time de criação. */
 export const requireCriador = () => requireRole(["criador"]);

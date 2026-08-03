@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { requireVendedor } from "@/lib/guard";
 
 // Schema para a busca via Geoapify
 const searchSchema = z.object({
@@ -35,16 +34,31 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // Verificar papel
-          const { data: roles } = await supabase
+          const { data: roles, error: rolesError } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
           
-          const userRoles = (roles ?? []).map(r => r.role);
-          const hasAccess = userRoles.some(r => ["admin", "vendedor", "diretor", "rh"].includes(r));
+          if (rolesError) {
+            console.error("Erro ao buscar papéis:", rolesError);
+            return new Response(JSON.stringify({ error: "Erro ao verificar permissões" }), { status: 500 });
+          }
+
+          // Normalizamos para minúsculas para evitar discrepâncias (ex: "Vendedor" vs "vendedor")
+          const userRoles = (roles ?? []).map(r => String(r.role).toLowerCase());
+          
+          // Debugging log (servidor - visível apenas nos logs internos)
+          console.log(`User ${user.id} (${user.email}) has roles:`, userRoles);
+
+          // As roles permitidas conforme a regra de negócio
+          const allowedRoles = ["admin", "vendedor", "diretor", "rh"];
+          const hasAccess = userRoles.some(r => allowedRoles.includes(r));
           
           if (!hasAccess) {
-            return new Response(JSON.stringify({ error: "Acesso negado para o seu perfil" }), {
+            return new Response(JSON.stringify({ 
+              error: "Acesso negado para o seu perfil",
+              debug_roles: userRoles
+            }), {
               status: 403,
               headers: { "Content-Type": "application/json" },
             });
@@ -67,13 +81,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // 4. Registrar a pesquisa no log (Auditoria/Controle)
-          // Vamos criar essa tabela se não existir na próxima migração, por enquanto apenas logamos no console ou simulamos
           console.log(`Pesquisa: ${userId} - ${niche}, ${city}/${state}`);
 
           // 5. Chamar Geoapify Places API
-          // Primeiro, precisamos do Geocoding da cidade para obter as coordenadas se a API de lugares não aceitar string pura de local
-          // Mas o Geoapify Places permite busca por texto ou por geocode.
-          // Vamos usar o Geocoding para ter precisão.
           const text = `${niche} in ${city}, ${state}, Brazil`;
           const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt`;
           
