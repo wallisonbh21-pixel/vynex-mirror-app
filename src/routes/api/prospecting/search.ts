@@ -44,8 +44,15 @@ export const Route = createFileRoute("/api/prospecting/search")({
             return new Response(JSON.stringify({ error: "Erro ao verificar permissões" }), { status: 500 });
           }
 
+          // Normalizamos para minúsculas para evitar discrepâncias (ex: "Vendedor" vs "vendedor")
           const userRoles = (roles ?? []).map(r => String(r.role).toLowerCase());
-          const hasAccess = userRoles.some(r => ["admin", "vendedor", "diretor", "rh"].includes(r));
+          
+          // Debugging log (servidor - visível apenas nos logs internos)
+          console.log(`User ${user.id} (${user.email}) has roles:`, userRoles);
+
+          // As roles permitidas conforme a regra de negócio
+          const allowedRoles = ["admin", "vendedor", "diretor", "rh"];
+          const hasAccess = userRoles.some(r => allowedRoles.includes(r));
           
           if (!hasAccess) {
             return new Response(JSON.stringify({ 
