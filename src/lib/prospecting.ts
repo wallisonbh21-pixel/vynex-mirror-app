@@ -130,7 +130,7 @@ export function useSaveOpportunity() {
 /** Busca externa de oportunidades via API (Geoapify). */
 export function useSearchOpportunities() {
   return useMutation({
-    mutationFn: async ({ niche, state, city }: { niche: string; state: string; city: string }) => {
+    mutationFn: async ({ niche, state, city }: { niche: string; state: string; city?: string | null }) => {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
       

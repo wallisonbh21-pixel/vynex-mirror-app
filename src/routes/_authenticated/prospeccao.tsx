@@ -271,13 +271,13 @@ function ProspeccaoPage() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Cidade</Label>
-            <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Digite a cidade" />
+            <Label>Cidade <span className="text-[10px] font-normal text-muted-foreground uppercase tracking-wider ml-1">(Opcional)</span></Label>
+            <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ex: Contagem" />
           </div>
           <div className="flex items-end">
             <Button
               className="w-full gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow"
-              disabled={!niche || !state || !city || searchExternal.isPending}
+              disabled={!niche || !state || searchExternal.isPending}
               onClick={() => {
                 setSearched(true);
                 searchExternal.mutate(
