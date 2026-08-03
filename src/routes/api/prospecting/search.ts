@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 const searchSchema = z.object({
   niche: z.string(),
   state: z.string(),
-  city: z.string(),
+  city: z.string().optional().nullable(),
 });
 
 /**
@@ -113,10 +113,14 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 5. Chamar Geoapify Places API
           stage = "geoapify_call";
           console.log(`[Search][${requestId}] Estágio: geoapify_call`);
-          const text = `${niche} em ${city}, ${state}, Brasil`;
-          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=${apiKey}&limit=20&lang=pt&type=amenity`;
           
-          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(text)}&apiKey=HIDDEN...`);
+          // Construir a query de texto baseada na presença ou não da cidade
+          const locationText = city && city.trim() ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
+          const textQuery = `${niche} em ${locationText}`;
+          
+          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&apiKey=${apiKey}&limit=20&lang=pt&type=amenity`;
+          
+          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&apiKey=HIDDEN...`);
           
           // Usando um timeout explícito para o fetch externo
           const controller = new AbortController();
@@ -133,17 +137,30 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           if (!response.ok) {
             let errorData;
+            let rawBody = "";
             try {
-              errorData = await response.json();
+              rawBody = await response.text();
+              errorData = JSON.parse(rawBody);
             } catch (e) {
-              errorData = "Resposta não-JSON da Geoapify";
+              errorData = { error: "Resposta inválida (não-JSON) da Geoapify", raw: rawBody.substring(0, 100) };
             }
-            console.error(`[Search][${requestId}] Erro Geoapify response:`, errorData);
+            
+            console.error(`[Search][${requestId}] Erro Geoapify response (Status ${response.status}):`, errorData);
             
             if (response.status === 429) {
               return new Response(JSON.stringify({ error: "Limite de consultas da API atingido.", stage }), { status: 429 });
             }
-            return new Response(JSON.stringify({ error: "Erro ao consultar provedor de dados externo.", stage, status: response.status }), { status: 502 });
+            
+            // Retornar erro detalhado para facilitar o debug do "Formato inválido"
+            return new Response(JSON.stringify({ 
+              error: `Erro no provedor (Geoapify ${response.status}): ${typeof errorData === 'object' ? errorData.message || errorData.error || 'Erro desconhecido' : errorData}`,
+              stage,
+              status: response.status,
+              requestId
+            }), { 
+              status: 502,
+              headers: { "Content-Type": "application/json" }
+            });
           }
 
           stage = "geoapify_parse";
@@ -181,7 +198,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
               phone: props.contact?.phone || null,
               email: props.contact?.email || null,
               address: props.address_line1 || props.formatted || "Endereço não disponível",
-              city: city,
+              city: props.city || city || null,
               state: state,
               website: website,
               instagram: props.contact?.instagram || null,
