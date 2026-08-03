@@ -154,7 +154,9 @@ export function useSearchOpportunities() {
       }
 
       if (!response.ok) {
-        throw new Error(responseData.error || "Erro ao buscar oportunidades.");
+        const msg = responseData.error || "Erro ao buscar oportunidades.";
+        const debug = responseData.debug_roles ? ` (Roles: ${responseData.debug_roles.join(', ')})` : '';
+        throw new Error(`${msg}${debug}`);
       }
 
       return responseData.opportunities as Partial<Opportunity>[];
