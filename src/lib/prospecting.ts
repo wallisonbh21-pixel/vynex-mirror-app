@@ -133,14 +133,18 @@ export function useSearchOpportunities() {
     mutationFn: async ({ niche, state, city }: { niche: string; state: string; city: string }) => {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
+      
+      const payload = { niche, state, city };
+      console.log("[Prospecting Search] Iniciando request para /api/prospecting/search", payload);
 
       const response = await fetch("/api/prospecting/search", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
+          "Accept": "application/json",
           ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ niche, state, city }),
+        body: JSON.stringify(payload),
       });
 
       let responseData;
@@ -149,14 +153,16 @@ export function useSearchOpportunities() {
         responseData = await response.json();
       } else {
         const text = await response.text();
-        console.error("Resposta não-JSON do servidor:", text);
-        throw new Error(`Erro no servidor: ${response.status} ${response.statusText}`);
+        console.error("[Prospecting Search] Resposta não-JSON do servidor:", text);
+        throw new Error(`Erro no servidor: ${response.status} (Formato inválido)`);
       }
 
       if (!response.ok) {
         const msg = responseData.error || "Erro ao buscar oportunidades.";
+        const stage = responseData.stage ? ` [Etapa: ${responseData.stage}]` : '';
+        const reqId = responseData.requestId ? ` (ID: ${responseData.requestId})` : '';
         const debug = responseData.debug_roles ? ` (Roles: ${responseData.debug_roles.join(', ')})` : '';
-        throw new Error(`${msg}${debug}`);
+        throw new Error(`${msg}${stage}${reqId}${debug}`);
       }
 
       return responseData.opportunities as Partial<Opportunity>[];
