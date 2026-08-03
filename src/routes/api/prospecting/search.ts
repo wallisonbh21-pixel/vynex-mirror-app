@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // Schema para a busca via Geoapify
 const searchSchema = z.object({
@@ -34,7 +35,10 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // Verificar papel
-          const { data: roles, error: rolesError } = await supabase
+          // USAR supabaseAdmin PARA BYPASS RLS NA user_roles
+          // Motivo: RLS da user_roles geralmente restringe leitura ao próprio usuário ou admin,
+          // mas o server route precisa garantir a leitura das roles para autorizar a operação.
+          const { data: roles, error: rolesError } = await supabaseAdmin
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
