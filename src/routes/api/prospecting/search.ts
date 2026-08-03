@@ -110,56 +110,22 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 4. Registrar a pesquisa no log
           console.log(`[Search][${requestId}] Executando: ${userId} - ${niche}, ${city}/${state}`);
 
-          // 5. Chamar Geoapify Places API (v2)
+          // 5. Chamar Geoapify Places API
           stage = "geoapify_call";
           console.log(`[Search][${requestId}] Estágio: geoapify_call`);
           
           /**
            * REGRA DE NEGÓCIO: 
-           * - O "niche" (hamburgueria, restaurante, etc) é passado no parâmetro "name".
-           * - Usamos categorias amplas em "categories" para garantir que pegamos estabelecimentos comerciais/serviços.
-           * - O "type" no v2 da Places API é opcional e serve para filtrar o tipo de resultado retornado (ex: shop, catering).
-           *   Conforme o erro 400 anterior, "amenity" não é um valor aceito para "type".
-           *   Vamos usar categorias (categories) que é o padrão recomendado.
+           * - O erro 400 anterior ocorreu pelo uso de "type=amenity", que não é aceito pela Geoapify no v1/places.
+           * - A melhor estratégia para buscas por nome/nicho é a busca textual (v1/places) 
+           *   com o termo completo "Nicho em Cidade, Estado".
            */
           
-          // Categorias recomendadas para cobrir diversos nichos comerciais e de serviços
-          // catering: alimentação, commercial: lojas, service: serviços gerais, activity: lazer/academias, healthcare: saúde
-          const categories = "catering,commercial,service,activity,healthcare,education";
-          
-          // Filtro de localização: se houver cidade, busca na cidade; senão, no estado.
-          // Usamos geocoding primeiro para pegar o place_id do estado/cidade para um filtro mais preciso "place:ID"
-          // Mas para simplificar e manter a lógica atual de texto, usaremos "bias" e "filter" se possível, 
-          // ou manteremos a busca textual ampla.
-          
           const locationText = city && city.trim() ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
+          const textQuery = `${niche} em ${locationText}`;
+          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&limit=20&lang=pt&apiKey=${apiKey}`;
           
-          // Na Places API v2, a busca por nome + localização funciona melhor com:
-          // categories=... & name=NICHO & filter=place:PLACE_ID (ou circle/rect)
-          // Como não temos o PLACE_ID agora, vamos usar a busca textual v2 que aceita "categories" e "name".
-          
-          const geoUrl = `https://api.geoapify.com/v2/places?categories=${categories}&name=${encodeURIComponent(niche)}&filter=place:515978f8709140ecbf598822987a049d4740f00101f9011c75020000000000c00208&limit=20&lang=pt&apiKey=${apiKey}`;
-          
-          // OPS: O place:ID fixo acima é apenas um exemplo. Precisamos de um filtro dinâmico.
-          // Como a Geoapify Places API v2 exige filter ou bias, e a busca textual por "Hamburgueria em Contagem" 
-          // era o que estávamos fazendo, vamos adaptar para o formato correto.
-          
-          // Se não temos o place_id da cidade/estado, a melhor forma de buscar por "Hamburgueria em Contagem" 
-          // é via Geocoding API ou manter a busca textual da Places API mas sem o parâmetro "type=amenity".
-          
-          // Vamos tentar a busca textual na Places API v2 (que é o que o endpoint /v1/places aceitava e redirecionava para v2)
-          // Mas usando os parâmetros corretos.
-          const finalGeoUrl = `https://api.geoapify.com/v2/places?categories=${categories}&name=${encodeURIComponent(niche)}&bias=proximity:-43.9345,-19.9167&filter=rect:-44.2,-20.1,-43.7,-19.7&limit=20&lang=pt&apiKey=${apiKey}`;
-          
-          // Ajuste: A estratégia de "text=Hamburgueria em Contagem" no v1 era válida. 
-          // O erro 400 foi especificamente pelo "type=amenity".
-          // Vamos voltar para a busca textual mas sem o "type" inválido.
-          const textSearchUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(`${niche} em ${locationText}`)}&limit=20&lang=pt&apiKey=${apiKey}`;
-          
-          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(`${niche} em ${locationText}`)}&apiKey=HIDDEN...`);
-          
-          const geoUrlToUse = textSearchUrl;
-
+          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&apiKey=HIDDEN...`);
           
           // Usando um timeout explícito para o fetch externo
           const controller = new AbortController();
@@ -167,7 +133,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           
           let response;
           try {
-            response = await fetch(geoUrlToUse, { signal: controller.signal });
+            response = await fetch(geoUrl, { signal: controller.signal });
           } finally {
             clearTimeout(timeoutId);
           }
@@ -190,7 +156,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
               return new Response(JSON.stringify({ error: "Limite de consultas da API atingido.", stage }), { status: 429 });
             }
             
-            // Retornar erro detalhado para facilitar o debug do "Formato inválido"
+            // Retornar erro detalhado para facilitar o debug
             return new Response(JSON.stringify({ 
               error: `Erro no provedor (Geoapify ${response.status}): ${typeof errorData === 'object' ? errorData.message || errorData.error || 'Erro desconhecido' : errorData}`,
               stage,
@@ -257,10 +223,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 7. Retornar resultados (Serialization stage)
           stage = "serialization";
           console.log(`[Search][${requestId}] Estágio: serialization`);
-          const jsonResponse = JSON.stringify({ opportunities });
           
           stage = "response";
-          const diagnostic = "prospecting-search-v2.1";
+          const diagnostic = "prospecting-search-v2.2";
           console.log(`[Search][${requestId}] Finalizando com sucesso. Diagnostic: ${diagnostic}`);
           
           return new Response(JSON.stringify({ 
