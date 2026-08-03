@@ -158,7 +158,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
             }
 
             // Gerar um ID determinístico seguro para Web/Edge
-            const fallbackId = generateDeterministicId(`${props.name}-${props.lat}-${props.lon}-${i}`);
+            const fallbackId = generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
 
             return {
               business_name: props.name || props.address_line1 || "Empresa sem nome",
@@ -206,9 +206,6 @@ export const Route = createFileRoute("/api/prospecting/search")({
           );
         }
       }
-    }
-  }
-});
     }
   }
 });
