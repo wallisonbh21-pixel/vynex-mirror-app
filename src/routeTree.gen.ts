@@ -35,6 +35,7 @@ import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authentic
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
+import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -169,6 +170,11 @@ const AuthenticatedLeadsLeadIdRoute =
     path: '/leads/$leadId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiProspectingSearchRoute = ApiProspectingSearchRouteImport.update({
+  id: '/api/prospecting/search',
+  path: '/api/prospecting/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
 }
 export interface FileRoutesById {
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
 }
 export interface FileRouteTypes {
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/leads/$leadId'
+    | '/api/prospecting/search'
     | '/leads/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/leads/$leadId'
+    | '/api/prospecting/search'
     | '/leads'
   id:
     | '__root__'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
     | '/_authenticated/leads/$leadId'
+    | '/api/prospecting/search'
     | '/_authenticated/leads/'
   fileRoutesById: FileRoutesById
 }
@@ -344,6 +356,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   AprovacaoTokenRoute: typeof AprovacaoTokenRoute
+  ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -530,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsLeadIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/prospecting/search': {
+      id: '/api/prospecting/search'
+      path: '/api/prospecting/search'
+      fullPath: '/api/prospecting/search'
+      preLoaderRoute: typeof ApiProspectingSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -590,6 +610,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   AprovacaoTokenRoute: AprovacaoTokenRoute,
+  ApiProspectingSearchRoute: ApiProspectingSearchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
