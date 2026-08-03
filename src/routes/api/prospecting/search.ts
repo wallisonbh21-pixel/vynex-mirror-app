@@ -11,6 +11,40 @@ const searchSchema = z.object({
 });
 
 /**
+ * Mapeamento de nichos comerciais para categorias oficiais da Geoapify Places API v2.
+ * Documentação: https://apidocs.geoapify.com/docs/places/categories/
+ */
+const NICHE_CATEGORY_MAP: Record<string, string> = {
+  "Hamburgueria": "catering.restaurant.burger,catering.restaurant",
+  "Restaurante": "catering.restaurant",
+  "Pizzaria": "catering.restaurant.pizza,catering.restaurant",
+  "Bar": "catering.bar,catering.pub",
+  "Café": "catering.cafe",
+  "Padaria": "commercial.food.bakery,catering.cafe",
+  "Hotel": "accommodation.hotel,accommodation.hostel",
+  "Pousada": "accommodation.guest_house,accommodation.hotel",
+  "Farmácia": "healthcare.pharmacy",
+  "Loja de roupas": "commercial.clothing",
+  "Dentista": "healthcare.dentist",
+  "Clínica": "healthcare.clinic,healthcare.hospital",
+  "Pet Shop": "commercial.pet",
+  "Academia": "leisure.fitness,leisure.sports_centre",
+  "Salão de beleza": "service.beauty",
+  "Barbearia": "service.beauty.barber",
+  "Oficina": "service.vehicle.repair",
+  "Imobiliária": "service.real_estate",
+  "Contabilidade": "service.financial",
+  "Advocacia": "service.legal",
+  "Fotografia": "service.photography",
+  "Eventos": "service.event_planner",
+};
+
+function getGeoapifyCategories(niche: string): string {
+  // Busca exata no mapa ou fallback para comercial genérico
+  return NICHE_CATEGORY_MAP[niche] || "commercial,catering,service";
+}
+
+/**
  * Função simples para gerar um ID determinístico sem dependências de Node.js (crypto)
  * que possam causar crash no runtime Edge.
  */
@@ -31,10 +65,10 @@ export const Route = createFileRoute("/api/prospecting/search")({
         const requestId = Math.random().toString(36).substring(2, 15);
         let stage = "init";
         console.log(`[Search][${requestId}] Request iniciada: ${request.method} ${request.url}`);
+        
         try {
           // 1. Validar autenticação e autorização
           stage = "auth";
-          console.log(`[Search][${requestId}] Estágio: auth`);
           const authHeader = request.headers.get("Authorization");
           if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return new Response(JSON.stringify({ error: "Não autorizado", stage }), {
@@ -47,7 +81,6 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
           if (authError || !user) {
-            console.error(`[Search][${requestId}] Erro auth:`, authError);
             return new Response(JSON.stringify({ error: "Sessão inválida ou expirada", stage }), {
               status: 401,
               headers: { "Content-Type": "application/json" },
@@ -56,14 +89,12 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           // Verificar papel
           stage = "roles";
-          console.log(`[Search][${requestId}] Estágio: roles para usuário`, user.id);
           const { data: roles, error: rolesError } = await supabaseAdmin
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
           
           if (rolesError) {
-            console.error(`[Search][${requestId}] Erro ao buscar papéis:`, rolesError);
             return new Response(JSON.stringify({ error: "Erro ao verificar permissões", stage }), { 
               status: 500,
               headers: { "Content-Type": "application/json" }
@@ -71,122 +102,99 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           const userRoles = (roles ?? []).map(r => String(r.role).toLowerCase());
-          console.log(`[Search][${requestId}] Usuário ${user.id} possui roles:`, userRoles);
-
           const allowedRoles = ["admin", "vendedor", "diretor", "rh"];
-          const hasAccess = userRoles.some(r => allowedRoles.includes(r));
-          
-          if (!hasAccess) {
-            return new Response(JSON.stringify({ 
-              error: "Acesso negado para o seu perfil",
-              stage,
-              debug_roles: userRoles
-            }), {
+          if (!userRoles.some(r => allowedRoles.includes(r))) {
+            return new Response(JSON.stringify({ error: "Acesso negado para o seu perfil", stage }), {
               status: 403,
               headers: { "Content-Type": "application/json" },
             });
           }
 
-          const userId = user.id;
-
           // 2. Validar input
           stage = "input";
-          console.log(`[Search][${requestId}] Estágio: input`);
           const body = await request.json();
           const { niche, state, city } = searchSchema.parse(body);
 
           // 3. Obter API Key (Secret)
           stage = "secrets";
-          console.log(`[Search][${requestId}] Estágio: secrets`);
           const apiKey = process.env["GEOAPIFY_API_KEY"];
           if (!apiKey) {
-            console.error(`[Search][${requestId}] GEOAPIFY_API_KEY não configurada.`);
             return new Response(
               JSON.stringify({ error: "Serviço de prospecção não configurado (API Key ausente).", stage }),
               { status: 500, headers: { "Content-Type": "application/json" } }
             );
           }
 
-          // 4. Registrar a pesquisa no log
-          console.log(`[Search][${requestId}] Executando: ${userId} - ${niche}, ${city}/${state}`);
-
-          // 5. Chamar Geoapify Places API
-          stage = "geoapify_call";
-          console.log(`[Search][${requestId}] Estágio: geoapify_call`);
-          
-          /**
-           * REGRA DE NEGÓCIO: 
-           * - O erro 400 anterior ocorreu pelo uso de "type=amenity", que não é aceito pela Geoapify no v1/places.
-           * - A melhor estratégia para buscas por nome/nicho é a busca textual (v1/places) 
-           *   com o termo completo "Nicho em Cidade, Estado".
-           */
-          
+          // 4. Geocodificação (Resolver local para obter Place ID da área)
+          stage = "geocoding";
           const locationText = city && city.trim() ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
-          const textQuery = `${niche} em ${locationText}`;
-          const geoUrl = `https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&limit=20&lang=pt&apiKey=${apiKey}`;
+          console.log(`[Search][${requestId}] Geocodificando: ${locationText}`);
           
-          console.log(`[Search][${requestId}] URL Geoapify: https://api.geoapify.com/v1/places?text=${encodeURIComponent(textQuery)}&apiKey=HIDDEN...`);
+          const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(locationText)}&limit=1&format=json&apiKey=${apiKey}`;
+          const geocodeResponse = await fetch(geocodeUrl);
           
-          // Usando um timeout explícito para o fetch externo
+          if (!geocodeResponse.ok) {
+            return new Response(JSON.stringify({ error: "Falha ao resolver localização geográfica", stage, status: geocodeResponse.status }), { status: 502 });
+          }
+          
+          const geocodeData = await geocodeResponse.json();
+          const locationResult = geocodeData.results?.[0];
+          
+          if (!locationResult) {
+            return new Response(JSON.stringify({ error: `Localização não encontrada: ${locationText}`, stage }), { status: 404 });
+          }
+
+          const areaPlaceId = locationResult.place_id;
+          console.log(`[Search][${requestId}] Local resolvido. Area Place ID: ${areaPlaceId}`);
+
+          // 5. Chamar Geoapify Places API v2
+          stage = "geoapify_call";
+          const categories = getGeoapifyCategories(niche);
+          
+          // Construindo URL da v2
+          // filter=place:{place_id} é a forma oficial de pesquisar dentro de uma área específica (cidade ou estado)
+          const geoUrl = new URL("https://api.geoapify.com/v2/places");
+          geoUrl.searchParams.set("categories", categories);
+          geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
+          geoUrl.searchParams.set("limit", "20");
+          geoUrl.searchParams.set("lang", "pt");
+          geoUrl.searchParams.set("apiKey", apiKey);
+          
+          console.log(`[Search][${requestId}] URL Geoapify v2: ${geoUrl.origin}${geoUrl.pathname}?categories=${categories}&filter=place:${areaPlaceId}&apiKey=HIDDEN`);
+          
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000);
           
           let response;
           try {
-            response = await fetch(geoUrl, { signal: controller.signal });
+            response = await fetch(geoUrl.toString(), { signal: controller.signal });
           } finally {
             clearTimeout(timeoutId);
           }
           
-          console.log(`[Search][${requestId}] Geoapify status: ${response.status} ${response.statusText}`);
-
           if (!response.ok) {
+            const rawBody = await response.text();
             let errorData;
-            let rawBody = "";
-            try {
-              rawBody = await response.text();
-              errorData = JSON.parse(rawBody);
-            } catch (e) {
-              errorData = { error: "Resposta inválida (não-JSON) da Geoapify", raw: rawBody.substring(0, 100) };
-            }
+            try { errorData = JSON.parse(rawBody); } catch { errorData = { message: rawBody.substring(0, 100) }; }
             
-            console.error(`[Search][${requestId}] Erro Geoapify response (Status ${response.status}):`, errorData);
-            
-            if (response.status === 429) {
-              return new Response(JSON.stringify({ error: "Limite de consultas da API atingido.", stage }), { status: 429 });
-            }
-            
-            // Retornar erro detalhado para facilitar o debug
             return new Response(JSON.stringify({ 
-              error: `Erro no provedor (Geoapify ${response.status}): ${typeof errorData === 'object' ? errorData.message || errorData.error || 'Erro desconhecido' : errorData}`,
+              error: `Erro no provedor (Geoapify v2 ${response.status}): ${errorData.message || 'Erro desconhecido'}`,
               stage,
               status: response.status,
               requestId
-            }), { 
-              status: 502,
-              headers: { "Content-Type": "application/json" }
-            });
+            }), { status: 502, headers: { "Content-Type": "application/json" } });
           }
 
           stage = "geoapify_parse";
-          console.log(`[Search][${requestId}] Estágio: geoapify_parse`);
           const data = await response.json();
-          console.log(`[Search][${requestId}] Dados Geoapify parseados. Status: ${data.status || 'OK'}`);
 
           // 6. Mapear resultados
           stage = "mapping";
-          console.log(`[Search][${requestId}] Estágio: mapping. Resultados brutos:`, data.features?.length || 0);
-          
-          if (!data.features || !Array.isArray(data.features)) {
-             console.warn(`[Search][${requestId}] Geoapify retornou features inválido ou vazio.`);
-          }
-
           const opportunities = (data.features || []).map((f: any) => {
             const props = f.properties;
             if (!props) return null;
 
             const website = props.website || null;
-            
             let level = "alta";
             if (website) {
               level = "baixa";
@@ -194,7 +202,6 @@ export const Route = createFileRoute("/api/prospecting/search")({
               level = "media";
             }
 
-            // Gerar um ID determinístico seguro para Web/Edge
             const fallbackId = generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
 
             return {
@@ -218,22 +225,21 @@ export const Route = createFileRoute("/api/prospecting/search")({
             };
           }).filter(Boolean);
 
-          console.log(`[Search][${requestId}] Estágio mapping finalizado. Oportunidades processadas: ${opportunities.length}`);
-
-          // 7. Retornar resultados (Serialization stage)
-          stage = "serialization";
-          console.log(`[Search][${requestId}] Estágio: serialization`);
-          
           stage = "response";
-          const diagnostic = "prospecting-search-v2.2";
-          console.log(`[Search][${requestId}] Finalizando com sucesso. Diagnostic: ${diagnostic}`);
+          const diagnostic = "prospecting-search-v3.0-v2api";
           
           return new Response(JSON.stringify({ 
             opportunities, 
             diagnostic, 
             requestId,
             stage: "success",
-            status: 200
+            status: 200,
+            meta: {
+              endpoint: "/v2/places",
+              categories,
+              filter: `place:${areaPlaceId}`,
+              resolvedLocation: locationText
+            }
           }), {
             status: 200,
             headers: { 
