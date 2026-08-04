@@ -4,15 +4,15 @@ import type { AppRole } from "@/lib/auth";
 
 /** Lê os papéis do usuário autenticado (admin sempre tem acesso total). */
 export async function getCurrentRoles(): Promise<AppRole[]> {
-  const { data: userData } = await supabase.auth.getUser();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
   const user = userData?.user;
-  if (!user) throw redirect({ to: "/auth" });
+  if (userError || !user) throw redirect({ to: "/auth" });
 
   const { data, error } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id);
-  if (error) throw redirect({ to: "/painel" });
+  if (error) return [];
   return (data ?? []).map((row) => row.role as AppRole);
 }
 
