@@ -6,7 +6,12 @@ import type { AppRole } from "@/lib/auth";
 export async function getCurrentRoles(): Promise<AppRole[]> {
   const { data: userData, error: userError } = await supabase.auth.getUser();
   const user = userData?.user;
-  if (userError || !user) throw redirect({ to: "/auth" });
+  if (userError || !user) {
+    if (typeof window === "undefined") {
+      throw new Error("AUTH_REQUIRED_SSR_REDIRECT");
+    }
+    throw redirect({ to: "/auth" });
+  }
 
   const { data, error } = await supabase
     .from("user_roles")

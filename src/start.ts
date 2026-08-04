@@ -10,6 +10,12 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
     if (error != null && typeof error === "object" && ("statusCode" in error || "status" in error || "headers" in error || "to" in error)) {
       throw error;
     }
+    if (error instanceof Error && error.message === "AUTH_REQUIRED_SSR_REDIRECT") {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: "/auth" },
+      });
+    }
     console.error("[InternalServerError]", error);
     return new Response(renderErrorPage(error), {
       status: 500,
