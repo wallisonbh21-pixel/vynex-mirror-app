@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/NotificationBell";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 /** Menu do time comercial (vendedor). */
 const NAV_VENDEDOR = [
@@ -164,6 +165,7 @@ export function AppShell({
             </div>
             <div className="flex items-center gap-2">
               {actions}
+              <ThemeToggle />
               <NotificationBell />
             </div>
           </div>
