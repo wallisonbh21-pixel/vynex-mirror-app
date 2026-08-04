@@ -531,13 +531,20 @@ function ExternalOpportunityCard({
         <Button className="gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow" onClick={onAdd}>
           <Plus className="size-4" /> Salvar em oportunidades
         </Button>
-        {opportunity.google_maps_url && (
-          <Button variant="outline" size="sm" asChild>
-            <a href={opportunity.google_maps_url} target="_blank" rel="noopener noreferrer" className="gap-1">
-              Ver no mapa <ExternalLink className="size-3" />
-            </a>
-          </Button>
-        )}
+        <Button variant="outline" size="sm" asChild>
+          <a 
+            href={
+              opportunity.lat && opportunity.lon 
+                ? `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${opportunity.business_name} ${opportunity.address || ""}`)}`
+            } 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="gap-1"
+          >
+            🗺️ Ver no Google Maps <ExternalLink className="size-3" />
+          </a>
+        </Button>
       </div>
     </article>
   );
@@ -589,6 +596,21 @@ function OpportunityCard({
         </li>
         <li className="flex items-center gap-2">
           <MapPin className="size-4 text-muted-foreground" />
+          <a 
+            href={
+              opportunity.lat && opportunity.lon 
+                ? `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${opportunity.business_name} ${opportunity.address || ""}`)}`
+            }
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline flex items-center gap-1"
+          >
+            🗺️ Ver no Google Maps <ExternalLink className="size-3" />
+          </a>
+        </li>
+        <li className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+          <Sparkles className="size-3" />
           Origem: {opportunity.source}
           {ownerName ? ` · ${ownerName}` : ""}
         </li>

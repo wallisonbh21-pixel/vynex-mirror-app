@@ -72,6 +72,8 @@ export type Opportunity = {
   instagram: string | null;
   facebook: string | null;
   google_maps_url: string | null;
+  lat: number | null;
+  lon: number | null;
   place_id: string | null;
   rating: number | null;
   review_count: number;
