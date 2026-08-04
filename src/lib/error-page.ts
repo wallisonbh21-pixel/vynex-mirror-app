@@ -1,4 +1,6 @@
-export function renderErrorPage(): string {
+export function renderErrorPage(error?: any): string {
+  const stack = error instanceof Error ? error.stack : JSON.stringify(error, null, 2);
+  const message = error instanceof Error ? error.message : "Something went wrong on our end.";
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -19,7 +21,8 @@ export function renderErrorPage(): string {
   <body>
     <div class="card">
       <h1>This page didn't load</h1>
-      <p>Something went wrong on our end. You can try refreshing or head back home.</p>
+      <p>${message}</p>
+      ${stack ? `<pre style="text-align: left; background: #eee; padding: 1rem; overflow: auto; max-height: 300px; font-size: 12px; margin-bottom: 1rem;">${stack}</pre>` : ""}
       <div class="actions">
         <button class="primary" onclick="location.reload()">Try again</button>
         <a class="secondary" href="/">Go home</a>
