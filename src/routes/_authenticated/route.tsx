@@ -1,5 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -7,7 +6,5 @@ export const Route = createFileRoute("/_authenticated")({
     // skip beforeLoad during SSR since ssr: false is set
     return {};
   },
-  component: () => <Outlet />,
-});
   component: () => <Outlet />,
 });
