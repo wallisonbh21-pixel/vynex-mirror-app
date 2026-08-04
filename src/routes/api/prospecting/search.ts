@@ -215,7 +215,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
               website: website,
               instagram: props.contact?.instagram || null,
               facebook: props.contact?.facebook || null,
-              google_maps_url: props.datasource?.raw?.osm_id ? `https://www.openstreetmap.org/node/${props.datasource.raw.osm_id}` : null,
+              google_maps_url: null, // Será gerado dinamicamente no frontend com lat/lon
+              lat: props.lat || null,
+              lon: props.lon || null,
               place_id: props.place_id || fallbackId,
               rating: props.rating || null,
               review_count: props.review_count || 0,
