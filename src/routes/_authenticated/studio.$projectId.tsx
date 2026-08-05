@@ -292,7 +292,7 @@ function ScaleNexusStudioPage() {
 
         case 'ADD_ELEMENT': {
           const { type, content, styles } = action.payload;
-          const targetSectionId = action.targetId || (clonedData.sections.length > 0 ? clonedData.sections[0].id : null);
+          const targetSectionId = action.targetId || (clonedData.sections && clonedData.sections.length > 0 ? clonedData.sections[0].id : null);
           if (!targetSectionId || !clonedData.sections) throw new Error('No target section');
           
           const sectionIdx = clonedData.sections.findIndex(s => s.id === targetSectionId);
