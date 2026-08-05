@@ -143,10 +143,11 @@ function BriefingPage() {
       const newData = { ...prev };
       let current: any = newData;
       for (let i = 0; i < keys.length - 1; i++) {
-        current[keys[i]] = { ...current[keys[i]] };
-        current = current[keys[i]];
+        const key = keys[i] as keyof typeof current;
+        current[key] = { ...current[key] };
+        current = current[key];
       }
-      current[keys[keys.length - 1]] = value;
+      current[keys[keys.length - 1] as keyof typeof current] = value;
       return newData;
     });
   };
