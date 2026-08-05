@@ -30,6 +30,8 @@ import {
   XAxis,
   YAxis,
   Cell,
+  Area,
+  AreaChart,
 } from "recharts";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
