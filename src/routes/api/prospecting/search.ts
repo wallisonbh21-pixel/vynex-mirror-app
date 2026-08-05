@@ -8,6 +8,7 @@ const searchSchema = z.object({
   state: z.string(),
   city: z.string().optional().nullable(),
   precision: z.enum(["alta", "ampla"]).default("alta"),
+  rawMode: z.boolean().default(false),
 });
 
 interface RelevanceMap {
@@ -145,56 +146,113 @@ export const Route = createFileRoute("/api/prospecting/search")({
     handlers: {
       POST: async ({ request }) => {
         const requestId = Math.random().toString(36).substring(2, 10);
+        const startTime = Date.now();
         
         try {
+          // Stage: auth
           const authHeader = request.headers.get("Authorization");
-          if (!authHeader?.startsWith("Bearer ")) return new Response(JSON.stringify({ error: "Não autorizado" }), { status: 401 });
+          if (!authHeader?.startsWith("Bearer ")) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "auth", message: "Não autorizado", requestId 
+            }), { status: 401 });
+          }
 
           const token = authHeader.split(" ")[1];
           const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-          if (authError || !user) return new Response(JSON.stringify({ error: "Sessão inválida" }), { status: 401 });
-
-          const { niche, state, city, precision } = searchSchema.parse(await request.json());
-          const apiKey = process.env["GEOAPIFY_API_KEY"];
-          if (!apiKey) return new Response(JSON.stringify({ error: "API Key ausente" }), { status: 500 });
-
-          // 1. Geocodificação
-          const locationText = city ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
-          const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(locationText)}&limit=1&format=json&apiKey=${apiKey}`;
-          const geocodeRes = await fetch(geocodeUrl);
-          const geocodeData = await geocodeRes.json();
-          const areaPlaceId = geocodeData.results?.[0]?.place_id;
-          if (!areaPlaceId) return new Response(JSON.stringify({ error: "Localização não encontrada" }), { status: 404 });
-
-          // 2. Busca
-          const terms = RELEVANCE_MAPS[niche] ? [...RELEVANCE_MAPS[niche].direct, ...RELEVANCE_MAPS[niche].related] : [niche];
-          const allFeatures: any[] = [];
-          
-          // Limitar busca para garantir qualidade e performance
-          const searchTerms = terms.slice(0, 3);
-          for (const term of searchTerms) {
-            const geoUrl = new URL("https://api.geoapify.com/v2/places");
-            const category = getGeoapifyCategories(niche);
-            
-            if (category) geoUrl.searchParams.set("categories", category);
-            else geoUrl.searchParams.set("type", "commercial");
-            
-            geoUrl.searchParams.set("text", term);
-            geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
-            geoUrl.searchParams.set("limit", "40");
-            geoUrl.searchParams.set("lang", "pt");
-            geoUrl.searchParams.set("apiKey", apiKey);
-
-            const res = await fetch(geoUrl.toString());
-            if (res.ok) {
-              const data = await res.json();
-              if (data.features) allFeatures.push(...data.features);
-            }
+          if (authError || !user) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "auth", message: "Sessão inválida", requestId 
+            }), { status: 401 });
           }
 
-          // 3. Deduplicação e Relevância
+          // Stage: roles (Verificando se o usuário tem permissão básica)
+          const { data: roles } = await supabaseAdmin
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id);
+          
+          const userRoles = roles?.map(r => r.role) || [];
+          if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
+             return new Response(JSON.stringify({ 
+              error: true, stage: "roles", message: "Sem permissão para prospecção", requestId 
+            }), { status: 403 });
+          }
+
+          // Stage: input
+          let body;
+          try {
+            body = await request.json();
+          } catch (e) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "input", message: "JSON inválido", requestId 
+            }), { status: 400 });
+          }
+          
+          const { niche, state, city, precision, rawMode } = searchSchema.parse(body);
+          const apiKey = process.env["GEOAPIFY_API_KEY"];
+          if (!apiKey) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "geoapify_call", message: "API Key ausente nas configurações do servidor", requestId 
+            }), { status: 500 });
+          }
+
+          // Stage: geocoding
+          const locationText = city ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
+          const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(locationText)}&limit=1&format=json&apiKey=${apiKey}`;
+          
+          const geocodeRes = await fetch(geocodeUrl);
+          if (!geocodeRes.ok) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "geocoding", message: `Erro na geocodificação: ${geocodeRes.status}`, requestId 
+            }), { status: geocodeRes.status });
+          }
+          
+          const geocodeData = await geocodeRes.json();
+          const areaPlaceId = geocodeData.results?.[0]?.place_id;
+          if (!areaPlaceId) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "geocoding", message: "Localização não encontrada no Geoapify", requestId 
+            }), { status: 404 });
+          }
+
+          // Stage: geoapify_call
+          const allFeatures: any[] = [];
+          const geoUrl = new URL("https://api.geoapify.com/v2/places");
+          const category = getGeoapifyCategories(niche);
+          
+          if (category) geoUrl.searchParams.set("categories", category);
+          else geoUrl.searchParams.set("type", "commercial");
+          
+          geoUrl.searchParams.set("text", niche);
+          geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
+          geoUrl.searchParams.set("limit", "30");
+          geoUrl.searchParams.set("lang", "pt");
+          geoUrl.searchParams.set("apiKey", apiKey);
+
+          const res = await fetch(geoUrl.toString());
+          const httpStatus = res.status;
+          
+          if (!res.ok) {
+            return new Response(JSON.stringify({ 
+              error: true, stage: "geoapify_call", message: `Erro na chamada Geoapify: ${httpStatus}`, requestId 
+            }), { status: httpStatus });
+          }
+
+          // Stage: geoapify_response
+          const data = await res.json();
+          if (data.features) allFeatures.push(...data.features);
+          const totalReceived = allFeatures.length;
+
+          // Stage: mapping
           const unique = new Map();
-          const diagnostic: any = { originalNiche: niche, expandedTerms: searchTerms, rejectedNegative: 0, rejectedLowScore: 0, finalResults: 0 };
+          const diagnostic: any = { 
+            requestId,
+            httpStatus,
+            totalReceived,
+            sentToFrontend: 0,
+            duration: 0,
+            rawMode
+          };
 
           for (const f of allFeatures) {
             const props = f.properties;
@@ -203,16 +261,14 @@ export const Route = createFileRoute("/api/prospecting/search")({
             const key = props.place_id || generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
             if (unique.has(key)) continue;
 
-            const relevance = calculateRelevance(props, niche, precision);
-            const minScore = precision === "alta" ? 60 : 10;
+            // Se NÃO estiver em modo RAW, aplicar relevância v9.0
+            if (!rawMode) {
+              const relevance = calculateRelevance(props, niche, precision);
+              const minScore = precision === "alta" ? 60 : 10;
 
-            if (relevance.score <= -50) {
-              diagnostic.rejectedNegative++;
-              continue;
-            }
-            if (relevance.score < minScore) {
-              diagnostic.rejectedLowScore++;
-              continue;
+              if (relevance.score <= -50 || relevance.score < minScore) {
+                continue;
+              }
             }
 
             unique.set(key, {
@@ -227,22 +283,31 @@ export const Route = createFileRoute("/api/prospecting/search")({
               website: props.website,
               opportunity_level: props.website ? "media" : "alta",
               status: "nova",
-              _debug: { score: relevance.score, reason: relevance.reason }
+              _debug: rawMode ? { raw: true } : { score: calculateRelevance(props, niche, precision).score }
             });
           }
 
-          const opportunities = Array.from(unique.values())
-            .sort((a, b) => b._debug.score - a._debug.score)
-            .slice(0, 30);
-          
-          diagnostic.finalResults = opportunities.length;
+          // Stage: serialization
+          const opportunities = Array.from(unique.values()).slice(0, 30);
+          diagnostic.sentToFrontend = opportunities.length;
+          diagnostic.duration = Date.now() - startTime;
 
-          return new Response(JSON.stringify({ opportunities, diagnostic, version: "v9.0-3-levels" }), {
+          return new Response(JSON.stringify({ 
+            opportunities, 
+            diagnostic, 
+            stage: "frontend",
+            version: rawMode ? "RAW-DIAGNOSTIC" : "v9.0-3-levels" 
+          }), {
             headers: { "Content-Type": "application/json" }
           });
 
         } catch (e: any) {
-          return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+          return new Response(JSON.stringify({ 
+            error: true, 
+            stage: "unknown", 
+            message: e.message, 
+            requestId 
+          }), { status: 500 });
         }
       }
     }
