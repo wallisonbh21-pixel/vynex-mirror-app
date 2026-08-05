@@ -287,7 +287,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v3.1-v2api-catfixed";
+          const diagnostic = "prospecting-search-v3.2-catfixed-v2final";
           
           return new Response(JSON.stringify({ 
             opportunities, 
