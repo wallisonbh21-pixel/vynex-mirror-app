@@ -239,25 +239,91 @@ function DetalhesProjetoPage() {
         </div>
         
         <aside className="space-y-6">
-          <div className="rounded-2xl border p-6 shadow-panel">
-            <h3 className="font-semibold mb-4">Notas do Criador</h3>
-            <div className="space-y-2 mb-4">
-              {notes.map(n => <div key={n.id} className="text-xs p-2 bg-muted rounded">{n.content}</div>)}
+          <div className="rounded-2xl border bg-card p-6 shadow-panel">
+            <h3 className="font-bold flex items-center gap-2 mb-4">
+              <MessageSquare className="size-4 text-primary" /> Notas do Projeto
+            </h3>
+            <div className="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {notes.map(n => (
+                <div key={n.id} className="p-3 bg-muted/50 rounded-xl border border-border/50 relative group">
+                  <p className="text-xs leading-relaxed">{n.content}</p>
+                  <span className="text-[9px] text-muted-foreground mt-2 block opacity-0 group-hover:opacity-100 transition-opacity">
+                    {shortDate(n.created_at)}
+                  </span>
+                </div>
+              ))}
+              {notes.length === 0 && (
+                <p className="text-center text-xs text-muted-foreground py-10 italic">Nenhuma nota interna.</p>
+              )}
             </div>
-            <div className="flex gap-2">
-               <Input value={newNote} onChange={e => setNewNote(e.target.value)} />
-               <Button onClick={() => { addNote.mutate(newNote); setNewNote(""); }}>+</Button>
+            <div className="flex flex-col gap-2">
+               <Input 
+                value={newNote} 
+                onChange={e => setNewNote(e.target.value)} 
+                placeholder="Escrever nota..."
+                className="bg-muted/30 border-none shadow-none focus-visible:ring-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newNote.trim()) {
+                    addNote.mutate(newNote);
+                    setNewNote("");
+                  }
+                }}
+               />
+               <Button 
+                variant="secondary" 
+                size="sm" 
+                className="w-full font-bold"
+                onClick={() => {
+                  if (!newNote.trim()) return;
+                  addNote.mutate(newNote);
+                  setNewNote("");
+                }}
+               >Adicionar Nota</Button>
             </div>
           </div>
-          {project.status === "em_producao" && (
-            <Button className="w-full" onClick={() => {
-              if (progress < 100) {
-                toast.error("Complete o checklist!");
-                return;
-              }
-              updateProject.mutate({ id: project.id, status: "aguardando_aprovacao" });
-            }}><Send className="size-4 mr-2" /> Enviar para Aprovação</Button>
-          )}
+
+          <div className="rounded-2xl border bg-primary/5 border-primary/20 p-6 shadow-panel">
+            <h3 className="font-bold flex items-center gap-2 mb-2">
+              <Info className="size-4 text-primary" /> Orientações
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed mb-6">
+              Certifique-se de que a versão mobile está impecável antes de enviar. O cliente revisará o site pelo link de pré-visualização.
+            </p>
+
+            {project.status === "em_producao" ? (
+              <Button 
+                className="w-full gap-2 shadow-lg shadow-primary/20 h-12 text-base font-bold" 
+                onClick={() => {
+                  if (progress < 100) {
+                    toast.error("Complete o checklist de produção primeiro!");
+                    return;
+                  }
+                  if (!project.delivery_link) {
+                    toast.error("Configure o link do projeto antes de enviar.");
+                    return;
+                  }
+                  
+                  const confirmed = window.confirm("Tem certeza que deseja enviar este projeto para aprovação?");
+                  if (confirmed) {
+                    updateProject.mutate({ id: project.id, status: "aguardando_aprovacao" });
+                  }
+                }}
+              >
+                <Send className="size-5" /> Enviar para Aprovação
+              </Button>
+            ) : project.status === "ajustes" ? (
+              <Button 
+                className="w-full gap-2 variant-warning"
+                onClick={() => updateProject.mutate({ id: project.id, status: "em_producao" })}
+              >
+                Retomar Produção
+              </Button>
+            ) : (
+              <div className="text-center p-4 bg-muted/50 rounded-xl border border-dashed text-xs text-muted-foreground">
+                Projeto com status: <StatusBadge status={project.status} className="inline-flex ml-1" />
+              </div>
+            )}
+          </div>
         </aside>
       </div>
     </AppShell>
