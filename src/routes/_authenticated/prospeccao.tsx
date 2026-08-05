@@ -198,30 +198,89 @@ function ProspeccaoPage() {
     return [...counts.entries()].sort((a, b) => b[1].total - a[1].total);
   };
 
+  const runGlobalAudit = async () => {
+    setIsAuditing(true);
+    setAuditReport([]);
+    const report: any[] = [];
+    
+    // We'll test the most common niches first as defined in NICHOS constant
+    const testNiches = [...NICHOS].filter(n => n !== "Outros");
+    
+    for (const testNiche of testNiches) {
+      try {
+        const data: any = await searchExternal.mutateAsync({
+          niche: testNiche,
+          state: state || "MG",
+          city: city || "Contagem",
+          precision: "alta",
+          rawMode: true
+        });
+        
+        const successCount = (data.diagnostic?.queries || []).filter((q: any) => !q.error).length;
+        const failCount = (data.diagnostic?.queries || []).filter((q: any) => q.error).length;
+        
+        report.push({
+          niche: testNiche,
+          queries: data.diagnostic?.queries?.length || 0,
+          success: successCount,
+          failures: failCount,
+          results: data.opportunities?.length || 0,
+          status: "OK",
+          requestId: data.diagnostic?.requestId
+        });
+      } catch (err: any) {
+        report.push({
+          niche: testNiche,
+          queries: 0,
+          success: 0,
+          failures: 1,
+          results: 0,
+          status: "ERROR",
+          message: err.message
+        });
+      }
+      setAuditReport([...report]);
+    }
+    setIsAuditing(false);
+  };
+
   return (
     <AppShell
       title="Central de Prospecção"
       description="Encontre empresas que podem precisar de uma presença digital profissional."
       actions={
-        <RecordDialog
-          title="Nova oportunidade"
-          fields={opportunityFields}
-          initial={{ state, city, category: niche }}
-          onSubmit={(values) =>
-            save.mutate({
-              ...values,
-              source: PROSPECTING_SOURCE,
-              status: "nova",
-              created_by: user?.id,
-              assigned_to: user?.id,
-            })
-          }
-          trigger={
-            <Button className="gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow">
-              <Plus className="size-4" /> Nova oportunidade
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Button 
+              variant="outline" 
+              className="gap-2 border-primary/20 hover:bg-primary/10" 
+              onClick={runGlobalAudit}
+              disabled={isAuditing}
+            >
+              {isAuditing ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+              Audit Global
             </Button>
-          }
-        />
+          )}
+          <RecordDialog
+            title="Nova oportunidade"
+            fields={opportunityFields}
+            initial={{ state, city, category: niche }}
+            onSubmit={(values) =>
+              save.mutate({
+                ...values,
+                source: PROSPECTING_SOURCE,
+                status: "nova",
+                created_by: user?.id,
+                assigned_to: user?.id,
+              })
+            }
+            trigger={
+              <Button className="gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow">
+                <Plus className="size-4" /> Nova oportunidade
+              </Button>
+            }
+          />
+        </div>
       }
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
