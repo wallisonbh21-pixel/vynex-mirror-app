@@ -25,9 +25,49 @@ export interface ScaleNexusProjectContext {
   secondaryCTA: string | undefined;
   availableAssets: any[] | undefined;
   designSystem: any | undefined;
+  designGuidance?: any;
 }
 
-export interface ProjectIntelligence {
+export interface StudioPageSnapshot {
+  sectionsCount: number;
+  sectionsOrder: string[];
+  elementsCount: number;
+  hasHero: boolean;
+  hasCTA: boolean;
+  hasTestimonials: boolean;
+  hasContact: boolean;
+  hasPricing: boolean;
+  contentQuality: {
+    hasLoremIpsum: boolean;
+    hasEmptyHeadlines: boolean;
+    hasMissingImages: boolean;
+  };
+  responsiveWarnings: string[];
+}
+
+export interface StudioAnalysis {
+  score: {
+    total: number;
+    breakdown: {
+      conversion: number;
+      visual: number;
+      responsiveness: number;
+      content: number;
+      structure: number;
+    };
+  };
+  strengths: string[];
+  issues: {
+    severity: 'critical' | 'important' | 'recommended' | 'positive';
+    label: string;
+    description: string;
+    action?: string;
+  }[];
+  opportunities: string[];
+  engineVersion: string;
+}
+
+export interface ProjectIntelligence extends StudioAnalysis {
   primaryGoal: string;
   recommendedCTA: string;
   recommendedSections: { name: string; priority: 'ESSENCIAL' | 'ALTA' | 'MÉDIA' | 'BAIXA' }[];
@@ -35,11 +75,45 @@ export interface ProjectIntelligence {
   toneOfVoice: string;
   visualDirection: string;
   contentPriorities: string[];
-  conversionRecommendations: string[];
-  warnings: string[];
-  opportunities: string[];
-  intelligenceScore: number;
-  engineVersion: string;
+}
+
+export function buildStudioSnapshot(studioData: StudioData | null): StudioPageSnapshot {
+  if (!studioData) {
+    return {
+      sectionsCount: 0,
+      sectionsOrder: [],
+      elementsCount: 0,
+      hasHero: false,
+      hasCTA: false,
+      hasTestimonials: false,
+      hasContact: false,
+      hasPricing: false,
+      contentQuality: { hasLoremIpsum: false, hasEmptyHeadlines: false, hasMissingImages: false },
+      responsiveWarnings: []
+    };
+  }
+
+  const sections = studioData.sections || [];
+  const elements = sections.flatMap(s => s.elements);
+  
+  const contentStr = JSON.stringify(studioData).toLowerCase();
+
+  return {
+    sectionsCount: sections.length,
+    sectionsOrder: sections.map(s => s.type),
+    elementsCount: elements.length,
+    hasHero: sections.some(s => s.type === 'hero'),
+    hasCTA: elements.some(e => e.type === 'button' || e.type === 'whatsapp'),
+    hasTestimonials: sections.some(s => s.type === 'testimonial' || s.type === 'testimonials'),
+    hasContact: sections.some(s => s.type === 'contact' || s.type === 'form'),
+    hasPricing: sections.some(s => s.type === 'pricing' || s.type === 'plans'),
+    contentQuality: {
+      hasLoremIpsum: contentStr.includes('lorem ipsum'),
+      hasEmptyHeadlines: elements.some(e => (e.type === 'title' || e.type === 'subtitle') && (!e.content.text || e.content.text.trim() === '')),
+      hasMissingImages: elements.some(e => e.type === 'image' && !e.content.url)
+    },
+    responsiveWarnings: []
+  };
 }
 
 export function buildProjectContext(
@@ -71,39 +145,114 @@ export function buildProjectContext(
     template: undefined,
     secondaryCTA: undefined,
     availableAssets: undefined,
+    designGuidance: undefined
   };
 }
 
-export function generateIntelligence(context: ScaleNexusProjectContext): ProjectIntelligence {
+export function generateIntelligence(
+  context: ScaleNexusProjectContext, 
+  studioData: StudioData | null
+): ProjectIntelligence {
+  const snapshot = buildStudioSnapshot(studioData);
   const objectives = context.objectives || [];
   const primaryGoal = objectives.length > 0 ? (objectives[0] as string) : 'institutional';
+  const niche = context.niche || 'general';
   
-  const recommendedCTA = objectives.includes('whatsapp') ? 'Pedir agora' : 
+  const recommendedCTA = objectives.includes('whatsapp') ? 'Fale no WhatsApp' : 
                          objectives.includes('agendamento') ? 'Agendar agora' : 'Saiba mais';
 
-  const warnings: string[] = [];
-  if (!context.visualStyle || context.visualStyle.length === 0) warnings.push('⚠️ A identidade visual ainda não foi definida.');
-  if (!context.sitePlan) warnings.push('⚠️ O Site Planner ainda não foi definido.');
+  const issues: ProjectIntelligence['issues'] = [];
+  const strengths: string[] = [];
+  const opportunities: string[] = [];
+
+  // 1. Structural Analysis
+  if (snapshot.sectionsCount === 0) {
+    issues.push({ 
+      severity: 'critical', 
+      label: 'Canvas Vazio', 
+      description: 'Comece adicionando uma seção Hero para definir a proposta de valor.' 
+    });
+  } else {
+    if (snapshot.hasHero) strengths.push('Hero definido');
+    else issues.push({ 
+      severity: 'critical', 
+      label: 'Hero ausente', 
+      description: 'O site precisa de uma headline clara no topo para prender a atenção.' 
+    });
+  }
+
+  // 2. Conversion Analysis
+  if (!snapshot.hasCTA) {
+    issues.push({ 
+      severity: 'critical', 
+      label: 'Sem CTA principal', 
+      description: 'O usuário não tem um caminho claro de conversão. Adicione um botão de ação.' 
+    });
+  } else {
+    strengths.push('CTA principal definido');
+  }
+
+  // 3. Niche Analysis
+  if (niche === 'hamburgueria' && !snapshot.hasCTA && objectives.includes('whatsapp')) {
+    issues.push({
+      severity: 'important',
+      label: 'CTA pouco específico',
+      description: 'Para hamburguerias, o botão de WhatsApp converte melhor que botões genéricos.'
+    });
+  }
+
+  if (['dentista', 'advocacia', 'academia'].includes(niche) && !snapshot.hasTestimonials) {
+    issues.push({
+      severity: 'recommended',
+      label: 'Prova social ausente',
+      description: 'Neste nicho, depoimentos aumentam drasticamente a confiança e conversão.'
+    });
+  }
+
+  // 4. Content Analysis
+  if (snapshot.contentQuality.hasLoremIpsum) {
+    issues.push({
+      severity: 'important',
+      label: 'Conteúdo Incompleto',
+      description: '"Lorem Ipsum" detectado. Substitua por textos reais antes de publicar.'
+    });
+  }
+
+  // 5. Score Calculation
+  let scoreTotal = 50;
+  if (snapshot.hasHero) scoreTotal += 15;
+  if (snapshot.hasCTA) scoreTotal += 15;
+  if (!snapshot.contentQuality.hasLoremIpsum && snapshot.sectionsCount > 0) scoreTotal += 10;
+  if (snapshot.hasTestimonials) scoreTotal += 5;
+  if (snapshot.hasContact) scoreTotal += 5;
+  
+  const score = {
+    total: Math.min(scoreTotal, 100),
+    breakdown: {
+      conversion: snapshot.hasCTA ? 90 : 20,
+      visual: snapshot.sectionsCount > 0 ? 85 : 0,
+      responsiveness: 80,
+      content: snapshot.contentQuality.hasLoremIpsum ? 40 : 90,
+      structure: snapshot.hasHero && snapshot.hasContact ? 90 : 50
+    }
+  };
 
   return {
+    score,
+    strengths,
+    issues,
+    opportunities: issues.filter(i => i.severity === 'recommended').map(i => i.description),
+    engineVersion: '1.1',
     primaryGoal,
     recommendedCTA,
     recommendedSections: [
       { name: 'Hero', priority: 'ESSENCIAL' },
-      { name: 'CTA', priority: 'ESSENCIAL' },
-      { name: 'Depoimentos', priority: 'ALTA' },
+      { name: 'Serviços', priority: 'ALTA' },
+      { name: 'Depoimentos', priority: 'MÉDIA' },
     ],
-    sectionPriorities: [
-      { name: 'Hero', priority: 'ESSENCIAL' },
-      { name: 'CTA', priority: 'ESSENCIAL' },
-    ],
+    sectionPriorities: [],
     toneOfVoice: context.niche === 'hamburgueria' ? 'direto, jovem, apetitoso' : 'profissional e claro',
     visualDirection: context.visualStyle?.join(', ') || 'modern',
     contentPriorities: context.services || [],
-    conversionRecommendations: ['Posicione o CTA principal no Hero para aumentar conversão.'],
-    warnings,
-    opportunities: ['Considere destacar avaliações de clientes para aumentar a confiança.'],
-    intelligenceScore: 86,
-    engineVersion: '1.0'
   };
 }
