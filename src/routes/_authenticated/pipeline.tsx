@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { SalesFunnel } from "@/components/SalesFunnel";
 import { requireVendedor } from "@/lib/guard";
 import { useSession } from "@/lib/auth";
 import { useChangeLeadStatus, type Lead } from "@/lib/crm";
@@ -54,6 +55,11 @@ function PipelinePage() {
       title="Funil de Vendas"
       description="Arraste cada oportunidade para a etapa atual — o histórico é registrado automaticamente."
     >
+      <section className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-panel">
+        <h2 className="mb-6 text-sm font-semibold">Conversão do Funil (Visual)</h2>
+        <SalesFunnel leads={data} />
+      </section>
+
       <div className="flex gap-4 overflow-x-auto pb-4">
         {LEAD_STATUS.map((status) => {
           const rows = data.filter((lead) => lead.status === status);
