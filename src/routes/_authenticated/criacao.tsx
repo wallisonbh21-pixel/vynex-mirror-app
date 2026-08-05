@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   CheckCircle2,
   Hammer,
@@ -66,6 +66,7 @@ export const Route = createFileRoute("/_authenticated/criacao")({
 type Withdrawal = { id: string; amount: number; status: string; created_at: string };
 
 function PainelCriador() {
+  const navigate = useNavigate();
   const { data: profile } = useProfile();
   const { data: mine = [] } = useMyCreatorProjects();
   const { data: withdrawals = [] } = useRows<Withdrawal>("withdrawals");
@@ -131,36 +132,46 @@ function PainelCriador() {
 
       {/* 2. CARDS DE RESUMO */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard 
-          label="Projetos ativos" 
-          value={String(active.length)} 
-          hint="Total em aberto" 
-          icon={Layers} 
-        />
-        <StatCard 
-          label="Em produção" 
-          value={String(inProduction.length)} 
-          hint="Desenvolvimento" 
-          icon={Hammer} 
-        />
-        <StatCard 
-          label="Aguardando aprovação" 
-          value={String(pendingApproval.length)} 
-          hint="Revisão interna/cliente" 
-          icon={Clock} 
-        />
-        <StatCard 
-          label="Entregues" 
-          value={String(delivered.length)} 
-          hint="Concluídos" 
-          icon={PackageCheck} 
-        />
-        <StatCard 
-          label="Comissões disponíveis" 
-          value={currency(earnings.balance)} 
-          hint="Liberado para saque" 
-          icon={Wallet} 
-        />
+        <div onClick={() => navigate({ to: "/meus-projetos" })} className="cursor-pointer">
+          <StatCard 
+            label="Projetos em andamento" 
+            value={String(active.length)} 
+            hint="Acompanhar progresso" 
+            icon={Layers} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/aprovacoes" })} className="cursor-pointer">
+          <StatCard 
+            label="Aguardando aprovação" 
+            value={String(pendingApproval.length)} 
+            hint="Revisão final" 
+            icon={Clock} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/meus-projetos" })} className="cursor-pointer">
+          <StatCard 
+            label="Projetos entregues" 
+            value={String(delivered.length)} 
+            hint="Total histórico" 
+            icon={PackageCheck} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/comissoes" })} className="cursor-pointer">
+          <StatCard 
+            label="Comissão acumulada" 
+            value={currency(earnings.paid + earnings.released + earnings.pending)} 
+            hint="Total gerado" 
+            icon={Banknote} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/meus-saques" })} className="cursor-pointer">
+          <StatCard 
+            label="Comissão disponível" 
+            value={currency(earnings.balance)} 
+            hint="Liberado para saque" 
+            icon={Wallet} 
+          />
+        </div>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
