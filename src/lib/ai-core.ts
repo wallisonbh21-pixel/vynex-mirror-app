@@ -1,5 +1,5 @@
 import { BriefingData } from './briefing';
-import { SitePlanData } from './planner';
+import { SitePlanData, SitePlanSection } from './planner';
 import { StudioData } from '@/types/studio';
 
 export interface ScaleNexusProjectContext {
@@ -146,7 +146,7 @@ export function buildProjectContext(
     visualStyle: briefing?.visualStyle || undefined,
     references: briefing?.references || undefined,
     sitePlan: sitePlan || undefined,
-    plannedSections: sitePlan?.sections?.map(s => s.name) || undefined,
+    plannedSections: sitePlan?.sections?.map(s => (s as any).name) || undefined,
     primaryCTA: sitePlan?.primary_cta || undefined,
     designSystem: studioData?.design_system || undefined,
     location: undefined,

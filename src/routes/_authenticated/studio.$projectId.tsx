@@ -63,6 +63,9 @@ function ScaleNexusStudioPage() {
   const [isPreview, setIsPreview] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [ignoredIssues, setIgnoredIssues] = useState<string[]>([]);
+  const [forgePlan, setForgePlan] = useState<ForgeBuildPlan | null>(null);
+  const [isBuildingWithForge, setIsBuildingWithForge] = useState(false);
+  const [forgeStepIndex, setForgeStepIndex] = useState(-1);
 
   const { data: briefing } = useQuery({
     queryKey: ['briefing', projectId],
@@ -82,6 +85,33 @@ function ScaleNexusStudioPage() {
       issues: result.issues.filter(i => !ignoredIssues.includes(i.id))
     };
   }, [projectId, briefing, sitePlan, data, ignoredIssues]);
+
+  // Initial Forge Plan Generation
+  useEffect(() => {
+    if (briefing && sitePlan && !forgePlan) {
+      const context = buildProjectContext(projectId, briefing, sitePlan, data);
+      const plan = createBuildPlan(context);
+      setForgePlan(plan);
+    }
+  }, [briefing, sitePlan, projectId, data, forgePlan]);
+
+  const runForgeBuild = async (plan: ForgeBuildPlan) => {
+    if (!data) return;
+    setIsBuildingWithForge(true);
+    setForgeStepIndex(0);
+
+    const activeSections = plan.sections.filter(s => s.recommended);
+    
+    // Execute actions one by one with a small delay for visual feedback
+    for (let i = 0; i < activeSections.length; i++) {
+      setForgeStepIndex(i);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      handleAIAction(activeSections[i].action);
+    }
+
+    setIsBuildingWithForge(false);
+    setForgeStepIndex(-1);
+  };
 
 
   // Sync with initial data
@@ -417,25 +447,49 @@ function ScaleNexusStudioPage() {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2 text-brand-400 hover:text-brand-300 hover:bg-brand-500/10">
-                <Brain className="size-4" /> Inteligência
+                <Sparkles className="size-4" /> Forge AI
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-96 p-0 bg-slate-950 border-slate-800 shadow-2xl mr-4" align="end" sideOffset={12}>
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-                <h3 className="font-bold flex items-center gap-2">
-                  <Brain className="size-4 text-brand-400" /> AI Core V1.2
-                </h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 uppercase tracking-tighter">ATIVO</span>
-              </div>
-              <div className="max-h-[500px] overflow-y-auto p-4 custom-scrollbar">
-                <AICorePanel 
-                  intelligence={intelligence} 
-                  onAccept={handleAIAction}
-                  onIgnore={(id) => setIgnoredIssues(prev => [...prev, id])}
-                  onUndoLast={undo}
-                  history={history}
-                />
-              </div>
+            <PopoverContent className="w-[450px] p-0 bg-slate-950 border-slate-800 shadow-2xl mr-4 overflow-hidden" align="end" sideOffset={12}>
+              <Tabs defaultValue="forge" className="w-full">
+                <div className="px-4 pt-4 border-b border-slate-800">
+                  <TabsList className="bg-slate-900 border-slate-800">
+                    <TabsTrigger value="forge" className="gap-2">
+                      <Sparkles className="size-3" /> Forge
+                    </TabsTrigger>
+                    <TabsTrigger value="intelligence" className="gap-2">
+                      <Brain className="size-3" /> AI Core
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <TabsContent value="forge" className="m-0 max-h-[600px] overflow-y-auto custom-scrollbar">
+                  {forgePlan && (
+                    <ForgePanel 
+                      context={buildProjectContext(projectId, briefing || null, sitePlan || null, data)}
+                      plan={forgePlan}
+                      onUpdatePlan={setForgePlan}
+                      onStartBuild={runForgeBuild}
+                      isBuilding={isBuildingWithForge}
+                      currentStepIndex={forgeStepIndex}
+                    />
+                  )}
+                </TabsContent>
+                <TabsContent value="intelligence" className="m-0 max-h-[600px] overflow-y-auto custom-scrollbar p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold flex items-center gap-2 text-sm">
+                      <Brain className="size-4 text-brand-400" /> AI Core V1.2
+                    </h3>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 uppercase tracking-tighter">ATIVO</span>
+                  </div>
+                  <AICorePanel 
+                    intelligence={intelligence} 
+                    onAccept={handleAIAction}
+                    onIgnore={(id) => setIgnoredIssues(prev => [...prev, id])}
+                    onUndoLast={undo}
+                    history={history}
+                  />
+                </TabsContent>
+              </Tabs>
             </PopoverContent>
           </Popover>
 
