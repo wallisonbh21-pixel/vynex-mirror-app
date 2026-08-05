@@ -14,6 +14,7 @@ import {
   UserRound,
   Loader2,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -116,7 +117,8 @@ function LevelBadge({ level }: { level: string }) {
 function ProspeccaoPage() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
-  const { data: opportunities = [], isLoading } = useOpportunities();
+  const [showArchived, setShowArchived] = useState(false);
+  const { data: opportunities = [], isLoading } = useOpportunities(showArchived);
   const { data: profiles = [] } = useProfiles();
   const save = useSaveOpportunity();
   const addToLeads = useAddOpportunityToLeads();
@@ -412,10 +414,20 @@ function ProspeccaoPage() {
 
       {/* Base de prospecção salva */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold tracking-tight">
-          {isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas"}{" "}
-          <span className="text-muted-foreground">({filtered.length})</span>
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {showArchived ? "Oportunidades arquivadas" : (isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas")}{" "}
+            <span className="text-muted-foreground">({filtered.length})</span>
+          </h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowArchived(!showArchived)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {showArchived ? "Ver ativas" : "Ver arquivadas"}
+          </Button>
+        </div>
 
         {isLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Carregando oportunidades…</p>
@@ -441,6 +453,18 @@ function ProspeccaoPage() {
                 onStatus={(status) =>
                   user && changeStatus.mutate({ opportunity, status, userId: user.id })
                 }
+                showArchived={showArchived}
+                onRemove={() => {
+                  if (showArchived) {
+                    if (confirm("Restaurar oportunidade?\nEssa empresa voltará para sua lista de oportunidades ativas.")) {
+                      save.mutate({ id: opportunity.id, removed_at: null });
+                    }
+                  } else {
+                    if (confirm("Remover oportunidade?\nEssa empresa será retirada das suas oportunidades salvas.")) {
+                      save.mutate({ id: opportunity.id, removed_at: new Date().toISOString() });
+                    }
+                  }
+                }}
               />
             ))}
           </div>
@@ -611,15 +635,33 @@ function OpportunityCard({
   ownerName,
   onAdd,
   onStatus,
+  onRemove,
+  showArchived,
 }: {
   opportunity: Opportunity;
   ownerName: string | null;
   onAdd: () => void;
   onStatus: (status: string) => void;
+  onRemove: () => void;
+  showArchived?: boolean;
 }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow">
-      <div className="flex flex-wrap items-start justify-between gap-2">
+    <article className="relative rounded-2xl border border-border bg-card p-5 shadow-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow">
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn(
+          "absolute right-3 top-3 size-8 rounded-full",
+          showArchived 
+            ? "hover:bg-primary/10 hover:text-primary" 
+            : "hover:bg-destructive/10 hover:text-destructive"
+        )}
+        onClick={onRemove}
+      >
+        {showArchived ? <Sparkles className="size-4 text-primary" /> : <X className="size-4" />}
+      </Button>
+
+      <div className="flex flex-wrap items-start justify-between gap-2 pr-8">
         <LevelBadge level={opportunity.opportunity_level} />
         <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
           {OPPORTUNITY_STATUS_LABEL[opportunity.status] ?? opportunity.status}

@@ -88,16 +88,24 @@ export type Opportunity = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  removed_at: string | null;
 };
 
-export function useOpportunities() {
+export function useOpportunities(showRemoved = false) {
   return useQuery({
-    queryKey: ["prospecting_opportunities"],
+    queryKey: ["prospecting_opportunities", showRemoved],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("prospecting_opportunities")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
+      
+      if (showRemoved) {
+        query = query.not("removed_at", "is", null);
+      } else {
+        query = query.is("removed_at", null);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Opportunity[];
     },

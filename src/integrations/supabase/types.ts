@@ -608,6 +608,7 @@ export type Database = {
           phone: string | null
           place_id: string | null
           rating: number | null
+          removed_at: string | null
           review_count: number
           source: string
           state: string | null
@@ -638,6 +639,7 @@ export type Database = {
           phone?: string | null
           place_id?: string | null
           rating?: number | null
+          removed_at?: string | null
           review_count?: number
           source?: string
           state?: string | null
@@ -668,6 +670,7 @@ export type Database = {
           phone?: string | null
           place_id?: string | null
           rating?: number | null
+          removed_at?: string | null
           review_count?: number
           source?: string
           state?: string | null
