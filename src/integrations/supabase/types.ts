@@ -308,6 +308,128 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_participants: {
+        Row: {
+          created_at: string
+          id: string
+          invitation_status: Database["public"]["Enums"]["meeting_participant_status"]
+          joined_at: string | null
+          left_at: string | null
+          meeting_id: string
+          participant_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invitation_status?: Database["public"]["Enums"]["meeting_participant_status"]
+          joined_at?: string | null
+          left_at?: string | null
+          meeting_id: string
+          participant_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invitation_status?: Database["public"]["Enums"]["meeting_participant_status"]
+          joined_at?: string | null
+          left_at?: string | null
+          meeting_id?: string
+          participant_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_participants_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          cancelled_at: string | null
+          client_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          duration_minutes: number
+          ended_at: string | null
+          id: string
+          meeting_action_items: Json | null
+          meeting_link: string | null
+          meeting_notes: string | null
+          meeting_summary: string | null
+          meeting_type: Database["public"]["Enums"]["meeting_type"]
+          project_id: string | null
+          scheduled_at: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["meeting_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number
+          ended_at?: string | null
+          id?: string
+          meeting_action_items?: Json | null
+          meeting_link?: string | null
+          meeting_notes?: string | null
+          meeting_summary?: string | null
+          meeting_type?: Database["public"]["Enums"]["meeting_type"]
+          project_id?: string | null
+          scheduled_at: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["meeting_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number
+          ended_at?: string | null
+          id?: string
+          meeting_action_items?: Json | null
+          meeting_link?: string | null
+          meeting_notes?: string | null
+          meeting_summary?: string | null
+          meeting_type?: Database["public"]["Enums"]["meeting_type"]
+          project_id?: string | null
+          scheduled_at?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["meeting_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
@@ -1281,6 +1403,26 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "vendedor" | "criador" | "diretor" | "rh"
+      meeting_participant_status:
+        | "PENDING"
+        | "ACCEPTED"
+        | "DECLINED"
+        | "REMOVED"
+      meeting_status:
+        | "SCHEDULED"
+        | "LIVE"
+        | "COMPLETED"
+        | "CANCELLED"
+        | "NO_SHOW"
+      meeting_type:
+        | "CLIENT"
+        | "SELLER"
+        | "CREATOR"
+        | "TRAFFIC_MANAGER"
+        | "TEAM"
+        | "GENERAL"
+        | "PROJECT"
+        | "INTERNAL"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1409,6 +1551,29 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "vendedor", "criador", "diretor", "rh"],
+      meeting_participant_status: [
+        "PENDING",
+        "ACCEPTED",
+        "DECLINED",
+        "REMOVED",
+      ],
+      meeting_status: [
+        "SCHEDULED",
+        "LIVE",
+        "COMPLETED",
+        "CANCELLED",
+        "NO_SHOW",
+      ],
+      meeting_type: [
+        "CLIENT",
+        "SELLER",
+        "CREATOR",
+        "TRAFFIC_MANAGER",
+        "TEAM",
+        "GENERAL",
+        "PROJECT",
+        "INTERNAL",
+      ],
     },
   },
 } as const
