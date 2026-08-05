@@ -12,6 +12,7 @@ const searchSchema = z.object({
 
 /**
  * Mapeamento de nichos comerciais para categorias oficiais da Geoapify Places API v2.
+ * Apenas categorias verificadas e suportadas devem ser incluídas aqui.
  * Documentação: https://apidocs.geoapify.com/docs/places/categories/
  */
 const NICHE_CATEGORY_MAP: Record<string, string> = {
@@ -28,20 +29,16 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Dentista": "healthcare.dentist",
   "Clínica": "healthcare.clinic_or_praxis",
   "Pet Shop": "commercial.pet",
-  "Academia": "activity.sport",
   "Salão de beleza": "service.beauty",
   "Barbearia": "service.beauty",
-  "Oficina": "service.vehicle.repair",
-  "Imobiliária": "commercial",
-  "Contabilidade": "office",
-  "Advocacia": "office",
-  "Fotografia": "service",
-  "Eventos": "entertainment",
+  // Nichos problemáticos (categorias activity.sport, office, etc. causaram erro 400 ou irrelevância):
+  // Serão tratados via busca textual (text search) para garantir precisão.
 };
 
 /**
  * Categorias oficiais suportadas pela Geoapify Places API v2.
- * Documentação de referência: https://apidocs.geoapify.com/docs/places/categories/
+ * Esta lista serve como um "gate" de segurança para evitar erros 400.
+ * Se a categoria não estiver aqui, ela NÃO deve ser enviada no parâmetro 'categories'.
  */
 const OFFICIAL_CATEGORIES = new Set([
   "accommodation", "accommodation.hotel", "accommodation.hostel", "accommodation.guest_house", "accommodation.apartment",
@@ -68,15 +65,15 @@ const OFFICIAL_CATEGORIES = new Set([
   "camping"
 ]);
 
-function getGeoapifyCategories(niche: string, requestId: string): { categories: string; fallbackUsed: boolean; log: string } {
-  // Garantir que estamos usando o mapa mais recente definido acima
-  const mapped = NICHE_CATEGORY_MAP[niche] || "commercial,catering,service";
+function getGeoapifyCategories(niche: string, requestId: string): { categories: string | null; fallbackUsed: boolean; log: string } {
+  const mapped = NICHE_CATEGORY_MAP[niche];
   
-  // Limpeza preventiva: se por algum motivo healthcare.clinic (inválida) ainda existir na string original
-  // nós a removemos antes da validação.
-  const cleanedMapped = mapped.replace(/healthcare\.clinic\b/g, "healthcare.clinic_or_praxis");
-  
-  const requestedCategories = cleanedMapped.split(",");
+  // Se não houver mapeamento definido, retornamos null para sinalizar busca textual
+  if (!mapped) {
+    return { categories: null, fallbackUsed: false, log: `[Search][${requestId}] Niche "${niche}" not mapped. Using text search.` };
+  }
+
+  const requestedCategories = mapped.split(",");
   const validatedCategories: string[] = [];
   let fallbackUsed = false;
   let log = "";
@@ -85,31 +82,14 @@ function getGeoapifyCategories(niche: string, requestId: string): { categories: 
     if (OFFICIAL_CATEGORIES.has(cat)) {
       validatedCategories.push(cat);
     } else {
+      // Se a categoria mapeada for inválida, logamos e tentamos um fallback básico
+      // (Mas o ideal é que NICHE_CATEGORY_MAP só tenha categorias válidas)
       fallbackUsed = true;
-      const parts = cat.split(".");
-      let fallback = "commercial"; // Default fallback
-      
-      // Tenta encontrar o pai mais próximo que seja oficial
-      for (let i = parts.length - 1; i > 0; i--) {
-        const parent = parts.slice(0, i).join(".");
-        if (OFFICIAL_CATEGORIES.has(parent)) {
-          fallback = parent;
-          break;
-        }
-      }
-      validatedCategories.push(fallback);
-      log += `[Fallback][${requestId}] Niche: ${niche}, Invalid: ${cat} -> Used: ${fallback}; `;
+      log += `[Warning][${requestId}] Mapped category "${cat}" for niche "${niche}" is NOT official. `;
     }
   }
 
-  // Deduplicar e juntar
-  const finalCategories = [...new Set(validatedCategories)].join(",");
-  
-  // LOG CRÍTICO PARA AUDITORIA DE RUNTIME
-  if (finalCategories.includes("healthcare.clinic") && !finalCategories.includes("healthcare.clinic_or_praxis")) {
-    console.error(`[CRITICAL_FAILURE][${requestId}] INVALID CATEGORY healthcare.clinic DETECTED IN FINAL STRING! Niche: ${niche}`);
-  }
-
+  const finalCategories = validatedCategories.length > 0 ? validatedCategories.join(",") : null;
   return { categories: finalCategories, fallbackUsed, log };
 }
 
@@ -225,17 +205,20 @@ export const Route = createFileRoute("/api/prospecting/search")({
           
           // Construindo URL da v2
           const geoUrl = new URL("https://api.geoapify.com/v2/places");
-          if (NICHE_CATEGORY_MAP[niche]) {
+          if (categories) {
             geoUrl.searchParams.set("categories", categories);
+            console.log(`[Search][${requestId}] Using Categories: ${categories}`);
           } else {
+            // Busca textual combinada com filtro geográfico
             geoUrl.searchParams.set("text", niche);
+            console.log(`[Search][${requestId}] Using Text Search: "${niche}"`);
           }
           geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
           geoUrl.searchParams.set("limit", "30");
           geoUrl.searchParams.set("lang", "pt");
           geoUrl.searchParams.set("apiKey", apiKey);
           
-          console.log(`[Search][${requestId}] URL Geoapify v2: ${geoUrl.origin}${geoUrl.pathname}?categories=${categories}&filter=place:${areaPlaceId}&limit=30&apiKey=HIDDEN`);
+          console.log(`[Search][${requestId}] Request URL: ${geoUrl.origin}${geoUrl.pathname}?${geoUrl.searchParams.toString().replace(apiKey, "HIDDEN")}`);
           
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -308,7 +291,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v3.3-catfixed-v2stable";
+          const diagnostic = "prospecting-search-v4.0-validated-text-hybrid";
           
           return new Response(JSON.stringify({ 
             opportunities, 
