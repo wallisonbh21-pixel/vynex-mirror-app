@@ -12,12 +12,12 @@ export const Route = createFileRoute("/_authenticated/pipeline")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Pipeline — VYNEXA" },
+      { title: "Funil de Vendas — VYNEXA" },
       {
         name: "description",
         content: "Funil visual das oportunidades: arraste os cards entre as etapas e acompanhe o fechamento.",
       },
-      { property: "og:title", content: "Pipeline — VYNEXA" },
+      { property: "og:title", content: "Funil de Vendas — VYNEXA" },
       { property: "og:description", content: "Kanban comercial do CRM VYNEXA." },
     ],
   }),
@@ -51,7 +51,7 @@ function PipelinePage() {
 
   return (
     <AppShell
-      title="Pipeline"
+      title="Funil de Vendas"
       description="Arraste cada oportunidade para a etapa atual — o histórico é registrado automaticamente."
     >
       <div className="flex gap-4 overflow-x-auto pb-4">
