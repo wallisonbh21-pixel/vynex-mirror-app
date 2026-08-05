@@ -443,11 +443,12 @@ function ProspeccaoPage() {
                 key={i}
                 opportunity={opt}
                 onAdd={() => {
-                  user && save.mutate({
-                    ...opt,
-                    created_by: user.id,
-                    assigned_to: user.id,
+                  if (!user) return;
+                  addToLeads.mutate({
+                    opportunity: opt as Opportunity,
+                    userId: user.id,
                   });
+                  // Removemos da lista local após adicionar
                   setExternalResults(prev => prev.filter((_, idx) => idx !== i));
                 }}
               />
