@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Instagram, Linkedin, Twitter, Github } from "lucide-react";
+import { Sparkles, Mail } from "lucide-react";
 
 export function LandingFooter() {
   const currentYear = new Date().getFullYear();
@@ -23,10 +23,7 @@ export function LandingFooter() {
             Plataforma completa para prospecção, vendas, criação de sites e gestão de projetos digitais em um único ecossistema inteligente.
           </p>
           <div className="flex gap-4">
-            <a href="#" className="text-slate-500 hover:text-primary transition-colors"><Instagram className="size-5" /></a>
-            <a href="#" className="text-slate-500 hover:text-primary transition-colors"><Linkedin className="size-5" /></a>
-            <a href="#" className="text-slate-500 hover:text-primary transition-colors"><Twitter className="size-5" /></a>
-            <a href="#" className="text-slate-500 hover:text-primary transition-colors"><Github className="size-5" /></a>
+            <a href="#" className="text-slate-500 hover:text-primary transition-colors"><Mail className="size-5" /></a>
           </div>
         </div>
 
