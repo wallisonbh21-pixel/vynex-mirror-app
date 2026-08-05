@@ -154,11 +154,23 @@ function LeadDetail() {
             <StatusBadge status={lead.status} />
           </div>
           <dl className="mt-4 space-y-2 text-sm">
+            <Row term="Empresa" value={lead.company} />
+            <Row term="Nicho" value={lead.niche} />
             <Row term="Contato" value={`${lead.name} — ${contact}`} />
-            <Row term="Nome fantasia" value={lead.trade_name} />
-            <Row term="Site" value={lead.website} />
-            <Row term="Instagram" value={lead.instagram} />
+            <Row term="Telefone/WhatsApp" value={lead.whatsapp || lead.phone} />
+            <Row term="Cidade" value={lead.city} />
+            <Row term="Estado" value={lead.state} />
             <Row term="Endereço" value={lead.address} />
+            {lead.google_maps_url ? (
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">Google Maps</dt>
+                <dd className="text-right">
+                  <a href={lead.google_maps_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center justify-end gap-1">
+                    Ver no mapa <ExternalLink className="size-3" />
+                  </a>
+                </dd>
+              </div>
+            ) : null}
             <Row term="Origem" value={lead.source} />
             <Row term="Cadastrado em" value={shortDate(lead.created_at)} />
             <Row term="Próximo contato" value={shortDate(lead.next_contact_at)} />
