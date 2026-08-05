@@ -19,7 +19,8 @@ import {
   AlertCircle,
   Link as LinkIcon,
   Rocket,
-  LayoutDashboard
+  LayoutDashboard,
+  Brain
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
@@ -35,6 +36,10 @@ import { useMyCreatorProjects, useProjectChecklist, useProjectNotes, useUpdateCr
 import { useApprovalEvents } from "@/lib/approval";
 import { getBriefing } from "@/lib/briefing";
 import { useQuery } from "@tanstack/react-query";
+import { buildProjectContext, generateIntelligence } from "@/lib/ai-core";
+import { AICorePanel } from "@/components/AICorePanel";
+import { getSitePlan } from "@/lib/planner";
+import { useStudioData } from "@/lib/studio/hooks";
 
 import { currency, shortDate, PROJECT_STATUS, label } from "@/lib/format";
 import { cn } from "@/lib/utils";

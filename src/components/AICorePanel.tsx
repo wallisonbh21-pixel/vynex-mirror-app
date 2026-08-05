@@ -142,10 +142,10 @@ export function AICorePanel({ intelligence, onAccept, onIgnore }: AICorePanelPro
                 <p>{opt}</p>
               </div>
               <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button size="xs" variant="ghost" className="h-6 text-[10px] text-white hover:bg-white/10" onClick={() => onAccept?.(opt)}>
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-white hover:bg-white/10" onClick={() => onAccept?.(opt)}>
                   <Check className="size-3 mr-1" /> Aceitar
                 </Button>
-                <Button size="xs" variant="ghost" className="h-6 text-[10px] text-white/50 hover:bg-white/5" onClick={() => onIgnore?.(opt)}>
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-white/50 hover:bg-white/5" onClick={() => onIgnore?.(opt)}>
                   Ignorar
                 </Button>
               </div>
