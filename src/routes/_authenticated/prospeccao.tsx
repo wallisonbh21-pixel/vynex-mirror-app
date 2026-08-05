@@ -126,6 +126,8 @@ function ProspeccaoPage() {
   const searchExternal = useSearchOpportunities();
   const [externalResults, setExternalResults] = useState<Partial<Opportunity>[]>([]);
   const [diagnostic, setDiagnostic] = useState<any>(null);
+  const [auditReport, setAuditReport] = useState<any[]>([]);
+  const [isAuditing, setIsAuditing] = useState(false);
 
   // Formulário de busca
   const [niche, setNiche] = useState("");
