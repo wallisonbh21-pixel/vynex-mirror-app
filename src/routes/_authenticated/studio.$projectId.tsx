@@ -15,7 +15,10 @@ import {
   Trash2,
   Copy,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Brain, 
+  Info,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -25,14 +28,16 @@ import { LibraryPanel } from '@/components/studio/LibraryPanel';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { PropertyPanel } from '@/components/studio/PropertyPanel';
 import { AICorePanel } from '@/components/AICorePanel';
+import { ForgePanel } from '@/components/ForgePanel';
 import { generateId } from '@/lib/studio/utils';
 import { SECTION_TEMPLATES } from '@/lib/studio/templates';
 import { buildProjectContext, generateIntelligence, AIAction } from '@/lib/ai-core';
+import { createBuildPlan, ForgeBuildPlan } from '@/lib/forge';
 import { getBriefing } from '@/lib/briefing';
 import { getSitePlan } from '@/lib/planner';
 import { useQuery } from '@tanstack/react-query';
-import { Brain, Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
