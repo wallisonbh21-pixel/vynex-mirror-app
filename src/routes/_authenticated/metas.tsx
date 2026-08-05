@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Trophy } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { AppShell } from "@/components/AppShell";
 import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -46,8 +47,8 @@ function MetasPage() {
 
   return (
     <AppShell
-      title="Metas"
-      description="Objetivos mensais comparados com os contratos realmente fechados."
+      title="Conquistas & Metas"
+      description="Alcance seus objetivos mensais e conquiste troféus com contratos fechados."
       actions={
         <RecordDialog
           title="Nova meta"
@@ -81,15 +82,33 @@ function MetasPage() {
           return (
             <article key={goal.id} className="rounded-2xl border border-border bg-card p-5 shadow-panel">
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-semibold">
-                    {new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(
-                      new Date(`${monthKey}-01T12:00:00`),
-                    )}
-                  </h2>
-                  <p className="text-xs text-muted-foreground">Início em {shortDate(goal.month)}</p>
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "flex size-10 items-center justify-center rounded-full shadow-sm",
+                    revenuePercent >= 100 ? "bg-success/20 text-success" : "bg-secondary text-muted-foreground"
+                  )}>
+                    <Trophy className={cn("size-5", revenuePercent >= 100 && "animate-pulse")} />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold">
+                      {new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(
+                        new Date(`${monthKey}-01T12:00:00`),
+                      )}
+                    </h2>
+                    <p className="text-xs text-muted-foreground">Início em {shortDate(goal.month)}</p>
+                  </div>
                 </div>
-                <span className="text-lg font-semibold text-primary">{revenuePercent}%</span>
+                <div className="text-right">
+                  <span className={cn(
+                    "text-lg font-bold",
+                    revenuePercent >= 100 ? "text-success" : "text-primary"
+                  )}>
+                    {revenuePercent}%
+                  </span>
+                  {revenuePercent >= 100 && (
+                    <span className="block text-[10px] font-bold text-success uppercase tracking-wider">Meta Batida</span>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 space-y-4">
