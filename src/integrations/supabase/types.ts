@@ -1216,6 +1216,43 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_project_assets_public: {
+        Args: { p_client_token: string; p_project_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          name: string
+          project_id: string
+          size: number
+          type: string
+          url: string
+        }[]
+      }
+      get_project_public_data: {
+        Args: { p_client_token: string; p_project_id: string }
+        Returns: {
+          client_company: string
+          client_contact_name: string
+          client_id: string
+          client_token_expires_at: string
+          delivery_link: string
+          id: string
+          site_type: string
+          status: string
+          submitted_at: string
+          title: string
+        }[]
+      }
+      get_project_studio_data_public: {
+        Args: { p_client_token: string; p_project_id: string }
+        Returns: {
+          design_system: Json
+          id: string
+          project_id: string
+          sections: Json
+          updated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
