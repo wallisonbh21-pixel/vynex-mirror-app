@@ -20,13 +20,15 @@ interface SalesFunnelProps {
   onStepClick?: (status: string) => void;
 }
 
-export const FUNNEL_CONFIG: Record<string, { 
-  color: string; 
-  icon: any; 
+interface FunnelConfig {
+  color: string;
+  icon: any;
   bg: string;
   border: string;
   text: string;
-}> = {
+}
+
+export const FUNNEL_CONFIG: Record<string, FunnelConfig> = {
   ['novo']: { 
     color: "#3b82f6", 
     icon: Users, 
@@ -78,6 +80,8 @@ export const FUNNEL_CONFIG: Record<string, {
   },
 };
 
+const DEFAULT_CONFIG: FunnelConfig = FUNNEL_CONFIG['novo'];
+
 export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps) {
   const counts = LEAD_STATUS.map((status) => {
     const rows = leads.filter((l) => l.status === status);
@@ -88,13 +92,13 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
-        {counts.filter(c => c.status !== 'perdido').map((item, index) => {
-          const config = FUNNEL_CONFIG[item.status] || FUNNEL_CONFIG['novo'];
+        {counts.filter(c => c.status !== 'perdido').map((item, index, filteredCounts) => {
+          const config = FUNNEL_CONFIG[item.status] || DEFAULT_CONFIG;
           const Icon = config.icon;
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
           
-          const prevCount = index > 0 ? counts[index - 1].count : 0;
+          const prevCount = index > 0 ? filteredCounts[index - 1].count : 0;
           const conversionRate = index === 0 ? 100 : (prevCount > 0 ? Math.round((item.count / prevCount) * 100) : 0);
 
           return (
@@ -170,7 +174,7 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
       
       <div className="relative flex justify-between">
         {steps.map((status, index) => {
-          const config = FUNNEL_CONFIG[status] || FUNNEL_CONFIG['novo'];
+          const config = FUNNEL_CONFIG[status] || DEFAULT_CONFIG;
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
           const isFuture = index > currentIndex;
@@ -293,7 +297,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
       
       <button 
         onClick={onOpen}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 cursor-pointer"
       />
     </motion.article>
   );
