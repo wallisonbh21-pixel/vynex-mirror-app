@@ -29,13 +29,13 @@ import { SECTION_TEMPLATES } from '@/lib/studio/templates';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
-  component: VynexaStudioPage,
+  component: ScaleNexusStudioPage,
   head: () => ({
     meta: [{ title: 'ScaleNexus Studio — Editor Visual' }],
   }),
 });
 
-function VynexaStudioPage() {
+function ScaleNexusStudioPage() {
   const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' });
   const { data: initialData, isLoading } = useStudioData(projectId);
   const saveMutation = useSaveStudioData();

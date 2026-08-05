@@ -14,13 +14,13 @@ import { ROLE_LABEL, useAvatarUrl, useProfile, useRoles, useSession } from "@/li
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
-      { title: "Meu perfil — VYNEXA" },
+      { title: "Meu perfil — ScaleNexus" },
       {
         name: "description",
-        content: "Atualize seu nome, apelido, contato e foto de perfil na plataforma VYNEXA.",
+        content: "Atualize seu nome, apelido, contato e foto de perfil na plataforma ScaleNexus.",
       },
-      { property: "og:title", content: "Meu perfil — VYNEXA" },
-      { property: "og:description", content: "Dados pessoais e foto do seu acesso VYNEXA." },
+      { property: "og:title", content: "Meu perfil — ScaleNexus" },
+      { property: "og:description", content: "Dados pessoais e foto do seu acesso ScaleNexus." },
     ],
   }),
   component: PerfilPage,
