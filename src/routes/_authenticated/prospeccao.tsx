@@ -617,15 +617,26 @@ function OpportunityCard({
   ownerName,
   onAdd,
   onStatus,
+  onRemove,
 }: {
   opportunity: Opportunity;
   ownerName: string | null;
   onAdd: () => void;
   onStatus: (status: string) => void;
+  onRemove: () => void;
 }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow">
-      <div className="flex flex-wrap items-start justify-between gap-2">
+    <article className="relative rounded-2xl border border-border bg-card p-5 shadow-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-3 top-3 size-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
+        onClick={onRemove}
+      >
+        <X className="size-4" />
+      </Button>
+
+      <div className="flex flex-wrap items-start justify-between gap-2 pr-8">
         <LevelBadge level={opportunity.opportunity_level} />
         <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
           {OPPORTUNITY_STATUS_LABEL[opportunity.status] ?? opportunity.status}
