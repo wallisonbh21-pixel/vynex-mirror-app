@@ -33,6 +33,7 @@ import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
+import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
@@ -161,6 +162,12 @@ const AprovacaoTokenRoute = AprovacaoTokenRouteImport.update({
   path: '/aprovacao/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedBriefingProjectIdRoute =
+  AuthenticatedBriefingProjectIdRouteImport.update({
+    id: '/briefing/$projectId',
+    path: '/briefing/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   id: '/leads/',
   path: '/leads/',
@@ -214,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
+  '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
   '/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
+  '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
@@ -276,6 +285,7 @@ export interface FileRoutesById {
   '/_authenticated/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
+  '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/projetos'
     | '/prospeccao'
     | '/aprovacao/$token'
+    | '/briefing/$projectId'
     | '/leads/$leadId'
     | '/projetos/$projectId'
     | '/studio/$projectId'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/projetos'
     | '/prospeccao'
     | '/aprovacao/$token'
+    | '/briefing/$projectId'
     | '/leads/$leadId'
     | '/projetos/$projectId'
     | '/studio/$projectId'
@@ -369,6 +381,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projetos'
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
+    | '/_authenticated/briefing/$projectId'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/projetos/$projectId'
     | '/_authenticated/studio/$projectId'
@@ -555,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AprovacaoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/briefing/$projectId': {
+      id: '/_authenticated/briefing/$projectId'
+      path: '/briefing/$projectId'
+      fullPath: '/briefing/$projectId'
+      preLoaderRoute: typeof AuthenticatedBriefingProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leads/': {
       id: '/_authenticated/leads/'
       path: '/leads'
@@ -626,6 +646,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRouteWithChildren
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
+  AuthenticatedBriefingProjectIdRoute: typeof AuthenticatedBriefingProjectIdRoute
   AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
   AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
@@ -651,6 +672,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedProjetosRoute: AuthenticatedProjetosRouteWithChildren,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
+  AuthenticatedBriefingProjectIdRoute: AuthenticatedBriefingProjectIdRoute,
   AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
   AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,

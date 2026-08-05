@@ -17,7 +17,8 @@ import {
   Info,
   Send,
   AlertCircle,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Rocket
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
@@ -31,6 +32,9 @@ import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
 import { useMyCreatorProjects, useProjectChecklist, useProjectNotes, useUpdateCreatorProject } from "@/lib/creator";
 import { useApprovalEvents } from "@/lib/approval";
+import { getBriefing } from "@/lib/briefing";
+import { useQuery } from "@tanstack/react-query";
+
 import { currency, shortDate, PROJECT_STATUS, label } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -52,6 +56,12 @@ function DetalhesProjetoPage() {
   const { data: notes = [], addNote } = useProjectNotes(projectId);
   const updateProject = useUpdateCreatorProject();
   const [newNote, setNewNote] = useState("");
+
+  const { data: savedBriefing } = useQuery({
+    queryKey: ["briefing", projectId],
+    queryFn: () => getBriefing(projectId),
+  });
+
 
   const project = useMemo(() => projects.find((p) => p.id === projectId), [projects, projectId]);
   const client = useMemo(() => clients.find((c) => c.id === project?.client_id), [clients, project]);
@@ -100,83 +110,105 @@ function DetalhesProjetoPage() {
           <Tabs defaultValue="briefing">
             <TabsList className="grid grid-cols-5 w-full bg-muted/20 p-1 h-12">
               <TabsTrigger value="briefing" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Briefcase className="size-4" /> Briefing</TabsTrigger>
-              <TabsTrigger value="id_visual" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Palette className="size-4" /> Identidade</TabsTrigger>
               <TabsTrigger value="checklist" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><CheckCircle2 className="size-4" /> Checklist</TabsTrigger>
               <TabsTrigger value="projeto" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Globe className="size-4" /> Projeto</TabsTrigger>
+              <TabsTrigger value="financeiro" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><CircleDollarSign className="size-4" /> Financeiro</TabsTrigger>
               <TabsTrigger value="historico" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Clock className="size-4" /> Histórico</TabsTrigger>
             </TabsList>
             <TabsContent value="briefing" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <div className="flex items-center justify-between mb-8">
+                 <div className="flex items-center gap-3">
+                   <div className="p-3 rounded-xl bg-brand-500/10 text-brand-500">
+                     <Briefcase className="size-6" />
+                   </div>
+                   <div>
+                     <h3 className="text-xl font-bold">Briefing Inteligente</h3>
+                     <p className="text-sm text-muted-foreground">Coleta e organização de informações do negócio.</p>
+                   </div>
+                 </div>
+                 <Button asChild className="gap-2 shadow-glow bg-gradient-brand border-none">
+                    <Link to="/briefing/$projectId" params={{ projectId: project.id }}>
+                      <FileText className="size-4" /> {savedBriefing ? 'Editar Briefing' : 'Iniciar Briefing'}
+                    </Link>
+                 </Button>
+               </div>
+
                <div className="grid md:grid-cols-2 gap-8">
-                 <div>
-                   <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
-                     <Briefcase className="size-4" /> Dados do Negócio
-                   </h3>
-                   <div className="space-y-4 text-sm">
-                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
-                       <span className="text-muted-foreground">Empresa:</span>
-                       <span className="font-medium text-right">{client?.company}</span>
+                 <div className="space-y-6">
+                   <div>
+                     <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Dados Fundamentais</h4>
+                     <div className="space-y-4">
+                       <div className="flex justify-between border-b pb-2">
+                         <span className="text-sm text-muted-foreground">Empresa:</span>
+                         <span className="text-sm font-bold">{project.title}</span>
+                       </div>
+                       <div className="flex justify-between border-b pb-2">
+                         <span className="text-sm text-muted-foreground">Segmento:</span>
+                         <span className="text-sm font-bold">{project.site_type || 'N/A'}</span>
+                       </div>
                      </div>
-                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
-                       <span className="text-muted-foreground">Nicho:</span>
-                       <span className="font-medium text-right">{client?.niche}</span>
-                     </div>
-                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
-                       <span className="text-muted-foreground">Responsável:</span>
-                       <span className="font-medium text-right">{client?.name}</span>
-                     </div>
-                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
-                       <span className="text-muted-foreground">Cidade/UF:</span>
-                       <span className="font-medium text-right">{client?.city} - {client?.state}</span>
+                   </div>
+                   
+                   <div>
+                     <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Progresso do Briefing</h4>
+                     <div className="p-4 rounded-xl bg-muted/30 border border-dashed text-center">
+                        <p className="text-xs text-muted-foreground">
+                          {savedBriefing ? 'Briefing preenchido e pronto para uso no Studio.' : 'O briefing ainda não foi iniciado para este projeto.'}
+                        </p>
                      </div>
                    </div>
                  </div>
+
                  <div>
-                   <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
-                     <FileText className="size-4" /> Descrição & Observações
-                   </h3>
-                   <div className="bg-muted/30 p-4 rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
-                     {project.description || "Nenhuma descrição adicional fornecida."}
-                   </div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Ambiente de Criação</h4>
+                    <div className="p-6 rounded-2xl bg-slate-900 text-white shadow-2xl overflow-hidden relative group">
+                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Palette className="size-20" />
+                      </div>
+                      <h5 className="font-bold text-lg mb-2">ScaleNexus Studio</h5>
+                      <p className="text-slate-400 text-xs leading-relaxed mb-6">
+                        Abra o editor profissional para construir o site do cliente utilizando os dados do briefing.
+                      </p>
+                      <Button asChild className="w-full gap-2 bg-brand-500 hover:bg-brand-600 border-none font-bold">
+                        <Link to="/studio/$projectId" params={{ projectId: project.id }}>
+                          <Rocket className="size-4" /> Abrir Studio
+                        </Link>
+                      </Button>
+                    </div>
                  </div>
                </div>
             </TabsContent>
             
-            <TabsContent value="id_visual" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+            <TabsContent value="financeiro" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
                <div className="grid md:grid-cols-2 gap-8">
                  <div>
                    <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
-                     <Palette className="size-4" /> Identidade Visual
+                     <CircleDollarSign className="size-4" /> Resumo de Ganhos
                    </h3>
-                   <div className="space-y-6 text-sm">
-                     <div className="p-4 bg-muted/30 rounded-xl border border-dashed text-center">
-                       <p className="text-muted-foreground italic">Arquivos de logotipo e marca serão exibidos aqui.</p>
+                   <div className="space-y-4 text-sm">
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Valor do Contrato:</span>
+                       <span className="font-medium text-right">{currency(project.value)}</span>
                      </div>
-                     <div>
-                       <h4 className="font-bold text-xs uppercase text-muted-foreground mb-3 tracking-wider">Cores da Marca</h4>
-                       <div className="flex gap-2">
-                         <div className="size-10 rounded-lg bg-primary border shadow-sm" title="Primária"></div>
-                         <div className="size-10 rounded-lg bg-secondary border shadow-sm" title="Secundária"></div>
-                         <div className="size-10 rounded-lg bg-muted border shadow-sm" title="Neutro"></div>
-                       </div>
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Sua Comissão ({project.commission_rate}%):</span>
+                       <span className="font-bold text-brand-500 text-right">{currency(project.commission)}</span>
+                     </div>
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Status do Pagamento:</span>
+                       <span className="font-medium text-right uppercase text-xs">{project.commission_status}</span>
                      </div>
                    </div>
                  </div>
                  <div>
                    <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
-                     <FolderOpen className="size-4" /> Materiais
+                     <Info className="size-4" /> Regras Financeiras
                    </h3>
-                   <div className="space-y-2">
-                     <div className="p-3 border rounded-xl flex items-center justify-between hover:bg-muted/50 transition-colors cursor-not-allowed opacity-60">
-                       <div className="flex items-center gap-3">
-                         <FileText className="size-4 text-muted-foreground" />
-                         <span className="text-xs font-medium">Briefing_Completo.pdf</span>
-                       </div>
-                       <Button variant="ghost" size="icon" className="size-8"><ExternalLink className="size-3" /></Button>
-                     </div>
-                     <p className="text-[10px] text-muted-foreground text-center py-4">Utilize a área de "Projeto" para links externos.</p>
-                   </div>
+                   <p className="text-xs text-muted-foreground leading-relaxed">
+                     A comissão é liberada para saque assim que o projeto é marcado como <strong>Entregue</strong> e o pagamento do cliente é confirmado pelo financeiro.
+                   </p>
                  </div>
-                </div>
+               </div>
             </TabsContent>
             
             <TabsContent value="checklist" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
