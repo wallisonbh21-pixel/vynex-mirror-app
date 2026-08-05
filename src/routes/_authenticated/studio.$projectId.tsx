@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { 
   ArrowLeft, 
   Save, 
@@ -70,7 +70,7 @@ function ScaleNexusStudioPage() {
 
   const intelligence = useMemo(() => {
     const context = buildProjectContext(projectId, briefing || null, sitePlan || null, data);
-    return generateIntelligence(context);
+    return generateIntelligence(context, data);
   }, [projectId, briefing, sitePlan, data]);
 
 

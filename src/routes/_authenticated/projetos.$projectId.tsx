@@ -78,7 +78,7 @@ function DetalhesProjetoPage() {
 
   const intelligence = useMemo(() => {
     const context = buildProjectContext(projectId, savedBriefing || null, sitePlan || null, studioData || null);
-    return generateIntelligence(context);
+    return generateIntelligence(context, studioData || null);
   }, [projectId, savedBriefing, sitePlan, studioData]);
 
   const project = useMemo(() => projects.find((p) => p.id === projectId), [projects, projectId]);
