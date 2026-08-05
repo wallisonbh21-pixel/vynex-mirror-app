@@ -250,10 +250,18 @@ function PainelCriador() {
 
           {/* Volume Histórico */}
           <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-6">Histórico de Volume (6 meses)</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+              <History className="size-4 text-brand-500" /> Histórico de Volume (6 meses)
+            </h2>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={series}>
+                <AreaChart data={series}>
+                  <defs>
+                    <linearGradient id="colorProjetos" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
                   <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
@@ -261,8 +269,15 @@ function PainelCriador() {
                     cursor={{ opacity: 0.1 }} 
                     contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
                   />
-                  <Bar dataKey="projetos" radius={[4, 4, 0, 0]} fill="var(--primary)" opacity={0.6} />
-                </BarChart>
+                  <Area 
+                    type="monotone" 
+                    dataKey="projetos" 
+                    stroke="hsl(var(--primary))" 
+                    fillOpacity={1} 
+                    fill="url(#colorProjetos)" 
+                    strokeWidth={2}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </section>
