@@ -327,7 +327,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
               endpoint: "/v2/places",
               categories,
               strategy: strategy.strategy,
-              fallbackLog: fallbackLog || null,
+              fallbackLog: catLog || null,
               filter: `place:${areaPlaceId}`,
               resolvedLocation: locationText
             }
