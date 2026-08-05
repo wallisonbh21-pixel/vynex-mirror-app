@@ -5,26 +5,26 @@ import { StudioData } from '@/types/studio';
 export interface ScaleNexusProjectContext {
   projectId: string;
   businessName: string;
-  niche?: string;
-  description?: string;
-  objectives?: string[];
-  audience?: any;
-  location?: string;
-  services?: string[];
-  products?: string[];
-  differentiators?: string[];
-  brandIdentity?: any;
-  visualStyle?: string[];
-  references?: any;
-  requirements?: any;
-  notes?: string;
-  template?: string;
-  sitePlan?: SitePlanData;
-  plannedSections?: string[];
-  primaryCTA?: string;
-  secondaryCTA?: string;
-  availableAssets?: any[];
-  designSystem?: any;
+  niche: string | undefined;
+  description: string | undefined;
+  objectives: string[] | undefined;
+  audience: any | undefined;
+  location: string | undefined;
+  services: string[] | undefined;
+  products: string[] | undefined;
+  differentiators: string[] | undefined;
+  brandIdentity: any | undefined;
+  visualStyle: string[] | undefined;
+  references: any | undefined;
+  requirements: any | undefined;
+  notes: string | undefined;
+  template: string | undefined;
+  sitePlan: SitePlanData | undefined;
+  plannedSections: string[] | undefined;
+  primaryCTA: string | undefined;
+  secondaryCTA: string | undefined;
+  availableAssets: any[] | undefined;
+  designSystem: any | undefined;
 }
 
 export interface ProjectIntelligence {
