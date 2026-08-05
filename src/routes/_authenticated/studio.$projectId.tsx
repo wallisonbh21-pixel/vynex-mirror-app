@@ -105,11 +105,16 @@ function ScaleNexusStudioPage() {
     // Execute actions one by one with a small delay for visual feedback
     for (let i = 0; i < activeSections.length; i++) {
       setForgeStepIndex(i);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      if (activeSections[i]) {
-        handleAIAction(activeSections[i]!.action);
+      const section = activeSections[i];
+      if (section) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        handleAIAction(section.action);
       }
     }
+
+    // After Forge Build, run AI Core Analysis automatically
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // Trigger analysis update through state sync logic already in place via intelligence useMemo
 
     setIsBuildingWithForge(false);
     setForgeStepIndex(-1);

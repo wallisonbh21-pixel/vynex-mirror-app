@@ -14,7 +14,8 @@ import {
   Settings2,
   GripVertical,
   Trash2,
-  Plus
+  Plus,
+  Brain
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -32,7 +33,7 @@ interface ForgePanelProps {
 }
 
 export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuilding, currentStepIndex = -1 }: ForgePanelProps) {
-  const [view, setView] = useState<'overview' | 'sections'>('overview');
+  const [view, setView] = useState<'overview' | 'sections' | 'decisions'>('overview');
 
   const handleToggleSection = (sectionId: string) => {
     const updatedSections = plan.sections.map(s => 
@@ -112,8 +113,8 @@ export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuildi
             <Sparkles className="size-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white leading-none mb-1">ScaleNexus Forge</h3>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">O que vamos construir?</p>
+            <h3 className="text-lg font-bold text-white leading-none mb-1">ScaleNexus Forge V1.1</h3>
+            <p className="text-[10px] text-brand-400 font-bold uppercase tracking-[0.2em]">Diretor de Construção Digital</p>
           </div>
         </div>
 
@@ -141,13 +142,13 @@ export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuildi
           <div className="p-4 rounded-xl bg-brand-500/5 border border-brand-500/20">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-[10px] font-bold text-brand-400 uppercase tracking-widest flex items-center gap-2">
-                <CheckCircle2 className="size-3" /> Compatibilidade
+                <Target className="size-3" /> Estratégia Digital
               </h4>
-              <span className="text-xl font-black text-white">{plan.compatibilityScore.total}%</span>
+              <span className="text-xl font-black text-white">{plan.strategyScore.total}%</span>
             </div>
-            <Progress value={plan.compatibilityScore.total} className="h-1.5 bg-slate-800" />
+            <Progress value={plan.strategyScore.total} className="h-1.5 bg-slate-800" />
             <div className="grid grid-cols-5 gap-1 mt-3">
-              {Object.entries(plan.compatibilityScore.breakdown).map(([key, value]) => (
+              {Object.entries(plan.strategyScore.breakdown).map(([key, value]) => (
                 <div key={key} className="text-center">
                   <div className="text-[8px] uppercase text-slate-500 font-bold mb-0.5 truncate">{key}</div>
                   <div className="text-[10px] font-bold text-slate-300">{value}%</div>
@@ -172,7 +173,17 @@ export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuildi
         </button>
         <button 
           className={cn(
-            "py-4 px-2 ml-6 text-xs font-bold uppercase tracking-widest transition-all relative",
+            "py-4 px-2 ml-4 text-xs font-bold uppercase tracking-widest transition-all relative",
+            view === 'decisions' ? "text-white" : "text-slate-500 hover:text-slate-300"
+          )}
+          onClick={() => setView('decisions')}
+        >
+          Decisões ({plan.decisions.length})
+          {view === 'decisions' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500" />}
+        </button>
+        <button 
+          className={cn(
+            "py-4 px-2 ml-4 text-xs font-bold uppercase tracking-widest transition-all relative",
             view === 'sections' ? "text-white" : "text-slate-500 hover:text-slate-300"
           )}
           onClick={() => setView('sections')}
@@ -186,13 +197,45 @@ export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuildi
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {view === 'overview' ? (
           <div className="p-6 space-y-6">
+            {/* Visual Strategy Summary */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                  <Target className="size-3" /> Objetivo
+                </h5>
+                <p className="text-xs font-bold text-white">{plan.goal}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                  <Brain className="size-3" /> Estratégia
+                </h5>
+                <p className="text-xs font-bold text-brand-400 truncate">{plan.strategy}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                  <Layout className="size-3" /> Estrutura
+                </h5>
+                <p className="text-xs font-bold text-white">{plan.sections.length} seções</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                  <Palette className="size-3" /> Visual
+                </h5>
+                <p className="text-xs font-bold text-white truncate">{plan.designDirection}</p>
+              </div>
+            </div>
+
             <div className="space-y-3">
               <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Sequência de Construção</h4>
               <div className="space-y-1">
                 {plan.sections.map((section, idx) => (
                   <div key={section.id} className="flex items-center gap-3 p-2 group">
                     <span className="text-[10px] font-mono text-slate-700 w-4">{idx + 1}</span>
-                    <div className="size-1.5 rounded-full bg-slate-800 group-hover:bg-brand-500 transition-colors" />
+                    <div className={cn(
+                      "size-1.5 rounded-full transition-colors",
+                      section.priority === 'ESSENTIAL' ? "bg-red-500" : 
+                      section.priority === 'IMPORTANT' ? "bg-brand-500" : "bg-slate-800"
+                    )} />
                     <span className="text-sm font-medium text-slate-300">{section.name}</span>
                     {section.priority === 'ESSENTIAL' && (
                       <span className="ml-auto text-[8px] font-black px-1.5 py-0.5 rounded-sm bg-red-500/10 text-red-500 border border-red-500/20 uppercase">Essencial</span>
@@ -202,11 +245,41 @@ export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuildi
               </div>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
-              <p className="text-xs text-slate-400 italic leading-relaxed">
-                "Este plano foi otimizado para o seu nicho e objetivo. A Forge irá construir a estrutura completa e você poderá revisar cada seção no Studio."
+            <div className="p-4 rounded-xl border border-brand-500/30 bg-brand-500/5">
+              <h5 className="text-[11px] font-bold text-brand-400 mb-2 flex items-center gap-2">
+                <Brain className="size-3" /> Por que escolhi esta estrutura?
+              </h5>
+              <p className="text-[11px] text-slate-400 italic leading-relaxed">
+                "Seu principal objetivo é {plan.goal.toLowerCase()}. Por isso, a Forge priorizou: 
+                {plan.sections.filter(s => s.priority === 'ESSENTIAL').map(s => ` ✓ ${s.name}`).join(', ')}. 
+                A ordem foi pensada para manter clareza, interesse e prova social antes da conversão final."
               </p>
             </div>
+          </div>
+        ) : view === 'decisions' ? (
+          <div className="p-6 space-y-4">
+            {plan.decisions.map(decision => (
+              <div key={decision.id} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30 group">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={cn(
+                    "text-[9px] font-black px-2 py-0.5 rounded-full uppercase",
+                    decision.priority === 'ESSENTIAL' ? "bg-red-500/20 text-red-400 border border-red-500/30" :
+                    decision.priority === 'IMPORTANT' ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                    "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  )}>
+                    {decision.priority === 'ESSENTIAL' ? '🔴 Essencial' : decision.priority === 'IMPORTANT' ? '🟠 Importante' : '🟡 Opcional'}
+                  </div>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{decision.category}</span>
+                </div>
+                <h5 className="text-sm font-bold text-white mb-1">{decision.title}</h5>
+                <p className="text-[11px] text-slate-300 leading-relaxed mb-3">{decision.decision}</p>
+                
+                <div className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/50">
+                  <h6 className="text-[9px] font-bold text-slate-500 uppercase mb-1">Motivo Estratégico</h6>
+                  <p className="text-[10px] text-slate-400 italic leading-relaxed">{decision.reason}</p>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="p-6 space-y-4">
@@ -239,10 +312,12 @@ export function ForgePanel({ context, plan, onUpdatePlan, onStartBuild, isBuildi
                 <div className="flex items-center gap-2">
                   <span className={cn(
                     "text-[9px] font-bold px-2 py-0.5 rounded-full uppercase",
-                    section.source === 'SITE_PLANNER' ? "bg-brand-500/10 text-brand-400" : "bg-amber-500/10 text-amber-500"
+                    section.priority === 'ESSENTIAL' ? "bg-red-500/10 text-red-500" : 
+                    section.priority === 'IMPORTANT' ? "bg-brand-500/10 text-brand-400" : "bg-slate-800 text-slate-400"
                   )}>
-                    Fonte: {section.source}
+                    {section.priority === 'ESSENTIAL' ? '🔴 Essencial' : section.priority === 'IMPORTANT' ? '🟠 Importante' : '🟡 Opcional'}
                   </span>
+                  <span className="text-[9px] font-bold text-slate-600 ml-auto">Posição: {section.recommendedPosition}</span>
                 </div>
               </div>
             ))}
