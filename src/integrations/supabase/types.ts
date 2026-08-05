@@ -887,6 +887,72 @@ export type Database = {
           },
         ]
       }
+      studio_favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          item_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          item_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          item_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      studio_user_templates: {
+        Row: {
+          category: string
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          id: string
+          name: string
+          niche: string | null
+          preview_url: string | null
+          structure: Json
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          id?: string
+          name: string
+          niche?: string | null
+          preview_url?: string | null
+          structure: Json
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          id?: string
+          name?: string
+          niche?: string | null
+          preview_url?: string | null
+          structure?: Json
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number

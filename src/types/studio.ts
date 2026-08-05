@@ -32,8 +32,9 @@ export interface StudioDesignSystem {
 
 export interface StudioElement {
   id: string;
-  type: 'title' | 'subtitle' | 'paragraph' | 'image' | 'button' | 'link' | 'card' | 'whatsapp' | 'form' | 'icon' | 'container' | 'columns';
+  type: 'title' | 'subtitle' | 'paragraph' | 'image' | 'button' | 'link' | 'card' | 'whatsapp' | 'form' | 'icon' | 'container' | 'columns' | 'header' | 'footer' | 'testimonial' | 'faq' | 'contact';
   content: any;
+
   styles: Record<string, any>;
   responsive?: {
     tablet?: Record<string, any>;

@@ -306,8 +306,10 @@ function VynexaStudioPage() {
               updateData({ ...data, sections });
             }}
             onApplyTemplate={(templateData) => {
-              // Implementation for template application with confirmation
+              updateData(templateData as StudioData);
             }}
+            hasContent={data.sections.length > 0}
+
             onUpdateDesignSystem={handleUpdateDesignSystem}
             designSystem={data.design_system}
           />

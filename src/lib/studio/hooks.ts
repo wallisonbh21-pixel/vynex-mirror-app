@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { StudioData, StudioSection, StudioDesignSystem } from '@/types/studio';
+import { LibraryItem } from '@/types/studio-v2';
 
 const DEFAULT_DATA: StudioData = {
   design_system: {
@@ -77,6 +78,96 @@ export function useSaveStudioData() {
     },
     onSuccess: (data, variables) => {
       queryClient.setQueryData(['studio-data', variables.projectId], data);
+    }
+  });
+}
+
+// Favorites Hooks
+export function useStudioFavorites() {
+  return useQuery({
+    queryKey: ['studio-favorites'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('studio_favorites')
+        .select('*');
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+}
+
+export function useToggleFavorite() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ itemId, itemType, isFavorite }: { itemId: string; itemType: string; isFavorite: boolean }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Unauthorized');
+
+      if (isFavorite) {
+        const { error } = await supabase
+          .from('studio_favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('item_id', itemId)
+          .eq('item_type', itemType);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('studio_favorites')
+          .insert({ user_id: user.id, item_id: itemId, item_type: itemType });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['studio-favorites'] });
+    }
+  });
+}
+
+// User Templates Hooks
+export function useUserTemplates() {
+  return useQuery({
+    queryKey: ['studio-user-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('studio_user_templates')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+}
+
+export function useSaveUserTemplate() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (template: Omit<LibraryItem, 'id' | 'type'>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Unauthorized');
+
+      const { error } = await supabase
+        .from('studio_user_templates')
+        .insert({
+          creator_id: user.id,
+          name: template.name,
+          description: template.description || null,
+          category: template.category,
+          niche: template.niche || null,
+          structure: template.structure as any,
+          preview_url: template.preview || null,
+          tags: template.tags || null
+
+        });
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['studio-user-templates'] });
     }
   });
 }
