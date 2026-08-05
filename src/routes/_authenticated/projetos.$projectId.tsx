@@ -141,6 +141,43 @@ function DetalhesProjetoPage() {
                </div>
             </TabsContent>
             
+            <TabsContent value="id_visual" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <div className="grid md:grid-cols-2 gap-8">
+                 <div>
+                   <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
+                     <Palette className="size-4" /> Identidade Visual
+                   </h3>
+                   <div className="space-y-6 text-sm">
+                     <div className="p-4 bg-muted/30 rounded-xl border border-dashed text-center">
+                       <p className="text-muted-foreground italic">Arquivos de logotipo e marca serão exibidos aqui.</p>
+                     </div>
+                     <div>
+                       <h4 className="font-bold text-xs uppercase text-muted-foreground mb-3 tracking-wider">Cores da Marca</h4>
+                       <div className="flex gap-2">
+                         <div className="size-10 rounded-lg bg-primary border shadow-sm" title="Primária"></div>
+                         <div className="size-10 rounded-lg bg-secondary border shadow-sm" title="Secundária"></div>
+                         <div className="size-10 rounded-lg bg-muted border shadow-sm" title="Neutro"></div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+                 <div>
+                   <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
+                     <FolderOpen className="size-4" /> Materiais
+                   </h3>
+                   <div className="space-y-2">
+                     <div className="p-3 border rounded-xl flex items-center justify-between hover:bg-muted/50 transition-colors cursor-not-allowed opacity-60">
+                       <div className="flex items-center gap-3">
+                         <FileText className="size-4 text-muted-foreground" />
+                         <span className="text-xs font-medium">Briefing_Completo.pdf</span>
+                       </div>
+                       <Button variant="ghost" size="icon" className="size-8"><ExternalLink className="size-3" /></Button>
+                     </div>
+                     <p className="text-[10px] text-muted-foreground text-center py-4">Utilize a área de "Projeto" para links externos.</p>
+                   </div>
+                 </div>
+               </div>
+            
             <TabsContent value="checklist" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
                <div className="flex items-center justify-between mb-6">
                  <div>
