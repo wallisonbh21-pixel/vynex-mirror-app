@@ -256,7 +256,11 @@ export const Route = createFileRoute("/api/prospecting/search")({
           
           // Sort by relevance level: DIRETA > RELACIONADA > GENÉRICA
           const levelOrder: Record<string, number> = { 'DIRETA': 0, 'RELACIONADA': 1, 'GENÉRICA': 2, 'IRRELEVANTE': 3 };
-          allOpportunities.sort((a, b) => levelOrder[a.relevance_level] - levelOrder[b.relevance_level]);
+          allOpportunities.sort((a, b) => {
+            const orderA = levelOrder[a.relevance_level] ?? 99;
+            const orderB = levelOrder[b.relevance_level] ?? 99;
+            return orderA - orderB;
+          });
 
           const finalOpportunities = allOpportunities.slice(0, 30);
           
