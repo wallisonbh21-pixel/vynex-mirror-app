@@ -113,7 +113,13 @@ const NAV_CRIADOR: NavItem[] = [
     ]
   },
   { 
+    to: "/reunioes", 
+    label: "Reuniões", 
+    icon: CalendarClock 
+  },
+  { 
     to: "/recursos", 
+
     label: "Recursos", 
     icon: Library,
     submenu: [
