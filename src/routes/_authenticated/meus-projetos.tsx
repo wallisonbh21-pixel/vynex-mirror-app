@@ -103,15 +103,7 @@ function MeusProjetosPage() {
             </div>
 
             <div className="mb-4">
-              <SalesProgression 
-                steps={[
-                  { id: 'briefing', label: 'Briefing' },
-                  { id: 'em_producao', label: 'Criação' },
-                  { id: 'aguardando_aprovacao', label: 'Aprovação' },
-                  { id: 'aprovado', label: 'Finalizado' },
-                ]} 
-                currentStepId={project.status} 
-              />
+              <SalesProgression status={project.status} />
             </div>
 
             <div className="mb-6 grid grid-cols-2 gap-4">
