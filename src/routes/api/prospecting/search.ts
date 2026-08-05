@@ -26,22 +26,22 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Farmácia": "healthcare.pharmacy",
   "Loja de roupas": "commercial.clothing",
   "Dentista": "healthcare.dentist",
-  "Clínica": "healthcare.hospital,healthcare.clinic",
+  "Clínica": "healthcare.clinic_or_praxis,healthcare.hospital",
   "Pet Shop": "commercial.pet",
-  "Academia": "leisure.fitness,leisure.sports_centre",
+  "Academia": "leisure",
   "Salão de beleza": "service.beauty",
-  "Barbearia": "service.beauty.hairdresser,service.beauty",
+  "Barbearia": "service.beauty",
   "Oficina": "service.vehicle.repair",
-  "Imobiliária": "service.real_estate,commercial.estate_agent",
-  "Contabilidade": "service.financial",
-  "Advocacia": "service.legal",
-  "Fotografia": "service.photography",
-  "Eventos": "service.event_planner,entertainment.event_venue",
+  "Imobiliária": "commercial",
+  "Contabilidade": "service",
+  "Advocacia": "office",
+  "Fotografia": "service",
+  "Eventos": "entertainment",
 };
 
 /**
  * Categorias oficiais suportadas pela Geoapify Places API v2.
- * Esta lista é usada para validar e prevenir erros 400.
+ * Documentação de referência: https://apidocs.geoapify.com/docs/places/categories/
  */
 const OFFICIAL_CATEGORIES = new Set([
   "accommodation", "accommodation.hotel", "accommodation.hostel", "accommodation.guest_house", "accommodation.apartment",
@@ -51,10 +51,10 @@ const OFFICIAL_CATEGORIES = new Set([
   "catering", "catering.restaurant", "catering.restaurant.burger", "catering.restaurant.pizza", "catering.restaurant.thai",
   "catering.cafe", "catering.bar", "catering.pub", "catering.fast_food",
   "education", "education.school", "education.university",
-  "entertainment", "entertainment.cinema", "entertainment.culture", "entertainment.event_venue",
-  "healthcare", "healthcare.hospital", "healthcare.clinic", "healthcare.dentist", "healthcare.pharmacy",
+  "entertainment", "entertainment.cinema", "entertainment.culture",
+  "healthcare", "healthcare.hospital", "healthcare.clinic_or_praxis", "healthcare.dentist", "healthcare.pharmacy",
   "heritage",
-  "leisure", "leisure.fitness", "leisure.sports_centre", "leisure.park", "leisure.playground",
+  "leisure", "leisure.park", "leisure.playground",
   "natural",
   "office", "office.government",
   "parking",
@@ -63,14 +63,20 @@ const OFFICIAL_CATEGORIES = new Set([
   "public_transport",
   "religion",
   "rental",
-  "service", "service.beauty", "service.beauty.hairdresser", "service.financial", "service.legal", "service.real_estate", "service.photography", "service.event_planner", "service.vehicle", "service.vehicle.repair",
+  "service", "service.beauty", "service.vehicle", "service.vehicle.repair",
   "tourism",
   "camping"
 ]);
 
 function getGeoapifyCategories(niche: string, requestId: string): { categories: string; fallbackUsed: boolean; log: string } {
+  // Garantir que estamos usando o mapa mais recente definido acima
   const mapped = NICHE_CATEGORY_MAP[niche] || "commercial,catering,service";
-  const requestedCategories = mapped.split(",");
+  
+  // Limpeza preventiva: se por algum motivo healthcare.clinic (inválida) ainda existir na string original
+  // nós a removemos antes da validação.
+  const cleanedMapped = mapped.replace(/healthcare\.clinic\b/g, "healthcare.clinic_or_praxis");
+  
+  const requestedCategories = cleanedMapped.split(",");
   const validatedCategories: string[] = [];
   let fallbackUsed = false;
   let log = "";
@@ -98,6 +104,12 @@ function getGeoapifyCategories(niche: string, requestId: string): { categories: 
 
   // Deduplicar e juntar
   const finalCategories = [...new Set(validatedCategories)].join(",");
+  
+  // LOG CRÍTICO PARA AUDITORIA DE RUNTIME
+  if (finalCategories.includes("healthcare.clinic") && !finalCategories.includes("healthcare.clinic_or_praxis")) {
+    console.error(`[CRITICAL_FAILURE][${requestId}] INVALID CATEGORY healthcare.clinic DETECTED IN FINAL STRING! Niche: ${niche}`);
+  }
+
   return { categories: finalCategories, fallbackUsed, log };
 }
 
@@ -287,7 +299,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v3.1-v2api-catfixed";
+          const diagnostic = "prospecting-search-v3.3-catfixed-v2stable";
           
           return new Response(JSON.stringify({ 
             opportunities, 
