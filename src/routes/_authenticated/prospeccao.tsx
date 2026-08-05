@@ -453,6 +453,7 @@ function ProspeccaoPage() {
                 onStatus={(status) =>
                   user && changeStatus.mutate({ opportunity, status, userId: user.id })
                 }
+                showArchived={showArchived}
                 onRemove={() => {
                   if (showArchived) {
                     if (confirm("Restaurar oportunidade?\nEssa empresa voltará para sua lista de oportunidades ativas.")) {
@@ -635,22 +636,29 @@ function OpportunityCard({
   onAdd,
   onStatus,
   onRemove,
+  showArchived,
 }: {
   opportunity: Opportunity;
   ownerName: string | null;
   onAdd: () => void;
   onStatus: (status: string) => void;
   onRemove: () => void;
+  showArchived?: boolean;
 }) {
   return (
     <article className="relative rounded-2xl border border-border bg-card p-5 shadow-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-glow">
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-3 top-3 size-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
+        className={cn(
+          "absolute right-3 top-3 size-8 rounded-full",
+          showArchived 
+            ? "hover:bg-primary/10 hover:text-primary" 
+            : "hover:bg-destructive/10 hover:text-destructive"
+        )}
         onClick={onRemove}
       >
-        <X className="size-4" />
+        {showArchived ? <Sparkles className="size-4 text-primary" /> : <X className="size-4" />}
       </Button>
 
       <div className="flex flex-wrap items-start justify-between gap-2 pr-8">
