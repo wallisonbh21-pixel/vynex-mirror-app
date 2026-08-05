@@ -67,7 +67,7 @@ export function createBuildPlan(context: ScaleNexusProjectContext): ForgeBuildPl
         id: `plan-sec-${idx}`,
         type,
         name: s.name,
-        purpose: s.description || 'Seção planejada',
+        purpose: s.recommendation || 'Seção planejada',
         priority: idx === 0 ? 'ESSENTIAL' : 'HIGH',
         recommended: true,
         source: 'SITE_PLANNER',
