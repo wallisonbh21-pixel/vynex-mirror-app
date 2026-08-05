@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { CheckCircle2, AlertCircle, Globe, ExternalLink, MessageSquare, Send, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Globe, ExternalLink, MessageSquare, Send, ArrowRight, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
@@ -74,11 +74,11 @@ function ClientApprovalPage() {
       await supabase.from('project_approval_events').insert({
         project_id: data.id,
         event_type: status === 'aprovado' ? 'client_approval' : 'client_adjustment',
-        previous_status: project?.status,
+        previous_status: project?.status || null,
         new_status: status,
         actor_label: 'Cliente',
         message: message || (status === 'aprovado' ? 'Projeto aprovado pelo cliente.' : 'Cliente solicitou ajustes.')
-      });
+      } as any);
 
       // Notification logic (internal system)
       await supabase.from('notifications').insert({
