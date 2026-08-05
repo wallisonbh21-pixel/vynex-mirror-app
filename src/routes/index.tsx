@@ -1,8 +1,13 @@
-import { Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Palette, Box, Layout, Monitor } from 'lucide-react';
+import { Palette, Layout, Monitor } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
-export default function Index() {
+export const Route = createFileRoute('/')({
+  component: Index,
+});
+
+function Index() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl text-center">
