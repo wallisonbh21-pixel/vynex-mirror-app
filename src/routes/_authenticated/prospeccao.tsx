@@ -130,6 +130,7 @@ function ProspeccaoPage() {
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
   const [searched, setSearched] = useState(false);
+  const [precision, setPrecision] = useState<"alta" | "ampla">("alta");
 
   const [levelFilter, setLevelFilter] = useState("todas");
   const [statusFilter, setStatusFilter] = useState("todas");
@@ -291,6 +292,23 @@ function ProspeccaoPage() {
             <Label>Cidade <span className="text-[10px] font-normal text-muted-foreground uppercase tracking-wider ml-1">(Opcional)</span></Label>
             <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ex: Contagem" />
           </div>
+          <div className="space-y-2">
+            <Label>Precisão da busca</Label>
+            <Select value={precision} onValueChange={(v: "alta" | "ampla") => setPrecision(v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="alta">🎯 Alta</SelectItem>
+                <SelectItem value="ampla">🔎 Ampla</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              {precision === "alta" 
+                ? "Somente empresas diretamente relacionadas ao nicho." 
+                : "Inclui empresas relacionadas ao segmento."}
+            </p>
+          </div>
           <div className="flex items-end">
             <Button
               className="w-full gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow"
@@ -298,7 +316,7 @@ function ProspeccaoPage() {
               onClick={() => {
                 setSearched(true);
                 searchExternal.mutate(
-                  { niche: niche === "Outros" ? otherNiche : niche, state, city },
+                  { niche: niche === "Outros" ? otherNiche : niche, state, city, precision },
                   { onSuccess: (data) => setExternalResults(data) }
                 );
               }}

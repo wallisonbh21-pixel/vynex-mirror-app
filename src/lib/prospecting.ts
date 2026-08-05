@@ -132,11 +132,11 @@ export function useSaveOpportunity() {
 /** Busca externa de oportunidades via API (Geoapify). */
 export function useSearchOpportunities() {
   return useMutation({
-    mutationFn: async ({ niche, state, city }: { niche: string; state: string; city?: string | null }) => {
+    mutationFn: async ({ niche, state, city, precision = "alta" }: { niche: string; state: string; city?: string | null; precision?: "alta" | "ampla" }) => {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
       
-      const payload = { niche, state, city };
+      const payload = { niche, state, city, precision };
       console.log("[Prospecting Search] Iniciando request para /api/prospecting/search", payload);
 
       const response = await fetch("/api/prospecting/search", {
