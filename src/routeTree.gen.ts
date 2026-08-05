@@ -37,6 +37,7 @@ import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_au
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
+import { Route as AuthenticatedReuniaoMeetingIdRouteImport } from './routes/_authenticated/reuniao/$meetingId'
 import { Route as AuthenticatedReunioesIndexRouteImport } from './routes/_authenticated/reunioes/index'
 import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
@@ -187,6 +188,12 @@ const AuthenticatedProjetosProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => AuthenticatedProjetosRoute,
   } as any)
+const AuthenticatedReuniaoMeetingIdRoute =
+  AuthenticatedReuniaoMeetingIdRouteImport.update({
+    id: '/reuniao/$meetingId',
+    path: '/reuniao/$meetingId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReunioesIndexRoute =
   AuthenticatedReunioesIndexRouteImport.update({
     id: '/reunioes/',
@@ -238,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
@@ -271,6 +279,7 @@ export interface FileRoutesByTo {
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
@@ -306,6 +315,7 @@ export interface FileRoutesById {
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/_authenticated/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
   '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
@@ -341,6 +351,7 @@ export interface FileRouteTypes {
     | '/briefing/$projectId'
     | '/leads/$leadId'
     | '/projetos/$projectId'
+    | '/reuniao/$meetingId'
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/api/prospecting/search'
@@ -374,6 +385,7 @@ export interface FileRouteTypes {
     | '/briefing/$projectId'
     | '/leads/$leadId'
     | '/projetos/$projectId'
+    | '/reuniao/$meetingId'
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/api/prospecting/search'
@@ -408,6 +420,7 @@ export interface FileRouteTypes {
     | '/_authenticated/briefing/$projectId'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/projetos/$projectId'
+    | '/_authenticated/reuniao/$meetingId'
     | '/_authenticated/site-planner/$projectId'
     | '/_authenticated/studio/$projectId'
     | '/api/prospecting/search'
@@ -622,6 +635,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetosProjectIdRouteImport
       parentRoute: typeof AuthenticatedProjetosRoute
     }
+    '/_authenticated/reuniao/$meetingId': {
+      id: '/_authenticated/reuniao/$meetingId'
+      path: '/reuniao/$meetingId'
+      fullPath: '/reuniao/$meetingId'
+      preLoaderRoute: typeof AuthenticatedReuniaoMeetingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reunioes/': {
       id: '/_authenticated/reunioes/'
       path: '/reunioes'
@@ -688,6 +708,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedBriefingProjectIdRoute: typeof AuthenticatedBriefingProjectIdRoute
   AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
+  AuthenticatedReuniaoMeetingIdRoute: typeof AuthenticatedReuniaoMeetingIdRoute
   AuthenticatedSitePlannerProjectIdRoute: typeof AuthenticatedSitePlannerProjectIdRoute
   AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
@@ -716,6 +737,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedBriefingProjectIdRoute: AuthenticatedBriefingProjectIdRoute,
   AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
+  AuthenticatedReuniaoMeetingIdRoute: AuthenticatedReuniaoMeetingIdRoute,
   AuthenticatedSitePlannerProjectIdRoute:
     AuthenticatedSitePlannerProjectIdRoute,
   AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
