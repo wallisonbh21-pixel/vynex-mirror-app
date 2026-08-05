@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { StudioData } from '@/types/studio';
+import { StudioData, StudioSection, StudioDesignSystem } from '@/types/studio';
 
 const DEFAULT_DATA: StudioData = {
   design_system: {
@@ -49,11 +49,11 @@ export function useStudioData(projectId: string) {
       
       if (!data) return DEFAULT_DATA;
       
-      // The database column for the JSON content is 'design_system' and 'sections'? 
-      // Wait, let's check the schema again. Usually it's a single 'data' jsonb column.
-      // Based on previous turn logs, it seems to be stored in project_studio_data.
-      
-      return (data as any).data ? ((data as any).data as unknown as StudioData) : DEFAULT_DATA;
+      // Map database flat structure to StudioData object
+      return {
+        design_system: (data.design_system as unknown as StudioDesignSystem) || DEFAULT_DATA.design_system,
+        sections: (data.sections as unknown as StudioSection[]) || DEFAULT_DATA.sections
+      };
     }
   });
 }
@@ -67,7 +67,8 @@ export function useSaveStudioData() {
         .from('project_studio_data')
         .upsert({ 
           project_id: projectId, 
-          data: data as any,
+          design_system: data.design_system as any,
+          sections: data.sections as any,
           updated_at: new Date().toISOString()
         });
       
