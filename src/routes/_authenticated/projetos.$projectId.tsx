@@ -303,7 +303,32 @@ function DetalhesProjetoPage() {
                    </div>
                  )}
                </div>
+             </TabsContent>
+            
+            <TabsContent value="reunioes" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <div className="flex items-center justify-between mb-8">
+                 <div className="flex items-center gap-3">
+                   <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                     <Calendar className="size-6" />
+                   </div>
+                   <div>
+                     <h3 className="text-xl font-bold">Agenda de Reuniões</h3>
+                     <p className="text-sm text-muted-foreground">Alinhamentos estratégicos com o cliente.</p>
+                   </div>
+                 </div>
+                 <Button asChild variant="outline" className="gap-2">
+                   <Link to="/reunioes">Ver Todas</Link>
+                 </Button>
+               </div>
+
+               <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-2xl text-center">
+                 <p className="text-muted-foreground italic mb-4">Nenhuma reunião agendada para este projeto.</p>
+                 <Button className="font-bold shadow-glow" asChild>
+                   <Link to="/reunioes">Agendar Reunião</Link>
+                 </Button>
+               </div>
             </TabsContent>
+
 
             <TabsContent value="historico" className="mt-4 overflow-hidden border rounded-2xl bg-card shadow-panel">
                <div className="divide-y">
