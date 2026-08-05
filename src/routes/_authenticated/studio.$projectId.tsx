@@ -106,7 +106,9 @@ function ScaleNexusStudioPage() {
     for (let i = 0; i < activeSections.length; i++) {
       setForgeStepIndex(i);
       await new Promise(resolve => setTimeout(resolve, 800));
-      handleAIAction(activeSections[i].action);
+      if (activeSections[i]) {
+        handleAIAction(activeSections[i].action);
+      }
     }
 
     setIsBuildingWithForge(false);
