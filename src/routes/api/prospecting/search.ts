@@ -76,6 +76,86 @@ const NICHE_STRATEGY: Record<string, NicheConfig> = {
       related: ["restaurante italiano", "delivery pizza", "massas"],
       negative: ["depósito", "supermercado", "banco", "farmácia"]
     }
+  },
+  "Restaurante": {
+    primaryCategories: ["catering.restaurant"],
+    secondaryCategories: ["catering.fast_food", "catering.cafe"],
+    searchTerms: ["restaurante", "gastronomia", "comida"],
+    relevance: {
+      direct: ["restaurante", "gourmet", "cozinha", "gastronomia"],
+      related: ["lanchonete", "churrascaria", "rodízio"],
+      negative: ["depósito", "banco", "farmácia"]
+    }
+  },
+  "Clínica": {
+    primaryCategories: ["healthcare.clinic_or_praxis"],
+    secondaryCategories: ["healthcare.hospital"],
+    searchTerms: ["clínica", "consultório", "médico"],
+    relevance: {
+      direct: ["clínica", "consultório", "policlínica", "médico"],
+      related: ["centro médico", "especialidades"],
+      negative: ["veterinário", "dentista", "farmácia"]
+    }
+  },
+  "Oficina": {
+    primaryCategories: ["service.vehicle.repair", "service.vehicle.car_wash"],
+    secondaryCategories: ["service.vehicle"],
+    searchTerms: ["oficina", "mecânica", "auto center", "funilaria"],
+    relevance: {
+      direct: ["oficina", "mecânica", "auto center", "auto socorro", "funilaria"],
+      related: ["borracharia", "troca de óleo", "estética automotiva"],
+      negative: ["concessionária", "venda de carros", "banco"]
+    }
+  },
+  "Advocacia": {
+    primaryCategories: ["service.office.lawyer"],
+    secondaryCategories: ["service.office"],
+    searchTerms: ["advogado", "advocacia", "jurídico", "direito"],
+    relevance: {
+      direct: ["advogado", "advocacia", "escritório de advocacia", "jurídico"],
+      related: ["direito", "consultoria jurídica"],
+      negative: ["banco", "cartório", "contabilidade"]
+    }
+  },
+  "Contabilidade": {
+    primaryCategories: ["service.office.accountant"],
+    secondaryCategories: ["service.office"],
+    searchTerms: ["contabilidade", "contador", "contábil"],
+    relevance: {
+      direct: ["contabilidade", "contador", "contábil", "assessoria contábil"],
+      related: ["escritório contábil", "auditoria"],
+      negative: ["banco", "advogado", "advocacia"]
+    }
+  },
+  "Imobiliária": {
+    primaryCategories: ["service.real_estate_agent"],
+    secondaryCategories: ["service.office"],
+    searchTerms: ["imobiliária", "corretor", "imóveis"],
+    relevance: {
+      direct: ["imobiliária", "imóveis", "corretor de imóveis"],
+      related: ["venda de casas", "aluguel"],
+      negative: ["construtora", "engenharia"]
+    }
+  },
+  "Fotografia": {
+    primaryCategories: ["service.beauty"], // No specific photo category in v2 commonly, use broad or search
+    secondaryCategories: [],
+    searchTerms: ["fotógrafo", "estúdio fotográfico", "fotografia"],
+    relevance: {
+      direct: ["fotógrafo", "fotografia", "estúdio fotográfico", "studio photo"],
+      related: ["vídeo", "filmagem", "ensaio"],
+      negative: ["gráfica", "impressão"]
+    }
+  },
+  "Eventos": {
+    primaryCategories: ["leisure.sports_centre", "catering.restaurant"], // Venues
+    secondaryCategories: ["service.beauty"],
+    searchTerms: ["espaço para eventos", "buffet", "salão de festas", "organização de eventos"],
+    relevance: {
+      direct: ["eventos", "buffet", "salão de festas", "cerimonial"],
+      related: ["festa", "casamento", "aniversário"],
+      negative: ["banco", "oficina"]
+    }
   }
 };
 
