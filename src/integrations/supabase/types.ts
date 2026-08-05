@@ -432,6 +432,47 @@ export type Database = {
           },
         ]
       }
+      project_assets: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          owner_id: string
+          project_id: string | null
+          size: number | null
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          project_id?: string | null
+          size?: number | null
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          project_id?: string | null
+          size?: number | null
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_assets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_checklist_items: {
         Row: {
           completed: boolean
@@ -497,6 +538,47 @@ export type Database = {
             foreignKeyName: "project_notes_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_studio_data: {
+        Row: {
+          created_at: string | null
+          design_system: Json | null
+          history: Json | null
+          id: string
+          last_saved_at: string | null
+          project_id: string
+          sections: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          design_system?: Json | null
+          history?: Json | null
+          id?: string
+          last_saved_at?: string | null
+          project_id: string
+          sections?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          design_system?: Json | null
+          history?: Json | null
+          id?: string
+          last_saved_at?: string | null
+          project_id?: string
+          sections?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_studio_data_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
