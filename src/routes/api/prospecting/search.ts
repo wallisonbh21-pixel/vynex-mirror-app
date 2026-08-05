@@ -214,7 +214,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
         const startTime = Date.now();
         
         try {
-          // Auth & Roles - MOVED TO CHECK IF PRODUCTION OR LOCAL AUDIT
+          // Auth & Roles
           const authHeader = request.headers.get("Authorization");
           let user: any = null;
           let userRoles: string[] = [];
@@ -229,11 +229,12 @@ export const Route = createFileRoute("/api/prospecting/search")({
             }
           }
 
-          // Allow audit from sandbox without full auth if needed, but strictly for GET or with specific internal header
-          const isInternalAudit = request.headers.get("X-ScaleNexus-Audit") === "true";
+          if (!user) {
+             return new Response(JSON.stringify({ error: "Unauthorized", message: "Autenticação necessária" }), { status: 401 });
+          }
 
-          if (!isInternalAudit && (!user || (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")))) {
-             return new Response(JSON.stringify({ error: true, stage: "auth", message: "Acesso negado", requestId }), { status: 403 });
+          if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
+             return new Response(JSON.stringify({ error: "Forbidden", message: "Acesso negado: permissão insuficiente" }), { status: 403 });
           }
 
           // Input
