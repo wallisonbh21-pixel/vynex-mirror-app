@@ -163,17 +163,16 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const areaPlaceId = geocodeData.results?.[0]?.place_id;
           if (!areaPlaceId) return new Response(JSON.stringify({ error: true, stage: "geocoding", message: "Localização não encontrada", requestId }), { status: 404 });
 
-          const config = NICHE_STRATEGY[niche] || null;
-          const uniqueResults = new Map();
-          let queriesExecuted = 0;
-          let pagesFetched = 0;
-          let rawResultsCount = 0;
+          // Layered approach: Execute multiple queries until target is reached
+          const resultsMap = new Map();
+          const diagnostic: any = {
+            requestId,
+            queries: [],
+            totalDuration: 0,
+            startTime: Date.now()
+          };
 
-          // Search Strategy: Layered approach
-          // Layer 1: Primary Categories
-          // Layer 2: Secondary Categories
-          // Layer 3: Search Terms
-          
+          const config = NICHE_STRATEGY[niche] || null;
           const searchLayers = [];
           if (config) {
             if (config.primaryCategories.length > 0) searchLayers.push({ type: 'categories', values: config.primaryCategories });
@@ -183,82 +182,117 @@ export const Route = createFileRoute("/api/prospecting/search")({
             searchLayers.push({ type: 'text', values: [niche] });
           }
 
-          for (const layer of searchLayers) {
-            if (uniqueResults.size >= 30 && !rawMode) break;
+          const targetCount = 30;
 
+          // Layer loop
+          for (const layer of searchLayers) {
+            if (resultsMap.size >= targetCount && !rawMode) break;
+
+            // Value loop within layer
             for (const value of layer.values) {
-              if (uniqueResults.size >= 30 && !rawMode) break;
+              if (resultsMap.size >= targetCount && !rawMode) break;
 
               let offset = 0;
               let hasMore = true;
+              let retryCount = 0;
 
-              while (hasMore && (uniqueResults.size < 30 || rawMode)) {
-                queriesExecuted++;
-                pagesFetched++;
-                
-                const geoUrl = new URL("https://api.geoapify.com/v2/places");
-                if (layer.type === 'categories') geoUrl.searchParams.set("categories", value);
-                geoUrl.searchParams.set("text", layer.type === 'text' ? value : niche);
-                geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
-                geoUrl.searchParams.set("limit", "20");
-                geoUrl.searchParams.set("offset", offset.toString());
-                geoUrl.searchParams.set("lang", "pt");
-                geoUrl.searchParams.set("apiKey", apiKey);
+              while (hasMore && (resultsMap.size < targetCount || rawMode) && retryCount < 5) {
+                const queryStartTime = Date.now();
+                const currentQuery: any = {
+                  type: layer.type,
+                  value,
+                  offset,
+                  stage: `layer_${layer.type}_${value}_offset_${offset}`
+                };
 
-                const res = await fetch(geoUrl.toString());
-                if (!res.ok) break;
-
-                const data = await res.json();
-                const features = data.features || [];
-                rawResultsCount += features.length;
-
-                if (features.length < 20) hasMore = false;
-                else offset += 20;
-
-                for (const f of features) {
-                  const props = f.properties;
-                  if (!props?.name) continue;
+                try {
+                  const geoUrl = new URL("https://api.geoapify.com/v2/places");
+                  if (layer.type === 'categories') {
+                    geoUrl.searchParams.set("categories", value);
+                  }
                   
-                  const key = props.place_id || generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
-                  if (uniqueResults.has(key)) continue;
+                  // Text parameter usage varies by API version/endpoint
+                  // For v2/places, 'text' search is a filter or we use /v1/places/search
+                  // We'll keep the current logic but wrap it in a try-catch per query
+                  geoUrl.searchParams.set("text", layer.type === 'text' ? value : niche);
+                  geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
+                  geoUrl.searchParams.set("limit", "20");
+                  geoUrl.searchParams.set("offset", offset.toString());
+                  geoUrl.searchParams.set("lang", "pt");
+                  geoUrl.searchParams.set("apiKey", apiKey);
 
-                  const relevance = calculateRelevanceScore(props, niche, config);
+                  const res = await fetch(geoUrl.toString());
+                  currentQuery.httpStatus = res.status;
                   
-                  // Skip if irrelevant or if we need high precision and it's just generic
-                  if (!rawMode) {
-                    if (relevance.level === 'IRRELEVANTE') continue;
-                    if (precision === 'alta' && relevance.level === 'GENÉRICA') continue;
+                  if (!res.ok) {
+                    const errorText = await res.text();
+                    currentQuery.error = true;
+                    currentQuery.message = `API Geoapify retornou ${res.status}`;
+                    currentQuery.details = errorText.substring(0, 200);
+                    diagnostic.queries.push(currentQuery);
+                    break; // Fail this layer/value path, move to next
                   }
 
-                  uniqueResults.set(key, {
-                    business_name: props.name,
-                    category: niche,
-                    address: props.address_line2,
-                    city: props.city,
-                    state: props.state_code || state,
-                    lat: props.lat,
-                    lon: props.lon,
-                    place_id: props.place_id,
-                    website: props.website,
-                    opportunity_level: props.website ? "media" : "alta",
-                    status: "nova",
-                    relevance_level: relevance.level,
-                    _debug: { score: relevance.score, level: relevance.level, layer: layer.type, value }
-                  });
+                  const data = await res.json();
+                  const features = data.features || [];
+                  currentQuery.resultsCount = features.length;
+                  currentQuery.duration = Date.now() - queryStartTime;
+                  diagnostic.queries.push(currentQuery);
 
-                  if (uniqueResults.size >= 30 && !rawMode) break;
+                  if (features.length < 20) {
+                    hasMore = false;
+                  } else {
+                    offset += 20;
+                  }
+
+                  for (const f of features) {
+                    const props = f.properties;
+                    if (!props?.name) continue;
+                    
+                    const key = props.place_id || generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
+                    if (resultsMap.has(key)) continue;
+
+                    const relevance = calculateRelevanceScore(props, niche, config);
+                    
+                    if (!rawMode) {
+                      if (relevance.level === 'IRRELEVANTE') continue;
+                      if (precision === 'alta' && relevance.level === 'GENÉRICA') continue;
+                    }
+
+                    resultsMap.set(key, {
+                      business_name: props.name,
+                      category: niche,
+                      address: props.address_line2,
+                      city: props.city,
+                      state: props.state_code || state,
+                      lat: props.lat,
+                      lon: props.lon,
+                      place_id: props.place_id,
+                      website: props.website,
+                      opportunity_level: props.website ? "media" : "alta",
+                      status: "nova",
+                      relevance_level: relevance.level,
+                      _debug: { score: relevance.score, level: relevance.level, layer: layer.type, value }
+                    });
+
+                    if (resultsMap.size >= targetCount && !rawMode) break;
+                  }
+                  
+                  if (features.length === 0) hasMore = false;
+
+                } catch (err: any) {
+                  currentQuery.error = true;
+                  currentQuery.message = err.message;
+                  diagnostic.queries.push(currentQuery);
+                  hasMore = false; // Stop this specific loop
                 }
-                
-                // Don't loop infinitely if we aren't finding new items
-                if (features.length === 0) hasMore = false;
+                retryCount++;
               }
             }
           }
 
-          // Final Results & Sorting
-          const allOpportunities = Array.from(uniqueResults.values());
-          
-          // Sort by relevance level: DIRETA > RELACIONADA > GENÉRICA
+          // Final consolidation
+          const allOpportunities = Array.from(resultsMap.values());
           const levelOrder: Record<string, number> = { 'DIRETA': 0, 'RELACIONADA': 1, 'GENÉRICA': 2, 'IRRELEVANTE': 3 };
           allOpportunities.sort((a, b) => {
             const orderA = levelOrder[a.relevance_level] ?? 99;
@@ -266,30 +300,32 @@ export const Route = createFileRoute("/api/prospecting/search")({
             return orderA - orderB;
           });
 
-          const finalOpportunities = allOpportunities.slice(0, 30);
-          
-          const diagnostic = { 
-            requestId,
-            queriesExecuted,
-            pagesFetched,
-            rawResults: rawResultsCount,
-            deduplicatedResults: Array.from(uniqueResults.keys()).length,
-            relevantResults: allOpportunities.length,
-            finalResults: finalOpportunities.length,
-            duration: Date.now() - startTime
-          };
+          const finalOpportunities = allOpportunities.slice(0, targetCount);
+          diagnostic.totalDuration = Date.now() - diagnostic.startTime;
+          diagnostic.finalCount = finalOpportunities.length;
+          diagnostic.totalFound = allOpportunities.length;
 
           return new Response(JSON.stringify({ 
             opportunities: finalOpportunities, 
             diagnostic, 
             stage: "complete",
-            version: "v10.0-layered-search" 
+            version: "v10.1-resilient" 
           }), {
             headers: { "Content-Type": "application/json" }
           });
 
         } catch (e: any) {
-          return new Response(JSON.stringify({ error: true, stage: "unknown", message: e.message, requestId }), { status: 500 });
+          console.error(`[Prospecting API Error] ${requestId}:`, e);
+          return new Response(JSON.stringify({ 
+            error: true, 
+            stage: "unknown", 
+            message: e.message || "Erro desconhecido", 
+            requestId,
+            details: e.stack?.substring(0, 300)
+          }), { 
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+          });
         }
       }
     }
