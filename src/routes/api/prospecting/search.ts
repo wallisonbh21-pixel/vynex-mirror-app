@@ -404,14 +404,21 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
         } catch (e: any) {
           console.error(`[Prospecting API Error] ${requestId}:`, e);
+          
+          // Generic production-safe error response
+          let status = 500;
+          let message = "Não foi possível realizar a prospecção.";
+          
+          if (e instanceof z.ZodError) {
+            status = 400;
+            message = "Parâmetros de busca inválidos.";
+          }
+
           return new Response(JSON.stringify({ 
-            error: true, 
-            stage: "unknown", 
-            message: e.message || "Erro desconhecido", 
-            requestId,
-            details: e.stack?.substring(0, 300)
+            error: message,
+            requestId 
           }), { 
-            status: 500,
+            status,
             headers: { "Content-Type": "application/json" }
           });
         }
