@@ -71,8 +71,10 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { to: "/clientes", label: "Clientes", icon: Building2 },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
+  { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
+
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/metas", label: "Metas", icon: BarChart3 },
@@ -111,7 +113,13 @@ const NAV_CRIADOR: NavItem[] = [
     ]
   },
   { 
+    to: "/reunioes", 
+    label: "Reuniões", 
+    icon: CalendarClock 
+  },
+  { 
     to: "/recursos", 
+
     label: "Recursos", 
     icon: Library,
     submenu: [

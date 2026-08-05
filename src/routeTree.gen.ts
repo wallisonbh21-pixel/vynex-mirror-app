@@ -37,6 +37,7 @@ import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_au
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
+import { Route as AuthenticatedReunioesIndexRouteImport } from './routes/_authenticated/reunioes/index'
 import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
@@ -186,6 +187,12 @@ const AuthenticatedProjetosProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => AuthenticatedProjetosRoute,
   } as any)
+const AuthenticatedReunioesIndexRoute =
+  AuthenticatedReunioesIndexRouteImport.update({
+    id: '/reunioes/',
+    path: '/reunioes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSitePlannerProjectIdRoute =
   AuthenticatedSitePlannerProjectIdRouteImport.update({
     id: '/site-planner/$projectId',
@@ -235,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
+  '/reunioes/': typeof AuthenticatedReunioesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
+  '/reunioes': typeof AuthenticatedReunioesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -301,6 +310,7 @@ export interface FileRoutesById {
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
+  '/_authenticated/reunioes/': typeof AuthenticatedReunioesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/studio/$projectId'
     | '/api/prospecting/search'
     | '/leads/'
+    | '/reunioes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/studio/$projectId'
     | '/api/prospecting/search'
     | '/leads'
+    | '/reunioes'
   id:
     | '__root__'
     | '/'
@@ -400,6 +412,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio/$projectId'
     | '/api/prospecting/search'
     | '/_authenticated/leads/'
+    | '/_authenticated/reunioes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -609,6 +622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetosProjectIdRouteImport
       parentRoute: typeof AuthenticatedProjetosRoute
     }
+    '/_authenticated/reunioes/': {
+      id: '/_authenticated/reunioes/'
+      path: '/reunioes'
+      fullPath: '/reunioes/'
+      preLoaderRoute: typeof AuthenticatedReunioesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/site-planner/$projectId': {
       id: '/_authenticated/site-planner/$projectId'
       path: '/site-planner/$projectId'
@@ -671,6 +691,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSitePlannerProjectIdRoute: typeof AuthenticatedSitePlannerProjectIdRoute
   AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
+  AuthenticatedReunioesIndexRoute: typeof AuthenticatedReunioesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -699,6 +720,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSitePlannerProjectIdRoute,
   AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
+  AuthenticatedReunioesIndexRoute: AuthenticatedReunioesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -715,13 +737,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
