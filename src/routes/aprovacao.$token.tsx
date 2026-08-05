@@ -139,7 +139,7 @@ function ClientApprovalPage() {
       <header className="border-b border-slate-800/50 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="size-8 bg-primary rounded-lg flex items-center justify-center font-black text-white italic">V</div>
+            <div className="size-8 bg-primary rounded-lg flex items-center justify-center font-black text-white italic">S</div>
             <span className="font-bold text-xl tracking-tight text-white uppercase">ScaleNexus</span>
           </div>
           <div className="hidden md:block">
