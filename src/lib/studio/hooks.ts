@@ -36,10 +36,29 @@ const DEFAULT_DATA: StudioData = {
   sections: []
 };
 
-export function useStudioData(projectId: string) {
+export function useStudioData(projectId: string, clientToken?: string) {
   return useQuery({
-    queryKey: ['studio-data', projectId],
+    queryKey: ['studio-data', projectId, clientToken],
     queryFn: async () => {
+      if (clientToken) {
+        // Use stateless RPC for public access
+        const { data, error } = await supabase
+          .rpc('get_project_studio_data_public', { 
+            p_project_id: projectId, 
+            p_client_token: clientToken 
+          });
+        
+        if (error) throw error;
+        if (!data || !Array.isArray(data) || data.length === 0) return DEFAULT_DATA;
+        
+        const first = data[0];
+        return {
+          design_system: (first.design_system as unknown as StudioDesignSystem) || DEFAULT_DATA.design_system,
+          sections: (first.sections as unknown as StudioSection[]) || DEFAULT_DATA.sections
+        };
+      }
+
+      // Standard authenticated access
       const { data, error } = await supabase
         .from('project_studio_data')
         .select('*')
@@ -50,7 +69,6 @@ export function useStudioData(projectId: string) {
       
       if (!data) return DEFAULT_DATA;
       
-      // Map database flat structure to StudioData object
       return {
         design_system: (data.design_system as unknown as StudioDesignSystem) || DEFAULT_DATA.design_system,
         sections: (data.sections as unknown as StudioSection[]) || DEFAULT_DATA.sections
