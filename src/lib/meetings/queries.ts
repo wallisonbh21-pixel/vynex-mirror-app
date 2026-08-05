@@ -9,13 +9,13 @@ export const meetingQueries = {
         *,
         participants:meeting_participants(
           *,
-          profiles:user_id(full_name, avatar_url)
+          profiles:profiles!meeting_participants_user_id_fkey(full_name, avatar_url)
         )
       `)
       .order("scheduled_at", { ascending: true });
 
     if (error) throw error;
-    return data as MeetingWithParticipants[];
+    return data as any[] as MeetingWithParticipants[];
   },
 
   getById: async (id: string) => {
@@ -25,27 +25,26 @@ export const meetingQueries = {
         *,
         participants:meeting_participants(
           *,
-          profiles:user_id(full_name, avatar_url)
+          profiles:profiles!meeting_participants_user_id_fkey(full_name, avatar_url)
         ),
-        project:project_id(title),
-        client:client_id(name)
+        project:projects!meetings_project_id_fkey(title),
+        client:clients!meetings_client_id_fkey(name:company)
       `)
       .eq("id", id)
       .single();
 
     if (error) throw error;
-    return data as MeetingWithParticipants & { 
+    return data as any as MeetingWithParticipants & { 
       project?: { title: string }, 
       client?: { name: string } 
     };
   },
 
   getMessages: async (meetingId: string) => {
-    const { data, error } = await supabase
-      .from("meeting_messages")
+    const { data, error } = await (supabase.from("meeting_messages" as any) as any)
       .select(`
         *,
-        sender:sender_id(full_name, avatar_url)
+        sender:profiles!meeting_messages_sender_id_fkey(full_name, avatar_url)
       `)
       .eq("meeting_id", meetingId)
       .order("created_at", { ascending: true });
@@ -55,8 +54,7 @@ export const meetingQueries = {
   },
 
   getNotes: async (meetingId: string) => {
-    const { data, error } = await supabase
-      .from("meeting_notes")
+    const { data, error } = await (supabase.from("meeting_notes" as any) as any)
       .select("*")
       .eq("meeting_id", meetingId)
       .order("created_at", { ascending: true });

@@ -41,6 +41,36 @@ export const meetingMutations = {
     return data;
   },
 
+  startMeeting: async (id: string) => {
+    const { data, error } = await supabase
+      .from("meetings")
+      .update({ 
+        status: "LIVE" as MeetingStatus,
+        started_at: new Date().toISOString()
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  completeMeeting: async (id: string) => {
+    const { data, error } = await supabase
+      .from("meetings")
+      .update({ 
+        status: "COMPLETED" as MeetingStatus,
+        ended_at: new Date().toISOString()
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   cancel: async (id: string) => {
     const { data, error } = await supabase
       .from("meetings")
@@ -56,15 +86,39 @@ export const meetingMutations = {
     return data;
   },
 
-  updateParticipantStatus: async (meetingId: string, userId: string, status: ParticipantStatus) => {
+  updateParticipantPresence: async (meetingId: string, userId: string, type: 'join' | 'leave') => {
+    const updates = type === 'join' 
+      ? { joined_at: new Date().toISOString() } 
+      : { left_at: new Date().toISOString() };
+      
     const { data, error } = await supabase
       .from("meeting_participants")
-      .update({ invitation_status: status })
+      .update(updates)
       .eq("meeting_id", meetingId)
       .eq("user_id", userId)
       .select()
       .single();
 
+    if (error) throw error;
+    return data;
+  },
+
+  sendMessage: async (message: { meeting_id: string; sender_id: string; message: string }) => {
+    const { data, error } = await (supabase.from("meeting_messages" as any) as any)
+      .insert([message])
+      .select()
+      .single();
+      
+    if (error) throw error;
+    return data;
+  },
+
+  saveNote: async (note: { meeting_id: string; author_id: string; content: string; is_public?: boolean }) => {
+    const { data, error } = await (supabase.from("meeting_notes" as any) as any)
+      .insert([note])
+      .select()
+      .single();
+      
     if (error) throw error;
     return data;
   }

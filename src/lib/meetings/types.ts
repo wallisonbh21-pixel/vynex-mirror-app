@@ -12,14 +12,28 @@ export type MeetingParticipant = Database["public"]["Tables"]["meeting_participa
   };
 };
 
-export type MeetingMessage = Database["public"]["Tables"]["meeting_messages"]["Row"] & {
+export type MeetingMessage = {
+  id: string;
+  meeting_id: string;
+  sender_id: string;
+  message: string;
+  created_at: string;
+  updated_at: string;
   sender?: {
     full_name: string | null;
     avatar_url: string | null;
   };
 };
 
-export type MeetingNote = Database["public"]["Tables"]["meeting_notes"]["Row"];
+export type MeetingNote = {
+  id: string;
+  meeting_id: string;
+  author_id: string;
+  content: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
 export type MeetingWithParticipants = Meeting & {
   participants: MeetingParticipant[];
