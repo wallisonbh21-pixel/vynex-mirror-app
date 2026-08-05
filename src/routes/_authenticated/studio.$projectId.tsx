@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   ArrowLeft, 
   Save, 
@@ -11,7 +11,6 @@ import {
   Smartphone,
   Plus,
   Settings,
-  Layers,
   Loader2,
   Trash2,
   Copy,
@@ -21,7 +20,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useStudioData, useSaveStudioData } from '@/lib/studio/hooks';
-import { StudioData } from '@/types/studio';
+import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/studio';
+import { ElementLibrary } from '@/components/studio/ElementLibrary';
+import { SectionRenderer } from '@/components/studio/SectionRenderer';
+import { PropertyPanel } from '@/components/studio/PropertyPanel';
+import { generateId } from '@/lib/studio/utils';
+import { SECTION_TEMPLATES } from '@/lib/studio/templates';
+
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
   component: VynexaStudioPage,
@@ -30,8 +35,6 @@ export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)
   }),
 });
 
-type Viewport = 'desktop' | 'tablet' | 'mobile';
-
 function VynexaStudioPage() {
   const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' as any });
   const { data: initialData, isLoading } = useStudioData(projectId);
@@ -39,32 +42,60 @@ function VynexaStudioPage() {
   
   const [data, setData] = useState<StudioData | null>(null);
   const [viewport, setViewport] = useState<Viewport>('desktop');
-  const [selectedElement] = useState<string | null>(null);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [history, setHistory] = useState<StudioData[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isPreview, setIsPreview] = useState(false);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 
   // Sync with initial data
   useEffect(() => {
     if (initialData && !data) {
-      setData(initialData);
+      const cloned = JSON.parse(JSON.stringify(initialData));
+      setData(cloned);
+      setHistory([cloned]);
+      setHistoryIndex(0);
     }
   }, [initialData, data]);
 
   // History Management
   const addToHistory = useCallback((newData: StudioData) => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(JSON.parse(JSON.stringify(newData)));
-    if (newHistory.length > 50) newHistory.shift();
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  }, [history, historyIndex]);
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(JSON.parse(JSON.stringify(newData)));
+      if (newHistory.length > 50) newHistory.shift();
+      return newHistory;
+    });
+    setHistoryIndex(prev => prev + 1);
+  }, [historyIndex]);
+
+  const updateData = useCallback((newData: StudioData) => {
+    setData(newData);
+    addToHistory(newData);
+
+    // Auto-save logic
+    setSaveStatus('saving');
+    if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await saveMutation.mutateAsync({ projectId, data: newData });
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      } catch (error) {
+        setSaveStatus('idle');
+      }
+    }, 2000);
+  }, [addToHistory, projectId, saveMutation]);
 
   const undo = () => {
     if (historyIndex > 0) {
       const prev = history[historyIndex - 1];
       if (prev) {
-        setData(prev);
+        setData(JSON.parse(JSON.stringify(prev)));
         setHistoryIndex(historyIndex - 1);
       }
     }
@@ -74,7 +105,7 @@ function VynexaStudioPage() {
     if (historyIndex < history.length - 1) {
       const next = history[historyIndex + 1];
       if (next) {
-        setData(next);
+        setData(JSON.parse(JSON.stringify(next)));
         setHistoryIndex(historyIndex + 1);
       }
     }
@@ -85,12 +116,29 @@ function VynexaStudioPage() {
     setIsSaving(true);
     try {
       await saveMutation.mutateAsync({ projectId, data });
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setIsSaving(false);
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
+
   if (isLoading || !data) {
+
     return (
       <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-white">
         <Loader2 className="size-10 animate-spin text-primary" />
@@ -98,6 +146,88 @@ function VynexaStudioPage() {
       </div>
     );
   }
+
+  const handleAddElement = (type: StudioElement['type']) => {
+    if (!data) return;
+    const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
+    const targetSectionId = selectedSectionId || (sections.length > 0 ? sections[0]?.id || null : null);
+    if (!targetSectionId) return;
+
+    const sectionIndex = sections.findIndex(s => s.id === targetSectionId);
+    if (sectionIndex === -1) return;
+
+    const newElement: StudioElement = {
+      id: generateId(),
+      type,
+      content: { text: type.charAt(0).toUpperCase() + type.slice(1) },
+      styles: {}
+    };
+
+    const targetSection = sections[sectionIndex];
+    if (!targetSection) return;
+
+    sections[sectionIndex] = {
+      ...targetSection,
+      elements: [...targetSection.elements, newElement]
+    };
+    
+    updateData({ ...data, sections });
+    setSelectedElementId(newElement.id);
+  };
+
+  const handleAddSection = (type: string) => {
+    if (!data) return;
+    const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
+    
+    let newSection: StudioSection;
+    
+    if (SECTION_TEMPLATES[type]) {
+      const template = JSON.parse(JSON.stringify(SECTION_TEMPLATES[type]));
+      newSection = {
+        ...template,
+        id: generateId(),
+        elements: (template.elements || []).map((el: any) => ({ ...el, id: generateId() })),
+        order: sections.length
+      } as StudioSection;
+    } else {
+      newSection = {
+        id: generateId(),
+        type,
+        elements: [],
+        styles: {},
+        order: sections.length
+      };
+    }
+    
+    sections.push(newSection);
+    updateData({ ...data, sections });
+    setSelectedSectionId(newSection.id);
+  };
+
+
+
+  const handleUpdateElement = (id: string, updates: Partial<StudioElement>) => {
+    if (!data) return;
+    const sections = data.sections.map(s => ({
+      ...s,
+      elements: s.elements.map(el => el.id === id ? { ...el, ...updates } : el)
+    }));
+    updateData({ ...data, sections });
+  };
+
+  const handleUpdateSection = (id: string, updates: Partial<StudioSection>) => {
+    if (!data) return;
+    const sections = data.sections.map(s => s.id === id ? { ...s, ...updates } : s);
+    updateData({ ...data, sections });
+  };
+
+  const handleUpdateDesignSystem = (updates: Partial<StudioData['design_system']>) => {
+    if (!data) return;
+    updateData({ ...data, design_system: { ...data.design_system, ...updates } });
+  };
+
+  const selectedElement = data.sections.flatMap(s => s.elements).find(el => el.id === selectedElementId) || null;
+  const selectedSection = data.sections.find(s => s.id === selectedSectionId) || null;
 
   return (
     <div className="h-screen w-screen bg-slate-900 flex flex-col overflow-hidden text-slate-200">
@@ -149,65 +279,40 @@ function VynexaStudioPage() {
                <Redo className="size-4" />
              </Button>
           </div>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <Eye className="size-4" /> Visualizar
+          <Button variant={isPreview ? "secondary" : "ghost"} size="sm" className="gap-2" onClick={() => setIsPreview(!isPreview)}>
+            <Eye className="size-4" /> {isPreview ? 'Editar' : 'Visualizar'}
           </Button>
+
           <Button 
             size="sm" 
             className="gap-2 bg-primary hover:bg-primary/90 font-bold"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || saveStatus === 'saving'}
           >
-            {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-            {isSaving ? 'Salvando...' : 'Salvar'}
+            {isSaving || saveStatus === 'saving' ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            {isSaving || saveStatus === 'saving' ? 'Salvando...' : 'Salvar'}
           </Button>
         </div>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR - Library */}
-        <aside className="w-72 border-r border-slate-800 bg-slate-950 flex flex-col z-40">
-          <div className="p-4 border-b border-slate-800">
-             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Biblioteca</h3>
-             <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-800 bg-slate-900/50 hover:bg-slate-800">
-                  <Plus className="size-3" /> Seção
-                </Button>
-                <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-800 bg-slate-900/50 hover:bg-slate-800">
-                  <Layers className="size-3" /> Grid
-                </Button>
-             </div>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-             <div>
-               <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Elementos Básicos</h4>
-               <div className="grid grid-cols-2 gap-2">
-                  {['Texto', 'Título', 'Imagem', 'Botão', 'Ícone', 'Espaço'].map(el => (
-                    <div key={el} className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs text-center cursor-move hover:border-primary/50 hover:bg-slate-800 transition-colors">
-                      {el}
-                    </div>
-                  ))}
-               </div>
-             </div>
-             <div>
-               <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Seções Prontas</h4>
-               <div className="space-y-2">
-                  {['Hero Profissional', 'Sobre Nós', 'Nossos Serviços', 'Depoimentos', 'FAQ'].map(sec => (
-                    <div key={sec} className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs cursor-move hover:border-primary/50 hover:bg-slate-800 transition-colors flex items-center justify-between group">
-                      {sec}
-                      <Plus className="size-3 text-slate-600 group-hover:text-primary" />
-                    </div>
-                  ))}
-               </div>
-             </div>
-          </div>
-        </aside>
+        {!isPreview && (
+          <ElementLibrary 
+            onAddElement={handleAddElement}
+            onAddSection={handleAddSection}
+          />
+        )}
+
 
         {/* CANVAS AREA */}
-        <main className="flex-1 bg-slate-800 overflow-auto p-12 flex justify-center custom-scrollbar">
+        <main className={cn("flex-1 bg-slate-800 overflow-auto flex justify-center custom-scrollbar", !isPreview ? "p-12" : "p-0")}>
+
            <div 
              className={cn(
-               "bg-white shadow-2xl transition-all duration-300 min-h-[800px] relative rounded-t-lg",
+               "bg-white transition-all duration-300 min-h-[800px] relative",
+               !isPreview && "shadow-2xl rounded-t-lg",
+
                viewport === 'desktop' && "w-[1200px]",
                viewport === 'tablet' && "w-[768px]",
                viewport === 'mobile' && "w-[375px]"
@@ -220,33 +325,85 @@ function VynexaStudioPage() {
                     <Plus className="size-8 text-slate-300" />
                  </div>
                  <div className="text-center">
-                    <p className="font-bold text-slate-600">Seu canvas está vazio</p>
-                    <p className="text-sm">Arraste elementos da biblioteca para começar.</p>
+                    <p className="font-bold text-slate-600">Vamos começar seu projeto</p>
+                    <p className="text-sm">Seu canvas está vazio. Comece criando uma seção.</p>
                  </div>
-                 <Button variant="outline" size="sm" className="mt-2">Ver Templates</Button>
+                 <div className="flex gap-2">
+                 <Button variant="outline" size="sm" onClick={() => handleAddSection('custom')}>
+
+                     + Criar primeira seção
+                   </Button>
+                   <Button variant="outline" size="sm">Começar com uma seção pronta</Button>
+                 </div>
                </div>
              ) : (
-               data.sections.map((section, idx) => (
-                 <div key={section.id} className="group relative border-b last:border-b-0 min-h-20">
-                    {/* Section controls */}
-                    <div className="absolute right-[-60px] top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <Button variant="secondary" size="icon" className="size-8 rounded-lg shadow-lg"><ChevronUp className="size-4" /></Button>
-                       <Button variant="secondary" size="icon" className="size-8 rounded-lg shadow-lg"><ChevronDown className="size-4" /></Button>
-                       <Button variant="secondary" size="icon" className="size-8 rounded-lg shadow-lg"><Copy className="size-4" /></Button>
-                       <Button variant="destructive" size="icon" className="size-8 rounded-lg shadow-lg"><Trash2 className="size-4" /></Button>
-                    </div>
-                    {/* Section content */}
-                    <div className="p-10 text-slate-900">
-                      #{idx + 1} {section.type}
-                    </div>
-                 </div>
-               ))
+               <div className="flex flex-col">
+                 {data.sections.map((section) => {
+                   return (
+                     <SectionRenderer 
+                       key={section.id}
+                       section={section}
+                       designSystem={data.design_system}
+                       selectedElementId={isPreview ? null : selectedElementId}
+                       isSelected={!isPreview && selectedSectionId === section.id}
+                       onSelectElement={(id) => {
+                         if (isPreview) return;
+                         setSelectedElementId(id);
+                         setSelectedSectionId(section.id);
+                       }}
+                       onSelectSection={(id) => {
+                         if (isPreview) return;
+                         setSelectedSectionId(id);
+                         setSelectedElementId(null);
+                       }}
+
+                       onMoveSection={(id, dir) => {
+                          if (!data) return;
+                          const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
+                          const idx = sections.findIndex(s => s.id === id);
+                          if (idx === -1) return;
+                          const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
+                          if (targetIdx < 0 || targetIdx >= sections.length) return;
+                          
+                          const sectionA = sections[idx];
+                          const sectionB = sections[targetIdx];
+                          if (sectionA && sectionB) {
+                            sections[idx] = sectionB;
+                            sections[targetIdx] = sectionA;
+                            updateData({ ...data, sections });
+                          }
+
+                       }}
+                       onDuplicateSection={(id) => {
+                          if (!data) return;
+                          const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
+                          const secToDup = sections.find(s => s.id === id);
+                          if (!secToDup) return;
+                          const newSec = JSON.parse(JSON.stringify(secToDup));
+                          newSec.id = generateId();
+                          newSec.elements = newSec.elements.map((el: any) => ({ ...el, id: generateId() }));
+                          sections.push(newSec);
+                          updateData({ ...data, sections });
+                       }}
+                       onDeleteSection={(id) => {
+                          if (!data) return;
+                          const sections = data.sections.filter(s => s.id !== id);
+                          updateData({ ...data, sections });
+                          if (selectedSectionId === id) setSelectedSectionId(null);
+                       }}
+
+                     />
+                   );
+                 })}
+               </div>
              )}
            </div>
         </main>
 
         {/* RIGHT SIDEBAR - Properties */}
-        <aside className="w-80 border-l border-slate-800 bg-slate-950 flex flex-col z-40">
+        {!isPreview && (
+          <aside className="w-80 border-l border-slate-800 bg-slate-950 flex flex-col z-40">
+
            <div className="h-12 border-b border-slate-800 flex items-center px-4">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <Settings className="size-3 text-primary" /> Propriedades
@@ -254,7 +411,7 @@ function VynexaStudioPage() {
            </div>
            
            <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-             {!selectedElement ? (
+             {!selectedElementId && !selectedSectionId ? (
                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
                   <div className="size-12 bg-slate-900 rounded-2xl flex items-center justify-center mb-4 border border-slate-800">
                     <Plus className="size-6 text-slate-700" />
@@ -263,11 +420,14 @@ function VynexaStudioPage() {
                   <p className="text-xs leading-relaxed">Selecione um elemento no canvas para editar suas propriedades.</p>
                </div>
              ) : (
-               <div className="space-y-6">
-                 <div>
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Dimensões</h4>
-                 </div>
-               </div>
+               <PropertyPanel 
+                 element={selectedElement}
+                 section={selectedSection}
+                 designSystem={data.design_system}
+                 onUpdateElement={handleUpdateElement}
+                 onUpdateSection={handleUpdateSection}
+                 onUpdateDesignSystem={handleUpdateDesignSystem}
+               />
              )}
            </div>
 
@@ -275,21 +435,26 @@ function VynexaStudioPage() {
            <div className="p-4 border-t border-slate-800 bg-slate-900/30">
               <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Estilo Global</h4>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                 <div className="size-8 rounded-full bg-primary ring-2 ring-white cursor-pointer" title="Marca"></div>
-                 <div className="size-8 rounded-full bg-slate-500 border border-slate-700 cursor-pointer" title="Secundária"></div>
-                 <div className="size-8 rounded-full bg-emerald-500 cursor-pointer" title="Ação"></div>
+                 <div className="size-8 rounded-full ring-2 ring-white cursor-pointer" title="Marca" style={{ backgroundColor: data.design_system.colors.primary }}></div>
+                 <div className="size-8 rounded-full border border-slate-700 cursor-pointer" title="Secundária" style={{ backgroundColor: data.design_system.colors.secondary }}></div>
+                 <div className="size-8 rounded-full cursor-pointer" title="Ação" style={{ backgroundColor: data.design_system.colors.accent }}></div>
                  <div className="size-8 rounded-full border border-slate-800 flex items-center justify-center cursor-pointer">
                     <Plus className="size-3 text-slate-500" />
                  </div>
               </div>
            </div>
-        </aside>
+          </aside>
+        )}
+
       </div>
 
       {/* STATUS BAR */}
       <footer className="h-8 border-t border-slate-800 bg-slate-950 px-4 flex items-center justify-between text-[10px] text-slate-500 font-medium">
          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5"><div className="size-1.5 rounded-full bg-emerald-500"></div> Online</span>
+            <span className="flex items-center gap-1.5">
+              <div className={cn("size-1.5 rounded-full", saveStatus === 'saved' ? "bg-emerald-500" : saveStatus === 'saving' ? "bg-amber-500 animate-pulse" : "bg-emerald-500")}></div>
+              {saveStatus === 'saved' ? '✓ Salvo agora' : saveStatus === 'saving' ? '● Salvando...' : 'Online'}
+            </span>
             <span>Projeto: {projectId}</span>
          </div>
          <div className="flex items-center gap-4">

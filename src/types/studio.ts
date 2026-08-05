@@ -1,3 +1,5 @@
+export type Viewport = 'desktop' | 'tablet' | 'mobile';
+
 export interface StudioDesignSystem {
   colors: {
     primary: string;
@@ -16,7 +18,7 @@ export interface StudioDesignSystem {
 
 export interface StudioElement {
   id: string;
-  type: string;
+  type: 'title' | 'subtitle' | 'paragraph' | 'image' | 'button' | 'link' | 'card' | 'whatsapp' | 'form' | 'icon' | 'container' | 'columns';
   content: any;
   styles: Record<string, any>;
   responsive?: {
@@ -27,12 +29,22 @@ export interface StudioElement {
 
 export interface StudioSection {
   id: string;
-  type: string;
+  type: string; // e.g., 'hero', 'about', 'services', 'custom'
   elements: StudioElement[];
   styles: Record<string, any>;
+  order: number;
 }
 
 export interface StudioData {
   design_system: StudioDesignSystem;
   sections: StudioSection[];
+}
+
+export interface StudioState {
+  data: StudioData;
+  viewport: Viewport;
+  selectedElementId: string | null;
+  selectedSectionId: string | null;
+  history: StudioData[];
+  historyIndex: number;
 }
