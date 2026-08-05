@@ -20,6 +20,7 @@ export type LeadStatus = (typeof LEAD_STATUS)[number];
 
 export const PROJECT_STATUS = [
   "disponivel",
+  "briefing",
   "em_producao",
   "aguardando_aprovacao",
   "aguardando_cliente",
@@ -46,6 +47,7 @@ export const STATUS_LABEL: Record<string, string> = {
   perdido: "Perdido",
   fila: "Na fila",
   disponivel: "Disponível",
+  briefing: "Briefing",
   em_producao: "Em produção",
   producao: "Em produção",
   aguardando_aprovacao: "Aguardando aprovação interna",
@@ -84,7 +86,24 @@ export const statusTone = (status: string) => {
   if (["fechado", "entregue", "ativo", "pago", "aceita", "aprovado", "disponivel"].includes(status))
     return "success" as const;
   if (["perdido", "cancelado", "recusado", "encerrado"].includes(status)) return "danger" as const;
-  if (["proposta", "negociacao", "producao", "revisao", "pendente", "pausado", "enviada", "interessado", "em_producao", "aguardando_aprovacao", "aguardando_cliente", "ajustes", "ajustes_solicitados"].includes(status))
+  if (
+    [
+      "proposta",
+      "negociacao",
+      "producao",
+      "revisao",
+      "pendente",
+      "pausado",
+      "enviada",
+      "interessado",
+      "em_producao",
+      "aguardando_aprovacao",
+      "aguardando_cliente",
+      "ajustes",
+      "ajustes_solicitados",
+      "briefing",
+    ].includes(status)
+  )
     return "warning" as const;
   return "neutral" as const;
 };
