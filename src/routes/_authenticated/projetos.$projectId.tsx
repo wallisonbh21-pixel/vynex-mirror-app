@@ -126,11 +126,18 @@ function DetalhesProjetoPage() {
                      <p className="text-sm text-muted-foreground">Coleta e organização de informações do negócio.</p>
                    </div>
                  </div>
-                 <Button asChild className="gap-2 shadow-glow bg-gradient-brand border-none">
-                    <Link to="/briefing/$projectId" params={{ projectId: project.id }}>
-                      <FileText className="size-4" /> {savedBriefing ? 'Editar Briefing' : 'Iniciar Briefing'}
-                    </Link>
-                 </Button>
+                 <div className="flex gap-2">
+                   <Button variant="outline" asChild className="gap-2 border-brand-500/50 text-brand-500 hover:bg-brand-500/5">
+                      <Link to="/briefing/$projectId" params={{ projectId: project.id }}>
+                        <FileText className="size-4" /> {savedBriefing ? 'Editar Briefing' : 'Iniciar Briefing'}
+                      </Link>
+                   </Button>
+                   <Button asChild className="gap-2 shadow-glow bg-gradient-brand border-none">
+                      <Link to="/site-planner/$projectId" params={{ projectId: project.id }}>
+                        <LayoutDashboard className="size-4" /> Site Planner
+                      </Link>
+                   </Button>
+                 </div>
                </div>
 
                <div className="grid md:grid-cols-2 gap-8">
