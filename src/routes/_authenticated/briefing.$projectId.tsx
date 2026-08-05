@@ -331,9 +331,9 @@ function BriefingPage() {
                   <div className="pt-6 border-t">
                     <Button 
                       className="w-full h-12 text-lg font-bold bg-gradient-brand border-none shadow-glow hover:opacity-90"
-                      onClick={() => navigate({ to: "/studio/$projectId", params: { projectId } })}
+                      onClick={() => navigate({ to: "/site-planner/$projectId", params: { projectId } })}
                     >
-                      <Palette className="size-5 mr-2" /> Abrir ScaleNexus Studio
+                      <Sparkles className="size-5 mr-2" /> Gerar Plano do Site
                     </Button>
                   </div>
                 </div>
