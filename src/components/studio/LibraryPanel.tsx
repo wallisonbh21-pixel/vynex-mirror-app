@@ -152,7 +152,8 @@ export function LibraryPanel({
               <Button 
                 key={cat} 
                 variant="ghost" 
-                size="xs" 
+                size="sm" 
+
                 className={cn("text-[10px] uppercase font-bold px-2 h-7 rounded-md border border-transparent", categoryFilter === cat ? "bg-primary/20 text-primary border-primary/30" : "bg-slate-900 text-slate-500 hover:bg-slate-800")}
                 onClick={() => setCategoryFilter(cat)}
               >
@@ -168,7 +169,8 @@ export function LibraryPanel({
               <Button 
                 key={niche} 
                 variant="ghost" 
-                size="xs" 
+                size="sm" 
+
                 className={cn("text-[10px] uppercase font-bold px-2 h-7 rounded-md border border-transparent", nicheFilter === niche ? "bg-primary/20 text-primary border-primary/30" : "bg-slate-900 text-slate-500 hover:bg-slate-800")}
                 onClick={() => setNicheFilter(niche)}
               >
@@ -182,12 +184,13 @@ export function LibraryPanel({
       {/* CONTENT AREA */}
       <ScrollArea className="flex-1">
         <div className="p-4">
-          {activeTab === 'elements' && <ElementsTab items={filteredItems} onAddElement={onAddElement} />}
-          {activeTab === 'sections' && <SectionsTab items={filteredItems} onAddSection={onAddSection} onFavorite={handleFavoriteToggle} favorites={favorites} />}
-          {activeTab === 'templates' && <TemplatesTab items={filteredItems} onApplyTemplate={onApplyTemplate} onFavorite={handleFavoriteToggle} favorites={favorites} hasContent={hasContent} />}
+          {activeTab === 'elements' && <ElementsTab items={filteredItems as any[]} onAddElement={onAddElement} />}
+          {activeTab === 'sections' && <SectionsTab items={filteredItems as any[]} onAddSection={onAddSection} onFavorite={handleFavoriteToggle} favorites={favorites} />}
+          {activeTab === 'templates' && <TemplatesTab items={filteredItems as any[]} onApplyTemplate={onApplyTemplate} onFavorite={handleFavoriteToggle} favorites={favorites} hasContent={hasContent} />}
           {activeTab === 'styles' && <StylesTab onUpdateDesignSystem={onUpdateDesignSystem} designSystem={designSystem} />}
-          {activeTab === 'favorites' && <FavoritesTab items={filteredItems} onAddSection={onAddSection} onApplyTemplate={onApplyTemplate} hasContent={hasContent} />}
+          {activeTab === 'favorites' && <FavoritesTab items={filteredItems as any} onAddSection={onAddSection} onApplyTemplate={onApplyTemplate} hasContent={hasContent} />}
         </div>
+
       </ScrollArea>
     </aside>
   );
