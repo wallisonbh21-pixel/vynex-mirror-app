@@ -31,8 +31,10 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Pet Shop": "commercial.pet",
   "Salão de beleza": "service.beauty",
   "Barbearia": "service.beauty",
-  // Nichos problemáticos (categorias activity.sport, office, etc. causaram erro 400 ou irrelevância):
-  // Serão tratados via busca textual (text search) para garantir precisão.
+  "Hamburguer": "catering.restaurant.burger",
+  // Nichos que utilizam categorias oficiais validadas para evitar 400
+  "Academia": "activity.sport",
+  "Oficina": "service.vehicle.repair",
 };
 
 /**
@@ -199,26 +201,34 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 5. Chamar Geoapify Places API v2
           stage = "geoapify_call";
           const { categories, fallbackUsed, log: fallbackLog } = getGeoapifyCategories(niche, requestId);
-          if (fallbackUsed) {
-            console.log(fallbackLog);
-          }
           
           // Construindo URL da v2
           const geoUrl = new URL("https://api.geoapify.com/v2/places");
+          
+          /**
+           * REGRA DE ESTRATÉGIA DE BUSCA V2:
+           * A Geoapify Places API v2 EXIGE 'categories' ou 'type'.
+           * Se o nicho tiver mapeamento oficial, usamos 'categories'.
+           * Se NÃO tiver, usamos 'type=commercial' como base estrutural e passamos o nicho em 'text'.
+           * Isso evita o erro "value must contain at least one of [type, categories]".
+           */
+          let searchStrategy = "categories";
           if (categories) {
             geoUrl.searchParams.set("categories", categories);
-            console.log(`[Search][${requestId}] Using Categories: ${categories}`);
           } else {
-            // Busca textual combinada com filtro geográfico
+            searchStrategy = "type+text";
+            geoUrl.searchParams.set("type", "commercial"); // Estratégia estrutural obrigatória para busca comercial genérica
             geoUrl.searchParams.set("text", niche);
-            console.log(`[Search][${requestId}] Using Text Search: "${niche}"`);
           }
+          
           geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
           geoUrl.searchParams.set("limit", "30");
           geoUrl.searchParams.set("lang", "pt");
           geoUrl.searchParams.set("apiKey", apiKey);
           
+          console.log(`[Search][${requestId}] Strategy: ${searchStrategy} | Niche: ${niche}`);
           console.log(`[Search][${requestId}] Request URL: ${geoUrl.origin}${geoUrl.pathname}?${geoUrl.searchParams.toString().replace(apiKey, "HIDDEN")}`);
+
           
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -291,7 +301,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v4.0-validated-text-hybrid";
+          const diagnostic = "prospecting-search-v5.0-structural-fix";
           
           return new Response(JSON.stringify({ 
             opportunities, 
