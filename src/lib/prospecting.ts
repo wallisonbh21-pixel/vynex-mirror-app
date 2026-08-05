@@ -88,6 +88,7 @@ export type Opportunity = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  removed_at: string | null;
 };
 
 export function useOpportunities() {
@@ -97,6 +98,7 @@ export function useOpportunities() {
       const { data, error } = await supabase
         .from("prospecting_opportunities")
         .select("*")
+        .is("removed_at", null)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Opportunity[];

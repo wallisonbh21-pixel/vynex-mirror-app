@@ -14,6 +14,7 @@ import {
   UserRound,
   Loader2,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -441,6 +442,11 @@ function ProspeccaoPage() {
                 onStatus={(status) =>
                   user && changeStatus.mutate({ opportunity, status, userId: user.id })
                 }
+                onRemove={() => {
+                  if (confirm("Remover oportunidade?\nEssa empresa será retirada das suas oportunidades salvas.")) {
+                    save.mutate({ id: opportunity.id, removed_at: new Date().toISOString() });
+                  }
+                }}
               />
             ))}
           </div>
