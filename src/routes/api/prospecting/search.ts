@@ -214,7 +214,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
         const startTime = Date.now();
         
         try {
-          // Auth & Roles - MOVED TO CHECK IF PRODUCTION OR LOCAL AUDIT
+          // Auth & Roles
           const authHeader = request.headers.get("Authorization");
           let user: any = null;
           let userRoles: string[] = [];
@@ -229,26 +229,35 @@ export const Route = createFileRoute("/api/prospecting/search")({
             }
           }
 
-          // Allow audit from sandbox without full auth if needed, but strictly for GET or with specific internal header
-          const isInternalAudit = request.headers.get("X-ScaleNexus-Audit") === "true";
+          if (!user) {
+             return new Response(JSON.stringify({ error: "Unauthorized", message: "Autenticação necessária" }), { status: 401 });
+          }
 
-          if (!isInternalAudit && (!user || (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")))) {
-             return new Response(JSON.stringify({ error: true, stage: "auth", message: "Acesso negado", requestId }), { status: 403 });
+          if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
+             return new Response(JSON.stringify({ error: "Forbidden", message: "Acesso negado: permissão insuficiente" }), { status: 403 });
           }
 
           // Input
           const body = await request.json();
           const { niche, state, city, precision, rawMode } = searchSchema.parse(body);
           const apiKey = process.env["GEOAPIFY_API_KEY"];
-          if (!apiKey) return new Response(JSON.stringify({ error: true, stage: "config", message: "API Key ausente", requestId }), { status: 500 });
+          if (!apiKey) {
+            console.error("GEOAPIFY_API_KEY is missing in server environment");
+            return new Response(JSON.stringify({ error: "Erro de configuração do servidor", requestId }), { status: 500 });
+          }
 
           // Geocoding
           const locationText = city ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
           const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(locationText)}&limit=1&format=json&apiKey=${apiKey}`;
           const geocodeRes = await fetch(geocodeUrl);
+          
+          if (!geocodeRes.ok) {
+            return new Response(JSON.stringify({ error: "Erro ao localizar região", requestId }), { status: 502 });
+          }
+
           const geocodeData = await geocodeRes.json();
           const areaPlaceId = geocodeData.results?.[0]?.place_id;
-          if (!areaPlaceId) return new Response(JSON.stringify({ error: true, stage: "geocoding", message: "Localização não encontrada", requestId }), { status: 404 });
+          if (!areaPlaceId) return new Response(JSON.stringify({ error: "Localização não encontrada", requestId }), { status: 404 });
 
           // Layered approach: Execute multiple queries until target is reached
           const resultsMap = new Map();
@@ -312,12 +321,10 @@ export const Route = createFileRoute("/api/prospecting/search")({
                   currentQuery.httpStatus = res.status;
                   
                   if (!res.ok) {
-                    const errorText = await res.text();
                     currentQuery.error = true;
-                    currentQuery.message = `API Geoapify retornou ${res.status}`;
-                    currentQuery.details = errorText.substring(0, 200);
+                    currentQuery.message = `API Externa retornou erro`;
                     diagnostic.queries.push(currentQuery);
-                    break; // Fail this layer/value path, move to next
+                    break; 
                   }
 
                   const data = await res.json();
@@ -403,14 +410,21 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
         } catch (e: any) {
           console.error(`[Prospecting API Error] ${requestId}:`, e);
+          
+          // Generic production-safe error response
+          let status = 500;
+          let message = "Não foi possível realizar a prospecção.";
+          
+          if (e instanceof z.ZodError) {
+            status = 400;
+            message = "Parâmetros de busca inválidos.";
+          }
+
           return new Response(JSON.stringify({ 
-            error: true, 
-            stage: "unknown", 
-            message: e.message || "Erro desconhecido", 
-            requestId,
-            details: e.stack?.substring(0, 300)
+            error: message,
+            requestId 
           }), { 
-            status: 500,
+            status,
             headers: { "Content-Type": "application/json" }
           });
         }
