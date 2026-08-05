@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Trash2, Trophy } from "lucide-react";
+import { Plus, Trash2, Trophy, Flame, Star, Gem, CheckCircle2, TrendingUp, Target, History as HistoryIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AppShell } from "@/components/AppShell";
-import { requireVendedor } from "@/lib/guard";
+import { requireVendedor, requireCriador } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useDeleteRow, useRows, useSaveRow } from "@/lib/data";
-import { useSession } from "@/lib/auth";
+import { useSession, useRoles } from "@/lib/auth";
 import type { Contract } from "@/lib/crm";
 import { currency, shortDate } from "@/lib/format";
+import { useMyCreatorProjects } from "@/lib/creator";
+
 
 export const Route = createFileRoute("/_authenticated/metas")({
   beforeLoad: () => requireVendedor(),
