@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   CalendarClock,
+  ExternalLink,
   FileText,
+  MapPin,
   MessageSquare,
   Plus,
   Trash2,

@@ -24,6 +24,9 @@ export type Lead = {
   closed_value: number;
   closed_at: string | null;
   next_contact_at: string | null;
+  google_maps_url: string | null;
+  lat: number | null;
+  lon: number | null;
   notes: string | null;
   created_at: string;
 };
