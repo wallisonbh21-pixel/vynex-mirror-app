@@ -130,7 +130,7 @@ function VynexaStudioPage() {
 
   const handleAddElement = (type: StudioElement['type']) => {
     if (!data) return;
-    const sections = [...data.sections];
+    const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
     const targetSectionId = selectedSectionId || (sections.length > 0 ? sections[0].id : null);
     if (!targetSectionId) return;
 
@@ -145,6 +145,8 @@ function VynexaStudioPage() {
     };
 
     const targetSection = sections[sectionIndex];
+    if (!targetSection) return;
+
     sections[sectionIndex] = {
       ...targetSection,
       elements: [...targetSection.elements, newElement]
@@ -156,7 +158,7 @@ function VynexaStudioPage() {
 
   const handleAddSection = (type: string) => {
     if (!data) return;
-    const sections = [...data.sections];
+    const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
     const newSection: StudioSection = {
       id: generateId(),
       type,
@@ -168,6 +170,7 @@ function VynexaStudioPage() {
     updateData({ ...data, sections });
     setSelectedSectionId(newSection.id);
   };
+
 
   const handleUpdateElement = (id: string, updates: Partial<StudioElement>) => {
     if (!data) return;
