@@ -15,6 +15,10 @@ import {
   AlertCircle,
   Calendar,
   ExternalLink,
+  Rocket,
+  ArrowRight,
+  Target,
+  History,
 } from "lucide-react";
 import {
   Bar,
@@ -24,6 +28,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Cell,
 } from "recharts";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
@@ -38,6 +43,9 @@ import {
 } from "@/lib/creator";
 import { currency, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useProfile } from "@/lib/auth";
+import { SalesProgression } from "@/components/SalesProgression";
+
 
 export const Route = createFileRoute("/_authenticated/criacao")({
   beforeLoad: () => requireCriador(),
