@@ -288,7 +288,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
       <div className="grid grid-cols-2 gap-2 border-t border-border pt-3 text-[10px]">
         <div className="space-y-0.5">
           <div className="text-muted-foreground uppercase">Vendedor</div>
-          <div className="font-medium truncate">VYNEXA Team</div>
+          <div className="font-medium truncate">ScaleNexus Team</div>
         </div>
         <div className="space-y-0.5 text-right">
           <div className="text-muted-foreground uppercase">Próximo</div>

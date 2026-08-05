@@ -25,14 +25,14 @@ export const Route = createFileRoute("/_authenticated/aprovacoes")({
   beforeLoad: () => requireAdmin(),
   head: () => ({
     meta: [
-      { title: "Sites aguardando aprovação — VYNEXA" },
+      { title: "Sites aguardando aprovação — ScaleNexus" },
       {
         name: "description",
         content:
           "Revise os sites entregues pelos criadores, libere o envio ao cliente e acompanhe as aprovações.",
       },
-      { property: "og:title", content: "Sites aguardando aprovação — VYNEXA" },
-      { property: "og:description", content: "Controle de liberação e aprovação de sites da VYNEXA." },
+      { property: "og:title", content: "Sites aguardando aprovação — ScaleNexus" },
+      { property: "og:description", content: "Controle de liberação e aprovação de sites da ScaleNexus." },
     ],
   }),
   component: AprovacoesPage,

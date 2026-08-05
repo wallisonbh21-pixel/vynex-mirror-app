@@ -20,13 +20,13 @@ export const Route = createFileRoute("/_authenticated/historico")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Histórico — VYNEXA" },
+      { title: "Histórico — ScaleNexus" },
       {
         name: "description",
         content: "Todas as interações comerciais registradas: ligações, mensagens, reuniões e mudanças de status.",
       },
-      { property: "og:title", content: "Histórico — VYNEXA" },
-      { property: "og:description", content: "Registro de atividades comerciais da VYNEXA." },
+      { property: "og:title", content: "Histórico — ScaleNexus" },
+      { property: "og:description", content: "Registro de atividades comerciais da ScaleNexus." },
     ],
   }),
   component: HistoricoPage,

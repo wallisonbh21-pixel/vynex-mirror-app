@@ -38,7 +38,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/projetos/$projectId")({
   beforeLoad: () => requireCriador(),
   head: () => ({
-    meta: [{ title: "Detalhes do Projeto — VYNEXA" }],
+    meta: [{ title: "Detalhes do Projeto — ScaleNexus" }],
   }),
   component: DetalhesProjetoPage,
 });

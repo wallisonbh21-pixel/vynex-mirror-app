@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/meus-projetos")({
   beforeLoad: () => requireCriador(),
   head: () => ({
-    meta: [{ title: "Meus Projetos — VYNEXA" }],
+    meta: [{ title: "Meus Projetos — ScaleNexus" }],
   }),
   component: MeusProjetosPage,
 });

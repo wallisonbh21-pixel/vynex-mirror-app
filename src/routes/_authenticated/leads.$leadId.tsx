@@ -47,13 +47,13 @@ export const Route = createFileRoute("/_authenticated/leads/$leadId")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Oportunidade — VYNEXA" },
+      { title: "Oportunidade — ScaleNexus" },
       {
         name: "description",
         content: "Linha do tempo, propostas e conversão em contrato de uma oportunidade comercial.",
       },
-      { property: "og:title", content: "Oportunidade — VYNEXA" },
-      { property: "og:description", content: "Detalhe do lead no CRM VYNEXA." },
+      { property: "og:title", content: "Oportunidade — ScaleNexus" },
+      { property: "og:description", content: "Detalhe do lead no CRM ScaleNexus." },
     ],
   }),
   component: LeadDetail,

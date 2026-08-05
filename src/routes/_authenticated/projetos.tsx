@@ -12,10 +12,10 @@ import { currency, PROJECT_STATUS, shortDate, STATUS_LABEL } from "@/lib/format"
 export const Route = createFileRoute("/_authenticated/projetos")({
   head: () => ({
     meta: [
-      { title: "Projetos — VYNEXA" },
+      { title: "Projetos — ScaleNexus" },
       { name: "description", content: "Fila de produção dos sites e landing pages, prazos e comissões." },
-      { property: "og:title", content: "Projetos — VYNEXA" },
-      { property: "og:description", content: "Produção e entregas do time criativo VYNEXA." },
+      { property: "og:title", content: "Projetos — ScaleNexus" },
+      { property: "og:description", content: "Produção e entregas do time criativo ScaleNexus." },
     ],
   }),
   component: ProjetosPage,
