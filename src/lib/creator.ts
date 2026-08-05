@@ -89,11 +89,36 @@ export function useUpdateCreatorProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...values }: { id: string } & Record<string, unknown>) => {
+      // Security: ensure user only updates their own project
+      // RLS handles this, but we add a check for robustness
+      const { data: project } = await supabase.from("projects").select("creator_id, status").eq("id", id).single();
+      if (!project) throw new Error("Projeto não encontrado.");
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (project.creator_id !== user?.id) throw new Error("Acesso negado.");
+
+      // Critical financial fields protection (re-enforcing what might be in triggers)
+      const protectedFields = ['value', 'commission', 'commission_rate', 'commission_status'];
+      const updateData = { ...values };
+      protectedFields.forEach(f => delete updateData[f]);
+
       const { error } = await supabase
         .from("projects")
-        .update(values as never)
+        .update(updateData as never)
         .eq("id", id);
       if (error) throw error;
+
+      // Log status changes in approval events if applicable
+      if (values.status && values.status !== project.status) {
+        await supabase.from("project_approval_events").insert({
+          project_id: id,
+          event_type: "status_change",
+          previous_status: project.status,
+          new_status: values.status as string,
+          actor_label: "Criador",
+          message: (values.delivery_notes as string) || `Status alterado para ${values.status}`
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PROJECTS_KEY });
@@ -101,6 +126,79 @@ export function useUpdateCreatorProject() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+}
+
+/** Checklist do projeto */
+export function useProjectChecklist(projectId: string) {
+  const queryClient = useQueryClient();
+  
+  const query = useQuery({
+    queryKey: ["projects", projectId, "checklist"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("project_checklist_items")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!projectId
+  });
+
+  const toggle = useMutation({
+    mutationFn: async ({ itemId, completed }: { itemId: string, completed: boolean }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("project_checklist_items")
+        .update({ 
+          completed, 
+          completed_at: completed ? new Date().toISOString() : null,
+          completed_by: completed ? user?.id : null
+        } as never)
+        .eq("id", itemId);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["projects", projectId, "checklist"] })
+  });
+
+  return { ...query, toggle };
+}
+
+/** Notas do projeto */
+export function useProjectNotes(projectId: string) {
+  const queryClient = useQueryClient();
+  
+  const query = useQuery({
+    queryKey: ["projects", projectId, "notes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("project_notes")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!projectId
+  });
+
+  const addNote = useMutation({
+    mutationFn: async (content: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("project_notes")
+        .insert({ 
+          project_id: projectId,
+          content,
+          author_id: user?.id
+        } as never);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["projects", projectId, "notes"] })
+  });
+
+  return { ...query, addNote };
 }
 
 /** Resumo financeiro do criador a partir das comissões e saques. */
