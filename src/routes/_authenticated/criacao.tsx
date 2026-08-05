@@ -164,7 +164,7 @@ function PainelCriador() {
                   <div className="text-right">
                     <div className="font-semibold text-primary">{currency(earnings.commissionOf(project))}</div>
                     <Button asChild size="sm" variant="ghost" className="h-8 px-2 mt-1">
-                      <Link to={`/projetos/${project.id}`} className="gap-1">
+                      <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
                         Abrir <ExternalLink className="size-3" />
                       </Link>
                     </Button>
