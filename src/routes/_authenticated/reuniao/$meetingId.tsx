@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { meetingQueries } from '@/lib/meetings/queries';
 import { meetingMutations } from '@/lib/meetings/mutations';
-import { useAuth } from '@/lib/auth';
+import { useSession, useRoles } from '@/lib/auth';
 import { useEffect, useState, useMemo } from 'react';
 import { MeetingRoomLayout } from '@/components/meetings/room/MeetingRoomLayout';
 import { MeetingWaitingRoom } from '@/components/meetings/room/MeetingWaitingRoom';
@@ -16,7 +16,8 @@ export const Route = createFileRoute('/_authenticated/reuniao/$meetingId')({
 
 function MeetingRoomPage() {
   const { meetingId } = Route.useParams();
-  const { user, isAdmin, isVendedor, isCriador } = useAuth();
+  const { user } = useSession();
+  const { isAdmin } = useRoles();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [hasJoined, setHasJoined] = useState(false);
