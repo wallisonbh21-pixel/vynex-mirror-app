@@ -43,14 +43,17 @@ export function useStudioData(projectId: string) {
         .from('project_studio_data')
         .select('*')
         .eq('project_id', projectId)
-        .single();
+        .maybeSingle();
       
-      if (error) {
-        if (error.code === 'PGRST116') return DEFAULT_DATA;
-        throw error;
-      }
+      if (error) throw error;
       
-      return (data.data as unknown as StudioData) || DEFAULT_DATA;
+      if (!data) return DEFAULT_DATA;
+      
+      // The database column for the JSON content is 'design_system' and 'sections'? 
+      // Wait, let's check the schema again. Usually it's a single 'data' jsonb column.
+      // Based on previous turn logs, it seems to be stored in project_studio_data.
+      
+      return (data as any).data ? ((data as any).data as unknown as StudioData) : DEFAULT_DATA;
     }
   });
 }
