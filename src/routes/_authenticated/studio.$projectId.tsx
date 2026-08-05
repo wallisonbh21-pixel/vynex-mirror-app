@@ -20,11 +20,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useStudioData, useSaveStudioData } from '@/lib/studio/hooks';
-import { StudioData, StudioSection, StudioElement } from '@/types/studio';
+import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/studio';
 import { ElementLibrary } from '@/components/studio/ElementLibrary';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { generateId } from '@/lib/studio/utils';
-
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
   component: VynexaStudioPage,
@@ -32,8 +31,6 @@ export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)
     meta: [{ title: 'VYNEXA Studio — Editor Visual' }],
   }),
 });
-
-type Viewport = 'desktop' | 'tablet' | 'mobile';
 
 function VynexaStudioPage() {
   const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' as any });
@@ -53,20 +50,26 @@ function VynexaStudioPage() {
   // Sync with initial data
   useEffect(() => {
     if (initialData && !data) {
-      setData(JSON.parse(JSON.stringify(initialData)));
-      setHistory([JSON.parse(JSON.stringify(initialData))]);
+      const cloned = JSON.parse(JSON.stringify(initialData));
+      setData(cloned);
+      setHistory([cloned]);
       setHistoryIndex(0);
     }
   }, [initialData, data]);
 
   // History Management
   const addToHistory = useCallback((newData: StudioData) => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(JSON.parse(JSON.stringify(newData)));
-    if (newHistory.length > 50) newHistory.shift();
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  }, [history, historyIndex]);
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(JSON.parse(JSON.stringify(newData)));
+      if (newHistory.length > 50) newHistory.shift();
+      return newHistory;
+    });
+    setHistoryIndex(prev => {
+      const currentHistoryLength = historyIndex + 1;
+      return currentHistoryLength >= 50 ? 49 : currentHistoryLength;
+    });
+  }, [historyIndex]);
 
   const updateData = useCallback((newData: StudioData) => {
     setData(newData);
@@ -106,12 +109,13 @@ function VynexaStudioPage() {
     }
   };
 
-
   const handleSave = async () => {
     if (!data) return;
     setIsSaving(true);
     try {
       await saveMutation.mutateAsync({ projectId, data });
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setIsSaving(false);
     }
@@ -125,6 +129,46 @@ function VynexaStudioPage() {
       </div>
     );
   }
+
+  const handleAddElement = (type: any) => {
+    if (!data) return;
+    const targetSectionId = selectedSectionId || (data.sections.length > 0 ? data.sections[0].id : null);
+    if (!targetSectionId) return;
+
+    const newData = { ...data, sections: [...data.sections] };
+    const sectionIndex = newData.sections.findIndex(s => s.id === targetSectionId);
+    if (sectionIndex === -1) return;
+
+    const newElement: StudioElement = {
+      id: generateId(),
+      type,
+      content: { text: type.charAt(0).toUpperCase() + type.slice(1) },
+      styles: {}
+    };
+
+    newData.sections[sectionIndex] = {
+      ...newData.sections[sectionIndex],
+      elements: [...newData.sections[sectionIndex].elements, newElement]
+    };
+    
+    updateData(newData);
+    setSelectedElementId(newElement.id);
+  };
+
+  const handleAddSection = (type: string) => {
+    if (!data) return;
+    const newData = { ...data, sections: [...data.sections] };
+    const newSection: StudioSection = {
+      id: generateId(),
+      type,
+      elements: [],
+      styles: {},
+      order: newData.sections.length
+    };
+    newData.sections.push(newSection);
+    updateData(newData);
+    setSelectedSectionId(newSection.id);
+  };
 
   return (
     <div className="h-screen w-screen bg-slate-900 flex flex-col overflow-hidden text-slate-200">
@@ -188,47 +232,14 @@ function VynexaStudioPage() {
             {isSaving || saveStatus === 'saving' ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
             {isSaving || saveStatus === 'saving' ? 'Salvando...' : 'Salvar'}
           </Button>
-
         </div>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR - Library */}
         <ElementLibrary 
-          onAddElement={(type) => {
-            if (!data) return;
-            const targetSectionId = selectedSectionId || (data.sections.length > 0 ? data.sections[0].id : null);
-            if (!targetSectionId) return;
-
-            const newData = { ...data };
-            const sectionIndex = newData.sections.findIndex(s => s.id === targetSectionId);
-            if (sectionIndex === -1) return;
-
-            const newElement: StudioElement = {
-              id: generateId(),
-              type,
-              content: { text: type.charAt(0).toUpperCase() + type.slice(1) },
-              styles: {}
-            };
-
-            newData.sections[sectionIndex].elements.push(newElement);
-            updateData(newData);
-            setSelectedElementId(newElement.id);
-          }}
-          onAddSection={(type) => {
-            if (!data) return;
-            const newData = { ...data };
-            const newSection: StudioSection = {
-              id: generateId(),
-              type,
-              elements: [],
-              styles: {},
-              order: newData.sections.length
-            };
-            newData.sections.push(newSection);
-            updateData(newData);
-            setSelectedSectionId(newSection.id);
-          }}
+          onAddElement={handleAddElement}
+          onAddSection={handleAddSection}
         />
 
         {/* CANVAS AREA */}
@@ -252,40 +263,15 @@ function VynexaStudioPage() {
                     <p className="text-sm">Seu canvas está vazio. Comece criando uma seção.</p>
                  </div>
                  <div className="flex gap-2">
-                   <Button variant="outline" size="sm" onClick={() => {
-                     const newData: StudioData = { ...data, sections: [...data.sections] };
-                     newData.sections.push({
-                       id: generateId(),
-                       type: 'custom',
-                       elements: [],
-                       styles: {},
-                       order: newData.sections.length
-                     });
-                     updateData(newData);
-                   }}>
+                   <Button variant="outline" size="sm" onClick={() => handleAddSection('custom')}>
                      + Criar primeira seção
                    </Button>
                    <Button variant="outline" size="sm">Começar com uma seção pronta</Button>
                  </div>
-
                </div>
-
              ) : (
                <div className="flex flex-col">
-                 {data.sections.map((section, idx) => {
-                   const moveSection = (id: string, dir: 'up' | 'down') => {
-                     const newData = { ...data, sections: [...data.sections] };
-                     const currentIdx = newData.sections.findIndex(s => s.id === id);
-                     if (currentIdx === -1) return;
-                     const targetIdx = dir === 'up' ? currentIdx - 1 : currentIdx + 1;
-                     if (targetIdx < 0 || targetIdx >= newData.sections.length) return;
-                     
-                     const temp = newData.sections[currentIdx];
-                     newData.sections[currentIdx] = newData.sections[targetIdx];
-                     newData.sections[targetIdx] = temp;
-                     updateData(newData);
-                   };
-
+                 {data.sections.map((section) => {
                    return (
                      <SectionRenderer 
                        key={section.id}
@@ -301,32 +287,40 @@ function VynexaStudioPage() {
                          setSelectedSectionId(id);
                          setSelectedElementId(null);
                        }}
-                       onMoveSection={moveSection}
+                       onMoveSection={(id, dir) => {
+                          const newData = { ...data, sections: [...data.sections] };
+                          const currentIdx = newData.sections.findIndex(s => s.id === id);
+                          if (currentIdx === -1) return;
+                          const targetIdx = dir === 'up' ? currentIdx - 1 : currentIdx + 1;
+                          if (targetIdx < 0 || targetIdx >= newData.sections.length) return;
+                          
+                          const temp = newData.sections[currentIdx];
+                          newData.sections[currentIdx] = newData.sections[targetIdx];
+                          newData.sections[targetIdx] = temp;
+                          updateData(newData);
+                       }}
                        onDuplicateSection={(id) => {
-                         const newData = { ...data, sections: [...data.sections] };
-                         const secToDup = newData.sections.find(s => s.id === id);
-                         if (!secToDup) return;
-                         const newSec = JSON.parse(JSON.stringify(secToDup));
-                         newSec.id = generateId();
-                         newSec.elements = newSec.elements.map((el: any) => ({ ...el, id: generateId() }));
-                         newData.sections.push(newSec);
-                         updateData(newData);
+                          const newData = { ...data, sections: [...data.sections] };
+                          const secToDup = newData.sections.find(s => s.id === id);
+                          if (!secToDup) return;
+                          const newSec = JSON.parse(JSON.stringify(secToDup));
+                          newSec.id = generateId();
+                          newSec.elements = newSec.elements.map((el: any) => ({ ...el, id: generateId() }));
+                          newData.sections.push(newSec);
+                          updateData(newData);
                        }}
                        onDeleteSection={(id) => {
-                         const newData = { ...data, sections: data.sections.filter(s => s.id !== id) };
-                         updateData(newData);
-                         if (selectedSectionId === id) setSelectedSectionId(null);
+                          const newData = { ...data, sections: data.sections.filter(s => s.id !== id) };
+                          updateData(newData);
+                          if (selectedSectionId === id) setSelectedSectionId(null);
                        }}
                      />
                    );
                  })}
                </div>
-
-
              )}
            </div>
         </main>
-
 
         {/* RIGHT SIDEBAR - Properties */}
         <aside className="w-80 border-l border-slate-800 bg-slate-950 flex flex-col z-40">
@@ -345,11 +339,11 @@ function VynexaStudioPage() {
                   <p className="text-xs font-medium uppercase tracking-widest mb-2">Nada selecionado</p>
                   <p className="text-xs leading-relaxed">Selecione um elemento no canvas para editar suas propriedades.</p>
                </div>
-
              ) : (
                <div className="space-y-6">
                  <div>
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Dimensões</h4>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Em breve: Editor de Propriedades</h4>
+                    <p className="text-xs text-slate-400">Aqui você poderá editar cores, textos, links e estilos do elemento selecionado.</p>
                  </div>
                </div>
              )}
@@ -359,9 +353,9 @@ function VynexaStudioPage() {
            <div className="p-4 border-t border-slate-800 bg-slate-900/30">
               <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Estilo Global</h4>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                 <div className="size-8 rounded-full bg-primary ring-2 ring-white cursor-pointer" title="Marca"></div>
-                 <div className="size-8 rounded-full bg-slate-500 border border-slate-700 cursor-pointer" title="Secundária"></div>
-                 <div className="size-8 rounded-full bg-emerald-500 cursor-pointer" title="Ação"></div>
+                 <div className="size-8 rounded-full bg-primary ring-2 ring-white cursor-pointer" title="Marca" style={{ backgroundColor: data.design_system.colors.primary }}></div>
+                 <div className="size-8 rounded-full bg-slate-500 border border-slate-700 cursor-pointer" title="Secundária" style={{ backgroundColor: data.design_system.colors.secondary }}></div>
+                 <div className="size-8 rounded-full bg-emerald-500 cursor-pointer" title="Ação" style={{ backgroundColor: data.design_system.colors.accent }}></div>
                  <div className="size-8 rounded-full border border-slate-800 flex items-center justify-center cursor-pointer">
                     <Plus className="size-3 text-slate-500" />
                  </div>
@@ -373,7 +367,10 @@ function VynexaStudioPage() {
       {/* STATUS BAR */}
       <footer className="h-8 border-t border-slate-800 bg-slate-950 px-4 flex items-center justify-between text-[10px] text-slate-500 font-medium">
          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5"><div className={cn("size-1.5 rounded-full", saveStatus === 'saved' ? "bg-emerald-500" : saveStatus === 'saving' ? "bg-amber-500 animate-pulse" : "bg-emerald-500")}></div> {saveStatus === 'saved' ? '✓ Salvo agora' : saveStatus === 'saving' ? '● Salvando...' : 'Online'}</span>
+            <span className="flex items-center gap-1.5">
+              <div className={cn("size-1.5 rounded-full", saveStatus === 'saved' ? "bg-emerald-500" : saveStatus === 'saving' ? "bg-amber-500 animate-pulse" : "bg-emerald-500")}></div>
+              {saveStatus === 'saved' ? '✓ Salvo agora' : saveStatus === 'saving' ? '● Salvando...' : 'Online'}
+            </span>
             <span>Projeto: {projectId}</span>
          </div>
          <div className="flex items-center gap-4">
