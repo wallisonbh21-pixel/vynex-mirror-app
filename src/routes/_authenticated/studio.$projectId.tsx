@@ -252,58 +252,76 @@ function VynexaStudioPage() {
                     <p className="text-sm">Seu canvas está vazio. Comece criando uma seção.</p>
                  </div>
                  <div className="flex gap-2">
-                   <Button variant="outline" size="sm" onClick={() => (Route as any).component({}).props.onAddSection('custom')}>
+                   <Button variant="outline" size="sm" onClick={() => {
+                     const newData: StudioData = { ...data, sections: [...data.sections] };
+                     newData.sections.push({
+                       id: generateId(),
+                       type: 'custom',
+                       elements: [],
+                       styles: {},
+                       order: newData.sections.length
+                     });
+                     updateData(newData);
+                   }}>
                      + Criar primeira seção
                    </Button>
                    <Button variant="outline" size="sm">Começar com uma seção pronta</Button>
                  </div>
+
                </div>
 
              ) : (
                <div className="flex flex-col">
-                 {data.sections.map((section) => (
-                   <SectionRenderer 
-                     key={section.id}
-                     section={section}
-                     designSystem={data.design_system}
-                     selectedElementId={selectedElementId}
-                     isSelected={selectedSectionId === section.id}
-                     onSelectElement={(id) => {
-                       setSelectedElementId(id);
-                       setSelectedSectionId(section.id);
-                     }}
-                     onSelectSection={(id) => {
-                       setSelectedSectionId(id);
-                       setSelectedElementId(null);
-                     }}
-                     onMoveSection={(id, dir) => {
-                       const newData = { ...data };
-                       const idx = newData.sections.findIndex(s => s.id === id);
-                       if (idx === -1) return;
-                       const newIdx = dir === 'up' ? idx - 1 : idx + 1;
-                       if (newIdx < 0 || newIdx >= newData.sections.length) return;
-                       [newData.sections[idx], newData.sections[newIdx]] = [newData.sections[newIdx], newData.sections[idx]];
-                       updateData(newData);
-                     }}
-                     onDuplicateSection={(id) => {
-                       const newData = { ...data };
-                       const section = newData.sections.find(s => s.id === id);
-                       if (!section) return;
-                       const newSection = JSON.parse(JSON.stringify(section));
-                       newSection.id = generateId();
-                       newSection.elements = newSection.elements.map((el: any) => ({ ...el, id: generateId() }));
-                       newData.sections.push(newSection);
-                       updateData(newData);
-                     }}
-                     onDeleteSection={(id) => {
-                       const newData = { ...data };
-                       newData.sections = newData.sections.filter(s => s.id !== id);
-                       updateData(newData);
-                       if (selectedSectionId === id) setSelectedSectionId(null);
-                     }}
-                   />
-                 ))}
+                 {data.sections.map((section, idx) => {
+                   const moveSection = (id: string, dir: 'up' | 'down') => {
+                     const newData = { ...data, sections: [...data.sections] };
+                     const currentIdx = newData.sections.findIndex(s => s.id === id);
+                     if (currentIdx === -1) return;
+                     const targetIdx = dir === 'up' ? currentIdx - 1 : currentIdx + 1;
+                     if (targetIdx < 0 || targetIdx >= newData.sections.length) return;
+                     
+                     const temp = newData.sections[currentIdx];
+                     newData.sections[currentIdx] = newData.sections[targetIdx];
+                     newData.sections[targetIdx] = temp;
+                     updateData(newData);
+                   };
+
+                   return (
+                     <SectionRenderer 
+                       key={section.id}
+                       section={section}
+                       designSystem={data.design_system}
+                       selectedElementId={selectedElementId}
+                       isSelected={selectedSectionId === section.id}
+                       onSelectElement={(id) => {
+                         setSelectedElementId(id);
+                         setSelectedSectionId(section.id);
+                       }}
+                       onSelectSection={(id) => {
+                         setSelectedSectionId(id);
+                         setSelectedElementId(null);
+                       }}
+                       onMoveSection={moveSection}
+                       onDuplicateSection={(id) => {
+                         const newData = { ...data, sections: [...data.sections] };
+                         const secToDup = newData.sections.find(s => s.id === id);
+                         if (!secToDup) return;
+                         const newSec = JSON.parse(JSON.stringify(secToDup));
+                         newSec.id = generateId();
+                         newSec.elements = newSec.elements.map((el: any) => ({ ...el, id: generateId() }));
+                         newData.sections.push(newSec);
+                         updateData(newData);
+                       }}
+                       onDeleteSection={(id) => {
+                         const newData = { ...data, sections: data.sections.filter(s => s.id !== id) };
+                         updateData(newData);
+                         if (selectedSectionId === id) setSelectedSectionId(null);
+                       }}
+                     />
+                   );
+                 })}
                </div>
+
 
              )}
            </div>
