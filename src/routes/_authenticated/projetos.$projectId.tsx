@@ -105,27 +105,135 @@ function DetalhesProjetoPage() {
               <TabsTrigger value="historico" className="gap-2"><Clock className="size-4" /> Histórico</TabsTrigger>
             </TabsList>
             <TabsContent value="briefing" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
-               <h3 className="font-semibold mb-4">Dados do Cliente</h3>
-               <p className="text-muted-foreground">{project.description}</p>
-            </TabsContent>
-            <TabsContent value="checklist" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
-               <Progress value={progress} className="h-2 mb-4" />
-               <div className="space-y-2">
-                 {checklist.map(item => (
-                   <div key={item.id} className="flex items-center gap-2 p-2 border rounded-lg">
-                     <Checkbox checked={item.completed} onCheckedChange={(c) => toggle.mutate({ itemId: item.id, completed: !!c })} />
-                     {item.title}
+               <div className="grid md:grid-cols-2 gap-8">
+                 <div>
+                   <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
+                     <Briefcase className="size-4" /> Dados do Negócio
+                   </h3>
+                   <div className="space-y-4 text-sm">
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Empresa:</span>
+                       <span className="font-medium text-right">{client?.company}</span>
+                     </div>
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Nicho:</span>
+                       <span className="font-medium text-right">{client?.niche}</span>
+                     </div>
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Responsável:</span>
+                       <span className="font-medium text-right">{client?.name}</span>
+                     </div>
+                     <div className="grid grid-cols-2 gap-2 border-b pb-2">
+                       <span className="text-muted-foreground">Cidade/UF:</span>
+                       <span className="font-medium text-right">{client?.city} - {client?.state}</span>
+                     </div>
                    </div>
+                 </div>
+                 <div>
+                   <h3 className="font-bold flex items-center gap-2 mb-4 text-primary">
+                     <FileText className="size-4" /> Descrição & Observações
+                   </h3>
+                   <div className="bg-muted/30 p-4 rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
+                     {project.description || "Nenhuma descrição adicional fornecida."}
+                   </div>
+                 </div>
+               </div>
+            </TabsContent>
+            
+            <TabsContent value="checklist" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <div className="flex items-center justify-between mb-6">
+                 <div>
+                   <h3 className="font-bold">Checklist de Produção</h3>
+                   <p className="text-xs text-muted-foreground">Complete todos os itens antes de enviar para aprovação.</p>
+                 </div>
+                 <div className="text-right">
+                   <span className="text-2xl font-bold text-primary">{progress}%</span>
+                 </div>
+               </div>
+               <Progress value={progress} className="h-3 mb-8" />
+               <div className="grid gap-3">
+                 {checklist.map(item => (
+                   <label key={item.id} className={cn(
+                     "flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer hover:bg-muted/50",
+                     item.completed ? "bg-muted/30 border-primary/20" : "bg-card border-border"
+                   )}>
+                     <Checkbox 
+                        checked={item.completed} 
+                        onCheckedChange={(c) => toggle.mutate({ itemId: item.id, completed: !!c })}
+                        className="size-5"
+                     />
+                     <span className={cn("font-medium", item.completed && "line-through text-muted-foreground")}>
+                       {item.title}
+                     </span>
+                   </label>
                  ))}
                </div>
             </TabsContent>
+
             <TabsContent value="projeto" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
-               <div className="flex gap-4">
-                 <Button asChild><a href={project.delivery_link || "#"} target="_blank">Visualizar Site</a></Button>
+               <div className="max-w-md mx-auto py-10 text-center">
+                 <div className="size-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <Globe className="size-8 text-primary" />
+                 </div>
+                 <h3 className="text-xl font-bold mb-2">Ambiente de Pré-visualização</h3>
+                 <p className="text-muted-foreground mb-8">
+                   Este é o link que o cliente usará para revisar o site.
+                 </p>
+                 
+                 {project.delivery_link ? (
+                   <div className="space-y-4">
+                     <div className="p-4 bg-muted rounded-xl border font-mono text-sm break-all">
+                       {project.delivery_link}
+                     </div>
+                     <div className="flex gap-2">
+                       <Button className="flex-1 gap-2" asChild>
+                         <a href={project.delivery_link} target="_blank"><ExternalLink className="size-4" /> Abrir Site</a>
+                       </Button>
+                       <Button variant="outline" onClick={() => {
+                         navigator.clipboard.writeText(project.delivery_link || "");
+                         toast.success("Link copiado!");
+                       }}><LinkIcon className="size-4" /></Button>
+                     </div>
+                   </div>
+                 ) : (
+                   <div className="p-8 rounded-2xl border border-dashed text-muted-foreground italic">
+                     Link de entrega ainda não configurado.
+                   </div>
+                 )}
                </div>
             </TabsContent>
-            <TabsContent value="historico" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
-               {events.map(e => <div key={e.id} className="text-sm py-2 border-b">{e.message}</div>)}
+
+            <TabsContent value="historico" className="mt-4 overflow-hidden border rounded-2xl bg-card shadow-panel">
+               <div className="divide-y">
+                 {events.map((event) => (
+                    <div key={event.id} className="p-4 flex gap-4 hover:bg-muted/30 transition-colors">
+                      <div className={cn(
+                        "flex size-10 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm",
+                        event.event_type.includes('ajustes') ? "bg-red-500/10 text-red-500" : "bg-primary/10 text-primary"
+                      )}>
+                        {event.actor_label[0]}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-sm">{event.actor_label}</span>
+                          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{shortDate(event.created_at)}</span>
+                        </div>
+                        <p className="text-sm text-foreground leading-relaxed">{event.message}</p>
+                        {event.new_status && (
+                          <div className="mt-3">
+                            <StatusBadge status={event.new_status} className="h-5 px-2 text-[10px] uppercase font-bold" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {events.length === 0 && (
+                    <div className="p-20 text-center">
+                      <Clock className="size-10 text-muted/20 mx-auto mb-4" />
+                      <p className="text-muted-foreground italic">Nenhuma atividade registrada ainda.</p>
+                    </div>
+                  )}
+               </div>
             </TabsContent>
           </Tabs>
         </div>
