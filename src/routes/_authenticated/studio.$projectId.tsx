@@ -27,7 +27,7 @@ import { PropertyPanel } from '@/components/studio/PropertyPanel';
 import { AICorePanel } from '@/components/AICorePanel';
 import { generateId } from '@/lib/studio/utils';
 import { SECTION_TEMPLATES } from '@/lib/studio/templates';
-import { buildProjectContext, generateIntelligence } from '@/lib/ai-core';
+import { buildProjectContext, generateIntelligence, AIAction } from '@/lib/ai-core';
 import { getBriefing } from '@/lib/briefing';
 import { getSitePlan } from '@/lib/planner';
 import { useQuery } from '@tanstack/react-query';
@@ -57,6 +57,7 @@ function ScaleNexusStudioPage() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [ignoredIssues, setIgnoredIssues] = useState<string[]>([]);
 
   const { data: briefing } = useQuery({
     queryKey: ['briefing', projectId],
@@ -70,8 +71,12 @@ function ScaleNexusStudioPage() {
 
   const intelligence = useMemo(() => {
     const context = buildProjectContext(projectId, briefing || null, sitePlan || null, data);
-    return generateIntelligence(context, data);
-  }, [projectId, briefing, sitePlan, data]);
+    const result = generateIntelligence(context, data);
+    return {
+      ...result,
+      issues: result.issues.filter(i => !ignoredIssues.includes(i.id))
+    };
+  }, [projectId, briefing, sitePlan, data, ignoredIssues]);
 
 
   // Sync with initial data
@@ -248,6 +253,107 @@ function ScaleNexusStudioPage() {
     updateData({ ...data, design_system: { ...data.design_system, ...updates } });
   };
 
+  const handleAIAction = useCallback((action: AIAction) => {
+    if (!data) return;
+    const clonedData: StudioData = JSON.parse(JSON.stringify(data));
+    
+    // Safety Layer check - no non-studio modifications allowed
+    if (['FINANCEIRO', 'CRM', 'RLS'].some(term => action.explanation.toUpperCase().includes(term))) {
+      console.error('Action blocked by AI Safety Layer');
+      return;
+    }
+
+    try {
+      switch (action.type) {
+        case 'ADD_SECTION': {
+          const type = action.payload.type;
+          let newSection: StudioSection;
+          if (SECTION_TEMPLATES[type]) {
+            const template = JSON.parse(JSON.stringify(SECTION_TEMPLATES[type]));
+            newSection = {
+              ...template,
+              id: generateId(),
+              elements: (template.elements || []).map((el: any) => ({ ...el, id: generateId() })),
+              order: clonedData.sections.length
+            } as StudioSection;
+          } else {
+            newSection = {
+              id: generateId(),
+              type: type || 'custom',
+              elements: [],
+              styles: {},
+              order: clonedData.sections.length
+            };
+          }
+          clonedData.sections.push(newSection);
+          setSelectedSectionId(newSection.id);
+          break;
+        }
+
+        case 'ADD_ELEMENT': {
+          const { type, content, styles } = action.payload;
+          const firstSection = clonedData.sections?.[0];
+          const targetSectionId = action.targetId || (firstSection ? firstSection.id : null);
+          if (!targetSectionId || !clonedData.sections) throw new Error('No target section');
+          
+          const sectionIdx = clonedData.sections.findIndex(s => s.id === targetSectionId);
+          if (sectionIdx === -1 || !clonedData.sections[sectionIdx]) throw new Error('Target section not found');
+
+          const newElement: StudioElement = {
+            id: generateId(),
+            type,
+            content: content || { text: 'New Element' },
+            styles: styles || {}
+          };
+          clonedData.sections[sectionIdx].elements.push(newElement);
+          setSelectedElementId(newElement.id);
+          break;
+        }
+
+        case 'UPDATE_TEXT': {
+          // Find first matching element to apply suggestion or use targetId
+          const suggestion = action.payload.suggestion;
+          let elementFound = false;
+          clonedData.sections.forEach(s => {
+            s.elements.forEach(el => {
+              if (!elementFound && (el.type === 'title' || el.type === 'subtitle' || el.type === 'paragraph')) {
+                if (!action.targetId || el.id === action.targetId) {
+                  el.content.text = suggestion;
+                  elementFound = true;
+                }
+              }
+            });
+          });
+          break;
+        }
+
+        case 'UPDATE_CTA': {
+          const { text, type } = action.payload;
+          clonedData.sections.forEach(s => {
+            s.elements.forEach(el => {
+              if (el.type === 'button' || el.type === 'whatsapp') {
+                if (!action.targetId || el.id === action.targetId) {
+                  el.content.text = text;
+                  if (type) el.type = type;
+                }
+              }
+            });
+          });
+          break;
+        }
+
+        default:
+          console.warn('Action type not yet implemented in V1.2:', action.type);
+          return;
+      }
+
+      updateData(clonedData);
+      // Small toast or visual feedback could go here
+    } catch (error) {
+      console.error('AI Action failed:', error);
+    }
+  }, [data, updateData]);
+
   const selectedElement = data.sections.flatMap(s => s.elements).find(el => el.id === selectedElementId) || null;
   const selectedSection = data.sections.find(s => s.id === selectedSectionId) || null;
 
@@ -312,12 +418,18 @@ function ScaleNexusStudioPage() {
             <PopoverContent className="w-96 p-0 bg-slate-950 border-slate-800 shadow-2xl mr-4" align="end" sideOffset={12}>
               <div className="p-4 border-b border-slate-800 flex items-center justify-between">
                 <h3 className="font-bold flex items-center gap-2">
-                  <Brain className="size-4 text-brand-400" /> AI Core V1
+                  <Brain className="size-4 text-brand-400" /> AI Core V1.2
                 </h3>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 uppercase tracking-tighter">ATIVO</span>
               </div>
               <div className="max-h-[500px] overflow-y-auto p-4 custom-scrollbar">
-                <AICorePanel intelligence={intelligence} />
+                <AICorePanel 
+                  intelligence={intelligence} 
+                  onAccept={handleAIAction}
+                  onIgnore={(id) => setIgnoredIssues(prev => [...prev, id])}
+                  onUndoLast={undo}
+                  history={history}
+                />
               </div>
             </PopoverContent>
           </Popover>

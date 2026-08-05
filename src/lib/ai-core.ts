@@ -45,6 +45,15 @@ export interface StudioPageSnapshot {
   responsiveWarnings: string[];
 }
 
+export interface AIAction {
+  type: 'ADD_SECTION' | 'REMOVE_SECTION' | 'MOVE_SECTION' | 'ADD_ELEMENT' | 'REMOVE_ELEMENT' | 'UPDATE_ELEMENT' | 'UPDATE_TEXT' | 'UPDATE_CTA' | 'UPDATE_STYLE' | 'APPLY_STYLE_PRESET' | 'UPDATE_RESPONSIVE_CONFIG';
+  targetId?: string | undefined; // sectionId or elementId
+  payload: any;
+  explanation: string;
+  previewLabel?: string;
+  reversible?: boolean;
+}
+
 export interface StudioAnalysis {
   score: {
     total: number;
@@ -58,10 +67,12 @@ export interface StudioAnalysis {
   };
   strengths: string[];
   issues: {
+    id: string;
     severity: 'critical' | 'important' | 'recommended' | 'positive';
     label: string;
     description: string;
-    action?: string;
+    action?: AIAction;
+    status?: 'PENDENTE' | 'APLICADA' | 'IGNORADA' | 'DESFEITA' | 'EXPIRADA' | 'ERRO';
   }[];
   opportunities: string[];
   engineVersion: string;
@@ -168,25 +179,54 @@ export function generateIntelligence(
   // 1. Structural Analysis
   if (snapshot.sectionsCount === 0) {
     issues.push({ 
+      id: 'empty_canvas',
       severity: 'critical', 
       label: 'Canvas Vazio', 
-      description: 'Comece adicionando uma seção Hero para definir a proposta de valor.' 
+      description: 'Comece adicionando uma seção Hero para definir a proposta de valor.',
+      action: {
+        type: 'ADD_SECTION',
+        payload: { type: 'hero_modern' },
+        explanation: 'O Hero é essencial para qualquer página de nicho comercial.',
+        previewLabel: 'Adicionar Hero Moderno',
+        reversible: true
+      }
     });
   } else {
     if (snapshot.hasHero) strengths.push('Hero definido');
     else issues.push({ 
+      id: 'missing_hero',
       severity: 'critical', 
       label: 'Hero ausente', 
-      description: 'O site precisa de uma headline clara no topo para prender a atenção.' 
+      description: 'O site precisa de uma headline clara no topo para prender a atenção.',
+      action: {
+        type: 'ADD_SECTION',
+        payload: { type: 'hero_modern' },
+        explanation: 'Adicionar uma seção de impacto no topo da página.',
+        previewLabel: 'Adicionar Seção Hero',
+        reversible: true
+      }
     });
   }
 
   // 2. Conversion Analysis
   if (!snapshot.hasCTA) {
     issues.push({ 
+      id: 'missing_cta',
       severity: 'critical', 
       label: 'Sem CTA principal', 
-      description: 'O usuário não tem um caminho claro de conversão. Adicione um botão de ação.' 
+      description: 'O usuário não tem um caminho claro de conversão. Adicione um botão de ação.',
+      action: {
+        type: 'ADD_ELEMENT',
+        targetId: studioData?.sections[0]?.id,
+        payload: { 
+          type: 'button',
+          content: { text: recommendedCTA },
+          styles: { backgroundColor: context.designSystem?.colors?.primary || '#3B82F6', color: '#ffffff' }
+        },
+        explanation: `Baseado no objetivo "${primaryGoal}", o CTA ideal é "${recommendedCTA}".`,
+        previewLabel: `Adicionar Botão: ${recommendedCTA}`,
+        reversible: true
+      }
     });
   } else {
     strengths.push('CTA principal definido');
@@ -195,26 +235,50 @@ export function generateIntelligence(
   // 3. Niche Analysis
   if (niche === 'hamburgueria' && !snapshot.hasCTA && objectives.includes('whatsapp')) {
     issues.push({
+      id: 'hamburgueria_whatsapp',
       severity: 'important',
       label: 'CTA pouco específico',
-      description: 'Para hamburguerias, o botão de WhatsApp converte melhor que botões genéricos.'
+      description: 'Para hamburguerias, o botão de WhatsApp converte melhor que botões genéricos.',
+      action: {
+        type: 'UPDATE_CTA',
+        payload: { text: 'Pedir no WhatsApp', type: 'whatsapp' },
+        explanation: 'WhatsApp é o canal de maior conversão para delivery.',
+        previewLabel: 'Trocar para Botão WhatsApp',
+        reversible: true
+      }
     });
   }
 
   if (['dentista', 'advocacia', 'academia'].includes(niche) && !snapshot.hasTestimonials) {
     issues.push({
+      id: 'niche_social_proof',
       severity: 'recommended',
       label: 'Prova social ausente',
-      description: 'Neste nicho, depoimentos aumentam drasticamente a confiança e conversão.'
+      description: 'Neste nicho, depoimentos aumentam drasticamente a confiança e conversão.',
+      action: {
+        type: 'ADD_SECTION',
+        payload: { type: 'testimonials_grid' },
+        explanation: 'Depoimentos de clientes reais geram autoridade.',
+        previewLabel: 'Adicionar Depoimentos',
+        reversible: true
+      }
     });
   }
 
   // 4. Content Analysis
   if (snapshot.contentQuality.hasLoremIpsum) {
     issues.push({
+      id: 'lorem_ipsum_detected',
       severity: 'important',
       label: 'Conteúdo Incompleto',
-      description: '"Lorem Ipsum" detectado. Substitua por textos reais antes de publicar.'
+      description: '"Lorem Ipsum" detectado. Substitua por textos reais antes de publicar.',
+      action: {
+        type: 'UPDATE_TEXT',
+        payload: { suggestion: `Melhore seu negócio ${context.businessName} com ScaleNexus.` },
+        explanation: 'Textos reais ajudam no SEO e na conversão.',
+        previewLabel: 'Aplicar Sugestão de Texto',
+        reversible: true
+      }
     });
   }
 
@@ -242,7 +306,7 @@ export function generateIntelligence(
     strengths,
     issues,
     opportunities: issues.filter(i => i.severity === 'recommended').map(i => i.description),
-    engineVersion: '1.1',
+    engineVersion: '1.2',
     primaryGoal,
     recommendedCTA,
     recommendedSections: [

@@ -16,21 +16,25 @@ import {
   Star,
   Plus
 } from 'lucide-react';
-import { ProjectIntelligence } from '@/lib/ai-core';
+import { ProjectIntelligence, AIAction } from '@/lib/ai-core';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { StudioData, StudioSection } from '@/types/studio';
+import { Sparkles, X, Undo2, AlertCircle } from 'lucide-react';
 
 interface AICorePanelProps {
   intelligence: ProjectIntelligence;
-  onAccept?: (rec: string) => void;
-  onIgnore?: (rec: string) => void;
+  onAccept?: (action: AIAction) => void;
+  onIgnore?: (issueId: string) => void;
+  onUndoLast?: () => void;
   studioData?: StudioData | null;
+  history?: any[];
 }
 
-export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AICorePanelProps) {
+export function AICorePanel({ intelligence, onAccept, onIgnore, onUndoLast, studioData, history }: AICorePanelProps) {
   const score = intelligence.score;
+  const [confirmedAction, setConfirmedAction] = React.useState<AIAction | null>(null);
 
   return (
     <div className="space-y-6 text-slate-200">
@@ -112,6 +116,18 @@ export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AI
         </div>
       )}
 
+      {/* Intelligence History */}
+      {history && history.length > 1 && (
+        <div className="space-y-3">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center justify-between px-1">
+            <span className="flex items-center gap-2"><Sparkles className="size-3 text-brand-400" /> Histórico de Ações</span>
+            <Button variant="ghost" size="sm" className="h-5 text-[9px] text-white/50 hover:text-white" onClick={onUndoLast}>
+              <Undo2 className="size-3 mr-1" /> Desfazer
+            </Button>
+          </h4>
+        </div>
+      )}
+
       {/* Issues / Warnings */}
       <div className="space-y-3">
         <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2 px-1">
@@ -120,9 +136,9 @@ export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AI
         <div className="space-y-3">
           {intelligence.issues.map((issue, idx) => (
             <div 
-              key={idx} 
+              key={issue.id || idx} 
               className={cn(
-                "p-4 rounded-xl border flex flex-col gap-1 group relative overflow-hidden",
+                "p-4 rounded-xl border flex flex-col gap-1 group relative overflow-hidden transition-all duration-300",
                 issue.severity === 'critical' ? "bg-red-500/5 border-red-500/20" :
                 issue.severity === 'important' ? "bg-orange-500/5 border-orange-500/20" :
                 "bg-slate-800/50 border-slate-800"
@@ -146,14 +162,60 @@ export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AI
               <p className="text-xs font-bold text-slate-100">{issue.label}</p>
               <p className="text-[11px] text-slate-400 leading-relaxed">{issue.description}</p>
               
-              <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-white hover:bg-white/10" onClick={() => onAccept?.(issue.label)}>
-                  Entendi
-                </Button>
-                <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-white/50 hover:bg-white/5" onClick={() => onIgnore?.(issue.label)}>
-                  Ignorar
-                </Button>
-              </div>
+              {issue.action && (
+                <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
+                  <p className="text-[10px] font-bold text-brand-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                    <Sparkles className="size-3" /> Melhoria Disponível
+                  </p>
+                  <p className="text-[11px] text-slate-300 italic mb-3">"{issue.action.explanation}"</p>
+                  
+                  {confirmedAction?.explanation === issue.action.explanation ? (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                      <p className="text-[10px] text-orange-400 flex items-center gap-1 font-bold">
+                        <AlertCircle className="size-3" /> Confirmar esta ação?
+                      </p>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="h-7 text-[10px] bg-brand-500 hover:bg-brand-600 font-bold flex-1"
+                          onClick={() => {
+                            onAccept?.(issue.action!);
+                            setConfirmedAction(null);
+                          }}
+                        >
+                          Confirmar Alteração
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="h-7 text-[10px] flex-1"
+                          onClick={() => setConfirmedAction(null)}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        className="h-7 text-[10px] bg-brand-500/20 hover:bg-brand-500/40 text-brand-400 border border-brand-500/30 font-bold flex-1"
+                        onClick={() => setConfirmedAction(issue.action!)}
+                      >
+                        <Sparkles className="size-3 mr-1" /> {issue.action.previewLabel || 'Aplicar melhoria'}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-7 w-7 p-0 text-white/30 hover:text-white/60"
+                        onClick={() => onIgnore?.(issue.id)}
+                      >
+                        <X className="size-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
           {intelligence.issues.length === 0 && (
