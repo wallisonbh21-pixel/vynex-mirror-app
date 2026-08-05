@@ -541,6 +541,10 @@ function ExternalOpportunityCard({
             target="_blank" 
             rel="noopener noreferrer" 
             className="gap-1"
+            onClick={(e) => {
+              // Garante que o clique não seja interceptado por outros elementos
+              e.stopPropagation();
+            }}
           >
             🗺️ Ver no Google Maps <ExternalLink className="size-3" />
           </a>
@@ -605,6 +609,7 @@ function OpportunityCard({
             target="_blank" 
             rel="noopener noreferrer"
             className="text-primary hover:underline flex items-center gap-1"
+            onClick={(e) => e.stopPropagation()}
           >
             🗺️ Ver no Google Maps <ExternalLink className="size-3" />
           </a>
