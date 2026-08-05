@@ -126,12 +126,14 @@ function DetalhesProjetoPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="briefing">
-            <TabsList className="grid grid-cols-5 w-full bg-muted/20 p-1 h-12">
+            <TabsList className="grid grid-cols-6 w-full bg-muted/20 p-1 h-12">
               <TabsTrigger value="briefing" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Briefcase className="size-4" /> Briefing</TabsTrigger>
               <TabsTrigger value="checklist" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><CheckCircle2 className="size-4" /> Checklist</TabsTrigger>
               <TabsTrigger value="projeto" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Globe className="size-4" /> Projeto</TabsTrigger>
+              <TabsTrigger value="reunioes" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Calendar className="size-4" /> Reuniões</TabsTrigger>
               <TabsTrigger value="financeiro" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><CircleDollarSign className="size-4" /> Financeiro</TabsTrigger>
               <TabsTrigger value="historico" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Clock className="size-4" /> Histórico</TabsTrigger>
+
             </TabsList>
             <TabsContent value="briefing" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
                <div className="flex items-center justify-between mb-8">
