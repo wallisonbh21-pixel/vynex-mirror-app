@@ -362,6 +362,17 @@ function DetalhesProjetoPage() {
                 Projeto com status: <StatusBadge status={project.status} className="inline-flex ml-1" />
               </div>
             )}
+
+            {/* VYNEXA Studio Entry */}
+            <Button 
+              variant="outline"
+              className="w-full gap-2 h-12 text-base font-bold border-primary/20 hover:bg-primary/10 text-primary mt-4"
+              asChild
+            >
+              <Link to="/_authenticated/studio/$projectId" params={{ projectId: project.id }}>
+                🎨 Abrir no VYNEXA Studio
+              </Link>
+            </Button>
           </div>
         </aside>
       </div>

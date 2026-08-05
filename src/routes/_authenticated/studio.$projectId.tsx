@@ -105,7 +105,7 @@ function VynexaStudioPage() {
       <header className="h-14 border-b border-slate-800 bg-slate-950 px-4 flex items-center justify-between z-50">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white">
-            <Link to="/_authenticated/projetos/$projectId" params={{ projectId }}>
+            <Link to={"/_authenticated/projetos/$projectId" as any} params={{ projectId } as any}>
               <ArrowLeft className="size-4 mr-2" /> Sair
             </Link>
           </Button>
