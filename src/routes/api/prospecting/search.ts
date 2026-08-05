@@ -32,9 +32,138 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Salão de beleza": "service.beauty",
   "Barbearia": "service.beauty",
   "Hamburguer": "catering.restaurant.burger",
-  // Nichos que utilizam categorias oficiais validadas para evitar 400
   "Oficina": "service.vehicle.repair",
 };
+
+/**
+ * Definição centralizada de relevância por nicho.
+ * Utilizada para filtrar e pontuar resultados da Geoapify.
+ */
+interface RelevanceConfig {
+  positiveTerms: string[];
+  positiveCategories: string[];
+  negativeTerms: string[];
+  negativeCategories: string[];
+  minScore: number;
+}
+
+const RELEVANCE_CONFIGS: Record<string, RelevanceConfig> = {
+  "Academia": {
+    positiveTerms: ["academia", "fitness", "musculação", "crossfit", "centro de treinamento", "treinamento funcional", "gym", "studio fitness", "ct ", "personal trainer", "treinamento esportivo", "pilates"],
+    positiveCategories: ["leisure.spa", "leisure.fitness_centre"],
+    negativeTerms: ["supermercado", "carrefour", "clínica", "hospital", "farmácia", "parque", "praça", "banco", "escola", "igreja", "rua", "avenida", "bairro", "residência", "condomínio", "edifício"],
+    negativeCategories: ["healthcare", "commercial.supermarket", "leisure.park", "education", "religion", "service.financial", "accommodation"],
+    minScore: 10,
+  },
+  "Oficina": {
+    positiveTerms: ["oficina", "mecânica", "auto center", "reparos automotivos", "lanternagem", "pintura automotiva", "freios", "suspensão", "pneus", "centro automotivo", "car service"],
+    positiveCategories: ["service.vehicle.repair", "commercial.vehicle"],
+    negativeTerms: ["concessionária", "venda de carros", "estacionamento", "lava jato", "supermercado", "clínica", "rua", "avenida"],
+    negativeCategories: ["commercial.supermarket", "healthcare", "parking"],
+    minScore: 10,
+  },
+  "Imobiliária": {
+    positiveTerms: ["imobiliária", "imóveis", "corretor", "venda", "aluguel", "negócios imobiliários", "properties", "real estate"],
+    positiveCategories: ["office", "commercial"],
+    negativeTerms: ["condomínio", "edifício", "residencial", "rua", "avenida", "supermercado"],
+    negativeCategories: ["accommodation", "commercial.supermarket"],
+    minScore: 10,
+  },
+  "Contabilidade": {
+    positiveTerms: ["contabilidade", "contador", "contábil", "assessoria contábil", "escritório contábil", "accounting"],
+    positiveCategories: ["office"],
+    negativeTerms: ["advocacia", "jurídico", "rua", "avenida"],
+    negativeCategories: ["healthcare", "accommodation"],
+    minScore: 10,
+  },
+  "Advocacia": {
+    positiveTerms: ["advocacia", "advogado", "jurídico", "escritório de advocacia", "direito", "law", "legal"],
+    positiveCategories: ["office"],
+    negativeTerms: ["contabilidade", "rua", "avenida"],
+    negativeCategories: ["healthcare", "accommodation"],
+    minScore: 10,
+  },
+  "Fotografia": {
+    positiveTerms: ["fotografia", "fotógrafo", "estúdio fotográfico", "foto", "photo", "studio"],
+    positiveCategories: ["service", "commercial"],
+    negativeTerms: ["rua", "avenida"],
+    negativeCategories: ["healthcare", "accommodation"],
+    minScore: 10,
+  },
+  "Eventos": {
+    positiveTerms: ["eventos", "buffet", "salão de festas", "casa de festas", "organização de eventos", "cerimonial", "party"],
+    positiveCategories: ["entertainment", "catering"],
+    negativeTerms: ["igreja", "escola", "rua", "avenida"],
+    negativeCategories: ["religion", "education"],
+    minScore: 10,
+  },
+  "Hamburgueria": {
+    positiveTerms: ["hamburgueria", "burger", "hambúrguer", "artesanal", "lanches"],
+    positiveCategories: ["catering.restaurant.burger"],
+    negativeTerms: ["pizzaria", "oriental", "rua", "avenida"],
+    negativeCategories: ["catering.restaurant.pizza"],
+    minScore: 10,
+  },
+  "Barbearia": {
+    positiveTerms: ["barbearia", "barbeiro", "barber", "beard", "corte masculino"],
+    positiveCategories: ["service.beauty"],
+    negativeTerms: ["feminino", "depilação", "unhas", "rua", "avenida"],
+    negativeCategories: ["healthcare"],
+    minScore: 10,
+  },
+  "Clínica": {
+    positiveTerms: ["clínica", "médica", "saúde", "consultório", "especialidades", "health", "clinic"],
+    positiveCategories: ["healthcare.clinic_or_praxis", "healthcare.hospital"],
+    negativeTerms: ["academia", "fitness", "rua", "avenida"],
+    negativeCategories: ["leisure.fitness_centre"],
+    minScore: 10,
+  },
+};
+
+function calculateRelevance(item: any, niche: string, searchNiche: string): number {
+  const name = (item.name || "").toLowerCase();
+  const categories = (item.categories || []);
+  const config = RELEVANCE_CONFIGS[searchNiche];
+  
+  let score = 0;
+
+  // Se for "Outros", usamos o termo pesquisado para relevância básica
+  const targetTerms = config?.positiveTerms || [niche.toLowerCase()];
+  const negativeTerms = config?.negativeTerms || ["rua", "avenida", "travessa", "bairro", "praça", "parque"];
+  const positiveCats = config?.positiveCategories || [];
+  const negativeCats = config?.negativeCategories || [];
+
+  // 1. Verificar termos negativos críticos (Descarte imediato)
+  if (negativeTerms.some(term => name.includes(term))) {
+    return -100;
+  }
+
+  // 2. Verificar categorias negativas críticas (Descarte imediato)
+  if (categories.some((cat: string) => negativeCats.some(negCat => cat === negCat || cat.startsWith(negCat + ".")))) {
+    return -100;
+  }
+
+  // 3. Pontuar por termos positivos no nome
+  for (const term of targetTerms) {
+    if (name.includes(term)) {
+      score += 20;
+    }
+  }
+
+  // 4. Pontuar por categorias positivas
+  for (const cat of categories) {
+    if (positiveCats.some(posCat => cat === posCat || cat.startsWith(posCat + "."))) {
+      score += 30;
+    }
+  }
+
+  // Se não tem config específica mas é "Outros", tenta match textual simples
+  if (!config && name.includes(niche.toLowerCase())) {
+    score += 50;
+  }
+
+  return score;
+}
 
 /**
  * Categorias oficiais suportadas pela Geoapify Places API v2.
