@@ -69,8 +69,14 @@ const OFFICIAL_CATEGORIES = new Set([
 ]);
 
 function getGeoapifyCategories(niche: string, requestId: string): { categories: string; fallbackUsed: boolean; log: string } {
+  // Garantir que estamos usando o mapa mais recente definido acima
   const mapped = NICHE_CATEGORY_MAP[niche] || "commercial,catering,service";
-  const requestedCategories = mapped.split(",");
+  
+  // Limpeza preventiva: se por algum motivo healthcare.clinic (inválida) ainda existir na string original
+  // nós a removemos antes da validação.
+  const cleanedMapped = mapped.replace(/healthcare\.clinic\b/g, "healthcare.clinic_or_praxis");
+  
+  const requestedCategories = cleanedMapped.split(",");
   const validatedCategories: string[] = [];
   let fallbackUsed = false;
   let log = "";
@@ -98,6 +104,12 @@ function getGeoapifyCategories(niche: string, requestId: string): { categories: 
 
   // Deduplicar e juntar
   const finalCategories = [...new Set(validatedCategories)].join(",");
+  
+  // LOG CRÍTICO PARA AUDITORIA DE RUNTIME
+  if (finalCategories.includes("healthcare.clinic") && !finalCategories.includes("healthcare.clinic_or_praxis")) {
+    console.error(`[CRITICAL_FAILURE][${requestId}] INVALID CATEGORY healthcare.clinic DETECTED IN FINAL STRING! Niche: ${niche}`);
+  }
+
   return { categories: finalCategories, fallbackUsed, log };
 }
 
