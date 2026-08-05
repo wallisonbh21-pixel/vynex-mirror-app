@@ -127,6 +127,8 @@ function ClientApprovalPage() {
     );
   }
 
+  const { data: studioData } = useStudioData(project?.id || '', token);
+
   const isAwaiting = project.status === 'aguardando_aprovacao';
   const isAdjusting = project.status === 'ajustes';
   const isApproved = project.status === 'aprovado' || project.status === 'entregue';
