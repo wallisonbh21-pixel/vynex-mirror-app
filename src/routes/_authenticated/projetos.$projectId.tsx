@@ -313,7 +313,7 @@ function DetalhesProjetoPage() {
               </Button>
             ) : project.status === "ajustes" ? (
               <Button 
-                className="w-full gap-2 variant-warning"
+                className="w-full gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold h-12"
                 onClick={() => updateProject.mutate({ id: project.id, status: "em_producao" })}
               >
                 Retomar Produção
