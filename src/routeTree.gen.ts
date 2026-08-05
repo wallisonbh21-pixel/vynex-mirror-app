@@ -36,6 +36,7 @@ import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
+import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 
 const IndexRoute = IndexRouteImport.update({
@@ -177,6 +178,12 @@ const AuthenticatedProjetosProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => AuthenticatedProjetosRoute,
   } as any)
+const AuthenticatedStudioProjectIdRoute =
+  AuthenticatedStudioProjectIdRouteImport.update({
+    id: '/studio/$projectId',
+    path: '/studio/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiProspectingSearchRoute = ApiProspectingSearchRouteImport.update({
   id: '/api/prospecting/search',
   path: '/api/prospecting/search',
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
 }
@@ -238,6 +246,7 @@ export interface FileRoutesByTo {
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
 }
@@ -269,6 +278,7 @@ export interface FileRoutesById {
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
 }
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/aprovacao/$token'
     | '/leads/$leadId'
     | '/projetos/$projectId'
+    | '/studio/$projectId'
     | '/api/prospecting/search'
     | '/leads/'
   fileRoutesByTo: FileRoutesByTo
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/aprovacao/$token'
     | '/leads/$leadId'
     | '/projetos/$projectId'
+    | '/studio/$projectId'
     | '/api/prospecting/search'
     | '/leads'
   id:
@@ -359,6 +371,7 @@ export interface FileRouteTypes {
     | '/aprovacao/$token'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/projetos/$projectId'
+    | '/_authenticated/studio/$projectId'
     | '/api/prospecting/search'
     | '/_authenticated/leads/'
   fileRoutesById: FileRoutesById
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetosProjectIdRouteImport
       parentRoute: typeof AuthenticatedProjetosRoute
     }
+    '/_authenticated/studio/$projectId': {
+      id: '/_authenticated/studio/$projectId'
+      path: '/studio/$projectId'
+      fullPath: '/studio/$projectId'
+      preLoaderRoute: typeof AuthenticatedStudioProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/prospecting/search': {
       id: '/api/prospecting/search'
       path: '/api/prospecting/search'
@@ -607,6 +627,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRouteWithChildren
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
+  AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
 }
 
@@ -631,6 +652,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProjetosRoute: AuthenticatedProjetosRouteWithChildren,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
+  AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
 }
 
@@ -648,13 +670,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

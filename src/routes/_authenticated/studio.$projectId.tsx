@@ -28,7 +28,7 @@ import { generateId } from '@/lib/studio/utils';
 import { SECTION_TEMPLATES } from '@/lib/studio/templates';
 
 
-export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
+export const Route = createFileRoute('/_authenticated/studio/$projectId')({
   component: VynexaStudioPage,
   head: () => ({
     meta: [{ title: 'VYNEXA Studio — Editor Visual' }],
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)
 });
 
 function VynexaStudioPage() {
-  const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' as any });
+  const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' });
   const { data: initialData, isLoading } = useStudioData(projectId);
   const saveMutation = useSaveStudioData();
   
@@ -235,7 +235,7 @@ function VynexaStudioPage() {
       <header className="h-14 border-b border-slate-800 bg-slate-950 px-4 flex items-center justify-between z-50">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white">
-            <Link to={"/_authenticated/projetos/$projectId" as any} params={{ projectId } as any}>
+            <Link to="/_authenticated/projetos/$projectId" params={{ projectId }}>
               <ArrowLeft className="size-4 mr-2" /> Sair
             </Link>
           </Button>
