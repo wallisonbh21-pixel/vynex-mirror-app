@@ -219,22 +219,32 @@ export const Route = createFileRoute("/api/prospecting/search")({
           let user: any = null;
           let userRoles: string[] = [];
 
-          if (authHeader?.startsWith("Bearer ")) {
-            const token = authHeader.split(" ")[1];
-            const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
-            if (!authError && authUser) {
-              user = authUser;
-              const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", user.id);
-              userRoles = roles?.map(r => r.role) || [];
-            }
+          if (!authHeader?.startsWith("Bearer ")) {
+             return new Response(JSON.stringify({ error: "Unauthorized", message: "Autenticação necessária" }), { 
+               status: 401,
+               headers: { "Content-Type": "application/json" }
+             });
           }
 
-          if (!user) {
-             return new Response(JSON.stringify({ error: "Unauthorized", message: "Autenticação necessária" }), { status: 401 });
+          const token = authHeader.split(" ")[1];
+          const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+          
+          if (authError || !authUser) {
+             return new Response(JSON.stringify({ error: "Unauthorized", message: "Sessão inválida" }), { 
+               status: 401,
+               headers: { "Content-Type": "application/json" }
+             });
           }
+
+          user = authUser;
+          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", user.id);
+          userRoles = roles?.map(r => r.role) || [];
 
           if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
-             return new Response(JSON.stringify({ error: "Forbidden", message: "Acesso negado: permissão insuficiente" }), { status: 403 });
+             return new Response(JSON.stringify({ error: "Forbidden", message: "Acesso negado: permissão insuficiente" }), { 
+               status: 403,
+               headers: { "Content-Type": "application/json" }
+             });
           }
 
           // Input
