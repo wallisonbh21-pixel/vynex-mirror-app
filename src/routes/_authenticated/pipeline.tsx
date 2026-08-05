@@ -1,13 +1,16 @@
-import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { SalesFunnel } from "@/components/SalesFunnel";
+import { SalesFunnel, ProgressionLine, LeadFunnelCard } from "@/components/SalesFunnel";
 import { requireVendedor } from "@/lib/guard";
 import { useSession } from "@/lib/auth";
 import { useChangeLeadStatus, type Lead } from "@/lib/crm";
 import { useRows } from "@/lib/data";
-import { currency, LEAD_STATUS, label, shortDate } from "@/lib/format";
+import { currency, LEAD_STATUS, label } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { LayoutGrid, List } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   beforeLoad: () => requireVendedor(),
