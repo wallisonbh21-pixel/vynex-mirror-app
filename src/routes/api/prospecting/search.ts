@@ -11,125 +11,105 @@ const searchSchema = z.object({
   rawMode: z.boolean().default(false),
 });
 
-interface RelevanceMap {
-  direct: string[];
-  related: string[];
-  negative: string[];
+interface NicheConfig {
+  primaryCategories: string[];
+  secondaryCategories: string[];
+  searchTerms: string[];
+  relevance: {
+    direct: string[];
+    related: string[];
+    negative: string[];
+  };
 }
 
-const RELEVANCE_MAPS: Record<string, RelevanceMap> = {
+const NICHE_STRATEGY: Record<string, NicheConfig> = {
+  "Hamburgueria": {
+    primaryCategories: ["catering.restaurant.burger"],
+    secondaryCategories: ["catering.restaurant"],
+    searchTerms: ["hamburgueria", "hambúrguer", "burger", "lanchonete"],
+    relevance: {
+      direct: ["hamburgueria", "burger", "hambúrguer", "burguer"],
+      related: ["lanchonete", "restaurante", "fast food", "snack"],
+      negative: ["depósito", "supermercado", "banco", "farmácia", "hospital", "oficina"]
+    }
+  },
+  "Dentista": {
+    primaryCategories: ["healthcare.dentist"],
+    secondaryCategories: ["healthcare.clinic_or_praxis"],
+    searchTerms: ["dentista", "dental", "odontologia"],
+    relevance: {
+      direct: ["dentista", "dental", "odontologia", "odontológico", "ortodontia"],
+      related: ["clínica odontológica", "consultório odontológico"],
+      negative: ["clínica médica", "hospital", "veterinário", "farmácia", "supermercado"]
+    }
+  },
   "Barbearia": {
-    direct: ["barbearia", "barber", "barber shop", "barbershop"],
-    related: ["corte masculino", "cabelo masculino", "salão masculino", "estética masculina"],
-    negative: ["depósito", "gráfica", "soluções gráficas", "supermercado", "banco", "farmácia", "hospital", "oficina", "imobiliária"]
+    primaryCategories: ["service.beauty"],
+    secondaryCategories: [],
+    searchTerms: ["barbearia", "barber", "barber shop"],
+    relevance: {
+      direct: ["barbearia", "barber", "barbershop", "barbeiro"],
+      related: ["corte masculino", "salão masculino", "estética masculina"],
+      negative: ["depósito", "supermercado", "banco", "gráfica", "farmácia"]
+    }
   },
   "Academia": {
-    direct: ["academia", "gym", "fitness", "musculação", "crossfit"],
-    related: ["centro de treinamento", "treinamento funcional", "studio fitness", "personal trainer", "pilates"],
-    negative: ["supermercado", "banco", "farmácia", "hospital", "clínica", "parque", "praça", "depósito", "gráfica"]
+    primaryCategories: ["leisure.fitness", "leisure.sports_centre"],
+    secondaryCategories: [],
+    searchTerms: ["academia", "gym", "fitness", "crossfit"],
+    relevance: {
+      direct: ["academia", "gym", "fitness", "musculação", "crossfit"],
+      related: ["centro de treinamento", "treinamento funcional", "studio fitness", "personal trainer", "pilates"],
+      negative: ["supermercado", "banco", "farmácia", "hospital", "clínica", "parque"]
+    }
   },
-  "Oficina": {
-    direct: ["oficina", "oficina mecânica", "mecânica", "auto center", "centro automotivo"],
-    related: ["funilaria", "auto elétrica", "pneus", "injeção eletrônica", "serviços automotivos"],
-    negative: ["supermercado", "banco", "barbearia", "gráfica", "imobiliária", "depósito genérico"]
-  },
-  "Imobiliária": {
-    direct: ["imobiliária", "imóveis", "corretora de imóveis", "corretor de imóveis", "negócios imobiliários"],
-    related: ["administração de imóveis", "aluguel de imóveis", "venda de imóveis", "consultoria imobiliária"],
-    negative: ["padaria", "barbearia", "supermercado", "farmácia", "depósito", "gráfica"]
-  },
-  "Contabilidade": {
-    direct: ["contabilidade", "contador", "contábil", "escritório contábil", "consultoria contábil"],
-    related: ["assessoria contábil", "serviços contábeis", "fiscal", "departamento pessoal"],
-    negative: ["salão", "lavanderia", "banco", "padaria", "depósito", "supermercado"]
+  "Pizzaria": {
+    primaryCategories: ["catering.restaurant.pizza"],
+    secondaryCategories: ["catering.restaurant"],
+    searchTerms: ["pizzaria", "pizza"],
+    relevance: {
+      direct: ["pizzaria", "pizza"],
+      related: ["restaurante italiano", "delivery pizza", "massas"],
+      negative: ["depósito", "supermercado", "banco", "farmácia"]
+    }
   }
 };
 
 const GENERIC_REJECTION_TERMS = ["comércio", "loja", "serviços", "empresa", "estabelecimento", "depósito", "soluções", "escritório genérico"];
 
-function calculateRelevance(item: any, niche: string, precision: "alta" | "ampla"): { score: number; reason: string; matches: { direct: string[]; related: string[]; negative: string[] } } {
+function calculateRelevanceScore(item: any, niche: string, config: NicheConfig | null): { score: number; level: 'DIRETA' | 'RELACIONADA' | 'GENÉRICA' | 'IRRELEVANTE' } {
   const name = (item.name || "").toLowerCase();
   const categories = (item.categories || []).map((c: string) => c.toLowerCase());
-  const address = (item.address_line2 || "").toLowerCase();
   
-  let score = 0;
-  let reason = "Iniciando análise";
-  const matches = { direct: [] as string[], related: [] as string[], negative: [] as string[] };
+  if (!config) {
+    const isDirect = name.includes(niche.toLowerCase());
+    return { 
+      score: isDirect ? 100 : 0, 
+      level: isDirect ? 'DIRETA' : 'GENÉRICA' 
+    };
+  }
 
-  const config = RELEVANCE_MAPS[niche] || {
-    direct: [niche.toLowerCase()],
-    related: [],
-    negative: GENERIC_REJECTION_TERMS
-  };
+  // 1. Check Negative Terms
+  const allNegative = [...config.relevance.negative, ...GENERIC_REJECTION_TERMS];
+  for (const term of allNegative) {
+    if (name.includes(term)) return { score: -100, level: 'IRRELEVANTE' };
+  }
 
-  // 1. Termos Negativos (Bloqueio crítico)
-  for (const term of config.negative) {
-    if (name.includes(term)) {
-      matches.negative.push(term);
-      return { score: -100, reason: `Termo incompatível detectado: "${term}"`, matches };
+  // 2. Direct Match
+  for (const term of config.relevance.direct) {
+    if (name.includes(term) || categories.some((c: string) => c.includes(term))) {
+      return { score: 100, level: 'DIRETA' };
     }
   }
 
-  // 2. Correspondência Direta (Nome e Categorias)
-  for (const term of config.direct) {
-    if (name.includes(term)) {
-      score += 100;
-      matches.direct.push(term);
-      reason = `Correspondência direta no nome: "${term}"`;
-    }
-    if (categories.some((cat: string) => cat.includes(term))) {
-      score += 90;
-      matches.direct.push(term);
-      reason = reason.includes("nome") ? `${reason} + categoria` : `Correspondência direta na categoria: "${term}"`;
+  // 3. Related Match
+  for (const term of config.relevance.related) {
+    if (name.includes(term) || categories.some((c: string) => c.includes(term))) {
+      return { score: 60, level: 'RELACIONADA' };
     }
   }
 
-  // 3. Termos Relacionados
-  for (const term of config.related) {
-    if (name.includes(term)) {
-      score += 60;
-      matches.related.push(term);
-    }
-    if (categories.some((cat: string) => cat.includes(term))) {
-      score += 50;
-    }
-  }
-
-  // 4. Correspondência em metadados/endereço
-  if (address.includes(niche.toLowerCase())) {
-    score += 30;
-  }
-
-  // 5. Penalidade por falta de evidência
-  if (score === 0) {
-    score = -80;
-    reason = "Resultado sem nenhuma evidência relacionada ao nicho";
-  }
-
-  return { score, reason, matches };
-}
-
-function getGeoapifyCategories(niche: string): string | null {
-  const MAP: Record<string, string> = {
-    "Hamburgueria": "catering.restaurant.burger",
-    "Restaurante": "catering.restaurant",
-    "Pizzaria": "catering.restaurant.pizza",
-    "Bar": "catering.bar",
-    "Café": "catering.cafe",
-    "Padaria": "commercial.food.bakery",
-    "Hotel": "accommodation.hotel",
-    "Pousada": "accommodation.guest_house",
-    "Farmácia": "healthcare.pharmacy",
-    "Loja de roupas": "commercial.clothing",
-    "Dentista": "healthcare.dentist",
-    "Clínica": "healthcare.clinic_or_praxis",
-    "Pet Shop": "commercial.pet",
-    "Salão de beleza": "service.beauty",
-    "Barbearia": "service.beauty",
-    "Oficina": "service.vehicle.repair",
-    "Academia": "leisure.fitness,leisure.sports_centre",
-  };
-  return MAP[niche] || null;
+  return { score: 20, level: 'GENÉRICA' };
 }
 
 function generateDeterministicId(str: string): string {
@@ -150,165 +130,158 @@ export const Route = createFileRoute("/api/prospecting/search")({
         const startTime = Date.now();
         
         try {
-          // Stage: auth
+          // Auth & Roles
           const authHeader = request.headers.get("Authorization");
           if (!authHeader?.startsWith("Bearer ")) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "auth", message: "Não autorizado", requestId 
-            }), { status: 401 });
+            return new Response(JSON.stringify({ error: true, stage: "auth", message: "Não autorizado", requestId }), { status: 401 });
           }
-
           const token = authHeader.split(" ")[1];
           const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-          if (authError || !user) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "auth", message: "Sessão inválida", requestId 
-            }), { status: 401 });
-          }
+          if (authError || !user) return new Response(JSON.stringify({ error: true, stage: "auth", message: "Sessão inválida", requestId }), { status: 401 });
 
-          // Stage: roles (Verificando se o usuário tem permissão básica)
-          const { data: roles } = await supabaseAdmin
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id);
-          
+          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", user.id);
           const userRoles = roles?.map(r => r.role) || [];
           if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
-             return new Response(JSON.stringify({ 
-              error: true, stage: "roles", message: "Sem permissão para prospecção", requestId 
-            }), { status: 403 });
+             return new Response(JSON.stringify({ error: true, stage: "roles", message: "Sem permissão", requestId }), { status: 403 });
           }
 
-          // Stage: input
-          let body;
-          try {
-            body = await request.json();
-          } catch (e) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "input", message: "JSON inválido", requestId 
-            }), { status: 400 });
-          }
-          
+          // Input
+          const body = await request.json();
           const { niche, state, city, precision, rawMode } = searchSchema.parse(body);
           const apiKey = process.env["GEOAPIFY_API_KEY"];
-          if (!apiKey) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "geoapify_call", message: "API Key ausente nas configurações do servidor", requestId 
-            }), { status: 500 });
-          }
+          if (!apiKey) return new Response(JSON.stringify({ error: true, stage: "config", message: "API Key ausente", requestId }), { status: 500 });
 
-          // Stage: geocoding
+          // Geocoding
           const locationText = city ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
           const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(locationText)}&limit=1&format=json&apiKey=${apiKey}`;
-          
           const geocodeRes = await fetch(geocodeUrl);
-          if (!geocodeRes.ok) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "geocoding", message: `Erro na geocodificação: ${geocodeRes.status}`, requestId 
-            }), { status: geocodeRes.status });
-          }
-          
           const geocodeData = await geocodeRes.json();
           const areaPlaceId = geocodeData.results?.[0]?.place_id;
-          if (!areaPlaceId) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "geocoding", message: "Localização não encontrada no Geoapify", requestId 
-            }), { status: 404 });
+          if (!areaPlaceId) return new Response(JSON.stringify({ error: true, stage: "geocoding", message: "Localização não encontrada", requestId }), { status: 404 });
+
+          const config = NICHE_STRATEGY[niche] || null;
+          const uniqueResults = new Map();
+          let queriesExecuted = 0;
+          let pagesFetched = 0;
+          let rawResultsCount = 0;
+
+          // Search Strategy: Layered approach
+          // Layer 1: Primary Categories
+          // Layer 2: Secondary Categories
+          // Layer 3: Search Terms
+          
+          const searchLayers = [];
+          if (config) {
+            if (config.primaryCategories.length > 0) searchLayers.push({ type: 'categories', values: config.primaryCategories });
+            if (config.secondaryCategories.length > 0) searchLayers.push({ type: 'categories', values: config.secondaryCategories });
+            if (config.searchTerms.length > 0) searchLayers.push({ type: 'text', values: config.searchTerms });
+          } else {
+            searchLayers.push({ type: 'text', values: [niche] });
           }
 
-          // Stage: geoapify_call
-          const allFeatures: any[] = [];
-          const geoUrl = new URL("https://api.geoapify.com/v2/places");
-          const category = getGeoapifyCategories(niche);
-          
-          if (category) geoUrl.searchParams.set("categories", category);
-          else geoUrl.searchParams.set("type", "commercial");
-          
-          geoUrl.searchParams.set("text", niche);
-          geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
-          geoUrl.searchParams.set("limit", "30");
-          geoUrl.searchParams.set("lang", "pt");
-          geoUrl.searchParams.set("apiKey", apiKey);
+          for (const layer of searchLayers) {
+            if (uniqueResults.size >= 30 && !rawMode) break;
 
-          const res = await fetch(geoUrl.toString());
-          const httpStatus = res.status;
-          
-          if (!res.ok) {
-            return new Response(JSON.stringify({ 
-              error: true, stage: "geoapify_call", message: `Erro na chamada Geoapify: ${httpStatus}`, requestId 
-            }), { status: httpStatus });
-          }
+            for (const value of layer.values) {
+              if (uniqueResults.size >= 30 && !rawMode) break;
 
-          // Stage: geoapify_response
-          const data = await res.json();
-          if (data.features) allFeatures.push(...data.features);
-          const totalReceived = allFeatures.length;
+              let offset = 0;
+              let hasMore = true;
 
-          // Stage: mapping
-          const unique = new Map();
-          const diagnostic: any = { 
-            requestId,
-            httpStatus,
-            totalReceived,
-            sentToFrontend: 0,
-            duration: 0,
-            rawMode
-          };
+              while (hasMore && (uniqueResults.size < 30 || rawMode)) {
+                queriesExecuted++;
+                pagesFetched++;
+                
+                const geoUrl = new URL("https://api.geoapify.com/v2/places");
+                if (layer.type === 'categories') geoUrl.searchParams.set("categories", value);
+                geoUrl.searchParams.set("text", layer.type === 'text' ? value : niche);
+                geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
+                geoUrl.searchParams.set("limit", "20");
+                geoUrl.searchParams.set("offset", offset.toString());
+                geoUrl.searchParams.set("lang", "pt");
+                geoUrl.searchParams.set("apiKey", apiKey);
 
-          for (const f of allFeatures) {
-            const props = f.properties;
-            if (!props?.name) continue;
-            
-            const key = props.place_id || generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
-            if (unique.has(key)) continue;
+                const res = await fetch(geoUrl.toString());
+                if (!res.ok) break;
 
-            // Se NÃO estiver em modo RAW, aplicar relevância v9.0
-            if (!rawMode) {
-              const relevance = calculateRelevance(props, niche, precision);
-              const minScore = precision === "alta" ? 60 : 10;
+                const data = await res.json();
+                const features = data.features || [];
+                rawResultsCount += features.length;
 
-              if (relevance.score <= -50 || relevance.score < minScore) {
-                continue;
+                if (features.length < 20) hasMore = false;
+                else offset += 20;
+
+                for (const f of features) {
+                  const props = f.properties;
+                  if (!props?.name) continue;
+                  
+                  const key = props.place_id || generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
+                  if (uniqueResults.has(key)) continue;
+
+                  const relevance = calculateRelevanceScore(props, niche, config);
+                  
+                  // Skip if irrelevant or if we need high precision and it's just generic
+                  if (!rawMode) {
+                    if (relevance.level === 'IRRELEVANTE') continue;
+                    if (precision === 'alta' && relevance.level === 'GENÉRICA') continue;
+                  }
+
+                  uniqueResults.set(key, {
+                    business_name: props.name,
+                    category: niche,
+                    address: props.address_line2,
+                    city: props.city,
+                    state: props.state_code || state,
+                    lat: props.lat,
+                    lon: props.lon,
+                    place_id: props.place_id,
+                    website: props.website,
+                    opportunity_level: props.website ? "media" : "alta",
+                    status: "nova",
+                    relevance_level: relevance.level,
+                    _debug: { score: relevance.score, level: relevance.level, layer: layer.type, value }
+                  });
+
+                  if (uniqueResults.size >= 30 && !rawMode) break;
+                }
+                
+                // Don't loop infinitely if we aren't finding new items
+                if (features.length === 0) hasMore = false;
               }
             }
-
-            unique.set(key, {
-              business_name: props.name,
-              category: niche,
-              address: props.address_line2,
-              city: props.city,
-              state: props.state_code || state,
-              lat: props.lat,
-              lon: props.lon,
-              place_id: props.place_id,
-              website: props.website,
-              opportunity_level: props.website ? "media" : "alta",
-              status: "nova",
-              _debug: rawMode ? { raw: true } : { score: calculateRelevance(props, niche, precision).score }
-            });
           }
 
-          // Stage: serialization
-          const opportunities = Array.from(unique.values()).slice(0, 30);
-          diagnostic.sentToFrontend = opportunities.length;
-          diagnostic.duration = Date.now() - startTime;
+          // Final Results & Sorting
+          const allOpportunities = Array.from(uniqueResults.values());
+          
+          // Sort by relevance level: DIRETA > RELACIONADA > GENÉRICA
+          const levelOrder = { 'DIRETA': 0, 'RELACIONADA': 1, 'GENÉRICA': 2, 'IRRELEVANTE': 3 };
+          allOpportunities.sort((a, b) => levelOrder[a.relevance_level] - levelOrder[b.relevance_level]);
+
+          const finalOpportunities = allOpportunities.slice(0, 30);
+          
+          const diagnostic = { 
+            requestId,
+            queriesExecuted,
+            pagesFetched,
+            rawResults: rawResultsCount,
+            deduplicatedResults: Array.from(uniqueResults.keys()).length,
+            relevantResults: allOpportunities.length,
+            finalResults: finalOpportunities.length,
+            duration: Date.now() - startTime
+          };
 
           return new Response(JSON.stringify({ 
-            opportunities, 
+            opportunities: finalOpportunities, 
             diagnostic, 
-            stage: "frontend",
-            version: rawMode ? "RAW-DIAGNOSTIC" : "v9.0-3-levels" 
+            stage: "complete",
+            version: "v10.0-layered-search" 
           }), {
             headers: { "Content-Type": "application/json" }
           });
 
         } catch (e: any) {
-          return new Response(JSON.stringify({ 
-            error: true, 
-            stage: "unknown", 
-            message: e.message, 
-            requestId 
-          }), { status: 500 });
+          return new Response(JSON.stringify({ error: true, stage: "unknown", message: e.message, requestId }), { status: 500 });
         }
       }
     }
