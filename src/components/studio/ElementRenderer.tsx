@@ -23,16 +23,25 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
     "hover:ring-1 hover:ring-primary/50 cursor-pointer"
   );
 
+  const getFontFamily = (type: 'heading' | 'body') => {
+    return type === 'heading' ? designSystem.typography.headingFont : designSystem.typography.bodyFont;
+  };
+
+  const getFontWeight = (type: 'heading' | 'body') => {
+    return type === 'heading' ? designSystem.typography.headingWeight : designSystem.typography.bodyWeight;
+  };
+
   switch (type) {
     case 'title':
       return (
         <h1 
-          className={cn(commonClasses, "font-bold")} 
+          className={cn(commonClasses)} 
           style={{ 
             fontSize: styles['fontSize'] || '2.5rem',
             color: styles['color'] || designSystem.colors.text,
             textAlign: styles['textAlign'] || 'left',
-            fontFamily: designSystem.fonts.heading,
+            fontFamily: getFontFamily('heading'),
+            fontWeight: getFontWeight('heading'),
             marginBottom: styles['marginBottom'] || '1rem'
           }}
           onClick={handleClick}
@@ -44,12 +53,13 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
     case 'subtitle':
       return (
         <h2 
-          className={cn(commonClasses, "font-semibold")} 
+          className={cn(commonClasses)} 
           style={{ 
             fontSize: styles['fontSize'] || '1.5rem',
-            color: styles['color'] || designSystem.colors.secondary,
+            color: styles['color'] || designSystem.colors.textSecondary,
             textAlign: styles['textAlign'] || 'left',
-            fontFamily: designSystem.fonts.heading,
+            fontFamily: getFontFamily('heading'),
+            fontWeight: getFontWeight('heading'),
             marginBottom: styles['marginBottom'] || '0.75rem'
           }}
           onClick={handleClick}
@@ -66,7 +76,8 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
             fontSize: styles['fontSize'] || '1rem',
             color: styles['color'] || designSystem.colors.text,
             textAlign: styles['textAlign'] || 'left',
-            fontFamily: designSystem.fonts.body,
+            fontFamily: getFontFamily('body'),
+            fontWeight: getFontWeight('body'),
             lineHeight: styles['lineHeight'] || '1.6',
             marginBottom: styles['marginBottom'] || '1rem'
           }}
@@ -79,13 +90,15 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
     case 'button':
       return (
         <button 
-          className={cn(commonClasses, "px-6 py-3 font-bold transition-all")} 
+          className={cn(commonClasses, "px-6 py-3 transition-all")} 
           style={{ 
             backgroundColor: styles['backgroundColor'] || designSystem.colors.primary,
             color: styles['color'] || '#FFFFFF',
-            borderRadius: styles['borderRadius'] || designSystem.borderRadius,
+            borderRadius: styles['borderRadius'] || designSystem.buttons.borderRadius,
             fontSize: styles['fontSize'] || '1rem',
-            display: 'inline-block'
+            fontWeight: getFontWeight('body'),
+            display: 'inline-block',
+            boxShadow: designSystem.buttons.shadow === 'sm' ? '0 1px 2px 0 rgb(0 0 0 / 0.05)' : 'none'
           }}
           onClick={handleClick}
         >
@@ -113,7 +126,7 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
         <button 
           className={cn(commonClasses, "px-6 py-3 font-bold flex items-center gap-2 bg-[#25D366] text-white shadow-lg")} 
           style={{ 
-            borderRadius: styles['borderRadius'] || '50px',
+            borderRadius: '50px',
           }}
           onClick={handleClick}
         >
@@ -121,7 +134,6 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
           {content.text || 'WhatsApp'}
         </button>
       );
-
 
     case 'form':
       return (
@@ -135,7 +147,7 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
               <label className="text-xs font-bold text-slate-500 uppercase">E-mail</label>
               <div className="h-10 border bg-white rounded-md"></div>
             </div>
-            <Button className="w-full" disabled>Enviar Mensagem</Button>
+            <button className="w-full px-4 py-2 bg-blue-600 text-white rounded font-medium opacity-50" disabled>Enviar Mensagem</button>
           </div>
         </div>
       );
@@ -143,9 +155,4 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect }:
     default:
       return <div onClick={handleClick} className={commonClasses}>Elemento {type}</div>;
   }
-}
-
-// Minimal button for the mock form
-function Button({ children, className, ...props }: any) {
-  return <button className={cn("px-4 py-2 bg-blue-600 text-white rounded font-medium", className)} {...props}>{children}</button>;
 }
