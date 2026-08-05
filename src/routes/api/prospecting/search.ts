@@ -211,14 +211,10 @@ export const Route = createFileRoute("/api/prospecting/search")({
     handlers: {
       POST: async ({ request }) => {
         const requestId = Math.random().toString(36).substring(2, 10);
-        const startTime = Date.now();
         
         try {
-          // Auth & Roles
+          // 1. ALWAYS REQUIRE AUTHENTICATION
           const authHeader = request.headers.get("Authorization");
-          let user: any = null;
-          let userRoles: string[] = [];
-
           if (!authHeader?.startsWith("Bearer ")) {
             return new Response(JSON.stringify({ error: "Unauthorized", message: "Autenticação necessária" }), { 
               status: 401,
@@ -236,9 +232,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
             });
           }
 
-          user = authUser;
-          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", user.id);
-          userRoles = roles?.map(r => r.role) || [];
+          // 2. ALWAYS VALIDATE ROLES
+          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", authUser.id);
+          const userRoles = roles?.map(r => r.role) || [];
 
           if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
             return new Response(JSON.stringify({ error: "Forbidden", message: "Acesso negado: permissão insuficiente" }), { 
@@ -246,6 +242,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
               headers: { "Content-Type": "application/json" }
             });
           }
+
+          // IGNORE ANY BYPASS HEADERS - THEY HAVE NO EFFECT
+          // The check above is absolute. Any request reaching here is authenticated and authorized.
 
           // Input
           const body = await request.json();
