@@ -182,42 +182,48 @@ function PainelCriador() {
         <section className="lg:col-span-2 space-y-6">
           <div className="rounded-2xl border border-border bg-card shadow-panel overflow-hidden">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <h2 className="font-semibold">Meus Projetos Recentes</h2>
-              <Button asChild variant="ghost" size="sm">
+              <h2 className="font-semibold flex items-center gap-2">
+                <History className="size-4 text-brand-500" /> Projetos em Andamento
+              </h2>
+              <Button asChild variant="ghost" size="sm" className="text-brand-500 hover:text-brand-600">
                 <Link to="/meus-projetos">Ver todos</Link>
               </Button>
             </div>
             <div className="divide-y divide-border">
               {active.slice(0, 5).map((project) => (
-                <div key={project.id} className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
-                  <div className="min-w-0 flex-1 pr-4">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate font-medium">{project.title}</span>
-                      <StatusBadge status={project.status} />
+                <div key={project.id} className="p-5 hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="min-w-0 flex-1 pr-4">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate font-bold text-base">{project.title}</span>
+                        <StatusBadge status={project.status} />
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Rocket className="size-3" /> {project.site_type || "Site"}</span>
+                        <span className="flex items-center gap-1"><Calendar className="size-3" /> Início: {shortDate(project.assigned_at || project.created_at)}</span>
+                      </div>
                     </div>
-                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                      <span>{project.site_type || "Site"}</span>
-                      <span>Início: {shortDate(project.assigned_at || project.created_at)}</span>
-                      <span className={cn(
-                        project.due_date && new Date(project.due_date) < today && "text-destructive font-bold"
-                      )}>
-                        Prazo: {shortDate(project.due_date)}
-                      </span>
+                    <div className="text-right">
+                      <div className="font-bold text-brand-500 text-lg">{currency(earnings.commissionOf(project))}</div>
+                      <Button asChild size="sm" variant="outline" className="h-8 mt-1 border-brand-500/30 text-brand-500 hover:bg-brand-500/10">
+                        <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
+                          Gerenciar <ExternalLink className="size-3" />
+                        </Link>
+                      </Button>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-primary">{currency(earnings.commissionOf(project))}</div>
-                    <Button asChild size="sm" variant="ghost" className="h-8 px-2 mt-1">
-                      <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
-                        Abrir <ExternalLink className="size-3" />
-                      </Link>
-                    </Button>
-                  </div>
+                  <SalesProgression status={project.status} />
                 </div>
               ))}
               {active.length === 0 && (
-                <div className="p-8 text-center text-sm text-muted-foreground">
-                  Nenhum projeto ativo atribuído.
+                <div className="p-12 text-center text-sm text-muted-foreground flex flex-col items-center gap-3">
+                  <div className="p-4 rounded-full bg-muted">
+                    <Layers className="size-8 opacity-20" />
+                  </div>
+                  <p>Você não tem projetos ativos no momento.</p>
+                  <Button asChild variant="link" className="text-brand-500">
+                    <Link to="/disponiveis">Ver projetos disponíveis</Link>
+                  </Button>
                 </div>
               )}
             </div>
@@ -368,8 +374,10 @@ function PainelCriador() {
                 <span className="text-muted-foreground">Já recebido</span>
                 <span className="font-medium">{currency(earnings.withdrawn)}</span>
               </div>
-              <Button asChild className="w-full mt-2" size="sm">
-                <Link to="/financeiro">Ver minhas comissões</Link>
+              <Button asChild size="sm" className="w-full mt-2 gap-2 shadow-glow bg-gradient-brand border-none hover:opacity-90">
+                <Link to="/meus-saques">
+                  Solicitar Saque <ArrowRight className="size-3" />
+                </Link>
               </Button>
             </div>
           </section>
