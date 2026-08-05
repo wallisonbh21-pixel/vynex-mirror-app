@@ -93,7 +93,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
         {counts.filter(c => c.status !== 'perdido').map((item, index, filteredCounts) => {
-          const config = (FUNNEL_CONFIG[item.status as keyof typeof FUNNEL_CONFIG] || DEFAULT_CONFIG);
+          const config: FunnelConfig = FUNNEL_CONFIG[item.status as string] || DEFAULT_CONFIG;
           const Icon = config.icon;
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
