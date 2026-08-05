@@ -292,7 +292,7 @@ function BriefingPage() {
                     <Rocket className="size-12 text-muted-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold">Etapa {step}: {STEPS.find(s => s.id === step)?.title}</h3>
+                    <h3 className="text-lg font-bold">Etapa {step}: {STEPS.find(s => s.id === step)?.title || ''}</h3>
                     <p className="text-muted-foreground">Esta etapa está sendo preparada para coleta de dados detalhados.</p>
                   </div>
                   <Button variant="outline" onClick={handleNext}>Pular esta etapa</Button>
