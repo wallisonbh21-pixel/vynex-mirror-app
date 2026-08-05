@@ -24,7 +24,7 @@ export interface ForgeSectionPlan {
   purpose: string;
   priority: ForgeDecisionPriority;
   recommended: boolean;
-  source: 'SITE_PLANNER' | 'AI_CORE' | 'TEMPLATE';
+  source: 'SITE_PLANNER' | 'AI_CORE' | 'TEMPLATE' | 'FORGE';
   action: AIAction;
   recommendedPosition: number;
 }

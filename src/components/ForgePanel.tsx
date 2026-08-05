@@ -14,7 +14,8 @@ import {
   Settings2,
   GripVertical,
   Trash2,
-  Plus
+  Plus,
+  Brain
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
