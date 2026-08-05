@@ -176,7 +176,8 @@ function DetalhesProjetoPage() {
                      <p className="text-[10px] text-muted-foreground text-center py-4">Utilize a área de "Projeto" para links externos.</p>
                    </div>
                  </div>
-               </div>
+                </div>
+            </TabsContent>
             
             <TabsContent value="checklist" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
                <div className="flex items-center justify-between mb-6">
