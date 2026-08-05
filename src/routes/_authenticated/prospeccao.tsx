@@ -13,6 +13,9 @@ import {
   Loader2,
   ExternalLink,
   X,
+  MessageSquare,
+  Facebook,
+  Instagram,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
