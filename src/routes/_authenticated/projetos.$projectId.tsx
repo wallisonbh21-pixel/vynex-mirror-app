@@ -143,7 +143,10 @@ function DetalhesProjetoPage() {
           </div>
           {project.status === "em_producao" && (
             <Button className="w-full" onClick={() => {
-              if (progress < 100) return toast.error("Complete o checklist!");
+              if (progress < 100) {
+                toast.error("Complete o checklist!");
+                return;
+              }
               updateProject.mutate({ id: project.id, status: "aguardando_aprovacao" });
             }}><Send className="size-4 mr-2" /> Enviar para Aprovação</Button>
           )}
