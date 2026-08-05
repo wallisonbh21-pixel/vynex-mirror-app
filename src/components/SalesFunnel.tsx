@@ -80,7 +80,7 @@ export const FUNNEL_CONFIG: Record<string, FunnelConfig> = {
   },
 };
 
-const DEFAULT_CONFIG: FunnelConfig = FUNNEL_CONFIG['novo'];
+const DEFAULT_CONFIG: FunnelConfig = FUNNEL_CONFIG['novo']!;
 
 export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps) {
   const counts = LEAD_STATUS.map((status) => {
