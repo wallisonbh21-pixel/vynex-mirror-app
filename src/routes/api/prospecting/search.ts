@@ -1,3 +1,7 @@
+/**
+ * Central de Prospecção VYNEXA - API Search v10.0
+ * Estratégia de Busca em Camadas com Paginação Geoapify
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
