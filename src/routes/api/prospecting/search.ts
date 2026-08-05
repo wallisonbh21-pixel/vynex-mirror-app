@@ -26,22 +26,79 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Farmácia": "healthcare.pharmacy",
   "Loja de roupas": "commercial.clothing",
   "Dentista": "healthcare.dentist",
-  "Clínica": "healthcare.clinic,healthcare.hospital",
+  "Clínica": "healthcare.hospital,healthcare.clinic",
   "Pet Shop": "commercial.pet",
   "Academia": "leisure.fitness,leisure.sports_centre",
   "Salão de beleza": "service.beauty",
-  "Barbearia": "service.beauty.barber",
+  "Barbearia": "service.beauty.hairdresser,service.beauty",
   "Oficina": "service.vehicle.repair",
-  "Imobiliária": "service.real_estate",
+  "Imobiliária": "service.real_estate,commercial.estate_agent",
   "Contabilidade": "service.financial",
   "Advocacia": "service.legal",
   "Fotografia": "service.photography",
-  "Eventos": "service.event_planner",
+  "Eventos": "service.event_planner,entertainment.event_venue",
 };
 
-function getGeoapifyCategories(niche: string): string {
-  // Busca exata no mapa ou fallback para comercial genérico
-  return NICHE_CATEGORY_MAP[niche] || "commercial,catering,service";
+/**
+ * Categorias oficiais suportadas pela Geoapify Places API v2.
+ * Esta lista é usada para validar e prevenir erros 400.
+ */
+const OFFICIAL_CATEGORIES = new Set([
+  "accommodation", "accommodation.hotel", "accommodation.hostel", "accommodation.guest_house", "accommodation.apartment",
+  "activity", "activity.community_center", "activity.sport", "activity.sport.swimming_pool",
+  "airport", "airport.international",
+  "commercial", "commercial.clothing", "commercial.food", "commercial.food.bakery", "commercial.pet", "commercial.supermarket",
+  "catering", "catering.restaurant", "catering.restaurant.burger", "catering.restaurant.pizza", "catering.restaurant.thai",
+  "catering.cafe", "catering.bar", "catering.pub", "catering.fast_food",
+  "education", "education.school", "education.university",
+  "entertainment", "entertainment.cinema", "entertainment.culture", "entertainment.event_venue",
+  "healthcare", "healthcare.hospital", "healthcare.clinic", "healthcare.dentist", "healthcare.pharmacy",
+  "heritage",
+  "leisure", "leisure.fitness", "leisure.sports_centre", "leisure.park", "leisure.playground",
+  "natural",
+  "office", "office.government",
+  "parking",
+  "pet",
+  "production",
+  "public_transport",
+  "religion",
+  "rental",
+  "service", "service.beauty", "service.beauty.hairdresser", "service.financial", "service.legal", "service.real_estate", "service.photography", "service.event_planner", "service.vehicle", "service.vehicle.repair",
+  "tourism",
+  "camping"
+]);
+
+function getGeoapifyCategories(niche: string, requestId: string): { categories: string; fallbackUsed: boolean; log: string } {
+  const mapped = NICHE_CATEGORY_MAP[niche] || "commercial,catering,service";
+  const requestedCategories = mapped.split(",");
+  const validatedCategories: string[] = [];
+  let fallbackUsed = false;
+  let log = "";
+
+  for (const cat of requestedCategories) {
+    if (OFFICIAL_CATEGORIES.has(cat)) {
+      validatedCategories.push(cat);
+    } else {
+      fallbackUsed = true;
+      const parts = cat.split(".");
+      let fallback = "commercial"; // Default fallback
+      
+      // Tenta encontrar o pai mais próximo que seja oficial
+      for (let i = parts.length - 1; i > 0; i--) {
+        const parent = parts.slice(0, i).join(".");
+        if (OFFICIAL_CATEGORIES.has(parent)) {
+          fallback = parent;
+          break;
+        }
+      }
+      validatedCategories.push(fallback);
+      log += `[Fallback][${requestId}] Niche: ${niche}, Invalid: ${cat} -> Used: ${fallback}; `;
+    }
+  }
+
+  // Deduplicar e juntar
+  const finalCategories = [...new Set(validatedCategories)].join(",");
+  return { categories: finalCategories, fallbackUsed, log };
 }
 
 /**
@@ -149,18 +206,20 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           // 5. Chamar Geoapify Places API v2
           stage = "geoapify_call";
-          const categories = getGeoapifyCategories(niche);
+          const { categories, fallbackUsed, log: fallbackLog } = getGeoapifyCategories(niche, requestId);
+          if (fallbackUsed) {
+            console.log(fallbackLog);
+          }
           
           // Construindo URL da v2
-          // filter=place:{place_id} é a forma oficial de pesquisar dentro de uma área específica (cidade ou estado)
           const geoUrl = new URL("https://api.geoapify.com/v2/places");
           geoUrl.searchParams.set("categories", categories);
           geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
-          geoUrl.searchParams.set("limit", "20");
+          geoUrl.searchParams.set("limit", "30"); // Aumentado para 30 conforme solicitado
           geoUrl.searchParams.set("lang", "pt");
           geoUrl.searchParams.set("apiKey", apiKey);
           
-          console.log(`[Search][${requestId}] URL Geoapify v2: ${geoUrl.origin}${geoUrl.pathname}?categories=${categories}&filter=place:${areaPlaceId}&apiKey=HIDDEN`);
+          console.log(`[Search][${requestId}] URL Geoapify v2: ${geoUrl.origin}${geoUrl.pathname}?categories=${categories}&filter=place:${areaPlaceId}&limit=30&apiKey=HIDDEN`);
           
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -228,7 +287,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v3.0-v2api";
+          const diagnostic = "prospecting-search-v3.1-v2api-catfixed";
           
           return new Response(JSON.stringify({ 
             opportunities, 
@@ -239,6 +298,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
             meta: {
               endpoint: "/v2/places",
               categories,
+              fallbackUsed,
+              fallbackLog: fallbackLog || null,
               filter: `place:${areaPlaceId}`,
               resolvedLocation: locationText
             }
