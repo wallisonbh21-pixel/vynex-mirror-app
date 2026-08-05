@@ -12,7 +12,7 @@ import { shortDate } from '@/lib/format';
 export const Route = createFileRoute('/aprovacao/$token')({
   component: ClientApprovalPage,
   head: () => ({
-    meta: [{ title: 'Aprovação de Projeto — VYNEXA' }],
+    meta: [{ title: 'Aprovação de Projeto — ScaleNexus' }],
   }),
 });
 
@@ -126,7 +126,7 @@ function ClientApprovalPage() {
             {error instanceof Error ? error.message : 'Este link de aprovação não existe mais ou expirou.'}
           </p>
           <Button variant="outline" className="text-white" asChild>
-            <a href="/">Ir para VYNEXA</a>
+            <a href="/">Ir para ScaleNexus</a>
           </Button>
         </div>
       </div>
@@ -144,7 +144,7 @@ function ClientApprovalPage() {
         <div className="max-w-5xl mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="size-8 bg-primary rounded-lg flex items-center justify-center font-black text-white italic">V</div>
-            <span className="font-bold text-xl tracking-tight text-white uppercase">Vynexa</span>
+            <span className="font-bold text-xl tracking-tight text-white uppercase">ScaleNexus</span>
           </div>
           <div className="hidden md:block">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">Portal de Aprovação</span>
@@ -363,7 +363,7 @@ function ClientApprovalPage() {
       </main>
 
       <footer className="border-t border-slate-900 py-12 text-center text-slate-600 text-sm">
-        <p>© {new Date().getFullYear()} VYNEXA — Inteligência e Tecnologia para Negócios Locais</p>
+        <p>© {new Date().getFullYear()} ScaleNexus — Inteligência e Tecnologia para Negócios Locais</p>
       </footer>
     </div>
   );

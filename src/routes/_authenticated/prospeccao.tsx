@@ -51,13 +51,13 @@ export const Route = createFileRoute("/_authenticated/prospeccao")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Central de Prospecção — VYNEXA" },
+      { title: "Central de Prospecção — ScaleNexus" },
       {
         name: "description",
         content:
-          "Encontre empresas sem presença digital, classifique oportunidades e envie direto para o CRM da VYNEXA.",
+          "Encontre empresas sem presença digital, classifique oportunidades e envie direto para o CRM da ScaleNexus.",
       },
-      { property: "og:title", content: "Central de Prospecção — VYNEXA" },
+      { property: "og:title", content: "Central de Prospecção — ScaleNexus" },
       {
         property: "og:description",
         content: "Prospecção de empresas por nicho, estado e cidade com envio automático para o funil.",

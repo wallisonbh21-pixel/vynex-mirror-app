@@ -32,13 +32,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/comissoes")({
   head: () => ({
     meta: [
-      { title: "Minhas comissões — VYNEXA" },
+      { title: "Minhas comissões — ScaleNexus" },
       {
         name: "description",
-        content: "Acompanhe comissões, bônus, saldo disponível e histórico financeiro pessoal na VYNEXA.",
+        content: "Acompanhe comissões, bônus, saldo disponível e histórico financeiro pessoal na ScaleNexus.",
       },
-      { property: "og:title", content: "Minhas comissões — VYNEXA" },
-      { property: "og:description", content: "Ganhos, bônus e saques da sua operação VYNEXA." },
+      { property: "og:title", content: "Minhas comissões — ScaleNexus" },
+      { property: "og:description", content: "Ganhos, bônus e saques da sua operação ScaleNexus." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

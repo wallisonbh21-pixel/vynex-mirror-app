@@ -13,13 +13,13 @@ export const Route = createFileRoute("/_authenticated/followups")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Acompanhamentos — VYNEXA" },
+      { title: "Acompanhamentos — ScaleNexus" },
       {
         name: "description",
         content: "Contatos de hoje, acompanhamentos atrasados e próximos retornos das suas oportunidades.",
       },
-      { property: "og:title", content: "Acompanhamentos — VYNEXA" },
-      { property: "og:description", content: "Agenda comercial do CRM VYNEXA." },
+      { property: "og:title", content: "Acompanhamentos — ScaleNexus" },
+      { property: "og:description", content: "Agenda comercial do CRM ScaleNexus." },
     ],
   }),
   component: FollowUpsPage,

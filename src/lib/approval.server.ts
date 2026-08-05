@@ -155,14 +155,14 @@ export function approvalEmailContent(params: {
     "",
     "Temos uma ótima notícia!",
     "",
-    `O site da ${params.company} foi finalizado pela equipe VYNEXA e está pronto para sua avaliação.`,
+    `O site da ${params.company} foi finalizado pela equipe ScaleNexus e está pronto para sua avaliação.`,
     "",
     `Acesse o projeto por aqui: ${params.link}`,
     "",
     "Depois de visualizar o site, você poderá aprovar o projeto ou solicitar alterações.",
     "",
     "Atenciosamente,",
-    "Equipe VYNEXA",
+    "Equipe ScaleNexus",
     "Transforme oportunidades em negócios digitais.",
   ].join("\n");
   return { subject, text };

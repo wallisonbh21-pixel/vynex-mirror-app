@@ -1,5 +1,5 @@
 /**
- * Central de Prospecção VYNEXA - API Search v10.0
+ * Central de Prospecção ScaleNexus - API Search v10.0
  * Estratégia de Busca em Camadas com Paginação Geoapify
  */
 import { createFileRoute } from "@tanstack/react-router";
@@ -230,7 +230,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // Allow audit from sandbox without full auth if needed, but strictly for GET or with specific internal header
-          const isInternalAudit = request.headers.get("X-Vynexa-Audit") === "true";
+          const isInternalAudit = request.headers.get("X-ScaleNexus-Audit") === "true";
 
           if (!isInternalAudit && (!user || (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")))) {
              return new Response(JSON.stringify({ error: true, stage: "auth", message: "Acesso negado", requestId }), { status: 403 });

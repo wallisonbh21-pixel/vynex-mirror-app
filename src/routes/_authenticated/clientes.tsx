@@ -14,13 +14,13 @@ export const Route = createFileRoute("/_authenticated/clientes")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Clientes — VYNEXA" },
+      { title: "Clientes — ScaleNexus" },
       {
         name: "description",
         content: "Carteira do vendedor: empresa, responsável, contrato, mensalidade, projetos e data de entrada.",
       },
-      { property: "og:title", content: "Clientes — VYNEXA" },
-      { property: "og:description", content: "Carteira de clientes da VYNEXA." },
+      { property: "og:title", content: "Clientes — ScaleNexus" },
+      { property: "og:description", content: "Carteira de clientes da ScaleNexus." },
     ],
   }),
   component: ClientesPage,

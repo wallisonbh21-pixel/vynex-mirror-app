@@ -38,7 +38,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/projetos/$projectId")({
   beforeLoad: () => requireCriador(),
   head: () => ({
-    meta: [{ title: "Detalhes do Projeto — VYNEXA" }],
+    meta: [{ title: "Detalhes do Projeto — ScaleNexus" }],
   }),
   component: DetalhesProjetoPage,
 });
@@ -363,14 +363,14 @@ function DetalhesProjetoPage() {
               </div>
             )}
 
-            {/* VYNEXA Studio Entry */}
+            {/* ScaleNexus Studio Entry */}
             <Button 
               variant="outline"
               className="w-full gap-2 h-12 text-base font-bold border-primary/20 hover:bg-primary/10 text-primary mt-4"
               asChild
             >
               <Link to={"/_authenticated/studio/$projectId" as any} params={{ projectId: project.id } as any}>
-                🎨 Abrir no VYNEXA Studio
+                🎨 Abrir no ScaleNexus Studio
               </Link>
             </Button>
           </div>

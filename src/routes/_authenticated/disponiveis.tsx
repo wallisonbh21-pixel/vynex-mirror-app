@@ -14,12 +14,12 @@ export const Route = createFileRoute("/_authenticated/disponiveis")({
   beforeLoad: () => requireCriador(),
   head: () => ({
     meta: [
-      { title: "Projetos disponíveis — VYNEXA" },
+      { title: "Projetos disponíveis — ScaleNexus" },
       {
         name: "description",
-        content: "Vitrine de projetos de sites disponíveis para criadores assumirem na VYNEXA.",
+        content: "Vitrine de projetos de sites disponíveis para criadores assumirem na ScaleNexus.",
       },
-      { property: "og:title", content: "Projetos disponíveis — VYNEXA" },
+      { property: "og:title", content: "Projetos disponíveis — ScaleNexus" },
       { property: "og:description", content: "Assuma um projeto e comece a produzir." },
     ],
   }),

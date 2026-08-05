@@ -203,7 +203,7 @@ function SidebarContent({
           <Sparkles className="size-4" />
         </span>
         <span>
-          <span className="block text-sm font-semibold tracking-[0.28em]">VYNEXA</span>
+          <span className="block text-sm font-semibold tracking-[0.28em]">ScaleNexus</span>
           <span className="block text-[10px] tracking-[0.2em] text-muted-foreground">
             DIGITAL BUSINESS
           </span>

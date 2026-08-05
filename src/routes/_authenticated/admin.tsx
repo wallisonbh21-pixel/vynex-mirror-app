@@ -24,10 +24,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: () => requireAdmin(),
   head: () => ({
     meta: [
-      { title: "Administração — VYNEXA" },
+      { title: "Administração — ScaleNexus" },
       { name: "description", content: "Gerencie papéis de acesso, comissões e aprove saques do time." },
-      { property: "og:title", content: "Administração — VYNEXA" },
-      { property: "og:description", content: "Controle de usuários e saques da VYNEXA." },
+      { property: "og:title", content: "Administração — ScaleNexus" },
+      { property: "og:description", content: "Controle de usuários e saques da ScaleNexus." },
     ],
   }),
   component: AdminPage,

@@ -15,10 +15,10 @@ export const Route = createFileRoute("/_authenticated/metas")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Metas — VYNEXA" },
+      { title: "Metas — ScaleNexus" },
       { name: "description", content: "Metas mensais de vendas e faturamento com progresso real do vendedor." },
-      { property: "og:title", content: "Metas — VYNEXA" },
-      { property: "og:description", content: "Metas e progresso do time VYNEXA." },
+      { property: "og:title", content: "Metas — ScaleNexus" },
+      { property: "og:description", content: "Metas e progresso do time ScaleNexus." },
     ],
   }),
   component: MetasPage,

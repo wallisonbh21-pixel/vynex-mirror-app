@@ -16,13 +16,13 @@ export const Route = createFileRoute("/_authenticated/pipeline")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Funil de Vendas — VYNEXA" },
+      { title: "Funil de Vendas — ScaleNexus" },
       {
         name: "description",
         content: "Funil visual das oportunidades: arraste os cards entre as etapas e acompanhe o fechamento.",
       },
-      { property: "og:title", content: "Funil de Vendas — VYNEXA" },
-      { property: "og:description", content: "Kanban comercial do CRM VYNEXA." },
+      { property: "og:title", content: "Funil de Vendas — ScaleNexus" },
+      { property: "og:description", content: "Kanban comercial do CRM ScaleNexus." },
     ],
   }),
   component: PipelinePage,

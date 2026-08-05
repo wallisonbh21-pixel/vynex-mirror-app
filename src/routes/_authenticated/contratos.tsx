@@ -14,13 +14,13 @@ export const Route = createFileRoute("/_authenticated/contratos")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Contratos — VYNEXA" },
+      { title: "Contratos — ScaleNexus" },
       {
         name: "description",
         content: "Contratos fechados, valores, mensalidades e situação de cada cliente conquistado.",
       },
-      { property: "og:title", content: "Contratos — VYNEXA" },
-      { property: "og:description", content: "Contratos fechados na VYNEXA." },
+      { property: "og:title", content: "Contratos — ScaleNexus" },
+      { property: "og:description", content: "Contratos fechados na ScaleNexus." },
     ],
   }),
   component: ContratosPage,

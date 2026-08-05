@@ -2,8 +2,8 @@ import { StudioDesignPreset } from '@/types/studio-v2';
 
 export const DESIGN_PRESETS: StudioDesignPreset[] = [
   {
-    id: 'vynexa-modern',
-    name: 'VYNEXA Modern',
+    id: 'scalenexus-modern',
+    name: 'ScaleNexus Modern',
     preview: '/previews/presets/modern.jpg',
     design_system: {
       colors: {
@@ -31,8 +31,8 @@ export const DESIGN_PRESETS: StudioDesignPreset[] = [
     }
   },
   {
-    id: 'vynexa-dark',
-    name: 'VYNEXA Dark',
+    id: 'scalenexus-dark',
+    name: 'ScaleNexus Dark',
     preview: '/previews/presets/dark.jpg',
     design_system: {
       colors: {

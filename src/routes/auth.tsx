@@ -20,15 +20,15 @@ import {
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — VYNEXA" },
+      { title: "Entrar — ScaleNexus" },
       {
         name: "description",
-        content: "Acesse a plataforma VYNEXA para gerenciar leads, projetos, comissões e metas.",
+        content: "Acesse a plataforma ScaleNexus para gerenciar leads, projetos, comissões e metas.",
       },
-      { property: "og:title", content: "Entrar — VYNEXA" },
+      { property: "og:title", content: "Entrar — ScaleNexus" },
       {
         property: "og:description",
-        content: "Acesso à plataforma de operações de sites da VYNEXA.",
+        content: "Acesso à plataforma de operações de sites da ScaleNexus.",
       },
     ],
   }),
@@ -160,7 +160,7 @@ function AuthPage() {
             <Sparkles className="size-5" />
           </span>
           <span>
-            <span className="block text-sm font-semibold tracking-[0.32em]">VYNEXA</span>
+            <span className="block text-sm font-semibold tracking-[0.32em]">ScaleNexus</span>
             <span className="block text-[10px] tracking-[0.22em] text-muted-foreground">
               DIGITAL BUSINESS
             </span>

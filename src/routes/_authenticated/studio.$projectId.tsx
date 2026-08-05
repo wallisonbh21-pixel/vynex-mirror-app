@@ -29,13 +29,13 @@ import { SECTION_TEMPLATES } from '@/lib/studio/templates';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
-  component: VynexaStudioPage,
+  component: ScaleNexusStudioPage,
   head: () => ({
-    meta: [{ title: 'VYNEXA Studio — Editor Visual' }],
+    meta: [{ title: 'ScaleNexus Studio — Editor Visual' }],
   }),
 });
 
-function VynexaStudioPage() {
+function ScaleNexusStudioPage() {
   const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' });
   const { data: initialData, isLoading } = useStudioData(projectId);
   const saveMutation = useSaveStudioData();
@@ -142,7 +142,7 @@ function VynexaStudioPage() {
     return (
       <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-white">
         <Loader2 className="size-10 animate-spin text-primary" />
-        <p className="animate-pulse font-medium">Carregando VYNEXA Studio...</p>
+        <p className="animate-pulse font-medium">Carregando ScaleNexus Studio...</p>
       </div>
     );
   }
@@ -241,7 +241,7 @@ function VynexaStudioPage() {
           </Button>
           <div className="h-4 w-px bg-slate-800 mx-2" />
           <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest block leading-none mb-1">VYNEXA STUDIO</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest block leading-none mb-1">ScaleNexus STUDIO</span>
             <span className="text-sm font-bold text-white leading-none">Editor Visual</span>
           </div>
         </div>

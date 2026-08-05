@@ -16,13 +16,13 @@ export const Route = createFileRoute("/_authenticated/meus-saques")({
   beforeLoad: () => requireCriador(),
   head: () => ({
     meta: [
-      { title: "Meus saques — VYNEXA" },
+      { title: "Meus saques — ScaleNexus" },
       {
         name: "description",
         content: "Saldo disponível, solicitações de saque PIX e histórico de pagamentos do criador.",
       },
-      { property: "og:title", content: "Meus saques — VYNEXA" },
-      { property: "og:description", content: "Receba suas comissões via PIX na VYNEXA." },
+      { property: "og:title", content: "Meus saques — ScaleNexus" },
+      { property: "og:description", content: "Receba suas comissões via PIX na ScaleNexus." },
     ],
   }),
   component: MeusSaquesPage,

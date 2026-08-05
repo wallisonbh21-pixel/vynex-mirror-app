@@ -23,14 +23,14 @@ export const Route = createFileRoute("/_authenticated/leads/")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Leads — VYNEXA" },
+      { title: "Leads — ScaleNexus" },
       {
         name: "description",
         content:
           "Cadastro completo de oportunidades comerciais: empresa, contato, origem, status e próximo follow-up.",
       },
-      { property: "og:title", content: "Leads — VYNEXA" },
-      { property: "og:description", content: "CRM comercial da operação VYNEXA." },
+      { property: "og:title", content: "Leads — ScaleNexus" },
+      { property: "og:description", content: "CRM comercial da operação ScaleNexus." },
     ],
   }),
   component: LeadsPage,
