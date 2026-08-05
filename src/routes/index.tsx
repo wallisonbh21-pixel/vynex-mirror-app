@@ -91,7 +91,8 @@ function LandingPage() {
                       <span className="text-primary font-bold">✓</span>
                       {item}
                     </li>
-                  </ul>
+                  ))}
+
               </div>
               <div className="size-48 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center relative overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-primary)_0%,transparent_70%)] opacity-20"></div>
