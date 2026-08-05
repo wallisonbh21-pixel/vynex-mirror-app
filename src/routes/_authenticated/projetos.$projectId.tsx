@@ -369,7 +369,7 @@ function DetalhesProjetoPage() {
               className="w-full gap-2 h-12 text-base font-bold border-primary/20 hover:bg-primary/10 text-primary mt-4"
               asChild
             >
-              <Link to="/_authenticated/studio/$projectId" params={{ projectId: project.id }}>
+              <Link to={"/_authenticated/studio/$projectId" as any} params={{ projectId: project.id } as any}>
                 🎨 Abrir no VYNEXA Studio
               </Link>
             </Button>
