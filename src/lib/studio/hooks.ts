@@ -155,12 +155,13 @@ export function useSaveUserTemplate() {
         .insert({
           creator_id: user.id,
           name: template.name,
-          description: template.description,
+          description: template.description || null,
           category: template.category,
-          niche: template.niche,
+          niche: template.niche || null,
           structure: template.structure as any,
-          preview_url: template.preview,
-          tags: template.tags
+          preview_url: template.preview || null,
+          tags: template.tags || null
+
         });
       
       if (error) throw error;
