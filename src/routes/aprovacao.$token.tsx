@@ -26,6 +26,9 @@ function ClientApprovalPage() {
   const { data: project, isLoading, error } = useQuery({
     queryKey: ['public-project', token],
     queryFn: async () => {
+      // Set the client token in the database context for RLS
+      await supabase.rpc('set_client_token', { token });
+
       // Use public data api, assuming RLS allows read by client_token
       const { data, error } = await supabase
         .from('projects')
