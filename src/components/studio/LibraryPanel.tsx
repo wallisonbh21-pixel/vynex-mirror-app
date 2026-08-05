@@ -165,7 +165,7 @@ export function LibraryPanel({
 
         {activeTab === 'templates' && (
           <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
-            {['all', 'hamburgueria', 'academia', 'advocacia'].map(niche => (
+            {['all', 'hamburgueria', 'academia', 'advocacia', 'dentista', 'barbearia', 'salao', 'imobiliaria', 'fotografia', 'oficina', 'contabilidade', 'eventos', 'loja', 'servicos'].map(niche => (
               <Button 
                 key={niche} 
                 variant="ghost" 
