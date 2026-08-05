@@ -66,6 +66,7 @@ export const Route = createFileRoute("/_authenticated/criacao")({
 type Withdrawal = { id: string; amount: number; status: string; created_at: string };
 
 function PainelCriador() {
+  const { data: profile } = useProfile();
   const { data: mine = [] } = useMyCreatorProjects();
   const { data: withdrawals = [] } = useRows<Withdrawal>("withdrawals");
 
@@ -102,11 +103,32 @@ function PainelCriador() {
   
   const completionRate = mine.length > 0 ? Math.round((delivered.length / mine.length) * 100) : 0;
 
+  const progressionData = [
+    { name: "Recebidos", value: mine.length, color: "var(--primary)" },
+    { name: "Produção", value: inProduction.length, color: "#3B82F6" },
+    { name: "Revisão", value: pendingApproval.length, color: "#F59E0B" },
+    { name: "Aprovados", value: approved.length, color: "#10B981" },
+    { name: "Entregues", value: delivered.length, color: "#8B5CF6" },
+  ];
+
   return (
     <AppShell
-      title="Painel do criador"
-      description="Dashboard de acompanhamento de projetos e comissões."
+      title="Central de Produção"
+      description="Gerencie seus projetos, prazos e desempenho profissional."
     >
+      {/* 1. HEADER BOAS-VINDAS */}
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Olá, {profile?.nickname || profile?.full_name?.split(' ')[0] || "Criador"} 👋</h1>
+          <p className="text-muted-foreground mt-1">Veja seus projetos, prazos e desempenho em tempo real.</p>
+        </div>
+        <Button asChild size="lg" className="gap-2 shadow-glow animate-pulse-subtle bg-gradient-brand border-none hover:opacity-90">
+          <Link to="/disponiveis">
+            <Rocket className="size-5" /> Criar novo site
+          </Link>
+        </Button>
+      </div>
+
       {/* 2. CARDS DE RESUMO */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard 
@@ -187,24 +209,52 @@ function PainelCriador() {
             </div>
           </div>
 
-          {/* Grafico de Projetos */}
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-            <h2 className="text-sm font-semibold mb-4">Volume de Projetos (Últimos 6 meses)</h2>
+          {/* Grafico de Meu Progresso */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <TrendingUp className="size-4 text-primary" /> Meu progresso
+              </h2>
+            </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={series}>
+                <BarChart data={progressionData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-xs" />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
                   <Tooltip 
                     cursor={{ opacity: 0.1 }} 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   />
-                  < Bar dataKey="projetos" radius={[6, 6, 0, 0]} fill="var(--primary)" />
+                  <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={40}>
+                    {progressionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </section>
+
+          {/* Volume Histórico */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-6">Histórico de Volume (6 meses)</h2>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={series}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
+                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
+                  <Tooltip 
+                    cursor={{ opacity: 0.1 }} 
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
+                  />
+                  <Bar dataKey="projetos" radius={[4, 4, 0, 0]} fill="var(--primary)" opacity={0.6} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+
         </section>
 
         <aside className="space-y-6">

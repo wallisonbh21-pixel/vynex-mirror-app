@@ -14,6 +14,8 @@ import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SalesProgression } from "@/components/SalesProgression";
+
 import { requireCriador } from "@/lib/guard";
 import { useMyCreatorProjects, creatorEarnings } from "@/lib/creator";
 import { useRows } from "@/lib/data";
@@ -86,7 +88,7 @@ function MeusProjetosPage() {
         {filtered.map((project) => (
           <div
             key={project.id}
-            className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-panel transition-all hover:shadow-md"
+            className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-panel transition-all hover:shadow-glow hover:-translate-y-1"
           >
             <div className="mb-4 flex items-start justify-between">
               <div className="space-y-1">
@@ -98,6 +100,18 @@ function MeusProjetosPage() {
                 </div>
               </div>
               <StatusBadge status={project.status} />
+            </div>
+
+            <div className="mb-4">
+              <SalesProgression 
+                steps={[
+                  { id: 'briefing', label: 'Briefing' },
+                  { id: 'em_producao', label: 'Criação' },
+                  { id: 'aguardando_aprovacao', label: 'Aprovação' },
+                  { id: 'aprovado', label: 'Finalizado' },
+                ]} 
+                currentStepId={project.status} 
+              />
             </div>
 
             <div className="mb-6 grid grid-cols-2 gap-4">
@@ -130,22 +144,16 @@ function MeusProjetosPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                {project.delivery_link && (
-                  <Button asChild variant="ghost" size="icon" className="size-8 rounded-full" title="Ver site">
-                    <a href={project.delivery_link} target="_blank" rel="noreferrer">
-                      <ExternalLink className="size-4" />
-                    </a>
-                  </Button>
-                )}
-                <Button asChild size="sm" className="h-8 gap-1.5 rounded-full px-4">
+                <Button asChild size="sm" className="h-9 gap-1.5 rounded-xl px-5 font-bold shadow-sm">
                   <Link to="/projetos/$projectId" params={{ projectId: project.id }}>
-                    Ver <ArrowRight className="size-3.5" />
+                    Continuar projeto <ArrowRight className="size-3.5" />
                   </Link>
                 </Button>
               </div>
             </div>
           </div>
         ))}
+
       </div>
 
       {!isLoading && filtered.length === 0 && (
