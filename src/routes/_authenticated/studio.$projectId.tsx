@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   ArrowLeft, 
   Save, 
@@ -11,7 +11,6 @@ import {
   Smartphone,
   Plus,
   Settings,
-  Layers,
   Loader2,
   Trash2,
   Copy,
@@ -21,7 +20,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useStudioData, useSaveStudioData } from '@/lib/studio/hooks';
-import { StudioData } from '@/types/studio';
+import { StudioData, StudioSection, StudioElement } from '@/types/studio';
+import { ElementLibrary } from '@/components/studio/ElementLibrary';
+import { SectionRenderer } from '@/components/studio/SectionRenderer';
+import { generateId } from '@/lib/studio/utils';
+
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
   component: VynexaStudioPage,
@@ -39,15 +42,20 @@ function VynexaStudioPage() {
   
   const [data, setData] = useState<StudioData | null>(null);
   const [viewport, setViewport] = useState<Viewport>('desktop');
-  const [selectedElement] = useState<string | null>(null);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [history, setHistory] = useState<StudioData[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync with initial data
   useEffect(() => {
     if (initialData && !data) {
-      setData(initialData);
+      setData(JSON.parse(JSON.stringify(initialData)));
+      setHistory([JSON.parse(JSON.stringify(initialData))]);
+      setHistoryIndex(0);
     }
   }, [initialData, data]);
 
@@ -60,11 +68,29 @@ function VynexaStudioPage() {
     setHistoryIndex(newHistory.length - 1);
   }, [history, historyIndex]);
 
+  const updateData = useCallback((newData: StudioData) => {
+    setData(newData);
+    addToHistory(newData);
+
+    // Auto-save logic
+    setSaveStatus('saving');
+    if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await saveMutation.mutateAsync({ projectId, data: newData });
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      } catch (error) {
+        setSaveStatus('idle');
+      }
+    }, 2000);
+  }, [addToHistory, projectId, saveMutation]);
+
   const undo = () => {
     if (historyIndex > 0) {
       const prev = history[historyIndex - 1];
       if (prev) {
-        setData(prev);
+        setData(JSON.parse(JSON.stringify(prev)));
         setHistoryIndex(historyIndex - 1);
       }
     }
@@ -74,11 +100,12 @@ function VynexaStudioPage() {
     if (historyIndex < history.length - 1) {
       const next = history[historyIndex + 1];
       if (next) {
-        setData(next);
+        setData(JSON.parse(JSON.stringify(next)));
         setHistoryIndex(historyIndex + 1);
       }
     }
   };
+
 
   const handleSave = async () => {
     if (!data) return;
@@ -156,11 +183,12 @@ function VynexaStudioPage() {
             size="sm" 
             className="gap-2 bg-primary hover:bg-primary/90 font-bold"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || saveStatus === 'saving'}
           >
-            {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-            {isSaving ? 'Salvando...' : 'Salvar'}
+            {isSaving || saveStatus === 'saving' ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            {isSaving || saveStatus === 'saving' ? 'Salvando...' : 'Salvar'}
           </Button>
+
         </div>
       </header>
 
@@ -168,12 +196,38 @@ function VynexaStudioPage() {
         {/* LEFT SIDEBAR - Library */}
         <ElementLibrary 
           onAddElement={(type) => {
-            // Placeholder for logic
-            console.log('Adding element:', type);
+            if (!data) return;
+            const targetSectionId = selectedSectionId || (data.sections.length > 0 ? data.sections[0].id : null);
+            if (!targetSectionId) return;
+
+            const newData = { ...data };
+            const sectionIndex = newData.sections.findIndex(s => s.id === targetSectionId);
+            if (sectionIndex === -1) return;
+
+            const newElement: StudioElement = {
+              id: generateId(),
+              type,
+              content: { text: type.charAt(0).toUpperCase() + type.slice(1) },
+              styles: {}
+            };
+
+            newData.sections[sectionIndex].elements.push(newElement);
+            updateData(newData);
+            setSelectedElementId(newElement.id);
           }}
           onAddSection={(type) => {
-            // Placeholder for logic
-            console.log('Adding section:', type);
+            if (!data) return;
+            const newData = { ...data };
+            const newSection: StudioSection = {
+              id: generateId(),
+              type,
+              elements: [],
+              styles: {},
+              order: newData.sections.length
+            };
+            newData.sections.push(newSection);
+            updateData(newData);
+            setSelectedSectionId(newSection.id);
           }}
         />
 
@@ -194,11 +248,17 @@ function VynexaStudioPage() {
                     <Plus className="size-8 text-slate-300" />
                  </div>
                  <div className="text-center">
-                    <p className="font-bold text-slate-600">Seu canvas está vazio</p>
-                    <p className="text-sm">Arraste elementos da biblioteca para começar.</p>
+                    <p className="font-bold text-slate-600">Vamos começar seu projeto</p>
+                    <p className="text-sm">Seu canvas está vazio. Comece criando uma seção.</p>
                  </div>
-                 <Button variant="outline" size="sm" className="mt-2">Ver Templates</Button>
+                 <div className="flex gap-2">
+                   <Button variant="outline" size="sm" onClick={() => (Route as any).component({}).props.onAddSection('custom')}>
+                     + Criar primeira seção
+                   </Button>
+                   <Button variant="outline" size="sm">Começar com uma seção pronta</Button>
+                 </div>
                </div>
+
              ) : (
                <div className="flex flex-col">
                  {data.sections.map((section) => (
@@ -206,15 +266,45 @@ function VynexaStudioPage() {
                      key={section.id}
                      section={section}
                      designSystem={data.design_system}
-                     selectedElementId={selectedElement}
-                     onSelectElement={(id) => console.log('select element', id)}
-                     onSelectSection={(id) => console.log('select section', id)}
-                     onMoveSection={(id, dir) => console.log('move', id, dir)}
-                     onDuplicateSection={(id) => console.log('dup', id)}
-                     onDeleteSection={(id) => console.log('del', id)}
+                     selectedElementId={selectedElementId}
+                     isSelected={selectedSectionId === section.id}
+                     onSelectElement={(id) => {
+                       setSelectedElementId(id);
+                       setSelectedSectionId(section.id);
+                     }}
+                     onSelectSection={(id) => {
+                       setSelectedSectionId(id);
+                       setSelectedElementId(null);
+                     }}
+                     onMoveSection={(id, dir) => {
+                       const newData = { ...data };
+                       const idx = newData.sections.findIndex(s => s.id === id);
+                       if (idx === -1) return;
+                       const newIdx = dir === 'up' ? idx - 1 : idx + 1;
+                       if (newIdx < 0 || newIdx >= newData.sections.length) return;
+                       [newData.sections[idx], newData.sections[newIdx]] = [newData.sections[newIdx], newData.sections[idx]];
+                       updateData(newData);
+                     }}
+                     onDuplicateSection={(id) => {
+                       const newData = { ...data };
+                       const section = newData.sections.find(s => s.id === id);
+                       if (!section) return;
+                       const newSection = JSON.parse(JSON.stringify(section));
+                       newSection.id = generateId();
+                       newSection.elements = newSection.elements.map((el: any) => ({ ...el, id: generateId() }));
+                       newData.sections.push(newSection);
+                       updateData(newData);
+                     }}
+                     onDeleteSection={(id) => {
+                       const newData = { ...data };
+                       newData.sections = newData.sections.filter(s => s.id !== id);
+                       updateData(newData);
+                       if (selectedSectionId === id) setSelectedSectionId(null);
+                     }}
                    />
                  ))}
                </div>
+
              )}
            </div>
         </main>
@@ -229,7 +319,7 @@ function VynexaStudioPage() {
            </div>
            
            <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-             {!selectedElement ? (
+             {!selectedElementId && !selectedSectionId ? (
                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
                   <div className="size-12 bg-slate-900 rounded-2xl flex items-center justify-center mb-4 border border-slate-800">
                     <Plus className="size-6 text-slate-700" />
@@ -237,6 +327,7 @@ function VynexaStudioPage() {
                   <p className="text-xs font-medium uppercase tracking-widest mb-2">Nada selecionado</p>
                   <p className="text-xs leading-relaxed">Selecione um elemento no canvas para editar suas propriedades.</p>
                </div>
+
              ) : (
                <div className="space-y-6">
                  <div>
@@ -264,7 +355,7 @@ function VynexaStudioPage() {
       {/* STATUS BAR */}
       <footer className="h-8 border-t border-slate-800 bg-slate-950 px-4 flex items-center justify-between text-[10px] text-slate-500 font-medium">
          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5"><div className="size-1.5 rounded-full bg-emerald-500"></div> Online</span>
+            <span className="flex items-center gap-1.5"><div className={cn("size-1.5 rounded-full", saveStatus === 'saved' ? "bg-emerald-500" : saveStatus === 'saving' ? "bg-amber-500 animate-pulse" : "bg-emerald-500")}></div> {saveStatus === 'saved' ? '✓ Salvo agora' : saveStatus === 'saving' ? '● Salvando...' : 'Online'}</span>
             <span>Projeto: {projectId}</span>
          </div>
          <div className="flex items-center gap-4">
