@@ -18,7 +18,8 @@ import {
   Send,
   AlertCircle,
   Link as LinkIcon,
-  Rocket
+  Rocket,
+  LayoutDashboard
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
