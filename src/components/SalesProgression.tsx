@@ -1,16 +1,21 @@
 import { cn } from "@/lib/utils";
 
-interface Step {
-  id: string;
-  label: string;
-}
+export const PROJECT_STATUS_STEPS = [
+  { id: "briefing", label: "Briefing" },
+  { id: "production", label: "Criação" },
+  { id: "revision", label: "Revisão" },
+  { id: "adjustments", label: "Ajustes" },
+  { id: "approval", label: "Aprovação" },
+  { id: "delivered", label: "Entrega" },
+];
 
 interface SalesProgressionProps {
-  steps: Step[];
-  currentStepId: string;
+  status: string;
 }
 
-export function SalesProgression({ steps, currentStepId }: SalesProgressionProps) {
+export function SalesProgression({ status }: SalesProgressionProps) {
+  const steps = PROJECT_STATUS_STEPS;
+  const currentStepId = status;
   const currentIndex = steps.findIndex(s => s.id === currentStepId);
 
   return (
