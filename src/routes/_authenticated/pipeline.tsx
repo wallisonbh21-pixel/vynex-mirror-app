@@ -101,7 +101,7 @@ function PipelinePage() {
           <section className="rounded-2xl border border-border bg-card p-4 shadow-panel overflow-x-auto">
              <ProgressionLine 
               steps={steps} 
-              currentStep={activeStep || undefined} 
+              currentStep={activeStep} 
               onStepClick={(s) => setActiveStep(s === activeStep ? null : s)}
               leads={data}
             />
