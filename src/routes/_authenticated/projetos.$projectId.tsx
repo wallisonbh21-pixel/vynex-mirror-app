@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { 
   ArrowLeft, 
   Calendar, 
@@ -9,18 +9,31 @@ import {
   User,
   ExternalLink,
   MessageSquare,
-  FileText
+  FileText,
+  Briefcase,
+  Palette,
+  FolderOpen,
+  CheckCircle2,
+  Info,
+  Send,
+  AlertCircle,
+  Link as LinkIcon
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
-import { useMyCreatorProjects } from "@/lib/creator";
+import { useMyCreatorProjects, useProjectChecklist, useProjectNotes, useUpdateCreatorProject } from "@/lib/creator";
 import { useApprovalEvents } from "@/lib/approval";
-import { currency, shortDate, PROJECT_STATUS } from "@/lib/format";
+import { currency, shortDate, PROJECT_STATUS, label } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/projetos/$projectId")({
   beforeLoad: () => requireCriador(),
