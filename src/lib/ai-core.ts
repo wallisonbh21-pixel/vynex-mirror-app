@@ -47,7 +47,7 @@ export interface StudioPageSnapshot {
 
 export interface AIAction {
   type: 'ADD_SECTION' | 'REMOVE_SECTION' | 'MOVE_SECTION' | 'ADD_ELEMENT' | 'REMOVE_ELEMENT' | 'UPDATE_ELEMENT' | 'UPDATE_TEXT' | 'UPDATE_CTA' | 'UPDATE_STYLE' | 'APPLY_STYLE_PRESET' | 'UPDATE_RESPONSIVE_CONFIG';
-  targetId?: string; // sectionId or elementId
+  targetId?: string | undefined; // sectionId or elementId
   payload: any;
   explanation: string;
   previewLabel?: string;
