@@ -288,7 +288,8 @@ function VynexaStudioPage() {
                     <p className="text-sm">Seu canvas está vazio. Comece criando uma seção.</p>
                  </div>
                  <div className="flex gap-2">
-                   <Button variant="outline" size="sm" onClick={() => handleAddSection('custom')}>
+                 <Button variant="outline" size="sm" onClick={() => handleAddSection('custom')}>
+
                      + Criar primeira seção
                    </Button>
                    <Button variant="outline" size="sm">Começar com uma seção pronta</Button>
@@ -313,7 +314,8 @@ function VynexaStudioPage() {
                          setSelectedElementId(null);
                        }}
                        onMoveSection={(id, dir) => {
-                          const sections = [...data.sections];
+                          if (!data) return;
+                          const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
                           const idx = sections.findIndex(s => s.id === id);
                           if (idx === -1) return;
                           const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
@@ -325,7 +327,8 @@ function VynexaStudioPage() {
                           updateData({ ...data, sections });
                        }}
                        onDuplicateSection={(id) => {
-                          const sections = [...data.sections];
+                          if (!data) return;
+                          const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
                           const secToDup = sections.find(s => s.id === id);
                           if (!secToDup) return;
                           const newSec = JSON.parse(JSON.stringify(secToDup));
@@ -335,10 +338,12 @@ function VynexaStudioPage() {
                           updateData({ ...data, sections });
                        }}
                        onDeleteSection={(id) => {
+                          if (!data) return;
                           const sections = data.sections.filter(s => s.id !== id);
                           updateData({ ...data, sections });
                           if (selectedSectionId === id) setSelectedSectionId(null);
                        }}
+
                      />
                    );
                  })}
