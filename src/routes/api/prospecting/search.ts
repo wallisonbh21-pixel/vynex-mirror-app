@@ -408,16 +408,20 @@ export const Route = createFileRoute("/api/prospecting/search")({
           stage = "geoapify_parse";
           const data = await response.json();
 
-          // 6. Mapear resultados
+          // 6. Mapear e Filtrar resultados por Relevância
           stage = "mapping";
-          const opportunities = (data.features || []).map((f: any) => {
+          const scoredOpportunities = (data.features || []).map((f: any) => {
             const props = f.properties;
-            if (!props || !props.name) return null; // Validação: precisa de nome
+            if (!props || !props.name) return null;
             
-            // Validação de irrelevância (discard)
-            const forbiddenKeywords = ["rua", "avenida", "travessa", "limite", "bairro"];
-            const nameLower = props.name.toLowerCase();
-            if (forbiddenKeywords.some(kw => nameLower.includes(kw))) return null;
+            const relevanceScore = calculateRelevance(props, niche, niche);
+            
+            // Se o score for muito baixo ou negativo, descarta
+            const minAllowedScore = RELEVANCE_CONFIGS[niche]?.minScore ?? 10;
+            if (relevanceScore < minAllowedScore) {
+              console.log(`[Search][${requestId}] Descartado por baixa relevância (${relevanceScore}): ${props.name}`);
+              return null;
+            }
 
             const website = props.website || null;
             let level = "alta";
@@ -430,30 +434,39 @@ export const Route = createFileRoute("/api/prospecting/search")({
             const fallbackId = generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
 
             return {
-              business_name: props.name,
-              category: niche,
-              phone: props.contact?.phone || null,
-              email: props.contact?.email || null,
-              address: props.address_line1 || props.formatted || "Endereço não disponível",
-              city: props.city || city || null,
-              state: state,
-              website: website,
-              instagram: props.contact?.instagram || null,
-              facebook: props.contact?.facebook || null,
-              google_maps_url: null,
-              lat: props.lat || null,
-              lon: props.lon || null,
-              place_id: props.place_id || fallbackId,
-              rating: props.rating || null,
-              review_count: props.review_count || 0,
-              opportunity_level: level,
-              source: "Geoapify",
-              status: "nova"
+              data: {
+                business_name: props.name,
+                category: niche,
+                phone: props.contact?.phone || null,
+                email: props.contact?.email || null,
+                address: props.address_line1 || props.formatted || "Endereço não disponível",
+                city: props.city || city || null,
+                state: state,
+                website: website,
+                instagram: props.contact?.instagram || null,
+                facebook: props.contact?.facebook || null,
+                google_maps_url: null,
+                lat: props.lat || null,
+                lon: props.lon || null,
+                place_id: props.place_id || fallbackId,
+                rating: props.rating || null,
+                review_count: props.review_count || 0,
+                opportunity_level: level,
+                source: "Geoapify",
+                status: "nova"
+              },
+              score: relevanceScore
             };
           }).filter(Boolean);
 
+          // Ordenar por score descendente e pegar no máximo 30
+          const opportunities = scoredOpportunities
+            .sort((a: any, b: any) => b.score - a.score)
+            .slice(0, 30)
+            .map((item: any) => item.data);
+
           stage = "response";
-          const diagnostic = "prospecting-search-v6.0-security-audit-complete";
+          const diagnostic = "prospecting-search-v7.0-relevance-engine";
           
           return new Response(JSON.stringify({ 
             opportunities, 
