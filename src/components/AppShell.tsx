@@ -21,6 +21,20 @@ import {
   UserRound,
   Users,
   Wallet,
+  Rocket,
+  Plus,
+  Compass,
+  Monitor,
+  CheckCircle2,
+  Eye,
+  Send,
+  Library,
+  Box,
+  Layout,
+  Star,
+  Trophy,
+  Flame,
+  ChevronDown,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,10 +44,25 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SidebarSubmenu } from "./SidebarSubmenu";
+
+interface SubmenuItem {
+  to: string;
+  label: string;
+  icon: any;
+  description?: string;
+}
+
+interface NavItem {
+  to: string;
+  label: string;
+  icon: any;
+  submenu?: SubmenuItem[];
+}
 
 /** Menu do time comercial (vendedor). */
-const NAV_VENDEDOR = [
-  { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
+const NAV_VENDEDOR: NavItem[] = [
+  { to: "/painel", label: "Dashboard", icon: LayoutDashboard },
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
@@ -46,19 +75,68 @@ const NAV_VENDEDOR = [
   { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/metas", label: "Metas", icon: BarChart3 },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
-] as const;
+];
 
-/** Menu do time de criação — sem acesso ao CRM comercial. */
-const NAV_CRIADOR = [
-  { to: "/criacao", label: "Visão geral", icon: LayoutDashboard },
-  { to: "/disponiveis", label: "Projetos disponíveis", icon: Layers },
-  { to: "/meus-projetos", label: "Meus projetos", icon: Palette },
-  { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
-  { to: "/meus-saques", label: "Meus saques", icon: Wallet },
+/** Menu do time de criação — Reorganizado V2.3. */
+const NAV_CRIADOR: NavItem[] = [
+  { 
+    to: "/criacao", 
+    label: "Dashboard", 
+    icon: LayoutDashboard,
+    submenu: [
+      { to: "/criacao", label: "Visão geral", icon: LayoutDashboard },
+      { to: "/meus-projetos", label: "Projetos ativos", icon: Palette },
+      { to: "/aprovacoes", label: "Aguardando aprovação", icon: Clock },
+      { to: "/metas", label: "Produtividade", icon: BarChart3 },
+    ]
+  },
+  { 
+    to: "/studio-new", 
+    label: "Criar Site", 
+    icon: Rocket,
+    submenu: [
+      { to: "/disponiveis", label: "Assumir novo site", icon: Plus },
+      { to: "/meus-projetos", label: "Continuar edição", icon: Palette },
+    ]
+  },
+  { 
+    to: "/meus-projetos", 
+    label: "Projetos", 
+    icon: FolderOpen,
+    submenu: [
+      { to: "/meus-projetos", label: "Todos os projetos", icon: Library },
+      { to: "/disponiveis", label: "Disponíveis", icon: Layers },
+    ]
+  },
+  { 
+    to: "/recursos", 
+    label: "Recursos", 
+    icon: Library,
+    submenu: [
+      { to: "/studio-new", label: "Biblioteca", icon: Box },
+      { to: "/studio-new", label: "Templates", icon: Layout },
+    ]
+  },
+  { 
+    to: "/metas", 
+    label: "Metas", 
+    icon: Trophy,
+    submenu: [
+      { to: "/metas", label: "Minhas Metas", icon: Target },
+      { to: "/metas", label: "Conquistas", icon: Star },
+    ]
+  },
+  { 
+    to: "/comissoes", 
+    label: "Financeiro", 
+    icon: Wallet,
+    submenu: [
+      { to: "/comissoes", label: "Minhas comissões", icon: CircleDollarSign },
+      { to: "/meus-saques", label: "Meus saques", icon: Wallet },
+    ]
+  },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
-] as const;
-
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
+];
 
 export function AppShell({
   title,
@@ -85,22 +163,23 @@ export function AppShell({
     setMobileOpen(false);
   }, [pathname]);
 
-  const base: NavItem[] = isAdmin
-    ? [...NAV_VENDEDOR]
+  const items: NavItem[] = isAdmin
+    ? [
+        ...NAV_VENDEDOR,
+        { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
+        { to: "/criacao", label: "Área do criador", icon: Layers },
+        { to: "/admin", label: "Administração", icon: ShieldCheck },
+        { to: "/perfil", label: "Meu perfil", icon: UserRound },
+      ]
     : isCriador
-      ? [...NAV_CRIADOR]
-      : [...NAV_VENDEDOR];
-  const items: NavItem[] = [
-    ...(isAdmin
       ? [
-          ...base,
-          { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
-          { to: "/criacao", label: "Área do criador", icon: Layers },
-          { to: "/admin", label: "Administração", icon: ShieldCheck },
+          ...NAV_CRIADOR,
+          { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ]
-      : base),
-    { to: "/perfil", label: "Meu perfil", icon: UserRound },
-  ];
+      : [
+          ...NAV_VENDEDOR,
+          { to: "/perfil", label: "Meu perfil", icon: UserRound },
+        ];
 
   const displayName = profile?.nickname || profile?.full_name || "Sem nome";
   const initials = displayName
@@ -129,6 +208,7 @@ export function AppShell({
       onSignOut={signOut}
     />
   );
+
 
   return (
     <div className="flex min-h-screen bg-background">
