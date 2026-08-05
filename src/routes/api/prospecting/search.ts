@@ -29,42 +29,42 @@ interface NicheConfig {
 const NICHE_STRATEGY: Record<string, NicheConfig> = {
   "Hamburgueria": {
     primaryCategories: ["catering.restaurant.burger"],
-    secondaryCategories: ["catering.restaurant"],
-    searchTerms: ["hamburgueria", "hambúrguer", "burger", "lanchonete"],
+    secondaryCategories: ["catering.restaurant", "catering.fast_food"],
+    searchTerms: ["hamburgueria", "burger", "hambúrguer", "lanchonete"],
     relevance: {
-      direct: ["hamburgueria", "burger", "hambúrguer", "burguer"],
-      related: ["lanchonete", "restaurante", "fast food", "snack"],
-      negative: ["depósito", "supermercado", "banco", "farmácia", "hospital", "oficina"]
+      direct: ["hamburgueria", "burger", "burger shop", "hambúrguer"],
+      related: ["lanchonete", "restaurante", "fast food"],
+      negative: ["depósito", "supermercado", "banco", "farmácia"]
     }
   },
   "Dentista": {
-    primaryCategories: ["healthcare.dentist"],
+    primaryCategories: ["healthcare.clinic_or_praxis.dentist"],
     secondaryCategories: ["healthcare.clinic_or_praxis"],
-    searchTerms: ["dentista", "dental", "odontologia"],
+    searchTerms: ["dentista", "odontologia", "clínica odontológica", "odonto"],
     relevance: {
-      direct: ["dentista", "dental", "odontologia", "odontológico", "ortodontia"],
-      related: ["clínica odontológica", "consultório odontológico"],
-      negative: ["clínica médica", "hospital", "veterinário", "farmácia", "supermercado"]
+      direct: ["dentista", "odontologia", "odonto", "clínica odontológica"],
+      related: ["ortodontia", "estética dental", "saúde bucal"],
+      negative: ["veterinário", "pet shop", "farmácia"]
     }
   },
   "Barbearia": {
-    primaryCategories: ["service.beauty"],
-    secondaryCategories: [],
-    searchTerms: ["barbearia", "barber", "barber shop"],
+    primaryCategories: ["service.beauty.barber"],
+    secondaryCategories: ["service.beauty"],
+    searchTerms: ["barbearia", "barbeiro", "corte masculino", "barba"],
     relevance: {
-      direct: ["barbearia", "barber", "barbershop", "barbeiro"],
-      related: ["corte masculino", "salão masculino", "estética masculina"],
-      negative: ["depósito", "supermercado", "banco", "gráfica", "farmácia"]
+      direct: ["barbearia", "barbeiro", "corte masculino"],
+      related: ["salão de beleza", "estética", "cortes"],
+      negative: ["depósito", "oficina"]
     }
   },
   "Academia": {
-    primaryCategories: ["leisure.fitness", "leisure.sports_centre"],
-    secondaryCategories: [],
-    searchTerms: ["academia", "gym", "fitness", "crossfit"],
+    primaryCategories: ["leisure.fitness_centre", "leisure.sports_centre"],
+    secondaryCategories: ["leisure.sports_centre.gym"],
+    searchTerms: ["academia", "fitness", "crossfit", "treino"],
     relevance: {
-      direct: ["academia", "gym", "fitness", "musculação", "crossfit"],
-      related: ["centro de treinamento", "treinamento funcional", "studio fitness", "personal trainer", "pilates"],
-      negative: ["supermercado", "banco", "farmácia", "hospital", "clínica", "parque"]
+      direct: ["academia", "fitness", "gym", "crossfit"],
+      related: ["clube", "esportes", "estúdio de pilates"],
+      negative: ["loja", "banco", "oficina"]
     }
   },
   "Pizzaria": {
