@@ -132,11 +132,11 @@ function VynexaStudioPage() {
 
   const handleAddElement = (type: any) => {
     if (!data) return;
-    const targetSectionId = selectedSectionId || (data.sections.length > 0 ? data.sections[0].id : null);
+    const sections = [...data.sections];
+    const targetSectionId = selectedSectionId || (sections.length > 0 ? sections[0].id : null);
     if (!targetSectionId) return;
 
-    const newData = { ...data, sections: [...data.sections] };
-    const sectionIndex = newData.sections.findIndex(s => s.id === targetSectionId);
+    const sectionIndex = sections.findIndex(s => s.id === targetSectionId);
     if (sectionIndex === -1) return;
 
     const newElement: StudioElement = {
@@ -146,29 +146,31 @@ function VynexaStudioPage() {
       styles: {}
     };
 
-    newData.sections[sectionIndex] = {
-      ...newData.sections[sectionIndex],
-      elements: [...newData.sections[sectionIndex].elements, newElement]
+    const targetSection = sections[sectionIndex];
+    sections[sectionIndex] = {
+      ...targetSection,
+      elements: [...targetSection.elements, newElement]
     };
     
-    updateData(newData);
+    updateData({ ...data, sections });
     setSelectedElementId(newElement.id);
   };
 
   const handleAddSection = (type: string) => {
     if (!data) return;
-    const newData = { ...data, sections: [...data.sections] };
+    const sections = [...data.sections];
     const newSection: StudioSection = {
       id: generateId(),
       type,
       elements: [],
       styles: {},
-      order: newData.sections.length
+      order: sections.length
     };
-    newData.sections.push(newSection);
-    updateData(newData);
+    sections.push(newSection);
+    updateData({ ...data, sections });
     setSelectedSectionId(newSection.id);
   };
+
 
   return (
     <div className="h-screen w-screen bg-slate-900 flex flex-col overflow-hidden text-slate-200">
@@ -360,6 +362,7 @@ function VynexaStudioPage() {
                     <Plus className="size-3 text-slate-500" />
                  </div>
               </div>
+
            </div>
         </aside>
       </div>
