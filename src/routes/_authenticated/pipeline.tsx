@@ -92,7 +92,7 @@ function PipelinePage() {
             <h2 className="mb-6 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Conversão de Etapas</h2>
             <SalesFunnel 
               leads={data} 
-              activeStep={activeStep || undefined} 
+              activeStep={activeStep} 
               onStepClick={(s) => setActiveStep(s === activeStep ? null : s)} 
             />
           </section>
