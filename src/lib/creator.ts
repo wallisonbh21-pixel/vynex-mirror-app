@@ -109,14 +109,14 @@ export function useUpdateCreatorProject() {
       if (error) throw error;
 
       // Log status changes in approval events if applicable
-      if (values.status && values.status !== project.status) {
+      if (values["status"] && values["status"] !== project.status) {
         await supabase.from("project_approval_events").insert({
           project_id: id,
           event_type: "status_change",
           previous_status: project.status,
-          new_status: values.status as string,
+          new_status: values["status"] as string,
           actor_label: "Criador",
-          message: (values.delivery_notes as string) || `Status alterado para ${values.status}`
+          message: (values["delivery_notes"] as string) || `Status alterado para ${values["status"]}`
         });
       }
     },
