@@ -21,6 +21,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { SalesFunnel } from "@/components/SalesFunnel";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProfile, useRoles, useSession } from "@/lib/auth";
@@ -110,7 +111,7 @@ function Painel() {
         <StatCard label="Vendido no mês" value={currency(monthRevenue)} hint={shortDate(`${monthKey}-01`)} icon={TrendingUp} />
         <StatCard label="Comissão prevista" value={currency(commission)} hint={`${rate}% sobre o mês`} icon={Wallet} />
         <StatCard
-          label="Meta do mês"
+          label="Melhor Meta do Mês"
           value={goal ? currency(goal.revenue_target) : "Sem meta"}
           hint={goal ? `${goalPercent}% alcançado` : "Cadastre em Metas"}
           icon={Trophy}
@@ -120,12 +121,20 @@ function Painel() {
       {goal ? (
         <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-panel">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold">Progresso da meta</span>
+            <div className="flex items-center gap-2">
+              <Trophy className="size-4 text-warning" />
+              <span className="font-semibold text-primary">Conquistas & Troféus: Meta Batida</span>
+            </div>
             <span className="text-muted-foreground">
               {currency(monthRevenue)} de {currency(goal.revenue_target)}
             </span>
           </div>
-          <Progress value={goalPercent} className="mt-3" />
+          <Progress value={goalPercent} className="mt-3 h-3 shadow-inner" />
+          {goalPercent >= 100 && (
+            <p className="mt-2 text-center text-xs font-bold animate-bounce text-success">
+              🏆 META BATIDA! VOCÊ É UM CAMPEÃO! 🏆
+            </p>
+          )}
         </div>
       ) : null}
 
@@ -161,25 +170,8 @@ function Painel() {
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold">Funil comercial</h2>
-          <ul className="mt-4 space-y-3">
-            {LEAD_STATUS.map((status) => {
-              const rows = leads.filter((lead) => lead.status === status);
-              const percent = leads.length ? Math.round((rows.length / leads.length) * 100) : 0;
-              return (
-                <li key={status}>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{label(status)}</span>
-                    <span className="text-muted-foreground">
-                      {rows.length} ·{" "}
-                      {currency(rows.reduce((sum, lead) => sum + Number(lead.closed_value || lead.estimated_value), 0))}
-                    </span>
-                  </div>
-                  <Progress value={percent} className="mt-1.5 h-1.5" />
-                </li>
-              );
-            })}
-          </ul>
+          <h2 className="text-sm font-semibold mb-6">Funil Comercial (Visual)</h2>
+          <SalesFunnel leads={leads} />
         </section>
       </div>
 

@@ -13,12 +13,12 @@ export const Route = createFileRoute("/_authenticated/followups")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Follow-ups — VYNEXA" },
+      { title: "Acompanhamentos — VYNEXA" },
       {
         name: "description",
-        content: "Contatos de hoje, follow-ups atrasados e próximos retornos das suas oportunidades.",
+        content: "Contatos de hoje, acompanhamentos atrasados e próximos retornos das suas oportunidades.",
       },
-      { property: "og:title", content: "Follow-ups — VYNEXA" },
+      { property: "og:title", content: "Acompanhamentos — VYNEXA" },
       { property: "og:description", content: "Agenda comercial do CRM VYNEXA." },
     ],
   }),
@@ -39,7 +39,7 @@ function FollowUpsPage() {
     .sort((a, b) => a.next_contact_at!.localeCompare(b.next_contact_at!));
 
   return (
-    <AppShell title="Follow-ups" description="Nenhum contato esquecido: acompanhe cada retorno combinado.">
+    <AppShell title="Acompanhamentos" description="Nenhum contato esquecido: acompanhe cada retorno combinado.">
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Atrasados" value={String(late.length)} hint="Precisam de contato imediato" icon={AlertTriangle} />
         <StatCard label="Para hoje" value={String(todayList.length)} hint={shortDate(now)} icon={CalendarClock} />
@@ -47,7 +47,7 @@ function FollowUpsPage() {
       </div>
 
       <div className="mt-6 space-y-6">
-        <Group title="Follow-up atrasado" rows={late} tone="danger" />
+        <Group title="Acompanhamento atrasado" rows={late} tone="danger" />
         <Group title="Contatos para hoje" rows={todayList} tone="warning" />
         <Group title="Próximos contatos" rows={next} tone="neutral" />
       </div>
