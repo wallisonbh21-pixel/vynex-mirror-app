@@ -23,6 +23,7 @@ import { useStudioData, useSaveStudioData } from '@/lib/studio/hooks';
 import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/studio';
 import { ElementLibrary } from '@/components/studio/ElementLibrary';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
+import { PropertyPanel } from '@/components/studio/PropertyPanel';
 import { generateId } from '@/lib/studio/utils';
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
@@ -65,10 +66,7 @@ function VynexaStudioPage() {
       if (newHistory.length > 50) newHistory.shift();
       return newHistory;
     });
-    setHistoryIndex(prev => {
-      const currentHistoryLength = historyIndex + 1;
-      return currentHistoryLength >= 50 ? 49 : currentHistoryLength;
-    });
+    setHistoryIndex(prev => prev + 1);
   }, [historyIndex]);
 
   const updateData = useCallback((newData: StudioData) => {
@@ -130,7 +128,7 @@ function VynexaStudioPage() {
     );
   }
 
-  const handleAddElement = (type: any) => {
+  const handleAddElement = (type: StudioElement['type']) => {
     if (!data) return;
     const sections = [...data.sections];
     const targetSectionId = selectedSectionId || (sections.length > 0 ? sections[0].id : null);
@@ -171,6 +169,28 @@ function VynexaStudioPage() {
     setSelectedSectionId(newSection.id);
   };
 
+  const handleUpdateElement = (id: string, updates: Partial<StudioElement>) => {
+    if (!data) return;
+    const sections = data.sections.map(s => ({
+      ...s,
+      elements: s.elements.map(el => el.id === id ? { ...el, ...updates } : el)
+    }));
+    updateData({ ...data, sections });
+  };
+
+  const handleUpdateSection = (id: string, updates: Partial<StudioSection>) => {
+    if (!data) return;
+    const sections = data.sections.map(s => s.id === id ? { ...s, ...updates } : s);
+    updateData({ ...data, sections });
+  };
+
+  const handleUpdateDesignSystem = (updates: Partial<StudioData['design_system']>) => {
+    if (!data) return;
+    updateData({ ...data, design_system: { ...data.design_system, ...updates } });
+  };
+
+  const selectedElement = data.sections.flatMap(s => s.elements).find(el => el.id === selectedElementId) || null;
+  const selectedSection = data.sections.find(s => s.id === selectedSectionId) || null;
 
   return (
     <div className="h-screen w-screen bg-slate-900 flex flex-col overflow-hidden text-slate-200">
@@ -290,30 +310,30 @@ function VynexaStudioPage() {
                          setSelectedElementId(null);
                        }}
                        onMoveSection={(id, dir) => {
-                          const newData = { ...data, sections: [...data.sections] };
-                          const currentIdx = newData.sections.findIndex(s => s.id === id);
-                          if (currentIdx === -1) return;
-                          const targetIdx = dir === 'up' ? currentIdx - 1 : currentIdx + 1;
-                          if (targetIdx < 0 || targetIdx >= newData.sections.length) return;
+                          const sections = [...data.sections];
+                          const idx = sections.findIndex(s => s.id === id);
+                          if (idx === -1) return;
+                          const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
+                          if (targetIdx < 0 || targetIdx >= sections.length) return;
                           
-                          const temp = newData.sections[currentIdx];
-                          newData.sections[currentIdx] = newData.sections[targetIdx];
-                          newData.sections[targetIdx] = temp;
-                          updateData(newData);
+                          const temp = sections[idx];
+                          sections[idx] = sections[targetIdx];
+                          sections[targetIdx] = temp;
+                          updateData({ ...data, sections });
                        }}
                        onDuplicateSection={(id) => {
-                          const newData = { ...data, sections: [...data.sections] };
-                          const secToDup = newData.sections.find(s => s.id === id);
+                          const sections = [...data.sections];
+                          const secToDup = sections.find(s => s.id === id);
                           if (!secToDup) return;
                           const newSec = JSON.parse(JSON.stringify(secToDup));
                           newSec.id = generateId();
                           newSec.elements = newSec.elements.map((el: any) => ({ ...el, id: generateId() }));
-                          newData.sections.push(newSec);
-                          updateData(newData);
+                          sections.push(newSec);
+                          updateData({ ...data, sections });
                        }}
                        onDeleteSection={(id) => {
-                          const newData = { ...data, sections: data.sections.filter(s => s.id !== id) };
-                          updateData(newData);
+                          const sections = data.sections.filter(s => s.id !== id);
+                          updateData({ ...data, sections });
                           if (selectedSectionId === id) setSelectedSectionId(null);
                        }}
                      />
@@ -342,12 +362,14 @@ function VynexaStudioPage() {
                   <p className="text-xs leading-relaxed">Selecione um elemento no canvas para editar suas propriedades.</p>
                </div>
              ) : (
-               <div className="space-y-6">
-                 <div>
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Em breve: Editor de Propriedades</h4>
-                    <p className="text-xs text-slate-400">Aqui você poderá editar cores, textos, links e estilos do elemento selecionado.</p>
-                 </div>
-               </div>
+               <PropertyPanel 
+                 element={selectedElement}
+                 section={selectedSection}
+                 designSystem={data.design_system}
+                 onUpdateElement={handleUpdateElement}
+                 onUpdateSection={handleUpdateSection}
+                 onUpdateDesignSystem={handleUpdateDesignSystem}
+               />
              )}
            </div>
 
@@ -355,14 +377,13 @@ function VynexaStudioPage() {
            <div className="p-4 border-t border-slate-800 bg-slate-900/30">
               <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Estilo Global</h4>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                 <div className="size-8 rounded-full bg-primary ring-2 ring-white cursor-pointer" title="Marca" style={{ backgroundColor: data.design_system.colors.primary }}></div>
-                 <div className="size-8 rounded-full bg-slate-500 border border-slate-700 cursor-pointer" title="Secundária" style={{ backgroundColor: data.design_system.colors.secondary }}></div>
-                 <div className="size-8 rounded-full bg-emerald-500 cursor-pointer" title="Ação" style={{ backgroundColor: data.design_system.colors.accent }}></div>
+                 <div className="size-8 rounded-full ring-2 ring-white cursor-pointer" title="Marca" style={{ backgroundColor: data.design_system.colors.primary }}></div>
+                 <div className="size-8 rounded-full border border-slate-700 cursor-pointer" title="Secundária" style={{ backgroundColor: data.design_system.colors.secondary }}></div>
+                 <div className="size-8 rounded-full cursor-pointer" title="Ação" style={{ backgroundColor: data.design_system.colors.accent }}></div>
                  <div className="size-8 rounded-full border border-slate-800 flex items-center justify-center cursor-pointer">
                     <Plus className="size-3 text-slate-500" />
                  </div>
               </div>
-
            </div>
         </aside>
       </div>
