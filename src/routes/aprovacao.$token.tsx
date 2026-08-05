@@ -27,14 +27,17 @@ function ClientApprovalPage() {
     queryKey: ['public-project', token],
     queryFn: async () => {
       // Use the new secure RPC to get project data by token
-      const { data, error } = await supabase
+      const { data, error: rpcError } = await supabase
         .rpc('get_project_public_data_by_token', { p_client_token: token });
 
-      if (error || !data || !Array.isArray(data) || data.length === 0) {
+      if (rpcError || !data || !Array.isArray(data) || data.length === 0) {
         throw new Error('Link de aprovação inválido ou expirado.');
       }
 
       const projectData = data[0];
+      if (!projectData) {
+        throw new Error('Link de aprovação inválido ou expirado.');
+      }
       
       // Map back to expected structure for the component
       return {
