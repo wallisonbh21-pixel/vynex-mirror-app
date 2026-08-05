@@ -115,22 +115,13 @@ function AprovacoesPage() {
           </p>
         ) : null}
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.delivery_link ? (
-            <Button asChild size="sm" variant="secondary">
-              <a href={project.delivery_link} target="_blank" rel="noreferrer noopener">
-                <ExternalLink className="size-4" /> Visualizar site
-              </a>
-            </Button>
-          ) : null}
-
-        <div className="mt-4 mb-4">
+        <div className="mt-6 mb-8 border-t border-b border-border/50 py-4">
           <SalesProgression status={project.status} />
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {project.delivery_link ? (
-            <Button asChild size="sm" variant="secondary">
+            <Button asChild size="sm" variant="secondary" className="gap-2">
               <a href={project.delivery_link} target="_blank" rel="noreferrer noopener">
                 <ExternalLink className="size-4" /> Visualizar site
               </a>
