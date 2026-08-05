@@ -1,9 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Facebook,
   Globe,
-  Instagram,
   MapPin,
   Phone,
   Plus,
@@ -15,6 +13,7 @@ import {
   Loader2,
   ExternalLink,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -860,11 +859,11 @@ function OpportunityCard({
           {opportunity.website || "Site: Não encontrado"}
         </li>
         <li className="flex items-center gap-2">
-          <Instagram className="size-4 text-muted-foreground" />
+          <MessageSquare className="size-4 text-muted-foreground" />
           {opportunity.instagram || "Instagram não informado"}
         </li>
         <li className="flex items-center gap-2">
-          <Facebook className="size-4 text-muted-foreground" />
+          <MessageSquare className="size-4 text-muted-foreground" />
           {opportunity.facebook || "Facebook não informado"}
         </li>
         <li className="flex items-center gap-2">
