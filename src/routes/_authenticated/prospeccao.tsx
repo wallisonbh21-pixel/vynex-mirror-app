@@ -117,7 +117,8 @@ function LevelBadge({ level }: { level: string }) {
 function ProspeccaoPage() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
-  const { data: opportunities = [], isLoading } = useOpportunities();
+  const [showArchived, setShowArchived] = useState(false);
+  const { data: opportunities = [], isLoading } = useOpportunities(showArchived);
   const { data: profiles = [] } = useProfiles();
   const save = useSaveOpportunity();
   const addToLeads = useAddOpportunityToLeads();
