@@ -1243,6 +1243,23 @@ export type Database = {
           title: string
         }[]
       }
+      get_project_public_data_by_token: {
+        Args: { p_client_token: string }
+        Returns: {
+          client_company: string
+          client_contact_name: string
+          client_id: string
+          client_token_expires_at: string
+          creator_id: string
+          delivery_link: string
+          id: string
+          owner_id: string
+          site_type: string
+          status: string
+          submitted_at: string
+          title: string
+        }[]
+      }
       get_project_studio_data_public: {
         Args: { p_client_token: string; p_project_id: string }
         Returns: {
