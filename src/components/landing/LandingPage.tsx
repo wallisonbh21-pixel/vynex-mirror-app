@@ -2,7 +2,7 @@ import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, ChevronRight, Zap, Target, Palette, BrainCircuit, LayoutGrid, BarChart3, ShieldCheck, Gauge } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronRight, Zap, Target, Palette, BrainCircuit, LayoutGrid, BarChart3, ShieldCheck, Gauge, Search } from "lucide-react";
 
 export function LandingPage() {
   return (
