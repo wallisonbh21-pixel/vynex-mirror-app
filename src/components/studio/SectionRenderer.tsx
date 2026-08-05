@@ -43,8 +43,10 @@ export function SectionRenderer({
         paddingBottom: styles['paddingBottom'] || '4rem',
         backgroundImage: styles['backgroundImage'] ? `url(${styles['backgroundImage']})` : 'none',
         backgroundSize: 'cover',
-        backgroundPosition: 'center'
+        backgroundPosition: 'center',
+        color: styles['backgroundColor'] === '#0f172a' ? '#ffffff' : designSystem.colors.text
       }}
+
       onClick={() => onSelectSection(section.id)}
     >
       {/* Section controls */}
