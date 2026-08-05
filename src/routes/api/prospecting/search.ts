@@ -31,8 +31,10 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Pet Shop": "commercial.pet",
   "Salão de beleza": "service.beauty",
   "Barbearia": "service.beauty",
-  // Nichos problemáticos (categorias activity.sport, office, etc. causaram erro 400 ou irrelevância):
-  // Serão tratados via busca textual (text search) para garantir precisão.
+  "Hamburguer": "catering.restaurant.burger",
+  // Nichos que utilizam categorias oficiais validadas para evitar 400
+  "Academia": "activity.sport",
+  "Oficina": "service.vehicle.repair",
 };
 
 /**
@@ -65,32 +67,45 @@ const OFFICIAL_CATEGORIES = new Set([
   "camping"
 ]);
 
-function getGeoapifyCategories(niche: string, requestId: string): { categories: string | null; fallbackUsed: boolean; log: string } {
+/**
+ * Valida se uma estratégia de busca é tecnicamente válida para a Geoapify v2.
+ * A API v2 EXIGE 'categories' ou 'type'.
+ */
+function validateSearchStrategy(niche: string, categories: string | null): { valid: boolean; strategy: "categories" | "type+text"; error?: string } {
+  if (categories && categories.length > 0) {
+    return { valid: true, strategy: "categories" };
+  }
+  
+  if (niche && niche.trim().length > 0) {
+    // Para busca textual, usamos 'type=commercial' como âncora estrutural obrigatória
+    return { valid: true, strategy: "type+text" };
+  }
+
+  return { 
+    valid: false, 
+    strategy: "type+text", 
+    error: "A busca requer um nicho definido ou uma categoria válida." 
+  };
+}
+
+function getGeoapifyCategories(niche: string, requestId: string): { categories: string | null; log: string } {
   const mapped = NICHE_CATEGORY_MAP[niche];
   
-  // Se não houver mapeamento definido, retornamos null para sinalizar busca textual
   if (!mapped) {
-    return { categories: null, fallbackUsed: false, log: `[Search][${requestId}] Niche "${niche}" not mapped. Using text search.` };
+    return { categories: null, log: `[Search][${requestId}] Niche "${niche}" not mapped. Using structural text search.` };
   }
 
   const requestedCategories = mapped.split(",");
   const validatedCategories: string[] = [];
-  let fallbackUsed = false;
-  let log = "";
 
   for (const cat of requestedCategories) {
     if (OFFICIAL_CATEGORIES.has(cat)) {
       validatedCategories.push(cat);
-    } else {
-      // Se a categoria mapeada for inválida, logamos e tentamos um fallback básico
-      // (Mas o ideal é que NICHE_CATEGORY_MAP só tenha categorias válidas)
-      fallbackUsed = true;
-      log += `[Warning][${requestId}] Mapped category "${cat}" for niche "${niche}" is NOT official. `;
     }
   }
 
   const finalCategories = validatedCategories.length > 0 ? validatedCategories.join(",") : null;
-  return { categories: finalCategories, fallbackUsed, log };
+  return { categories: finalCategories, log: `[Search][${requestId}] Categories: ${finalCategories}` };
 }
 
 /**
@@ -198,27 +213,36 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
           // 5. Chamar Geoapify Places API v2
           stage = "geoapify_call";
-          const { categories, fallbackUsed, log: fallbackLog } = getGeoapifyCategories(niche, requestId);
-          if (fallbackUsed) {
-            console.log(fallbackLog);
+          const { categories, log: catLog } = getGeoapifyCategories(niche, requestId);
+          console.log(catLog);
+          
+          const strategy = validateSearchStrategy(niche, categories);
+          if (!strategy.valid) {
+            return new Response(JSON.stringify({ error: strategy.error, stage }), { 
+              status: 400, 
+              headers: { "Content-Type": "application/json" } 
+            });
           }
           
           // Construindo URL da v2
           const geoUrl = new URL("https://api.geoapify.com/v2/places");
-          if (categories) {
-            geoUrl.searchParams.set("categories", categories);
-            console.log(`[Search][${requestId}] Using Categories: ${categories}`);
+          
+          if (strategy.strategy === "categories") {
+            geoUrl.searchParams.set("categories", categories!);
           } else {
-            // Busca textual combinada com filtro geográfico
+            // Busca textual combinada com filtro geográfico e âncora estrutural 'type'
+            geoUrl.searchParams.set("type", "commercial");
             geoUrl.searchParams.set("text", niche);
-            console.log(`[Search][${requestId}] Using Text Search: "${niche}"`);
           }
+          
           geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
           geoUrl.searchParams.set("limit", "30");
           geoUrl.searchParams.set("lang", "pt");
           geoUrl.searchParams.set("apiKey", apiKey);
           
+          console.log(`[Search][${requestId}] Strategy: ${strategy.strategy} | Niche: ${niche}`);
           console.log(`[Search][${requestId}] Request URL: ${geoUrl.origin}${geoUrl.pathname}?${geoUrl.searchParams.toString().replace(apiKey, "HIDDEN")}`);
+
           
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -291,7 +315,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v4.0-validated-text-hybrid";
+          const diagnostic = "prospecting-search-v5.0-structural-fix";
           
           return new Response(JSON.stringify({ 
             opportunities, 
@@ -302,8 +326,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
             meta: {
               endpoint: "/v2/places",
               categories,
-              fallbackUsed,
-              fallbackLog: fallbackLog || null,
+              strategy: strategy.strategy,
+              fallbackLog: catLog || null,
               filter: `place:${areaPlaceId}`,
               resolvedLocation: locationText
             }
