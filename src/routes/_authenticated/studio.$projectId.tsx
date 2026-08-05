@@ -25,6 +25,8 @@ import { ElementLibrary } from '@/components/studio/ElementLibrary';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { PropertyPanel } from '@/components/studio/PropertyPanel';
 import { generateId } from '@/lib/studio/utils';
+import { SECTION_TEMPLATES } from '@/lib/studio/templates';
+
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
   component: VynexaStudioPage,
@@ -121,7 +123,22 @@ function VynexaStudioPage() {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
+
   if (isLoading || !data) {
+
     return (
       <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-white">
         <Loader2 className="size-10 animate-spin text-primary" />
@@ -161,17 +178,32 @@ function VynexaStudioPage() {
   const handleAddSection = (type: string) => {
     if (!data) return;
     const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
-    const newSection: StudioSection = {
-      id: generateId(),
-      type,
-      elements: [],
-      styles: {},
-      order: sections.length
-    };
+    
+    let newSection: StudioSection;
+    
+    if (SECTION_TEMPLATES[type]) {
+      const template = JSON.parse(JSON.stringify(SECTION_TEMPLATES[type]));
+      newSection = {
+        ...template,
+        id: generateId(),
+        elements: (template.elements || []).map((el: any) => ({ ...el, id: generateId() })),
+        order: sections.length
+      } as StudioSection;
+    } else {
+      newSection = {
+        id: generateId(),
+        type,
+        elements: [],
+        styles: {},
+        order: sections.length
+      };
+    }
+    
     sections.push(newSection);
     updateData({ ...data, sections });
     setSelectedSectionId(newSection.id);
   };
+
 
 
   const handleUpdateElement = (id: string, updates: Partial<StudioElement>) => {
