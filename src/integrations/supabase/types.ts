@@ -575,6 +575,53 @@ export type Database = {
           },
         ]
       }
+      project_site_plans: {
+        Row: {
+          completion: number | null
+          created_at: string
+          id: string
+          primary_cta: string | null
+          project_id: string
+          sections: Json
+          status: string | null
+          strategy: Json
+          updated_at: string
+          visual_direction: string | null
+        }
+        Insert: {
+          completion?: number | null
+          created_at?: string
+          id?: string
+          primary_cta?: string | null
+          project_id: string
+          sections?: Json
+          status?: string | null
+          strategy?: Json
+          updated_at?: string
+          visual_direction?: string | null
+        }
+        Update: {
+          completion?: number | null
+          created_at?: string
+          id?: string
+          primary_cta?: string | null
+          project_id?: string
+          sections?: Json
+          status?: string | null
+          strategy?: Json
+          updated_at?: string
+          visual_direction?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_site_plans_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_studio_data: {
         Row: {
           created_at: string | null
