@@ -51,25 +51,32 @@ export function buildProjectContext(
   return {
     projectId,
     businessName: briefing?.businessName || 'Projeto sem nome',
-    niche: briefing?.niche,
-    description: briefing?.description,
-    objectives: briefing?.objectives,
-    audience: briefing?.audience,
-    services: briefing?.contentAssets,
-    differentiators: briefing?.differentiators,
-    brandIdentity: briefing?.brandIdentity,
-    visualStyle: briefing?.visualStyle,
-    references: briefing?.references,
+    niche: briefing?.niche || undefined,
+    description: briefing?.description || undefined,
+    objectives: briefing?.objectives || undefined,
+    audience: briefing?.audience || undefined,
+    services: briefing?.contentAssets || undefined,
+    differentiators: briefing?.differentiators || undefined,
+    brandIdentity: briefing?.brandIdentity || undefined,
+    visualStyle: briefing?.visualStyle || undefined,
+    references: briefing?.references || undefined,
     sitePlan: sitePlan || undefined,
-    plannedSections: sitePlan?.sections?.map(s => s.name),
-    primaryCTA: sitePlan?.primary_cta,
-    designSystem: studioData?.design_system,
+    plannedSections: sitePlan?.sections?.map(s => s.name) || undefined,
+    primaryCTA: sitePlan?.primary_cta || undefined,
+    designSystem: studioData?.design_system || undefined,
+    location: undefined,
+    products: undefined,
+    requirements: undefined,
+    notes: undefined,
+    template: undefined,
+    secondaryCTA: undefined,
+    availableAssets: undefined,
   };
 }
 
 export function generateIntelligence(context: ScaleNexusProjectContext): ProjectIntelligence {
   const objectives = context.objectives || [];
-  const primaryGoal = objectives.length > 0 ? objectives[0] : 'institutional';
+  const primaryGoal = objectives.length > 0 ? (objectives[0] as string) : 'institutional';
   
   const recommendedCTA = objectives.includes('whatsapp') ? 'Pedir agora' : 
                          objectives.includes('agendamento') ? 'Agendar agora' : 'Saiba mais';
