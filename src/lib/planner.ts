@@ -110,7 +110,7 @@ export function generateRecommendedPlan(briefing: BriefingData): Partial<SitePla
   return {
     sections,
     strategy: {
-      objective: objectives.length > 0 ? objectives[0] : 'Presença institucional',
+      objective: objectives.length > 0 ? (objectives[0] as string) : 'Presença institucional',
       audience: briefing.audience?.target || 'Público geral',
       primary_cta: objectives.includes('whatsapp') ? 'Pedir no WhatsApp' : 'Saiba Mais',
       visual_style: briefing.visualStyle?.join(', ') || 'Moderno e Clean',

@@ -109,14 +109,26 @@ function SitePlannerPage() {
   const moveUp = (index: number) => {
     if (!plan?.sections || index === 0) return;
     const newSections = [...plan.sections];
-    [newSections[index], newSections[index - 1]] = [newSections[index - 1], newSections[index]];
+    const prevSection = newSections[index - 1];
+    const currSection = newSections[index];
+    if (prevSection && currSection) {
+      newSections[index] = prevSection;
+      newSections[index - 1] = currSection;
+      updateSections(newSections);
+    }
     updateSections(newSections);
   };
 
   const moveDown = (index: number) => {
     if (!plan?.sections || index === plan.sections.length - 1) return;
     const newSections = [...plan.sections];
-    [newSections[index], newSections[index + 1]] = [newSections[index + 1], newSections[index]];
+    const nextSection = newSections[index + 1];
+    const currSection = newSections[index];
+    if (nextSection && currSection) {
+      newSections[index] = nextSection;
+      newSections[index + 1] = currSection;
+      updateSections(newSections);
+    }
     updateSections(newSections);
   };
 
