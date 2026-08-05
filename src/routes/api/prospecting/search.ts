@@ -241,15 +241,23 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const body = await request.json();
           const { niche, state, city, precision, rawMode } = searchSchema.parse(body);
           const apiKey = process.env["GEOAPIFY_API_KEY"];
-          if (!apiKey) return new Response(JSON.stringify({ error: true, stage: "config", message: "API Key ausente", requestId }), { status: 500 });
+          if (!apiKey) {
+            console.error("GEOAPIFY_API_KEY is missing in server environment");
+            return new Response(JSON.stringify({ error: "Erro de configuração do servidor", requestId }), { status: 500 });
+          }
 
           // Geocoding
           const locationText = city ? `${city}, ${state}, Brasil` : `${state}, Brasil`;
           const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(locationText)}&limit=1&format=json&apiKey=${apiKey}`;
           const geocodeRes = await fetch(geocodeUrl);
+          
+          if (!geocodeRes.ok) {
+            return new Response(JSON.stringify({ error: "Erro ao localizar região", requestId }), { status: 502 });
+          }
+
           const geocodeData = await geocodeRes.json();
           const areaPlaceId = geocodeData.results?.[0]?.place_id;
-          if (!areaPlaceId) return new Response(JSON.stringify({ error: true, stage: "geocoding", message: "Localização não encontrada", requestId }), { status: 404 });
+          if (!areaPlaceId) return new Response(JSON.stringify({ error: "Localização não encontrada", requestId }), { status: 404 });
 
           // Layered approach: Execute multiple queries until target is reached
           const resultsMap = new Map();
