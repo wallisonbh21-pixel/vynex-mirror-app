@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Meeting, MeetingParticipant, MeetingWithParticipants } from "./types";
+import { Meeting, MeetingParticipant, MeetingWithParticipants, MeetingMessage, MeetingNote } from "./types";
 
 export const meetingQueries = {
   list: async () => {
@@ -7,7 +7,10 @@ export const meetingQueries = {
       .from("meetings")
       .select(`
         *,
-        participants:meeting_participants(*)
+        participants:meeting_participants(
+          *,
+          profiles:user_id(full_name, avatar_url)
+        )
       `)
       .order("scheduled_at", { ascending: true });
 
@@ -20,40 +23,45 @@ export const meetingQueries = {
       .from("meetings")
       .select(`
         *,
-        participants:meeting_participants(*)
+        participants:meeting_participants(
+          *,
+          profiles:user_id(full_name, avatar_url)
+        ),
+        project:project_id(title),
+        client:client_id(name)
       `)
       .eq("id", id)
       .single();
 
     if (error) throw error;
-    return data as MeetingWithParticipants;
+    return data as MeetingWithParticipants & { 
+      project?: { title: string }, 
+      client?: { name: string } 
+    };
   },
 
-  listByProject: async (projectId: string) => {
+  getMessages: async (meetingId: string) => {
     const { data, error } = await supabase
-      .from("meetings")
+      .from("meeting_messages")
       .select(`
         *,
-        participants:meeting_participants(*)
+        sender:sender_id(full_name, avatar_url)
       `)
-      .eq("project_id", projectId)
-      .order("scheduled_at", { ascending: true });
+      .eq("meeting_id", meetingId)
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
-    return data as MeetingWithParticipants[];
+    return data as MeetingMessage[];
   },
 
-  listByClient: async (clientId: string) => {
+  getNotes: async (meetingId: string) => {
     const { data, error } = await supabase
-      .from("meetings")
-      .select(`
-        *,
-        participants:meeting_participants(*)
-      `)
-      .eq("client_id", clientId)
-      .order("scheduled_at", { ascending: true });
+      .from("meeting_notes")
+      .select("*")
+      .eq("meeting_id", meetingId)
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
-    return data as MeetingWithParticipants[];
+    return data as MeetingNote[];
   }
 };
