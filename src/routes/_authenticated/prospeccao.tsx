@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Facebook,
@@ -243,7 +243,12 @@ function ProspeccaoPage() {
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
             <Label>Nicho / categoria</Label>
-            <Select value={niche} onValueChange={(v) => { setNiche(v); if(v !== "Outros") setOtherNiche(""); }}>
+            <Select value={niche} onValueChange={(v) => { 
+              setNiche(v); 
+              if(v !== "Outros") {
+                setOtherNiche("");
+              }
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o nicho" />
               </SelectTrigger>
@@ -256,11 +261,15 @@ function ProspeccaoPage() {
               </SelectContent>
             </Select>
             {niche === "Outros" && (
-              <Input
-                placeholder="Ex.: pet shop, loja de roupas..."
-                value={otherNiche}
-                onChange={(e) => setOtherNiche(e.target.value)}
-              />
+              <div className="mt-2 space-y-1">
+                <Label className="text-[10px] text-muted-foreground uppercase font-semibold">Digite o nicho que deseja pesquisar</Label>
+                <Input
+                  placeholder="Ex.: Academia, Pet shop, Loja de roupas..."
+                  value={otherNiche}
+                  onChange={(e) => setOtherNiche(e.target.value)}
+                  autoFocus
+                />
+              </div>
             )}
           </div>
           <div className="space-y-2">

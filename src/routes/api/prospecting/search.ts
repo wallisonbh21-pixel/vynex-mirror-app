@@ -36,6 +36,26 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
 };
 
 /**
+ * Expansão semântica dinâmica de nichos para termos de busca.
+ * Transforma um nicho em um ecossistema de termos relacionados para busca textual.
+ */
+function expandNicheKeywords(niche: string): string[] {
+  const normalized = niche.toLowerCase().trim();
+  
+  const expansions: Record<string, string[]> = {
+    "academia": ["academia", "fitness", "musculação", "crossfit", "centro de treinamento", "treinamento funcional", "gym", "studio fitness", "personal trainer", "pilates", "suplementos", "artigos esportivos"],
+    "oficina": ["oficina", "mecânica", "auto center", "reparos automotivos", "lanternagem", "pintura automotiva", "pneus", "centro automotivo", "car service", "freios"],
+    "imobiliária": ["imobiliária", "imóveis", "corretor", "venda de imóveis", "aluguel de imóveis", "negócios imobiliários", "real estate", "consultoria imobiliária"],
+    "contabilidade": ["contabilidade", "contador", "contábil", "assessoria contábil", "escritório contábil", "escritório de contabilidade", "auditoria"],
+    "advocacia": ["advocacia", "advogado", "jurídico", "escritório de advocacia", "direito", "law office", "consultoria jurídica"],
+    "pet shop": ["pet shop", "pet", "animais", "banho e tosa", "veterinária", "clínica veterinária", "rações", "acessórios para animais"],
+    "loja de roupas": ["loja de roupas", "vestuário", "moda", "boutique", "confecção", "roupas femininas", "roupas masculinas", "outlet"],
+  };
+
+  return expansions[normalized] || [normalized];
+}
+
+/**
  * Definição centralizada de relevância por nicho.
  * Utilizada para filtrar e pontuar resultados da Geoapify.
  */
@@ -49,74 +69,39 @@ interface RelevanceConfig {
 
 const RELEVANCE_CONFIGS: Record<string, RelevanceConfig> = {
   "Academia": {
-    positiveTerms: ["academia", "fitness", "musculação", "crossfit", "centro de treinamento", "treinamento funcional", "gym", "studio fitness", "ct ", "personal trainer", "treinamento esportivo", "pilates"],
-    positiveCategories: ["leisure.spa", "leisure.fitness_centre"],
-    negativeTerms: ["supermercado", "carrefour", "clínica", "hospital", "farmácia", "parque", "praça", "banco", "escola", "igreja", "rua", "avenida", "bairro", "residência", "condomínio", "edifício"],
+    positiveTerms: ["academia", "fitness", "musculação", "crossfit", "centro de treinamento", "treinamento funcional", "gym", "studio fitness", "ct ", "personal trainer", "treinamento esportivo", "pilates", "suplemento", "esportivo"],
+    positiveCategories: ["leisure.spa", "leisure.fitness_centre", "commercial.clothing", "commercial.food"],
+    negativeTerms: ["supermercado", "carrefour", "clínica médica", "hospital", "farmácia", "parque", "praça", "banco", "escola", "igreja", "rua", "avenida", "bairro", "residência", "condomínio", "edifício"],
     negativeCategories: ["healthcare", "commercial.supermarket", "leisure.park", "education", "religion", "service.financial", "accommodation"],
-    minScore: 10,
+    minScore: 5, // Reduzido para ser menos rígido
   },
   "Oficina": {
     positiveTerms: ["oficina", "mecânica", "auto center", "reparos automotivos", "lanternagem", "pintura automotiva", "freios", "suspensão", "pneus", "centro automotivo", "car service"],
     positiveCategories: ["service.vehicle.repair", "commercial.vehicle"],
-    negativeTerms: ["concessionária", "venda de carros", "estacionamento", "lava jato", "supermercado", "clínica", "rua", "avenida"],
-    negativeCategories: ["commercial.supermarket", "healthcare", "parking"],
-    minScore: 10,
+    negativeTerms: ["supermercado", "clínica", "rua", "avenida", "banco", "escola", "igreja"],
+    negativeCategories: ["commercial.supermarket", "healthcare", "parking", "education", "religion"],
+    minScore: 5,
   },
   "Imobiliária": {
     positiveTerms: ["imobiliária", "imóveis", "corretor", "venda", "aluguel", "negócios imobiliários", "properties", "real estate"],
     positiveCategories: ["office", "commercial"],
     negativeTerms: ["condomínio", "edifício", "residencial", "rua", "avenida", "supermercado"],
     negativeCategories: ["accommodation", "commercial.supermarket"],
-    minScore: 10,
+    minScore: 5,
   },
   "Contabilidade": {
     positiveTerms: ["contabilidade", "contador", "contábil", "assessoria contábil", "escritório contábil", "accounting"],
     positiveCategories: ["office"],
-    negativeTerms: ["advocacia", "jurídico", "rua", "avenida"],
-    negativeCategories: ["healthcare", "accommodation"],
-    minScore: 10,
+    negativeTerms: ["rua", "avenida", "supermercado", "clínica"],
+    negativeCategories: ["healthcare", "accommodation", "commercial.supermarket"],
+    minScore: 5,
   },
-  "Advocacia": {
-    positiveTerms: ["advocacia", "advogado", "jurídico", "escritório de advocacia", "direito", "law", "legal"],
-    positiveCategories: ["office"],
-    negativeTerms: ["contabilidade", "rua", "avenida"],
-    negativeCategories: ["healthcare", "accommodation"],
-    minScore: 10,
-  },
-  "Fotografia": {
-    positiveTerms: ["fotografia", "fotógrafo", "estúdio fotográfico", "foto", "photo", "studio"],
-    positiveCategories: ["service", "commercial"],
-    negativeTerms: ["rua", "avenida"],
-    negativeCategories: ["healthcare", "accommodation"],
-    minScore: 10,
-  },
-  "Eventos": {
-    positiveTerms: ["eventos", "buffet", "salão de festas", "casa de festas", "organização de eventos", "cerimonial", "party"],
-    positiveCategories: ["entertainment", "catering"],
-    negativeTerms: ["igreja", "escola", "rua", "avenida"],
-    negativeCategories: ["religion", "education"],
-    minScore: 10,
-  },
-  "Hamburgueria": {
-    positiveTerms: ["hamburgueria", "burger", "hambúrguer", "artesanal", "lanches"],
-    positiveCategories: ["catering.restaurant.burger"],
-    negativeTerms: ["pizzaria", "oriental", "rua", "avenida"],
-    negativeCategories: ["catering.restaurant.pizza"],
-    minScore: 10,
-  },
-  "Barbearia": {
-    positiveTerms: ["barbearia", "barbeiro", "barber", "beard", "corte masculino"],
-    positiveCategories: ["service.beauty"],
-    negativeTerms: ["feminino", "depilação", "unhas", "rua", "avenida"],
-    negativeCategories: ["healthcare"],
-    minScore: 10,
-  },
-  "Clínica": {
-    positiveTerms: ["clínica", "médica", "saúde", "consultório", "especialidades", "health", "clinic"],
-    positiveCategories: ["healthcare.clinic_or_praxis", "healthcare.hospital"],
-    negativeTerms: ["academia", "fitness", "rua", "avenida"],
-    negativeCategories: ["leisure.fitness_centre"],
-    minScore: 10,
+  "Pet Shop": {
+    positiveTerms: ["pet shop", "pet", "animais", "banho e tosa", "veterinária", "rações", "grooming", "animal"],
+    positiveCategories: ["commercial.pet", "healthcare.clinic_or_praxis"],
+    negativeTerms: ["supermercado", "hospital humano", "clínica médica", "rua", "avenida"],
+    negativeCategories: ["commercial.supermarket", "accommodation"],
+    minScore: 5,
   },
 };
 
@@ -349,77 +334,85 @@ export const Route = createFileRoute("/api/prospecting/search")({
           const areaPlaceId = locationResult.place_id;
           console.log(`[Search][${requestId}] Local resolvido. Area Place ID: ${areaPlaceId}`);
 
-          // 5. Chamar Geoapify Places API v2
-          stage = "geoapify_call";
-          const { categories, log: catLog } = getGeoapifyCategories(niche, requestId);
-          console.log(catLog);
+          // 5. Estratégia de Busca Inteligente com Expansão Semântica
+          stage = "discovery";
+          const expandedTerms = expandNicheKeywords(niche);
+          const allFetchedFeatures: any[] = [];
           
-          const strategy = validateSearchStrategy(niche, categories);
-          if (!strategy.valid) {
-            return new Response(JSON.stringify({ error: strategy.error, stage }), { 
-              status: 400, 
-              headers: { "Content-Type": "application/json" } 
-            });
-          }
-          
-          // Construindo URL da v2
-          const geoUrl = new URL("https://api.geoapify.com/v2/places");
-          
-          if (strategy.strategy === "categories") {
-            geoUrl.searchParams.set("categories", categories!);
-          } else {
-            // Busca textual combinada com filtro geográfico e âncora estrutural 'type'
-            geoUrl.searchParams.set("type", "commercial");
-            geoUrl.searchParams.set("text", niche);
-          }
-          
-          geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
-          geoUrl.searchParams.set("limit", "30");
-          geoUrl.searchParams.set("lang", "pt");
-          geoUrl.searchParams.set("apiKey", apiKey);
-          
-          console.log(`[Search][${requestId}] Strategy: ${strategy.strategy} | Niche: ${niche}`);
-          console.log(`[Search][${requestId}] Request URL: ${geoUrl.origin}${geoUrl.pathname}?${geoUrl.searchParams.toString().replace(apiKey, "HIDDEN")}`);
+          console.log(`[Search][${requestId}] Nicho: ${niche} | Termos expandidos: ${expandedTerms.join(", ")}`);
 
+          // Para cada termo expandido, fazemos uma busca
+          // Nota: Em produção, poderíamos paralelizar isso, mas vamos fazer sequencialmente com limite de termos para estabilidade
+          const termsToSearch = expandedTerms.slice(0, 5); // Limitar a 5 termos principais para evitar rate limit ou timeout excessivo
           
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 15000);
-          
-          let response;
-          try {
-            response = await fetch(geoUrl.toString(), { signal: controller.signal });
-          } finally {
-            clearTimeout(timeoutId);
-          }
-          
-          if (!response.ok) {
-            const rawBody = await response.text();
-            let errorData;
-            try { errorData = JSON.parse(rawBody); } catch { errorData = { message: rawBody.substring(0, 100) }; }
+          for (const term of termsToSearch) {
+            const { categories, log: catLog } = getGeoapifyCategories(term, requestId);
+            const strategy = validateSearchStrategy(term, categories);
             
-            return new Response(JSON.stringify({ 
-              error: `Erro no provedor (Geoapify v2 ${response.status}): ${errorData.message || 'Erro desconhecido'}`,
-              stage,
-              status: response.status,
-              requestId
-            }), { status: 502, headers: { "Content-Type": "application/json" } });
+            if (!strategy.valid) continue;
+
+            const geoUrl = new URL("https://api.geoapify.com/v2/places");
+            if (strategy.strategy === "categories") {
+              geoUrl.searchParams.set("categories", categories!);
+            } else {
+              geoUrl.searchParams.set("type", "commercial");
+              geoUrl.searchParams.set("text", term);
+            }
+            
+            geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
+            geoUrl.searchParams.set("limit", "20"); // Buscar 20 de cada termo para ter margem de deduplicação
+            geoUrl.searchParams.set("lang", "pt");
+            geoUrl.searchParams.set("apiKey", apiKey);
+
+            try {
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 8000);
+              const response = await fetch(geoUrl.toString(), { signal: controller.signal });
+              clearTimeout(timeoutId);
+
+              if (response.ok) {
+                const data = await response.json();
+                if (data.features) {
+                  allFetchedFeatures.push(...data.features);
+                }
+              }
+            } catch (e) {
+              console.error(`[Search][${requestId}] Erro ao buscar termo "${term}":`, e);
+              // Continuar para o próximo termo
+            }
           }
 
-          stage = "geoapify_parse";
-          const data = await response.json();
+          const countBeforeDeduplication = allFetchedFeatures.length;
 
-          // 6. Mapear e Filtrar resultados por Relevância
-          stage = "mapping";
-          const scoredOpportunities = (data.features || []).map((f: any) => {
+          // 6. Deduplicação por Place ID ou Nome + Coordenadas
+          stage = "deduplication";
+          const uniqueFeatures = new Map();
+          for (const f of allFetchedFeatures) {
             const props = f.properties;
-            if (!props || !props.name) return null;
+            if (!props || !props.name) continue;
             
+            const key = props.place_id || generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
+            if (!uniqueFeatures.has(key)) {
+              uniqueFeatures.set(key, f);
+            }
+          }
+          
+          const countAfterDeduplication = uniqueFeatures.size;
+
+          // 7. Mapear e Filtrar resultados por Relevância
+          stage = "mapping";
+          const scoredOpportunities = Array.from(uniqueFeatures.values()).map((f: any) => {
+            const props = f.properties;
             const relevanceScore = calculateRelevance(props, niche, niche);
             
-            // Se o score for muito baixo ou negativo, descarta
-            const minAllowedScore = RELEVANCE_CONFIGS[niche]?.minScore ?? 10;
+            // Se o score for muito negativo (bloqueio absoluto), descarta
+            if (relevanceScore <= -50) {
+              return null;
+            }
+
+            // Para nichos conhecidos, aplicamos o minScore, mas para "Outros" somos mais permissivos
+            const minAllowedScore = RELEVANCE_CONFIGS[niche]?.minScore ?? 0;
             if (relevanceScore < minAllowedScore) {
-              console.log(`[Search][${requestId}] Descartado por baixa relevância (${relevanceScore}): ${props.name}`);
               return null;
             }
 
@@ -459,14 +452,16 @@ export const Route = createFileRoute("/api/prospecting/search")({
             };
           }).filter(Boolean);
 
+          const countAfterRelevance = scoredOpportunities.length;
+
           // Ordenar por score descendente e pegar no máximo 30
-          const opportunities = scoredOpportunities
+          const opportunities = (scoredOpportunities as any[])
             .sort((a: any, b: any) => b.score - a.score)
             .slice(0, 30)
             .map((item: any) => item.data);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v7.0-relevance-engine";
+          const diagnostic = "v8.0-semantic-expansion";
           
           return new Response(JSON.stringify({ 
             opportunities, 
@@ -475,12 +470,12 @@ export const Route = createFileRoute("/api/prospecting/search")({
             stage: "success",
             status: 200,
             meta: {
-              endpoint: "/v2/places",
-              categories,
-              strategy: strategy.strategy,
-              fallbackLog: catLog || null,
-              filter: `place:${areaPlaceId}`,
-              resolvedLocation: locationText
+              nicheOriginal: niche,
+              termosExpandidos: expandedTerms,
+              countBeforeDeduplication,
+              countAfterDeduplication,
+              countAfterRelevance,
+              countFinal: opportunities.length
             }
           }), {
             status: 200,
