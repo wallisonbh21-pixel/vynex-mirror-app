@@ -100,7 +100,7 @@ function ScaleNexusStudioPage() {
     setIsBuildingWithForge(true);
     setForgeStepIndex(0);
 
-    const activeSections = plan.sections.filter(s => s.recommended);
+    const activeSections = plan?.sections?.filter(s => s.recommended) || [];
     
     // Execute actions one by one with a small delay for visual feedback
     for (let i = 0; i < activeSections.length; i++) {
