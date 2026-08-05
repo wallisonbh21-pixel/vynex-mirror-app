@@ -6,14 +6,28 @@ export interface StudioDesignSystem {
     secondary: string;
     accent: string;
     background: string;
+    surface: string;
+    border: string;
     text: string;
+    textSecondary: string;
   };
-  fonts: {
-    heading: string;
-    body: string;
+  typography: {
+    headingFont: string;
+    bodyFont: string;
+    headingWeight: string;
+    bodyWeight: string;
   };
-  spacing: 'compact' | 'normal' | 'loose';
-  borderRadius: string;
+  buttons: {
+    style: 'solid' | 'outline' | 'ghost';
+    borderRadius: string;
+    shadow: string;
+    size: 'sm' | 'md' | 'lg';
+  };
+  cards: {
+    borderRadius: string;
+    shadow: string;
+    border: boolean;
+  };
 }
 
 export interface StudioElement {
