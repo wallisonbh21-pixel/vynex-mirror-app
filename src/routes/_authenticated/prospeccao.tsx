@@ -126,6 +126,7 @@ function ProspeccaoPage() {
 
   // Formulário de busca (a fonte de dados externa chega na FASE 5.2).
   const [niche, setNiche] = useState("");
+  const [otherNiche, setOtherNiche] = useState("");
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
   const [searched, setSearched] = useState(false);
@@ -242,7 +243,7 @@ function ProspeccaoPage() {
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
             <Label>Nicho / categoria</Label>
-            <Select value={niche} onValueChange={setNiche}>
+            <Select value={niche} onValueChange={(v) => { setNiche(v); if(v !== "Outros") setOtherNiche(""); }}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o nicho" />
               </SelectTrigger>
@@ -254,6 +255,13 @@ function ProspeccaoPage() {
                 ))}
               </SelectContent>
             </Select>
+            {niche === "Outros" && (
+              <Input
+                placeholder="Ex.: pet shop, loja de roupas..."
+                value={otherNiche}
+                onChange={(e) => setOtherNiche(e.target.value)}
+              />
+            )}
           </div>
           <div className="space-y-2">
             <Label>Estado</Label>
@@ -281,7 +289,7 @@ function ProspeccaoPage() {
               onClick={() => {
                 setSearched(true);
                 searchExternal.mutate(
-                  { niche, state, city },
+                  { niche: niche === "Outros" ? otherNiche : niche, state, city },
                   { onSuccess: (data) => setExternalResults(data) }
                 );
               }}

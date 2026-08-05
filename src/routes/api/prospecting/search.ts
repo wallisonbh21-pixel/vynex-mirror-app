@@ -15,25 +15,25 @@ const searchSchema = z.object({
  * Documentação: https://apidocs.geoapify.com/docs/places/categories/
  */
 const NICHE_CATEGORY_MAP: Record<string, string> = {
-  "Hamburgueria": "catering.restaurant.burger,catering.restaurant",
+  "Hamburgueria": "catering.restaurant.burger",
   "Restaurante": "catering.restaurant",
-  "Pizzaria": "catering.restaurant.pizza,catering.restaurant",
-  "Bar": "catering.bar,catering.pub",
+  "Pizzaria": "catering.restaurant.pizza",
+  "Bar": "catering.bar",
   "Café": "catering.cafe",
-  "Padaria": "commercial.food.bakery,catering.cafe",
-  "Hotel": "accommodation.hotel,accommodation.hostel",
-  "Pousada": "accommodation.guest_house,accommodation.hotel",
+  "Padaria": "commercial.food.bakery",
+  "Hotel": "accommodation.hotel",
+  "Pousada": "accommodation.guest_house",
   "Farmácia": "healthcare.pharmacy",
   "Loja de roupas": "commercial.clothing",
   "Dentista": "healthcare.dentist",
-  "Clínica": "healthcare.clinic_or_praxis,healthcare.hospital",
+  "Clínica": "healthcare.clinic_or_praxis",
   "Pet Shop": "commercial.pet",
-  "Academia": "leisure",
+  "Academia": "activity.sport",
   "Salão de beleza": "service.beauty",
   "Barbearia": "service.beauty",
   "Oficina": "service.vehicle.repair",
   "Imobiliária": "commercial",
-  "Contabilidade": "service",
+  "Contabilidade": "office",
   "Advocacia": "office",
   "Fotografia": "service",
   "Eventos": "entertainment",
@@ -225,9 +225,13 @@ export const Route = createFileRoute("/api/prospecting/search")({
           
           // Construindo URL da v2
           const geoUrl = new URL("https://api.geoapify.com/v2/places");
-          geoUrl.searchParams.set("categories", categories);
+          if (NICHE_CATEGORY_MAP[niche]) {
+            geoUrl.searchParams.set("categories", categories);
+          } else {
+            geoUrl.searchParams.set("text", niche);
+          }
           geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
-          geoUrl.searchParams.set("limit", "30"); // Aumentado para 30 conforme solicitado
+          geoUrl.searchParams.set("limit", "30");
           geoUrl.searchParams.set("lang", "pt");
           geoUrl.searchParams.set("apiKey", apiKey);
           
@@ -263,7 +267,12 @@ export const Route = createFileRoute("/api/prospecting/search")({
           stage = "mapping";
           const opportunities = (data.features || []).map((f: any) => {
             const props = f.properties;
-            if (!props) return null;
+            if (!props || !props.name) return null; // Validação: precisa de nome
+            
+            // Validação de irrelevância (discard)
+            const forbiddenKeywords = ["rua", "avenida", "travessa", "limite", "bairro"];
+            const nameLower = props.name.toLowerCase();
+            if (forbiddenKeywords.some(kw => nameLower.includes(kw))) return null;
 
             const website = props.website || null;
             let level = "alta";
@@ -276,7 +285,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
             const fallbackId = generateDeterministicId(`${props.name}-${props.lat}-${props.lon}`);
 
             return {
-              business_name: props.name || props.address_line1 || "Empresa sem nome",
+              business_name: props.name,
               category: niche,
               phone: props.contact?.phone || null,
               email: props.contact?.email || null,
@@ -286,7 +295,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
               website: website,
               instagram: props.contact?.instagram || null,
               facebook: props.contact?.facebook || null,
-              google_maps_url: null, // Será gerado dinamicamente no frontend com lat/lon
+              google_maps_url: null,
               lat: props.lat || null,
               lon: props.lon || null,
               place_id: props.place_id || fallbackId,
