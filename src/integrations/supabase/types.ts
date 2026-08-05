@@ -600,7 +600,9 @@ export type Database = {
           has_website: boolean
           id: string
           instagram: string | null
+          lat: number | null
           lead_id: string | null
+          lon: number | null
           notes: string | null
           opportunity_level: string
           phone: string | null
@@ -628,7 +630,9 @@ export type Database = {
           has_website?: boolean
           id?: string
           instagram?: string | null
+          lat?: number | null
           lead_id?: string | null
+          lon?: number | null
           notes?: string | null
           opportunity_level?: string
           phone?: string | null
@@ -656,7 +660,9 @@ export type Database = {
           has_website?: boolean
           id?: string
           instagram?: string | null
+          lat?: number | null
           lead_id?: string | null
+          lon?: number | null
           notes?: string | null
           opportunity_level?: string
           phone?: string | null
