@@ -256,3 +256,7 @@ export function LandingPage() {
         </div>
       </section>
 
+      <LandingFooter />
+    </div>
+  );
+}
