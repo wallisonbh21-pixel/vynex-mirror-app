@@ -166,42 +166,16 @@ function VynexaStudioPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR - Library */}
-        <aside className="w-72 border-r border-slate-800 bg-slate-950 flex flex-col z-40">
-          <div className="p-4 border-b border-slate-800">
-             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Biblioteca</h3>
-             <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-800 bg-slate-900/50 hover:bg-slate-800">
-                  <Plus className="size-3" /> Seção
-                </Button>
-                <Button variant="outline" size="sm" className="justify-start gap-2 border-slate-800 bg-slate-900/50 hover:bg-slate-800">
-                  <Layers className="size-3" /> Grid
-                </Button>
-             </div>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-             <div>
-               <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Elementos Básicos</h4>
-               <div className="grid grid-cols-2 gap-2">
-                  {['Texto', 'Título', 'Imagem', 'Botão', 'Ícone', 'Espaço'].map(el => (
-                    <div key={el} className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs text-center cursor-move hover:border-primary/50 hover:bg-slate-800 transition-colors">
-                      {el}
-                    </div>
-                  ))}
-               </div>
-             </div>
-             <div>
-               <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Seções Prontas</h4>
-               <div className="space-y-2">
-                  {['Hero Profissional', 'Sobre Nós', 'Nossos Serviços', 'Depoimentos', 'FAQ'].map(sec => (
-                    <div key={sec} className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs cursor-move hover:border-primary/50 hover:bg-slate-800 transition-colors flex items-center justify-between group">
-                      {sec}
-                      <Plus className="size-3 text-slate-600 group-hover:text-primary" />
-                    </div>
-                  ))}
-               </div>
-             </div>
-          </div>
-        </aside>
+        <ElementLibrary 
+          onAddElement={(type) => {
+            // Placeholder for logic
+            console.log('Adding element:', type);
+          }}
+          onAddSection={(type) => {
+            // Placeholder for logic
+            console.log('Adding section:', type);
+          }}
+        />
 
         {/* CANVAS AREA */}
         <main className="flex-1 bg-slate-800 overflow-auto p-12 flex justify-center custom-scrollbar">
@@ -226,24 +200,25 @@ function VynexaStudioPage() {
                  <Button variant="outline" size="sm" className="mt-2">Ver Templates</Button>
                </div>
              ) : (
-               data.sections.map((section, idx) => (
-                 <div key={section.id} className="group relative border-b last:border-b-0 min-h-20">
-                    {/* Section controls */}
-                    <div className="absolute right-[-60px] top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <Button variant="secondary" size="icon" className="size-8 rounded-lg shadow-lg"><ChevronUp className="size-4" /></Button>
-                       <Button variant="secondary" size="icon" className="size-8 rounded-lg shadow-lg"><ChevronDown className="size-4" /></Button>
-                       <Button variant="secondary" size="icon" className="size-8 rounded-lg shadow-lg"><Copy className="size-4" /></Button>
-                       <Button variant="destructive" size="icon" className="size-8 rounded-lg shadow-lg"><Trash2 className="size-4" /></Button>
-                    </div>
-                    {/* Section content */}
-                    <div className="p-10 text-slate-900">
-                      #{idx + 1} {section.type}
-                    </div>
-                 </div>
-               ))
+               <div className="flex flex-col">
+                 {data.sections.map((section) => (
+                   <SectionRenderer 
+                     key={section.id}
+                     section={section}
+                     designSystem={data.design_system}
+                     selectedElementId={selectedElement}
+                     onSelectElement={(id) => console.log('select element', id)}
+                     onSelectSection={(id) => console.log('select section', id)}
+                     onMoveSection={(id, dir) => console.log('move', id, dir)}
+                     onDuplicateSection={(id) => console.log('dup', id)}
+                     onDeleteSection={(id) => console.log('del', id)}
+                   />
+                 ))}
+               </div>
              )}
            </div>
         </main>
+
 
         {/* RIGHT SIDEBAR - Properties */}
         <aside className="w-80 border-l border-slate-800 bg-slate-950 flex flex-col z-40">
