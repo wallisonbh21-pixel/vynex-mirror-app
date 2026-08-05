@@ -12,8 +12,6 @@ import {
   Plus,
   Settings,
   Layers,
-  ChevronLeft,
-  ChevronRight,
   Loader2,
   Trash2,
   Copy,
@@ -23,10 +21,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useStudioData, useSaveStudioData } from '@/lib/studio/hooks';
-import { StudioData, StudioSection, StudioElement } from '@/types/studio';
-import { toast } from 'sonner';
+import { StudioData } from '@/types/studio';
 
-export const Route = createFileRoute('/_authenticated/studio/$projectId')({
+export const Route = createFileRoute('/_authenticated/studio/$projectId' as any)({
   component: VynexaStudioPage,
   head: () => ({
     meta: [{ title: 'VYNEXA Studio — Editor Visual' }],
@@ -36,14 +33,13 @@ export const Route = createFileRoute('/_authenticated/studio/$projectId')({
 type Viewport = 'desktop' | 'tablet' | 'mobile';
 
 function VynexaStudioPage() {
-  const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' });
+  const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' as any });
   const { data: initialData, isLoading } = useStudioData(projectId);
   const saveMutation = useSaveStudioData();
   
   const [data, setData] = useState<StudioData | null>(null);
   const [viewport, setViewport] = useState<Viewport>('desktop');
-  const [selectedElement, setSelectedElement] = useState<string | null>(null);
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [selectedElement] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState<StudioData[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -67,16 +63,20 @@ function VynexaStudioPage() {
   const undo = () => {
     if (historyIndex > 0) {
       const prev = history[historyIndex - 1];
-      setData(prev);
-      setHistoryIndex(historyIndex - 1);
+      if (prev) {
+        setData(prev);
+        setHistoryIndex(historyIndex - 1);
+      }
     }
   };
 
   const redo = () => {
     if (historyIndex < history.length - 1) {
       const next = history[historyIndex + 1];
-      setData(next);
-      setHistoryIndex(historyIndex + 1);
+      if (next) {
+        setData(next);
+        setHistoryIndex(historyIndex + 1);
+      }
     }
   };
 
@@ -105,7 +105,7 @@ function VynexaStudioPage() {
       <header className="h-14 border-b border-slate-800 bg-slate-950 px-4 flex items-center justify-between z-50">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white">
-            <Link to="/projetos/$projectId" params={{ projectId }}>
+            <Link to="/_authenticated/projetos/$projectId" params={{ projectId }}>
               <ArrowLeft className="size-4 mr-2" /> Sair
             </Link>
           </Button>
@@ -264,10 +264,8 @@ function VynexaStudioPage() {
                </div>
              ) : (
                <div className="space-y-6">
-                 {/* Property groups will go here */}
                  <div>
                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Dimensões</h4>
-                    {/* Form controls */}
                  </div>
                </div>
              )}
@@ -280,7 +278,7 @@ function VynexaStudioPage() {
                  <div className="size-8 rounded-full bg-primary ring-2 ring-white cursor-pointer" title="Marca"></div>
                  <div className="size-8 rounded-full bg-slate-500 border border-slate-700 cursor-pointer" title="Secundária"></div>
                  <div className="size-8 rounded-full bg-emerald-500 cursor-pointer" title="Ação"></div>
-                 <div className="size-8 rounded-full border border-slate-700 flex items-center justify-center cursor-pointer">
+                 <div className="size-8 rounded-full border border-slate-800 flex items-center justify-center cursor-pointer">
                     <Plus className="size-3 text-slate-500" />
                  </div>
               </div>
