@@ -37,6 +37,7 @@ import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_au
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
+import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 
@@ -185,6 +186,12 @@ const AuthenticatedProjetosProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => AuthenticatedProjetosRoute,
   } as any)
+const AuthenticatedSitePlannerProjectIdRoute =
+  AuthenticatedSitePlannerProjectIdRouteImport.update({
+    id: '/site-planner/$projectId',
+    path: '/site-planner/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStudioProjectIdRoute =
   AuthenticatedStudioProjectIdRouteImport.update({
     id: '/studio/$projectId',
@@ -224,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -255,6 +263,7 @@ export interface FileRoutesByTo {
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
@@ -288,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/briefing/$projectId'
     | '/leads/$leadId'
     | '/projetos/$projectId'
+    | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/api/prospecting/search'
     | '/leads/'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/briefing/$projectId'
     | '/leads/$leadId'
     | '/projetos/$projectId'
+    | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/api/prospecting/search'
     | '/leads'
@@ -384,6 +396,7 @@ export interface FileRouteTypes {
     | '/_authenticated/briefing/$projectId'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/projetos/$projectId'
+    | '/_authenticated/site-planner/$projectId'
     | '/_authenticated/studio/$projectId'
     | '/api/prospecting/search'
     | '/_authenticated/leads/'
@@ -596,6 +609,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetosProjectIdRouteImport
       parentRoute: typeof AuthenticatedProjetosRoute
     }
+    '/_authenticated/site-planner/$projectId': {
+      id: '/_authenticated/site-planner/$projectId'
+      path: '/site-planner/$projectId'
+      fullPath: '/site-planner/$projectId'
+      preLoaderRoute: typeof AuthenticatedSitePlannerProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/studio/$projectId': {
       id: '/_authenticated/studio/$projectId'
       path: '/studio/$projectId'
@@ -648,6 +668,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedBriefingProjectIdRoute: typeof AuthenticatedBriefingProjectIdRoute
   AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
+  AuthenticatedSitePlannerProjectIdRoute: typeof AuthenticatedSitePlannerProjectIdRoute
   AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
 }
@@ -674,6 +695,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedBriefingProjectIdRoute: AuthenticatedBriefingProjectIdRoute,
   AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
+  AuthenticatedSitePlannerProjectIdRoute:
+    AuthenticatedSitePlannerProjectIdRoute,
   AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
 }
@@ -692,13 +715,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
