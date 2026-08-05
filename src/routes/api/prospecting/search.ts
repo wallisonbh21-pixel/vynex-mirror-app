@@ -221,7 +221,18 @@ export const Route = createFileRoute("/api/prospecting/search")({
                   // Text parameter usage varies by API version/endpoint
                   // For v2/places, 'text' search is a filter or we use /v1/places/search
                   // We'll keep the current logic but wrap it in a try-catch per query
-                  geoUrl.searchParams.set("text", layer.type === 'text' ? value : niche);
+                  if (layer.type === 'categories') {
+                    geoUrl.searchParams.set("categories", value);
+                  } else {
+                    // text-only search in /v2/places is not supported without categories or type
+                    // We must use 'type' (e.g., 'amenity', 'commercial') if no categories are provided,
+                    // or just switch to the correct endpoint if we wanted text search.
+                    // For now, let's use a broad category as a baseline when doing 'text' search
+                    // or define a default type.
+                    geoUrl.searchParams.set("categories", "commercial,catering,service,healthcare,leisure,education,activity");
+                    geoUrl.searchParams.set("text", value);
+                  }
+                  
                   geoUrl.searchParams.set("filter", `place:${areaPlaceId}`);
                   geoUrl.searchParams.set("limit", "20");
                   geoUrl.searchParams.set("offset", offset.toString());
