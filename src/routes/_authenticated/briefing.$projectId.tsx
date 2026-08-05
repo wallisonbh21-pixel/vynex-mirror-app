@@ -30,7 +30,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/briefing/")({
+export const Route = createFileRoute("/_authenticated/briefing/$projectId")({
   component: BriefingPage,
   head: () => ({
     meta: [{ title: "Briefing Inteligente — ScaleNexus" }],
