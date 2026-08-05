@@ -46,7 +46,9 @@ function VynexaStudioPage() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [history, setHistory] = useState<StudioData[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isPreview, setIsPreview] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 
   // Sync with initial data
   useEffect(() => {
@@ -245,9 +247,10 @@ function VynexaStudioPage() {
                <Redo className="size-4" />
              </Button>
           </div>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <Eye className="size-4" /> Visualizar
+          <Button variant={isPreview ? "secondary" : "ghost"} size="sm" className="gap-2" onClick={() => setIsPreview(!isPreview)}>
+            <Eye className="size-4" /> {isPreview ? 'Editar' : 'Visualizar'}
           </Button>
+
           <Button 
             size="sm" 
             className="gap-2 bg-primary hover:bg-primary/90 font-bold"
@@ -262,16 +265,22 @@ function VynexaStudioPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR - Library */}
-        <ElementLibrary 
-          onAddElement={handleAddElement}
-          onAddSection={handleAddSection}
-        />
+        {!isPreview && (
+          <ElementLibrary 
+            onAddElement={handleAddElement}
+            onAddSection={handleAddSection}
+          />
+        )}
+
 
         {/* CANVAS AREA */}
-        <main className="flex-1 bg-slate-800 overflow-auto p-12 flex justify-center custom-scrollbar">
+        <main className={cn("flex-1 bg-slate-800 overflow-auto flex justify-center custom-scrollbar", !isPreview ? "p-12" : "p-0")}>
+
            <div 
              className={cn(
-               "bg-white shadow-2xl transition-all duration-300 min-h-[800px] relative rounded-t-lg",
+               "bg-white transition-all duration-300 min-h-[800px] relative",
+               !isPreview && "shadow-2xl rounded-t-lg",
+
                viewport === 'desktop' && "w-[1200px]",
                viewport === 'tablet' && "w-[768px]",
                viewport === 'mobile' && "w-[375px]"
@@ -303,16 +312,19 @@ function VynexaStudioPage() {
                        key={section.id}
                        section={section}
                        designSystem={data.design_system}
-                       selectedElementId={selectedElementId}
-                       isSelected={selectedSectionId === section.id}
+                       selectedElementId={isPreview ? null : selectedElementId}
+                       isSelected={!isPreview && selectedSectionId === section.id}
                        onSelectElement={(id) => {
+                         if (isPreview) return;
                          setSelectedElementId(id);
                          setSelectedSectionId(section.id);
                        }}
                        onSelectSection={(id) => {
+                         if (isPreview) return;
                          setSelectedSectionId(id);
                          setSelectedElementId(null);
                        }}
+
                        onMoveSection={(id, dir) => {
                           if (!data) return;
                           const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
@@ -357,7 +369,9 @@ function VynexaStudioPage() {
         </main>
 
         {/* RIGHT SIDEBAR - Properties */}
-        <aside className="w-80 border-l border-slate-800 bg-slate-950 flex flex-col z-40">
+        {!isPreview && (
+          <aside className="w-80 border-l border-slate-800 bg-slate-950 flex flex-col z-40">
+
            <div className="h-12 border-b border-slate-800 flex items-center px-4">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <Settings className="size-3 text-primary" /> Propriedades
@@ -397,7 +411,9 @@ function VynexaStudioPage() {
                  </div>
               </div>
            </div>
-        </aside>
+          </aside>
+        )}
+
       </div>
 
       {/* STATUS BAR */}
