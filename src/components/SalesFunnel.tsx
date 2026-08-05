@@ -93,7 +93,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
         {counts.filter(c => c.status !== 'perdido').map((item, index, filteredCounts) => {
-          const config = (FUNNEL_CONFIG[item.status] || DEFAULT_CONFIG) as FunnelConfig;
+          const config = FUNNEL_CONFIG[item.status] || DEFAULT_CONFIG;
           const Icon = config.icon;
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
@@ -247,6 +247,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
         <div className="flex-1 overflow-hidden">
           <button 
             onClick={onOpen}
+            type="button"
             className="truncate text-left font-bold text-foreground hover:text-primary transition-colors"
           >
             {lead.company || lead.name}
@@ -297,6 +298,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
       
       <button 
         onClick={onOpen}
+        type="button"
         className="absolute inset-0 z-0 cursor-pointer"
       />
     </motion.article>
