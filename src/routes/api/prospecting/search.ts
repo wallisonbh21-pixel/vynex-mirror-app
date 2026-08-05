@@ -28,8 +28,8 @@ interface NicheConfig {
 
 const NICHE_STRATEGY: Record<string, NicheConfig> = {
   "Hamburgueria": {
-    primaryCategories: ["catering.restaurant.burger"],
-    secondaryCategories: ["catering.restaurant", "catering.fast_food"],
+    primaryCategories: ["catering.restaurant.burger", "catering.fast_food"],
+    secondaryCategories: ["catering.restaurant"],
     searchTerms: ["hamburgueria", "burger", "hambúrguer", "lanchonete"],
     relevance: {
       direct: ["hamburgueria", "burger", "burger shop", "hambúrguer"],
