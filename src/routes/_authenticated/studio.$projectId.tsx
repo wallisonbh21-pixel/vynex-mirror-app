@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useStudioData, useSaveStudioData } from '@/lib/studio/hooks';
 import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/studio';
-import { ElementLibrary } from '@/components/studio/ElementLibrary';
+import { LibraryPanel } from '@/components/studio/LibraryPanel';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { PropertyPanel } from '@/components/studio/PropertyPanel';
 import { generateId } from '@/lib/studio/utils';
@@ -298,11 +298,21 @@ function VynexaStudioPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR - Library */}
         {!isPreview && (
-          <ElementLibrary 
+          <LibraryPanel 
             onAddElement={handleAddElement}
-            onAddSection={handleAddSection}
+            onAddSection={(sec) => {
+              if (!data) return;
+              const sections = [...data.sections, { ...sec, id: generateId(), order: data.sections.length }];
+              updateData({ ...data, sections });
+            }}
+            onApplyTemplate={(templateData) => {
+              // Implementation for template application with confirmation
+            }}
+            onUpdateDesignSystem={handleUpdateDesignSystem}
+            designSystem={data.design_system}
           />
         )}
+
 
 
         {/* CANVAS AREA */}
