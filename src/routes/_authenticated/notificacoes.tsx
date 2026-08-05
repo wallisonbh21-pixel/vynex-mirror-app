@@ -24,13 +24,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/notificacoes")({
   head: () => ({
     meta: [
-      { title: "Notificações — VYNEXA" },
+      { title: "Notificações — ScaleNexus" },
       {
         name: "description",
-        content: "Central de avisos da VYNEXA: projetos, aprovações, contratos e saques em tempo real.",
+        content: "Central de avisos da ScaleNexus: projetos, aprovações, contratos e saques em tempo real.",
       },
-      { property: "og:title", content: "Notificações — VYNEXA" },
-      { property: "og:description", content: "Acompanhe todos os avisos da sua operação VYNEXA." },
+      { property: "og:title", content: "Notificações — ScaleNexus" },
+      { property: "og:description", content: "Acompanhe todos os avisos da sua operação ScaleNexus." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

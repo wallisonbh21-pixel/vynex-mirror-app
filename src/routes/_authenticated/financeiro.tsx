@@ -12,10 +12,10 @@ import { currency, shortDate, STATUS_LABEL } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/financeiro")({
   head: () => ({
     meta: [
-      { title: "Financeiro — VYNEXA" },
+      { title: "Financeiro — ScaleNexus" },
       { name: "description", content: "Comissões, mensalidades, bônus e solicitações de saque em um só lugar." },
-      { property: "og:title", content: "Financeiro — VYNEXA" },
-      { property: "og:description", content: "Extrato e saques da sua operação VYNEXA." },
+      { property: "og:title", content: "Financeiro — ScaleNexus" },
+      { property: "og:description", content: "Extrato e saques da sua operação ScaleNexus." },
     ],
   }),
   component: FinanceiroPage,

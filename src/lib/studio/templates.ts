@@ -120,7 +120,7 @@ export const SECTION_TEMPLATES: Record<string, LibraryItem> = {
       order: 0,
       styles: { padding: '4rem 0', backgroundColor: '#0f172a', color: '#ffffff', textAlign: 'center' },
       elements: [
-        createText('paragraph', '© 2026 VYNEXA. Todos os direitos reservados.', { color: '#94a3b8' })
+        createText('paragraph', '© 2026 ScaleNexus. Todos os direitos reservados.', { color: '#94a3b8' })
       ]
     } as StudioSection
   },

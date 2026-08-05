@@ -43,13 +43,13 @@ export const Route = createFileRoute("/_authenticated/criacao")({
   beforeLoad: () => requireCriador(),
   head: () => ({
     meta: [
-      { title: "Painel do criador — VYNEXA" },
+      { title: "Painel do criador — ScaleNexus" },
       {
         name: "description",
-        content: "Projetos atribuídos, prazos e comissões do criador VYNEXA.",
+        content: "Projetos atribuídos, prazos e comissões do criador ScaleNexus.",
       },
-      { property: "og:title", content: "Painel do criador — VYNEXA" },
-      { property: "og:description", content: "Acompanhe seus projetos e ganhos na VYNEXA." },
+      { property: "og:title", content: "Painel do criador — ScaleNexus" },
+      { property: "og:description", content: "Acompanhe seus projetos e ganhos na ScaleNexus." },
     ],
   }),
   component: PainelCriador,
