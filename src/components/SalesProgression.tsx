@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 export const PROJECT_STATUS_STEPS = [
+  { id: "disponivel", label: "Disponível" },
   { id: "briefing", label: "Briefing" },
   { id: "production", label: "Criação" },
   { id: "revision", label: "Revisão" },
@@ -9,12 +11,32 @@ export const PROJECT_STATUS_STEPS = [
   { id: "delivered", label: "Entrega" },
 ];
 
+export const LEAD_STATUS_STEPS = [
+  { id: "novo", label: "Novo" },
+  { id: "contato", label: "Contato" },
+  { id: "reuniao", label: "Reunião" },
+  { id: "proposta", label: "Proposta" },
+  { id: "negociacao", label: "Negociação" },
+  { id: "fechado", label: "Fechado" },
+];
+
+export const APPROVAL_STATUS_STEPS = [
+  { id: "interna", label: "Revisão Interna" },
+  { id: "liberado", label: "Com Cliente" },
+  { id: "ajustes_cliente", label: "Ajustes" },
+  { id: "aprovado", label: "Aprovado" },
+];
+
 interface SalesProgressionProps {
   status: string;
 }
 
 export function SalesProgression({ status }: SalesProgressionProps) {
-  const steps = PROJECT_STATUS_STEPS;
+  const steps = useMemo(() => {
+    if (LEAD_STATUS_STEPS.some(s => s.id === status)) return LEAD_STATUS_STEPS;
+    if (APPROVAL_STATUS_STEPS.some(s => s.id === status)) return APPROVAL_STATUS_STEPS;
+    return PROJECT_STATUS_STEPS;
+  }, [status]);
   const currentStepId = status;
   const currentIndex = steps.findIndex(s => s.id === currentStepId);
 
