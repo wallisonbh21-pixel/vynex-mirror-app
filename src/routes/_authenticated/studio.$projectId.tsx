@@ -58,6 +58,21 @@ function ScaleNexusStudioPage() {
   const [isPreview, setIsPreview] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const { data: briefing } = useQuery({
+    queryKey: ['briefing', projectId],
+    queryFn: () => getBriefing(projectId)
+  });
+
+  const { data: sitePlan } = useQuery({
+    queryKey: ['site-plan', projectId],
+    queryFn: () => getSitePlan(projectId)
+  });
+
+  const intelligence = useMemo(() => {
+    const context = buildProjectContext(projectId, briefing || null, sitePlan || null, data);
+    return generateIntelligence(context);
+  }, [projectId, briefing, sitePlan, data]);
+
 
   // Sync with initial data
   useEffect(() => {
@@ -286,6 +301,27 @@ function ScaleNexusStudioPage() {
                <Redo className="size-4" />
              </Button>
           </div>
+          <div className="h-4 w-px bg-slate-800 mx-1" />
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 text-brand-400 hover:text-brand-300 hover:bg-brand-500/10">
+                <Brain className="size-4" /> Inteligência
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-96 p-0 bg-slate-950 border-slate-800 shadow-2xl mr-4" align="end" sideOffset={12}>
+              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 className="font-bold flex items-center gap-2">
+                  <Brain className="size-4 text-brand-400" /> AI Core V1
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 uppercase tracking-tighter">ATIVO</span>
+              </div>
+              <div className="max-h-[500px] overflow-y-auto p-4 custom-scrollbar">
+                <AICorePanel intelligence={intelligence} />
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <Button variant={isPreview ? "secondary" : "ghost"} size="sm" className="gap-2" onClick={() => setIsPreview(!isPreview)}>
             <Eye className="size-4" /> {isPreview ? 'Editar' : 'Visualizar'}
           </Button>
