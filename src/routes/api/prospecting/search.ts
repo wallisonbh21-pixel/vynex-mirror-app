@@ -26,33 +26,33 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Farmácia": "healthcare.pharmacy",
   "Loja de roupas": "commercial.clothing",
   "Dentista": "healthcare.dentist",
-  "Clínica": "healthcare.hospital,healthcare.clinic",
+  "Clínica": "healthcare.clinic_or_praxis,healthcare.hospital",
   "Pet Shop": "commercial.pet",
   "Academia": "leisure.fitness,leisure.sports_centre",
   "Salão de beleza": "service.beauty",
-  "Barbearia": "service.beauty.hairdresser,service.beauty",
+  "Barbearia": "service.beauty",
   "Oficina": "service.vehicle.repair",
-  "Imobiliária": "service.real_estate,commercial.estate_agent",
+  "Imobiliária": "commercial.estate_agent",
   "Contabilidade": "service.financial",
   "Advocacia": "service.legal",
   "Fotografia": "service.photography",
-  "Eventos": "service.event_planner,entertainment.event_venue",
+  "Eventos": "entertainment.event_venue",
 };
 
 /**
  * Categorias oficiais suportadas pela Geoapify Places API v2.
- * Esta lista é usada para validar e prevenir erros 400.
+ * Documentação de referência: https://apidocs.geoapify.com/docs/places/categories/
  */
 const OFFICIAL_CATEGORIES = new Set([
   "accommodation", "accommodation.hotel", "accommodation.hostel", "accommodation.guest_house", "accommodation.apartment",
   "activity", "activity.community_center", "activity.sport", "activity.sport.swimming_pool",
   "airport", "airport.international",
-  "commercial", "commercial.clothing", "commercial.food", "commercial.food.bakery", "commercial.pet", "commercial.supermarket",
+  "commercial", "commercial.clothing", "commercial.food", "commercial.food.bakery", "commercial.pet", "commercial.supermarket", "commercial.estate_agent",
   "catering", "catering.restaurant", "catering.restaurant.burger", "catering.restaurant.pizza", "catering.restaurant.thai",
   "catering.cafe", "catering.bar", "catering.pub", "catering.fast_food",
   "education", "education.school", "education.university",
   "entertainment", "entertainment.cinema", "entertainment.culture", "entertainment.event_venue",
-  "healthcare", "healthcare.hospital", "healthcare.clinic", "healthcare.dentist", "healthcare.pharmacy",
+  "healthcare", "healthcare.hospital", "healthcare.clinic_or_praxis", "healthcare.dentist", "healthcare.pharmacy",
   "heritage",
   "leisure", "leisure.fitness", "leisure.sports_centre", "leisure.park", "leisure.playground",
   "natural",
@@ -63,7 +63,7 @@ const OFFICIAL_CATEGORIES = new Set([
   "public_transport",
   "religion",
   "rental",
-  "service", "service.beauty", "service.beauty.hairdresser", "service.financial", "service.legal", "service.real_estate", "service.photography", "service.event_planner", "service.vehicle", "service.vehicle.repair",
+  "service", "service.beauty", "service.financial", "service.legal", "service.real_estate", "service.photography", "service.event_planner", "service.vehicle", "service.vehicle.repair",
   "tourism",
   "camping"
 ]);
