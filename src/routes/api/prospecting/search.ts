@@ -33,7 +33,6 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
   "Barbearia": "service.beauty",
   "Hamburguer": "catering.restaurant.burger",
   // Nichos que utilizam categorias oficiais validadas para evitar 400
-  "Academia": "activity.sport",
   "Oficina": "service.vehicle.repair",
 };
 
@@ -44,7 +43,8 @@ const NICHE_CATEGORY_MAP: Record<string, string> = {
  */
 const OFFICIAL_CATEGORIES = new Set([
   "accommodation", "accommodation.hotel", "accommodation.hostel", "accommodation.guest_house", "accommodation.apartment",
-  "activity", "activity.community_center", "activity.sport", "activity.sport.swimming_pool",
+  "activity", "activity.community_center",
+
   "airport", "airport.international",
   "commercial", "commercial.clothing", "commercial.food", "commercial.food.bakery", "commercial.pet", "commercial.supermarket",
   "catering", "catering.restaurant", "catering.restaurant.burger", "catering.restaurant.pizza", "catering.restaurant.thai",
@@ -72,6 +72,15 @@ const OFFICIAL_CATEGORIES = new Set([
  * A API v2 EXIGE 'categories' ou 'type'.
  */
 function validateSearchStrategy(niche: string, categories: string | null): { valid: boolean; strategy: "categories" | "type+text"; error?: string } {
+  // BLOQUEIO FINAL DE SEGURANÇA: NUNCA permitir activity.sport
+  if (categories && (categories.includes("activity.sport") || categories.includes("activity.sport.swimming_pool"))) {
+    return { 
+      valid: false, 
+      strategy: "categories", 
+      error: "Configuração de categoria inválida detectada (activity.sport bloqueada)." 
+    };
+  }
+
   if (categories && categories.length > 0) {
     return { valid: true, strategy: "categories" };
   }
@@ -315,7 +324,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }).filter(Boolean);
 
           stage = "response";
-          const diagnostic = "prospecting-search-v5.0-structural-fix";
+          const diagnostic = "prospecting-search-v6.0-security-audit-complete";
           
           return new Response(JSON.stringify({ 
             opportunities, 
