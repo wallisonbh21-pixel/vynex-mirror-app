@@ -206,8 +206,16 @@ export function PropertyPanel({
               />
             </div>
           </div>
-          {/* Add more global settings here */}
+          <div className="space-y-2">
+            <Label className="text-xs text-slate-400">Fonte dos Títulos</Label>
+            <Input 
+              value={designSystem.typography.headingFont} 
+              onChange={(e) => onUpdateDesignSystem({ typography: { ...designSystem.typography, headingFont: e.target.value } })}
+              className="bg-slate-900 border-slate-800 text-slate-200"
+            />
+          </div>
        </div>
+
     </div>
   );
 }
