@@ -26,15 +26,11 @@ function ClientApprovalPage() {
   const { data: project, isLoading, error } = useQuery({
     queryKey: ['public-project', token],
     queryFn: async () => {
-      // First, we need the project_id to call the new RPC
-      // Since the token is in the URL, we first find the project by token
-      // In a real scenario, the URL might already contain the projectId.
-      // But here we'll use a specialized RPC to get the project info by token safely.
-      
+      // Use the new secure RPC to get project data by token
       const { data, error } = await supabase
         .rpc('get_project_public_data_by_token', { p_client_token: token });
 
-      if (error || !data || data.length === 0) {
+      if (error || !data || !Array.isArray(data) || data.length === 0) {
         throw new Error('Link de aprovação inválido ou expirado.');
       }
 
@@ -47,7 +43,7 @@ function ClientApprovalPage() {
           company: projectData.client_company,
           contact_name: projectData.client_contact_name
         }
-      };
+      } as any;
     },
     retry: false
   });
