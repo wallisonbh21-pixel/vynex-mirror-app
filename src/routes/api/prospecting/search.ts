@@ -293,11 +293,12 @@ export const Route = createFileRoute("/api/prospecting/search")({
                 };
 
                 try {
-                  const geoUrl = new URL("https://api.geoapify.com/v2/places");
-                  if (layer.type === 'categories') {
+                  const isText = layer.type === 'text';
+                  const geoUrl = new URL(isText ? "https://api.geoapify.com/v1/places/search" : "https://api.geoapify.com/v2/places");
+                  
+                  if (!isText) {
                     geoUrl.searchParams.set("categories", value);
                   } else {
-                    geoUrl.searchParams.set("categories", "commercial,catering,service,healthcare,leisure,education,activity");
                     geoUrl.searchParams.set("text", value);
                   }
                   
