@@ -24,8 +24,15 @@ import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/stud
 import { LibraryPanel } from '@/components/studio/LibraryPanel';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { PropertyPanel } from '@/components/studio/PropertyPanel';
+import { AICorePanel } from '@/components/AICorePanel';
 import { generateId } from '@/lib/studio/utils';
 import { SECTION_TEMPLATES } from '@/lib/studio/templates';
+import { buildProjectContext, generateIntelligence } from '@/lib/ai-core';
+import { getBriefing } from '@/lib/briefing';
+import { getSitePlan } from '@/lib/planner';
+import { useQuery } from '@tanstack/react-query';
+import { Brain, Info } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
