@@ -231,8 +231,11 @@ export type Database = {
           created_at: string
           email: string | null
           estimated_value: number
+          google_maps_url: string | null
           id: string
           instagram: string | null
+          lat: number | null
+          lon: number | null
           name: string
           next_contact_at: string | null
           niche: string | null
@@ -256,8 +259,11 @@ export type Database = {
           created_at?: string
           email?: string | null
           estimated_value?: number
+          google_maps_url?: string | null
           id?: string
           instagram?: string | null
+          lat?: number | null
+          lon?: number | null
           name: string
           next_contact_at?: string | null
           niche?: string | null
@@ -281,8 +287,11 @@ export type Database = {
           created_at?: string
           email?: string | null
           estimated_value?: number
+          google_maps_url?: string | null
           id?: string
           instagram?: string | null
+          lat?: number | null
+          lon?: number | null
           name?: string
           next_contact_at?: string | null
           niche?: string | null
