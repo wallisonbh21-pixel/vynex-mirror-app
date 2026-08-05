@@ -131,7 +131,7 @@ function VynexaStudioPage() {
   const handleAddElement = (type: StudioElement['type']) => {
     if (!data) return;
     const sections: StudioSection[] = JSON.parse(JSON.stringify(data.sections));
-    const targetSectionId = selectedSectionId || (sections.length > 0 ? sections[0].id : null);
+    const targetSectionId = selectedSectionId || (sections.length > 0 ? sections[0]?.id || null : null);
     if (!targetSectionId) return;
 
     const sectionIndex = sections.findIndex(s => s.id === targetSectionId);
@@ -321,10 +321,14 @@ function VynexaStudioPage() {
                           const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
                           if (targetIdx < 0 || targetIdx >= sections.length) return;
                           
-                          const temp = sections[idx];
-                          sections[idx] = sections[targetIdx];
-                          sections[targetIdx] = temp;
-                          updateData({ ...data, sections });
+                          const sectionA = sections[idx];
+                          const sectionB = sections[targetIdx];
+                          if (sectionA && sectionB) {
+                            sections[idx] = sectionB;
+                            sections[targetIdx] = sectionA;
+                            updateData({ ...data, sections });
+                          }
+
                        }}
                        onDuplicateSection={(id) => {
                           if (!data) return;
