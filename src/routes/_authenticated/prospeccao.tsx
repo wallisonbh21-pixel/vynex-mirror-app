@@ -346,10 +346,17 @@ function ProspeccaoPage() {
                     precision,
                     rawMode
                   },
-                  { onSuccess: (data: any) => {
-                    setExternalResults(data.opportunities);
-                    setDiagnostic(data.diagnostic);
-                  }}
+                  { 
+                    onSuccess: (data: any) => {
+                      setExternalResults(data.opportunities);
+                      setDiagnostic(data.diagnostic);
+                    },
+                    onError: (err: any) => {
+                      // O erro já é disparado via toast pelo useSearchOpportunities, 
+                      // mas aqui garantimos que o estado de erro seja visível
+                      console.error("Erro na busca:", err);
+                    }
+                  }
                 );
               }}
             >

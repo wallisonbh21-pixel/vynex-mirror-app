@@ -127,6 +127,7 @@ function getGeoapifyCategories(niche: string): string | null {
     "Salão de beleza": "service.beauty",
     "Barbearia": "service.beauty",
     "Oficina": "service.vehicle.repair",
+    "Academia": "leisure.fitness,leisure.sports_centre",
   };
   return MAP[niche] || null;
 }
