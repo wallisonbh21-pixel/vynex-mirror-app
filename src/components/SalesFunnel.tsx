@@ -27,49 +27,49 @@ export const FUNNEL_CONFIG: Record<string, {
   border: string;
   text: string;
 }> = {
-  novo: { 
+  ['novo']: { 
     color: "#3b82f6", 
     icon: Users, 
     bg: "bg-blue-500/10", 
     border: "border-blue-500/20",
     text: "text-blue-500"
   },
-  contatado: { 
+  ['contatado']: { 
     color: "#8b5cf6", 
     icon: MessageSquare, 
     bg: "bg-purple-500/10", 
     border: "border-purple-500/20",
     text: "text-purple-500"
   },
-  interessado: { 
+  ['interessado']: { 
     color: "#f97316", 
     icon: TrendingUp, 
     bg: "bg-orange-500/10", 
     border: "border-orange-500/20",
     text: "text-orange-500"
   },
-  negociacao: { 
+  ['negociacao']: { 
     color: "#eab308", 
     icon: Handshake, 
     bg: "bg-yellow-500/10", 
     border: "border-yellow-500/20",
     text: "text-yellow-600"
   },
-  proposta: { 
+  ['proposta']: { 
     color: "#a855f7", 
     icon: FileText, 
     bg: "bg-violet-500/10", 
     border: "border-violet-500/20",
     text: "text-violet-500"
   },
-  fechado: { 
+  ['fechado']: { 
     color: "#22c55e", 
     icon: Trophy, 
     bg: "bg-green-500/10", 
     border: "border-green-500/20",
     text: "text-green-500"
   },
-  perdido: { 
+  ['perdido']: { 
     color: "#ef4444", 
     icon: CheckCircle2, 
     bg: "bg-red-500/10", 
@@ -85,17 +85,17 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
     return { status, count: rows.length, value };
   });
 
-  const totalLeads = leads.length || 1;
-
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
         {counts.filter(c => c.status !== 'perdido').map((item, index) => {
-          const config = FUNNEL_CONFIG[item.status] || FUNNEL_CONFIG.novo;
+          const config = FUNNEL_CONFIG[item.status] || FUNNEL_CONFIG['novo'];
           const Icon = config.icon;
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
-          const conversionRate = index === 0 ? 100 : Math.round((item.count / counts[index-1].count) * 100) || 0;
+          
+          const prevCount = index > 0 ? counts[index - 1].count : 0;
+          const conversionRate = index === 0 ? 100 : (prevCount > 0 ? Math.round((item.count / prevCount) * 100) : 0);
 
           return (
             <motion.button
@@ -145,7 +145,6 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
                 <ChevronRight size={16} className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               
-              {/* Visual Taper Mask (Optional decoration) */}
               <div className="absolute -bottom-4 left-1/2 h-4 w-px -translate-x-1/2 bg-border/50" />
             </motion.button>
           );
@@ -167,12 +166,11 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
 
   return (
     <div className="relative py-8 px-4">
-      {/* Background Line */}
       <div className="absolute left-8 right-8 top-1/2 h-0.5 -translate-y-1/2 bg-border sm:left-12 sm:right-12" />
       
       <div className="relative flex justify-between">
         {steps.map((status, index) => {
-          const config = FUNNEL_CONFIG[status] || FUNNEL_CONFIG.novo;
+          const config = FUNNEL_CONFIG[status] || FUNNEL_CONFIG['novo'];
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
           const isFuture = index > currentIndex;
@@ -230,8 +228,8 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
 }
 
 export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => void }) {
-  const steps = LEAD_STATUS.filter(s => s !== 'perdido');
-  const currentIndex = steps.indexOf(lead.status);
+  const allSteps = LEAD_STATUS.filter(s => s !== 'perdido');
+  const currentIndex = allSteps.indexOf(lead.status as any);
 
   return (
     <motion.article
@@ -264,14 +262,13 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
         </div>
       </div>
 
-      {/* Mini Progress Bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
           <span className="text-primary">{label(lead.status)}</span>
-          <span className="text-muted-foreground">{currentIndex + 1} de {steps.length}</span>
+          <span className="text-muted-foreground">{currentIndex + 1} de {allSteps.length}</span>
         </div>
         <div className="flex h-1 gap-1 overflow-hidden rounded-full bg-secondary/50">
-          {steps.map((_, i) => (
+          {allSteps.map((_, i) => (
             <div 
               key={i} 
               className={cn(
