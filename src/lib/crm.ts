@@ -18,6 +18,9 @@ export type Lead = {
   city: string | null;
   state: string | null;
   address: string | null;
+  google_maps_url: string | null;
+  lat: number | null;
+  lon: number | null;
   source: string | null;
   status: string;
   estimated_value: number;
