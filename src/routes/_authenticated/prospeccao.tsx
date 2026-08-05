@@ -1,9 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Facebook,
   Globe,
-  Instagram,
   MapPin,
   Phone,
   Plus,
