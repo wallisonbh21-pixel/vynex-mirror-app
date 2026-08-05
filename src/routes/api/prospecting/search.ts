@@ -321,12 +321,10 @@ export const Route = createFileRoute("/api/prospecting/search")({
                   currentQuery.httpStatus = res.status;
                   
                   if (!res.ok) {
-                    const errorText = await res.text();
                     currentQuery.error = true;
-                    currentQuery.message = `API Geoapify retornou ${res.status}`;
-                    currentQuery.details = errorText.substring(0, 200);
+                    currentQuery.message = `API Externa retornou erro`;
                     diagnostic.queries.push(currentQuery);
-                    break; // Fail this layer/value path, move to next
+                    break; 
                   }
 
                   const data = await res.json();
