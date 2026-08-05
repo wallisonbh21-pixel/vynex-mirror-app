@@ -125,14 +125,16 @@ function ProspeccaoPage() {
   const changeStatus = useChangeOpportunityStatus();
   const searchExternal = useSearchOpportunities();
   const [externalResults, setExternalResults] = useState<Partial<Opportunity>[]>([]);
+  const [diagnostic, setDiagnostic] = useState<any>(null);
 
-  // Formulário de busca (a fonte de dados externa chega na FASE 5.2).
+  // Formulário de busca
   const [niche, setNiche] = useState("");
   const [otherNiche, setOtherNiche] = useState("");
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
   const [searched, setSearched] = useState(false);
   const [precision, setPrecision] = useState<"alta" | "ampla">("alta");
+  const [rawMode, setRawMode] = useState(false);
 
   const [levelFilter, setLevelFilter] = useState("todas");
   const [statusFilter, setStatusFilter] = useState("todas");
@@ -235,9 +237,17 @@ function ProspeccaoPage() {
             <h2 className="text-lg font-semibold tracking-tight">Encontrar novas oportunidades</h2>
           </div>
           {externalResults.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => setExternalResults([])}>
-              Limpar resultados da busca
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setRawMode(!rawMode)}>
+                {rawMode ? "Modo Normal" : "Modo Diagnóstico (RAW)"}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => {
+                setExternalResults([]);
+                setDiagnostic(null);
+              }}>
+                Limpar resultados
+              </Button>
+            </div>
           )}
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -311,15 +321,42 @@ function ProspeccaoPage() {
                 : "Inclui empresas relacionadas ao segmento."}
             </p>
           </div>
-          <div className="flex items-end">
+          <div className="flex flex-col justify-end gap-2">
+            <div className="flex items-center gap-2 mb-2">
+              <input 
+                type="checkbox" 
+                id="rawMode" 
+                checked={rawMode} 
+                onChange={(e) => setRawMode(e.target.checked)}
+                className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <Label htmlFor="rawMode" className="text-xs cursor-pointer">Modo Diagnóstico (Sem filtros)</Label>
+            </div>
             <Button
               className="w-full gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow"
               disabled={!niche || !state || searchExternal.isPending}
               onClick={() => {
                 setSearched(true);
+                setDiagnostic(null);
                 searchExternal.mutate(
-                  { niche: niche === "Outros" ? otherNiche : niche, state, city, precision },
-                  { onSuccess: (data) => setExternalResults(data) }
+                  { 
+                    niche: niche === "Outros" ? otherNiche : niche, 
+                    state, 
+                    city, 
+                    precision,
+                    rawMode
+                  },
+                  { 
+                    onSuccess: (data: any) => {
+                      setExternalResults(data.opportunities);
+                      setDiagnostic(data.diagnostic);
+                    },
+                    onError: (err: any) => {
+                      // O erro já é disparado via toast pelo useSearchOpportunities, 
+                      // mas aqui garantimos que o estado de erro seja visível
+                      console.error("Erro na busca:", err);
+                    }
+                  }
                 );
               }}
             >
@@ -390,9 +427,16 @@ function ProspeccaoPage() {
       {/* Resultados da busca externa */}
       {externalResults.length > 0 && (
         <section className="mt-6">
-          <h2 className="text-lg font-semibold tracking-tight text-primary">
-            Resultados da busca externa <span className="text-muted-foreground">({externalResults.length})</span>
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold tracking-tight text-primary">
+              Resultados da busca externa <span className="text-muted-foreground">({externalResults.length})</span>
+            </h2>
+            {diagnostic && (
+              <div className="text-[10px] bg-muted px-2 py-1 rounded text-muted-foreground font-mono">
+                ID: {diagnostic.requestId} | Status: {diagnostic.httpStatus} | Recebidos: {diagnostic.totalReceived} | Enviados: {diagnostic.sentToFrontend} | Tempo: {diagnostic.duration}ms
+              </div>
+            )}
+          </div>
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             {externalResults.map((opt, i) => (
               <ExternalOpportunityCard

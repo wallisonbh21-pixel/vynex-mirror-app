@@ -140,12 +140,24 @@ export function useSaveOpportunity() {
 /** Busca externa de oportunidades via API (Geoapify). */
 export function useSearchOpportunities() {
   return useMutation({
-    mutationFn: async ({ niche, state, city, precision = "alta" }: { niche: string; state: string; city?: string | null; precision?: "alta" | "ampla" }) => {
+    mutationFn: async ({ 
+      niche, 
+      state, 
+      city, 
+      precision = "alta", 
+      rawMode = false 
+    }: { 
+      niche: string; 
+      state: string; 
+      city?: string | null; 
+      precision?: "alta" | "ampla";
+      rawMode?: boolean;
+    }) => {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
       
-      const payload = { niche, state, city, precision };
-      console.log("[Prospecting Search] Iniciando request para /api/prospecting/search", payload);
+      const payload = { niche, state, city, precision, rawMode };
+      console.log(`[Prospecting Search] ${rawMode ? 'RAW ' : ''}Iniciando request para /api/prospecting/search`, payload);
 
       const response = await fetch("/api/prospecting/search", {
         method: "POST",
@@ -167,15 +179,14 @@ export function useSearchOpportunities() {
         throw new Error(`Erro no servidor: ${response.status} (Formato inválido)`);
       }
 
-      if (!response.ok) {
-        const msg = responseData.error || "Erro ao buscar oportunidades.";
+      if (!response.ok || responseData.error) {
+        const msg = responseData.message || responseData.error || "Erro ao buscar oportunidades.";
         const stage = responseData.stage ? ` [Etapa: ${responseData.stage}]` : '';
         const reqId = responseData.requestId ? ` (ID: ${responseData.requestId})` : '';
-        const debug = responseData.debug_roles ? ` (Roles: ${responseData.debug_roles.join(', ')})` : '';
-        throw new Error(`${msg}${stage}${reqId}${debug}`);
+        throw new Error(`${msg}${stage}${reqId}`);
       }
 
-      return responseData.opportunities as Partial<Opportunity>[];
+      return responseData;
     },
     onError: (error: Error) => toast.error(error.message),
   });
