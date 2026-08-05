@@ -533,16 +533,33 @@ function ExternalOpportunityCard({
         </Button>
         <Button variant="outline" size="sm" asChild>
           <a 
-            href={
-              opportunity.lat && opportunity.lon 
-                ? `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`
-                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${opportunity.business_name} ${opportunity.address || ""}`)}`
-            } 
+            href={(() => {
+              const name = opportunity.business_name;
+              const address = opportunity.address;
+              const city = opportunity.city;
+              const state = opportunity.state;
+              const country = "Brasil";
+              
+              if (name && (address || city || state)) {
+                const queryParts = [name];
+                if (address) queryParts.push(address);
+                if (city) queryParts.push(city);
+                if (state) queryParts.push(state);
+                queryParts.push(country);
+                
+                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
+              }
+
+              if (opportunity.lat && opportunity.lon) {
+                return `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`;
+              }
+
+              return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
+            })()} 
             target="_blank" 
             rel="noopener noreferrer" 
             className="gap-1"
             onClick={(e) => {
-              // Garante que o clique não seja interceptado por outros elementos
               e.stopPropagation();
             }}
           >
@@ -601,11 +618,29 @@ function OpportunityCard({
         <li className="flex items-center gap-2">
           <MapPin className="size-4 text-muted-foreground" />
           <a 
-            href={
-              opportunity.lat && opportunity.lon 
-                ? `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`
-                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${opportunity.business_name} ${opportunity.address || ""}`)}`
-            }
+            href={(() => {
+              const name = opportunity.business_name;
+              const address = opportunity.address;
+              const city = opportunity.city;
+              const state = opportunity.state;
+              const country = "Brasil";
+              
+              if (name && (address || city || state)) {
+                const queryParts = [name];
+                if (address) queryParts.push(address);
+                if (city) queryParts.push(city);
+                if (state) queryParts.push(state);
+                queryParts.push(country);
+                
+                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
+              }
+
+              if (opportunity.lat && opportunity.lon) {
+                return `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`;
+              }
+
+              return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
+            })()}
             target="_blank" 
             rel="noopener noreferrer"
             className="text-primary hover:underline flex items-center gap-1"
