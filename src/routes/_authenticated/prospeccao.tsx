@@ -485,6 +485,75 @@ function ProspeccaoPage() {
         ) : null}
       </section>
 
+      {/* Relatório de Auditoria Global */}
+      {auditReport.length > 0 && (
+        <section className="mt-8 rounded-2xl border border-primary/20 bg-card p-6 shadow-glow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Sparkles className="size-5 text-primary" />
+              Relatório de Auditoria Global
+              {isAuditing && <Loader2 className="size-4 animate-spin text-primary ml-2" />}
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => setAuditReport([])} className="h-8">
+              <X className="size-4 mr-1" /> Fechar
+            </Button>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left border-collapse">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+                  <th className="py-3 px-4">Nicho</th>
+                  <th className="py-3 px-4 text-center">Consultas</th>
+                  <th className="py-3 px-4 text-center">Sucesso</th>
+                  <th className="py-3 px-4 text-center">Falhas</th>
+                  <th className="py-3 px-4 text-center">Resultados</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">RequestID</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {auditReport.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                    <td className="py-3 px-4 font-medium">{item.niche}</td>
+                    <td className="py-3 px-4 text-center">{item.queries}</td>
+                    <td className="py-3 px-4 text-center text-green-500 font-bold">{item.success}</td>
+                    <td className="py-3 px-4 text-center text-red-500 font-bold">{item.failures}</td>
+                    <td className="py-3 px-4 text-center">{item.results}</td>
+                    <td className="py-3 px-4">
+                      {item.status === "OK" ? (
+                        <span className="bg-green-500/10 text-green-500 px-2 py-0.5 rounded text-[10px] font-bold">SUCESSO</span>
+                      ) : (
+                        <span className="bg-red-500/10 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold" title={item.message}>ERRO</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 font-mono text-[10px] text-muted-foreground">{item.requestId || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-border">
+            <h4 className="text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Resumo da Estrutura v10.1</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="space-y-1">
+                <p><span className="text-muted-foreground">Busca em Camadas:</span> Ativa</p>
+                <p><span className="text-muted-foreground">Deduplicação Determinística:</span> Ativa</p>
+              </div>
+              <div className="space-y-1">
+                <p><span className="text-muted-foreground">Resiliência (Catch-all):</span> Implementada por Consulta</p>
+                <p><span className="text-muted-foreground">Paginação Resiliente:</span> Implementada</p>
+              </div>
+              <div className="space-y-1">
+                <p><span className="text-muted-foreground">Validação de Categorias:</span> API Check per Request</p>
+                <p><span className="text-muted-foreground">Status da Hamburgueria:</span> Aguardando Auditoria</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Resultados da busca externa */}
       {externalResults.length > 0 && (
         <section className="mt-6">
