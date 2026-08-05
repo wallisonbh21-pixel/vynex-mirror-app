@@ -30,22 +30,7 @@ interface AICorePanelProps {
 }
 
 export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AICorePanelProps) {
-  // Studio Intelligence Engine Logic (V1.1 Concept)
-  const getQualityScore = () => {
-    // Mock logic based on engine_version 1.1 requirements
-    return {
-      total: 82,
-      breakdown: {
-        conversao: 88,
-        visual: 91,
-        responsividade: 76,
-        conteudo: 82,
-        estrutura: 90
-      }
-    };
-  };
-
-  const score = getQualityScore();
+  const score = intelligence.score;
 
   return (
     <div className="space-y-6 text-slate-200">
@@ -58,7 +43,7 @@ export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AI
             </div>
             <div>
               <h3 className="text-lg font-bold">Inteligência ScaleNexus</h3>
-              <p className="text-xs text-white/70">Análise Real-Time (v1.1)</p>
+              <p className="text-xs text-white/70">Análise Real-Time (v{intelligence.engineVersion})</p>
             </div>
           </div>
           <div className="text-right">
@@ -70,15 +55,27 @@ export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AI
       </div>
 
       {/* Breakdowns */}
-      <div className="grid grid-cols-5 gap-1">
-        {Object.entries(score.breakdown).map(([key, val]) => (
-          <div key={key} className="text-center">
-            <div className="text-xs font-bold mb-1 opacity-50 capitalize">
-              {key === 'conversao' ? '🎯' : key === 'visual' ? '🎨' : key === 'responsividade' ? '📱' : key === 'conteudo' ? '📝' : '🧭'}
-            </div>
-            <div className="text-sm font-black text-white">{val}</div>
-          </div>
-        ))}
+      <div className="grid grid-cols-5 gap-1 px-1">
+        <div className="text-center">
+          <div className="text-xs mb-1 opacity-50">🎯</div>
+          <div className="text-sm font-black text-white">{score.breakdown.conversion}</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs mb-1 opacity-50">🎨</div>
+          <div className="text-sm font-black text-white">{score.breakdown.visual}</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs mb-1 opacity-50">📱</div>
+          <div className="text-sm font-black text-white">{score.breakdown.responsiveness}</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs mb-1 opacity-50">📝</div>
+          <div className="text-sm font-black text-white">{score.breakdown.content}</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs mb-1 opacity-50">🧭</div>
+          <div className="text-sm font-black text-white">{score.breakdown.structure}</div>
+        </div>
       </div>
 
       {/* Primary Insights */}
@@ -99,33 +96,71 @@ export function AICorePanel({ intelligence, onAccept, onIgnore, studioData }: AI
         </div>
       </div>
 
-      {/* Warnings & Opportunities */}
-      <div className="space-y-4">
-        <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10 space-y-3">
-          <h4 className="text-xs font-bold text-red-400 flex items-center gap-2">
-            <AlertTriangle className="size-3" /> ATENÇÃO (3 pontos)
+      {/* Strengths */}
+      {intelligence.strengths.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2 px-1">
+            <Check className="size-3 text-green-500" /> Pontos Fortes
           </h4>
-          <ul className="space-y-2 text-xs text-red-200/60">
-            <li>1. CTA pouco específico</li>
-            <li>2. Seção de depoimentos ausente</li>
-            <li>3. Mobile precisa de revisão</li>
-          </ul>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-white space-y-4">
-          <h4 className="text-sm font-bold flex items-center gap-2">
-            <Lightbulb className="size-4 text-yellow-400" /> Oportunidades
-          </h4>
-          <div className="space-y-3">
-            {intelligence.opportunities.map((opt, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs leading-relaxed group">
-                <div className="flex items-start gap-3">
-                  <Info className="size-3 text-brand-400 mt-0.5 shrink-0" />
-                  <p>{opt}</p>
-                </div>
+          <div className="space-y-2">
+            {intelligence.strengths.map((s, idx) => (
+              <div key={idx} className="flex items-center gap-2 text-xs font-medium text-slate-300 px-1">
+                <Check className="size-3 text-green-500 shrink-0" /> {s}
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Issues / Warnings */}
+      <div className="space-y-3">
+        <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2 px-1">
+          <AlertTriangle className="size-3 text-orange-500" /> Atenção & Recomendações
+        </h4>
+        <div className="space-y-3">
+          {intelligence.issues.map((issue, idx) => (
+            <div 
+              key={idx} 
+              className={cn(
+                "p-4 rounded-xl border flex flex-col gap-1 group relative overflow-hidden",
+                issue.severity === 'critical' ? "bg-red-500/5 border-red-500/20" :
+                issue.severity === 'important' ? "bg-orange-500/5 border-orange-500/20" :
+                "bg-slate-800/50 border-slate-800"
+              )}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  {issue.severity === 'critical' ? <AlertTriangle className="size-3 text-red-500" /> : 
+                   issue.severity === 'important' ? <AlertTriangle className="size-3 text-orange-500" /> : 
+                   <Info className="size-3 text-brand-400" />}
+                  <span className={cn(
+                    "text-[10px] font-bold uppercase tracking-tighter",
+                    issue.severity === 'critical' ? "text-red-500" :
+                    issue.severity === 'important' ? "text-orange-500" :
+                    "text-brand-400"
+                  )}>
+                    {issue.severity.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs font-bold text-slate-100">{issue.label}</p>
+              <p className="text-[11px] text-slate-400 leading-relaxed">{issue.description}</p>
+              
+              <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-white hover:bg-white/10" onClick={() => onAccept?.(issue.label)}>
+                  Entendi
+                </Button>
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-white/50 hover:bg-white/5" onClick={() => onIgnore?.(issue.label)}>
+                  Ignorar
+                </Button>
+              </div>
+            </div>
+          ))}
+          {intelligence.issues.length === 0 && (
+            <div className="text-center py-6 text-slate-500 italic text-xs">
+              Nenhum problema detectado. Excelente trabalho!
+            </div>
+          )}
         </div>
       </div>
     </div>
