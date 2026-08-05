@@ -1223,6 +1223,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      set_client_token: { Args: { token: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "vendedor" | "criador" | "diretor" | "rh"
