@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Target,
   History,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   Bar,
