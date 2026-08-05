@@ -52,6 +52,8 @@ export function useStudioData(projectId: string, clientToken?: string) {
         if (!data || !Array.isArray(data) || data.length === 0) return DEFAULT_DATA;
         
         const first = data[0];
+        if (!first) return DEFAULT_DATA;
+        
         return {
           design_system: (first.design_system as unknown as StudioDesignSystem) || DEFAULT_DATA.design_system,
           sections: (first.sections as unknown as StudioSection[]) || DEFAULT_DATA.sections
@@ -66,7 +68,6 @@ export function useStudioData(projectId: string, clientToken?: string) {
         .maybeSingle();
       
       if (error) throw error;
-      
       if (!data) return DEFAULT_DATA;
       
       return {
