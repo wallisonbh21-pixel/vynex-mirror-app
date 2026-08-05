@@ -126,6 +126,8 @@ function ProspeccaoPage() {
   const searchExternal = useSearchOpportunities();
   const [externalResults, setExternalResults] = useState<Partial<Opportunity>[]>([]);
   const [diagnostic, setDiagnostic] = useState<any>(null);
+  const [auditReport, setAuditReport] = useState<any[]>([]);
+  const [isAuditing, setIsAuditing] = useState(false);
 
   // Formulário de busca
   const [niche, setNiche] = useState("");
@@ -196,30 +198,89 @@ function ProspeccaoPage() {
     return [...counts.entries()].sort((a, b) => b[1].total - a[1].total);
   };
 
+  const runGlobalAudit = async () => {
+    setIsAuditing(true);
+    setAuditReport([]);
+    const report: any[] = [];
+    
+    // We'll test the most common niches first as defined in NICHOS constant
+    const testNiches = [...NICHOS].filter(n => n !== "Outros");
+    
+    for (const testNiche of testNiches) {
+      try {
+        const data: any = await searchExternal.mutateAsync({
+          niche: testNiche,
+          state: state || "MG",
+          city: city || "Contagem",
+          precision: "alta",
+          rawMode: true
+        });
+        
+        const successCount = (data.diagnostic?.queries || []).filter((q: any) => !q.error).length;
+        const failCount = (data.diagnostic?.queries || []).filter((q: any) => q.error).length;
+        
+        report.push({
+          niche: testNiche,
+          queries: data.diagnostic?.queries?.length || 0,
+          success: successCount,
+          failures: failCount,
+          results: data.opportunities?.length || 0,
+          status: "OK",
+          requestId: data.diagnostic?.requestId
+        });
+      } catch (err: any) {
+        report.push({
+          niche: testNiche,
+          queries: 0,
+          success: 0,
+          failures: 1,
+          results: 0,
+          status: "ERROR",
+          message: err.message
+        });
+      }
+      setAuditReport([...report]);
+    }
+    setIsAuditing(false);
+  };
+
   return (
     <AppShell
       title="Central de Prospecção"
       description="Encontre empresas que podem precisar de uma presença digital profissional."
       actions={
-        <RecordDialog
-          title="Nova oportunidade"
-          fields={opportunityFields}
-          initial={{ state, city, category: niche }}
-          onSubmit={(values) =>
-            save.mutate({
-              ...values,
-              source: PROSPECTING_SOURCE,
-              status: "nova",
-              created_by: user?.id,
-              assigned_to: user?.id,
-            })
-          }
-          trigger={
-            <Button className="gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow">
-              <Plus className="size-4" /> Nova oportunidade
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Button 
+              variant="outline" 
+              className="gap-2 border-primary/20 hover:bg-primary/10" 
+              onClick={runGlobalAudit}
+              disabled={isAuditing}
+            >
+              {isAuditing ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+              Audit Global
             </Button>
-          }
-        />
+          )}
+          <RecordDialog
+            title="Nova oportunidade"
+            fields={opportunityFields}
+            initial={{ state, city, category: niche }}
+            onSubmit={(values) =>
+              save.mutate({
+                ...values,
+                source: PROSPECTING_SOURCE,
+                status: "nova",
+                created_by: user?.id,
+                assigned_to: user?.id,
+              })
+            }
+            trigger={
+              <Button className="gap-2 transition-all hover:-translate-y-0.5 hover:shadow-glow">
+                <Plus className="size-4" /> Nova oportunidade
+              </Button>
+            }
+          />
+        </div>
       }
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -423,6 +484,75 @@ function ProspeccaoPage() {
           </div>
         ) : null}
       </section>
+
+      {/* Relatório de Auditoria Global */}
+      {auditReport.length > 0 && (
+        <section className="mt-8 rounded-2xl border border-primary/20 bg-card p-6 shadow-glow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Sparkles className="size-5 text-primary" />
+              Relatório de Auditoria Global
+              {isAuditing && <Loader2 className="size-4 animate-spin text-primary ml-2" />}
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => setAuditReport([])} className="h-8">
+              <X className="size-4 mr-1" /> Fechar
+            </Button>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left border-collapse">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+                  <th className="py-3 px-4">Nicho</th>
+                  <th className="py-3 px-4 text-center">Consultas</th>
+                  <th className="py-3 px-4 text-center">Sucesso</th>
+                  <th className="py-3 px-4 text-center">Falhas</th>
+                  <th className="py-3 px-4 text-center">Resultados</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">RequestID</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {auditReport.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                    <td className="py-3 px-4 font-medium">{item.niche}</td>
+                    <td className="py-3 px-4 text-center">{item.queries}</td>
+                    <td className="py-3 px-4 text-center text-green-500 font-bold">{item.success}</td>
+                    <td className="py-3 px-4 text-center text-red-500 font-bold">{item.failures}</td>
+                    <td className="py-3 px-4 text-center">{item.results}</td>
+                    <td className="py-3 px-4">
+                      {item.status === "OK" ? (
+                        <span className="bg-green-500/10 text-green-500 px-2 py-0.5 rounded text-[10px] font-bold">SUCESSO</span>
+                      ) : (
+                        <span className="bg-red-500/10 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold" title={item.message}>ERRO</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 font-mono text-[10px] text-muted-foreground">{item.requestId || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-border">
+            <h4 className="text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Resumo da Estrutura v10.1</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="space-y-1">
+                <p><span className="text-muted-foreground">Busca em Camadas:</span> Ativa</p>
+                <p><span className="text-muted-foreground">Deduplicação Determinística:</span> Ativa</p>
+              </div>
+              <div className="space-y-1">
+                <p><span className="text-muted-foreground">Resiliência (Catch-all):</span> Implementada por Consulta</p>
+                <p><span className="text-muted-foreground">Paginação Resiliente:</span> Implementada</p>
+              </div>
+              <div className="space-y-1">
+                <p><span className="text-muted-foreground">Validação de Categorias:</span> API Check per Request</p>
+                <p><span className="text-muted-foreground">Status da Hamburgueria:</span> Aguardando Auditoria</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Resultados da busca externa */}
       {externalResults.length > 0 && (
