@@ -26,37 +26,28 @@ function ClientApprovalPage() {
   const { data: project, isLoading, error } = useQuery({
     queryKey: ['public-project', token],
     queryFn: async () => {
-      // Set the client token in the database context for RLS
-      await supabase.rpc('set_client_token', { token });
-
-      // Use public data api, assuming RLS allows read by client_token
-      const { data, error } = await supabase
-        .from('projects')
-        .select(`
-          id, 
-          title, 
-          status, 
-          site_type, 
-          delivery_link, 
-          submitted_at, 
-          client_token_expires_at,
-          client_id,
-          clients (
-            company,
-            contact_name
-          )
-        `)
-        .eq('client_token', token)
-        .single();
-
-      if (error) throw new Error('Link de aprovação inválido ou expirado.');
+      // First, we need the project_id to call the new RPC
+      // Since the token is in the URL, we first find the project by token
+      // In a real scenario, the URL might already contain the projectId.
+      // But here we'll use a specialized RPC to get the project info by token safely.
       
-      // Check expiry
-      if (data.client_token_expires_at && new Date(data.client_token_expires_at) < new Date()) {
-        throw new Error('Este link de aprovação expirou.');
+      const { data, error } = await supabase
+        .rpc('get_project_public_data_by_token', { p_client_token: token });
+
+      if (error || !data || data.length === 0) {
+        throw new Error('Link de aprovação inválido ou expirado.');
       }
 
-      return data;
+      const projectData = data[0];
+      
+      // Map back to expected structure for the component
+      return {
+        ...projectData,
+        clients: {
+          company: projectData.client_company,
+          contact_name: projectData.client_contact_name
+        }
+      };
     },
     retry: false
   });
