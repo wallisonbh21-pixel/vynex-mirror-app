@@ -160,7 +160,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
 
 interface ProgressionLineProps {
   steps: string[];
-  currentStep?: string;
+  currentStep?: string | null;
   onStepClick?: (status: string) => void;
   leads: Lead[];
 }
