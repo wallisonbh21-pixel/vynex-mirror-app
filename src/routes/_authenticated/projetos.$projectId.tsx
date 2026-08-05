@@ -48,212 +48,106 @@ function DetalhesProjetoPage() {
   const { data: projects = [] } = useMyCreatorProjects();
   const { data: clients = [] } = useRows<any>("clients");
   const { data: events = [] } = useApprovalEvents(projectId);
+  const { data: checklist = [], toggle } = useProjectChecklist(projectId);
+  const { data: notes = [], addNote } = useProjectNotes(projectId);
+  const updateProject = useUpdateCreatorProject();
+  const [newNote, setNewNote] = useState("");
 
   const project = useMemo(() => projects.find((p) => p.id === projectId), [projects, projectId]);
   const client = useMemo(() => clients.find((c) => c.id === project?.client_id), [clients, project]);
+  
+  const progress = useMemo(() => {
+    if (checklist.length === 0) return 0;
+    const completed = checklist.filter((i) => i.completed).length;
+    return Math.round((completed / checklist.length) * 100);
+  }, [checklist]);
 
-  if (!project) {
-    return (
-      <AppShell title="Projeto não encontrado">
-        <div className="flex flex-col items-center justify-center py-20">
-          <p className="text-muted-foreground">O projeto solicitado não existe ou você não tem permissão para acessá-lo.</p>
-          <Button asChild className="mt-4">
-            <Link to="/criacao">Voltar ao painel</Link>
-          </Button>
-        </div>
-      </AppShell>
-    );
-  }
+  if (!project) return null;
 
-  // Filtrar status para a linha de progresso (excluindo cancelado e disponível se já atribuído)
   const progressionSteps = PROJECT_STATUS.filter(s => !["cancelado", "disponivel"].includes(s));
 
   return (
-    <AppShell
-      title={project.title}
-      description={`Detalhes e progresso do desenvolvimento.`}
-      actions={
-        <Button asChild variant="outline" size="sm">
-          <Link to="/meus-projetos" className="gap-2">
-            <ArrowLeft className="size-4" /> Voltar
-          </Link>
-        </Button>
-      }
-    >
-      <div className="space-y-6">
-        {/* 4. PROGRESSO DO PROJETO */}
-        <section className="rounded-2xl border border-border bg-card shadow-panel overflow-hidden">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="font-semibold">Progresso do Desenvolvimento</h2>
+    <AppShell title={project.title}>
+      {/* HEADER INFO */}
+      <div className="mb-6 rounded-2xl border bg-card p-6 shadow-panel">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">{project.title}</h1>
+            <p className="text-muted-foreground">{client?.company || "Cliente"}</p>
           </div>
-          <ProjectProgression steps={progressionSteps as any} currentStatus={project.status} />
-        </section>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Informações Gerais */}
-            <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-              <h2 className="text-lg font-semibold mb-4">Informações do Projeto</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <FileText className="size-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground">Tipo de Site</div>
-                      <div className="font-medium">{project.site_type || "Não definido"}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Calendar className="size-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground">Data de Início</div>
-                      <div className="font-medium">{shortDate(project.assigned_at || project.created_at)}</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Clock className="size-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground">Prazo de Entrega</div>
-                      <div className="font-medium">{shortDate(project.due_date)}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <CircleDollarSign className="size-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground">Sua Comissão</div>
-                      <div className="font-bold text-primary">{currency(project.commission || (project.value * (project.commission_rate || 0) / 100))}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {project.description && (
-                <div className="mt-6 pt-6 border-t border-border">
-                  <h3 className="text-sm font-semibold mb-2">Descrição / Briefing</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{project.description}</p>
-                </div>
-              )}
-            </section>
-
-            {/* Histórico de Atividade */}
-            <section className="rounded-2xl border border-border bg-card shadow-panel overflow-hidden">
-              <div className="border-b border-border px-5 py-4">
-                <h2 className="font-semibold">Histórico de Aprovação e Ajustes</h2>
-              </div>
-              <div className="divide-y divide-border">
-                {events.map((event) => (
-                  <div key={event.id} className="p-4 flex gap-4">
-                    <div className={cn(
-                      "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                      event.event_type.includes('ajustes') ? "bg-warning/10 text-warning" : "bg-primary/10 text-primary"
-                    )}>
-                      {event.actor_label[0]}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-bold">{event.actor_label}</span>
-                        <span className="text-[10px] text-muted-foreground">{shortDate(event.created_at)}</span>
-                      </div>
-                      <div className="text-sm text-foreground mt-0.5">
-                        {event.message || "Atualização de status no fluxo de aprovação."}
-                      </div>
-                      {event.new_status && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Status:</span>
-                          <StatusBadge status={event.new_status} className="h-5 py-0 px-2" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {events.length === 0 && (
-                  <div className="p-8 text-center text-sm text-muted-foreground">
-                    Nenhuma atividade de aprovação registrada.
-                  </div>
-                )}
-              </div>
-            </section>
+          <div className="flex gap-4">
+            <div className="text-right">
+              <div className="text-xs uppercase font-bold text-muted-foreground">Status</div>
+              <StatusBadge status={project.status} />
+            </div>
+            <div className="text-right">
+              <div className="text-xs uppercase font-bold text-muted-foreground">Prazo</div>
+              <div className="font-bold">{shortDate(project.due_date)}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs uppercase font-bold text-muted-foreground">Comissão</div>
+              <div className="font-bold text-primary">{currency(project.commission)}</div>
+            </div>
           </div>
-
-          <aside className="space-y-6">
-            {/* Dados do Cliente */}
-            <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-              <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <User className="size-4 text-primary" /> Cliente
-              </h2>
-              {client ? (
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-[10px] uppercase font-bold text-muted-foreground">Empresa</div>
-                    <div className="font-semibold">{client.company}</div>
-                  </div>
-                  {client.niche && (
-                    <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground">Nicho</div>
-                      <div className="text-sm">{client.niche}</div>
-                    </div>
-                  )}
-                  {client.city && (
-                    <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground">Localização</div>
-                      <div className="text-sm">{client.city}{client.state ? `, ${client.state}` : ''}</div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Dados do cliente não vinculados.</p>
-              )}
-            </section>
-
-            {/* Links de Entrega */}
-            <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-              <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <Globe className="size-4 text-primary" /> Entrega
-              </h2>
-              <div className="space-y-4">
-                {project.delivery_link ? (
-                  <Button asChild className="w-full justify-between" variant="outline">
-                    <a href={project.delivery_link} target="_blank" rel="noreferrer">
-                      Ver Site em Produção <ExternalLink className="size-4" />
-                    </a>
-                  </Button>
-                ) : (
-                  <div className="rounded-lg bg-muted/50 p-4 text-center text-xs text-muted-foreground">
-                    O link de entrega será exibido após o primeiro envio para aprovação.
-                  </div>
-                )}
-                
-                {project.status === "em_producao" && (
-                   <Button asChild className="w-full">
-                    <Link to="/meus-projetos">
-                      Gerenciar Entrega
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </section>
-
-            {/* Dúvidas ou Suporte */}
-            <section className="rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-sm">
-              <h2 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <MessageSquare className="size-4 text-primary" /> Suporte Interno
-              </h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Precisa de ajuda com este projeto ou identificou um erro no briefing? Entre em contato com o vendedor responsável ou administrador.
-              </p>
-            </section>
-          </aside>
         </div>
+        <div className="mt-6 border-t pt-6">
+          <ProjectProgression steps={progressionSteps as any} currentStatus={project.status} />
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <Tabs defaultValue="briefing">
+            <TabsList className="grid grid-cols-4 w-full">
+              <TabsTrigger value="briefing" className="gap-2"><Briefcase className="size-4" /> Briefing</TabsTrigger>
+              <TabsTrigger value="checklist" className="gap-2"><CheckCircle2 className="size-4" /> Checklist</TabsTrigger>
+              <TabsTrigger value="projeto" className="gap-2"><Globe className="size-4" /> Projeto</TabsTrigger>
+              <TabsTrigger value="historico" className="gap-2"><Clock className="size-4" /> Histórico</TabsTrigger>
+            </TabsList>
+            <TabsContent value="briefing" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <h3 className="font-semibold mb-4">Dados do Cliente</h3>
+               <p className="text-muted-foreground">{project.description}</p>
+            </TabsContent>
+            <TabsContent value="checklist" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <Progress value={progress} className="h-2 mb-4" />
+               <div className="space-y-2">
+                 {checklist.map(item => (
+                   <div key={item.id} className="flex items-center gap-2 p-2 border rounded-lg">
+                     <Checkbox checked={item.completed} onCheckedChange={(c) => toggle.mutate({ itemId: item.id, completed: !!c })} />
+                     {item.title}
+                   </div>
+                 ))}
+               </div>
+            </TabsContent>
+            <TabsContent value="projeto" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               <div className="flex gap-4">
+                 <Button asChild><a href={project.delivery_link || "#"} target="_blank">Visualizar Site</a></Button>
+               </div>
+            </TabsContent>
+            <TabsContent value="historico" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
+               {events.map(e => <div key={e.id} className="text-sm py-2 border-b">{e.message}</div>)}
+            </TabsContent>
+          </Tabs>
+        </div>
+        
+        <aside className="space-y-6">
+          <div className="rounded-2xl border p-6 shadow-panel">
+            <h3 className="font-semibold mb-4">Notas do Criador</h3>
+            <div className="space-y-2 mb-4">
+              {notes.map(n => <div key={n.id} className="text-xs p-2 bg-muted rounded">{n.content}</div>)}
+            </div>
+            <div className="flex gap-2">
+               <Input value={newNote} onChange={e => setNewNote(e.target.value)} />
+               <Button onClick={() => { addNote.mutate(newNote); setNewNote(""); }}>+</Button>
+            </div>
+          </div>
+          {project.status === "em_producao" && (
+            <Button className="w-full" onClick={() => {
+              if (progress < 100) return toast.error("Complete o checklist!");
+              updateProject.mutate({ id: project.id, status: "aguardando_aprovacao" });
+            }}><Send className="size-4 mr-2" /> Enviar para Aprovação</Button>
+          )}
+        </aside>
       </div>
     </AppShell>
   );
