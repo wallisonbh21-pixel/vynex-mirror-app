@@ -98,7 +98,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
           
-          const prevCount = index > 0 ? filteredCounts[index - 1].count : 0;
+          const prevCount = index > 0 ? (filteredCounts[index - 1]?.count || 0) : 0;
           const conversionRate = index === 0 ? 100 : (prevCount > 0 ? Math.round((item.count / prevCount) * 100) : 0);
 
           return (
