@@ -413,10 +413,20 @@ function ProspeccaoPage() {
 
       {/* Base de prospecção salva */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold tracking-tight">
-          {isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas"}{" "}
-          <span className="text-muted-foreground">({filtered.length})</span>
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas"}{" "}
+            <span className="text-muted-foreground">({filtered.length})</span>
+          </h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowArchived(!showArchived)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {showArchived ? "Ver ativas" : "Ver arquivadas"}
+          </Button>
+        </div>
 
         {isLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Carregando oportunidades…</p>
@@ -443,8 +453,14 @@ function ProspeccaoPage() {
                   user && changeStatus.mutate({ opportunity, status, userId: user.id })
                 }
                 onRemove={() => {
-                  if (confirm("Remover oportunidade?\nEssa empresa será retirada das suas oportunidades salvas.")) {
-                    save.mutate({ id: opportunity.id, removed_at: new Date().toISOString() });
+                  if (showArchived) {
+                    if (confirm("Restaurar oportunidade?\nEssa empresa voltará para sua lista de oportunidades ativas.")) {
+                      save.mutate({ id: opportunity.id, removed_at: null });
+                    }
+                  } else {
+                    if (confirm("Remover oportunidade?\nEssa empresa será retirada das suas oportunidades salvas.")) {
+                      save.mutate({ id: opportunity.id, removed_at: new Date().toISOString() });
+                    }
                   }
                 }}
               />
