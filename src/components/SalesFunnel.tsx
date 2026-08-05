@@ -16,7 +16,7 @@ import type { Lead } from "@/lib/crm";
 
 interface SalesFunnelProps {
   leads: Lead[];
-  activeStep?: string;
+  activeStep?: string | null;
   onStepClick?: (status: string) => void;
 }
 
