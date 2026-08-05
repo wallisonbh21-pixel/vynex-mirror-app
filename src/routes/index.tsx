@@ -92,6 +92,8 @@ function LandingPage() {
                       {item}
                     </li>
                   ))}
+                </ul>
+
 
               </div>
               <div className="size-48 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center relative overflow-hidden shrink-0">
