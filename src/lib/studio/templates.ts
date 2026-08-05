@@ -123,8 +123,66 @@ export const SECTION_TEMPLATES: Record<string, LibraryItem> = {
         createText('paragraph', '© 2026 VYNEXA. Todos os direitos reservados.', { color: '#94a3b8' })
       ]
     } as StudioSection
+  },
+  
+  // NICHE SPECIFIC SECTIONS
+  pizza_menu: {
+    id: 'pizza_menu',
+    name: 'Cardápio de Pizzas',
+    category: 'menu',
+    type: 'section',
+    tags: ['pizza', 'menu', 'food'],
+    preview: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80',
+    structure: {
+      id: generateId(),
+      type: 'menu',
+      order: 0,
+      styles: { padding: '5rem 0' },
+      elements: [
+        createText('title', 'Nossas Pizzas', { textAlign: 'center' }),
+        { id: generateId(), type: 'container', content: {}, styles: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', maxWidth: '1000px', margin: '0 auto' } }
+      ]
+    } as StudioSection
+  },
+  barber_services: {
+    id: 'barber_services',
+    name: 'Serviços da Barbearia',
+    category: 'services',
+    type: 'section',
+    tags: ['barber', 'services', 'prices'],
+    preview: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80',
+    structure: {
+      id: generateId(),
+      type: 'services',
+      order: 0,
+      styles: { padding: '5rem 0', backgroundColor: '#0f172a' },
+      elements: [
+        createText('title', 'Serviços & Preços', { textAlign: 'center', color: '#78350F' }),
+        createText('paragraph', 'Corte de Cabelo ............ R$ 50', { textAlign: 'center' }),
+        createText('paragraph', 'Barba Completa ............ R$ 40', { textAlign: 'center' })
+      ]
+    } as StudioSection
+  },
+  dentist_procedures: {
+    id: 'dentist_procedures',
+    name: 'Procedimentos Odontológicos',
+    category: 'services',
+    type: 'section',
+    tags: ['dentist', 'health', 'odontologia'],
+    preview: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=400&q=80',
+    structure: {
+      id: generateId(),
+      type: 'services',
+      order: 0,
+      styles: { padding: '5rem 0' },
+      elements: [
+        createText('title', 'Nossos Procedimentos', { textAlign: 'center' }),
+        { id: generateId(), type: 'container', content: {}, styles: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' } }
+      ]
+    } as StudioSection
   }
 };
+
 
 // FULL NICHE TEMPLATES
 export const NICHE_TEMPLATES: LibraryItem[] = [
