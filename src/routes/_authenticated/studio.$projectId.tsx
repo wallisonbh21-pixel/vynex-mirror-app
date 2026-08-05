@@ -24,8 +24,15 @@ import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/stud
 import { LibraryPanel } from '@/components/studio/LibraryPanel';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { PropertyPanel } from '@/components/studio/PropertyPanel';
+import { AICorePanel } from '@/components/AICorePanel';
 import { generateId } from '@/lib/studio/utils';
 import { SECTION_TEMPLATES } from '@/lib/studio/templates';
+import { buildProjectContext, generateIntelligence } from '@/lib/ai-core';
+import { getBriefing } from '@/lib/briefing';
+import { getSitePlan } from '@/lib/planner';
+import { useQuery } from '@tanstack/react-query';
+import { Brain, Info } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
@@ -50,6 +57,21 @@ function ScaleNexusStudioPage() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { data: briefing } = useQuery({
+    queryKey: ['briefing', projectId],
+    queryFn: () => getBriefing(projectId)
+  });
+
+  const { data: sitePlan } = useQuery({
+    queryKey: ['site-plan', projectId],
+    queryFn: () => getSitePlan(projectId)
+  });
+
+  const intelligence = useMemo(() => {
+    const context = buildProjectContext(projectId, briefing || null, sitePlan || null, data);
+    return generateIntelligence(context);
+  }, [projectId, briefing, sitePlan, data]);
 
 
   // Sync with initial data
@@ -235,7 +257,7 @@ function ScaleNexusStudioPage() {
       <header className="h-14 border-b border-slate-800 bg-slate-950 px-4 flex items-center justify-between z-50">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white">
-            <Link to="/_authenticated/projetos/$projectId" params={{ projectId }}>
+            <Link to="/projetos/$projectId" params={{ projectId }}>
               <ArrowLeft className="size-4 mr-2" /> Sair
             </Link>
           </Button>
@@ -279,6 +301,27 @@ function ScaleNexusStudioPage() {
                <Redo className="size-4" />
              </Button>
           </div>
+          <div className="h-4 w-px bg-slate-800 mx-1" />
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 text-brand-400 hover:text-brand-300 hover:bg-brand-500/10">
+                <Brain className="size-4" /> Inteligência
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-96 p-0 bg-slate-950 border-slate-800 shadow-2xl mr-4" align="end" sideOffset={12}>
+              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 className="font-bold flex items-center gap-2">
+                  <Brain className="size-4 text-brand-400" /> AI Core V1
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 uppercase tracking-tighter">ATIVO</span>
+              </div>
+              <div className="max-h-[500px] overflow-y-auto p-4 custom-scrollbar">
+                <AICorePanel intelligence={intelligence} />
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <Button variant={isPreview ? "secondary" : "ghost"} size="sm" className="gap-2" onClick={() => setIsPreview(!isPreview)}>
             <Eye className="size-4" /> {isPreview ? 'Editar' : 'Visualizar'}
           </Button>

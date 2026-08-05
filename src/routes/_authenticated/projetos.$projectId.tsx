@@ -19,7 +19,8 @@ import {
   AlertCircle,
   Link as LinkIcon,
   Rocket,
-  LayoutDashboard
+  LayoutDashboard,
+  Brain
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
@@ -35,6 +36,10 @@ import { useMyCreatorProjects, useProjectChecklist, useProjectNotes, useUpdateCr
 import { useApprovalEvents } from "@/lib/approval";
 import { getBriefing } from "@/lib/briefing";
 import { useQuery } from "@tanstack/react-query";
+import { buildProjectContext, generateIntelligence } from "@/lib/ai-core";
+import { AICorePanel } from "@/components/AICorePanel";
+import { getSitePlan } from "@/lib/planner";
+import { useStudioData } from "@/lib/studio/hooks";
 
 import { currency, shortDate, PROJECT_STATUS, label } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -63,6 +68,18 @@ function DetalhesProjetoPage() {
     queryFn: () => getBriefing(projectId),
   });
 
+
+  const { data: sitePlan } = useQuery({
+    queryKey: ["site-plan", projectId],
+    queryFn: () => getSitePlan(projectId),
+  });
+
+  const { data: studioData } = useStudioData(projectId);
+
+  const intelligence = useMemo(() => {
+    const context = buildProjectContext(projectId, savedBriefing || null, sitePlan || null, studioData || null);
+    return generateIntelligence(context);
+  }, [projectId, savedBriefing, sitePlan, studioData]);
 
   const project = useMemo(() => projects.find((p) => p.id === projectId), [projects, projectId]);
   const client = useMemo(() => clients.find((c) => c.id === project?.client_id), [clients, project]);
@@ -185,6 +202,10 @@ function DetalhesProjetoPage() {
                     </div>
                  </div>
                </div>
+            </TabsContent>
+            
+            <TabsContent value="ai-core" className="mt-4">
+              <AICorePanel intelligence={intelligence} />
             </TabsContent>
             
             <TabsContent value="financeiro" className="mt-4 p-6 bg-card border rounded-2xl shadow-panel">
