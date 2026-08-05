@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useStudioData } from '@/lib/studio/hooks';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, AlertCircle, Globe, ExternalLink, MessageSquare, Send, ArrowRight, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,37 +27,27 @@ function ClientApprovalPage() {
   const { data: project, isLoading, error } = useQuery({
     queryKey: ['public-project', token],
     queryFn: async () => {
-      // Set the client token in the database context for RLS
-      await supabase.rpc('set_client_token', { token });
+      // Use the new secure RPC to get project data by token
+      const { data, error: rpcError } = await supabase
+        .rpc('get_project_public_data_by_token', { p_client_token: token });
 
-      // Use public data api, assuming RLS allows read by client_token
-      const { data, error } = await supabase
-        .from('projects')
-        .select(`
-          id, 
-          title, 
-          status, 
-          site_type, 
-          delivery_link, 
-          submitted_at, 
-          client_token_expires_at,
-          client_id,
-          clients (
-            company,
-            contact_name
-          )
-        `)
-        .eq('client_token', token)
-        .single();
-
-      if (error) throw new Error('Link de aprovação inválido ou expirado.');
-      
-      // Check expiry
-      if (data.client_token_expires_at && new Date(data.client_token_expires_at) < new Date()) {
-        throw new Error('Este link de aprovação expirou.');
+      if (rpcError || !data || !Array.isArray(data) || data.length === 0) {
+        throw new Error('Link de aprovação inválido ou expirado.');
       }
 
-      return data;
+      const projectData = data[0];
+      if (!projectData) {
+        throw new Error('Link de aprovação inválido ou expirado.');
+      }
+      
+      // Map back to expected structure for the component
+      return {
+        ...projectData,
+        clients: {
+          company: projectData.client_company,
+          contact_name: projectData.client_contact_name
+        }
+      } as any;
     },
     retry: false
   });
@@ -136,6 +127,8 @@ function ClientApprovalPage() {
     );
   }
 
+  const { data: studioData } = useStudioData(project?.id || '', token);
+
   const isAwaiting = project.status === 'aguardando_aprovacao';
   const isAdjusting = project.status === 'ajustes';
   const isApproved = project.status === 'aprovado' || project.status === 'entregue';
@@ -146,7 +139,7 @@ function ClientApprovalPage() {
       <header className="border-b border-slate-800/50 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="size-8 bg-primary rounded-lg flex items-center justify-center font-black text-white italic">V</div>
+            <div className="size-8 bg-primary rounded-lg flex items-center justify-center font-black text-white italic">S</div>
             <span className="font-bold text-xl tracking-tight text-white uppercase">ScaleNexus</span>
           </div>
           <div className="hidden md:block">
