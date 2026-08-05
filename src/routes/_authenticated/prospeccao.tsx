@@ -416,7 +416,7 @@ function ProspeccaoPage() {
       <section className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">
-            {isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas"}{" "}
+            {showArchived ? "Oportunidades arquivadas" : (isAdmin ? "Todas as oportunidades salvas" : "Minhas oportunidades salvas")}{" "}
             <span className="text-muted-foreground">({filtered.length})</span>
           </h2>
           <Button
