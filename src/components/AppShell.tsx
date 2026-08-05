@@ -21,6 +21,22 @@ import {
   UserRound,
   Users,
   Wallet,
+  Rocket,
+  Plus,
+  Compass,
+  Monitor,
+  CheckCircle2,
+  Eye,
+  Send,
+  Library,
+  Box,
+  Layout,
+  Star,
+  Trophy,
+  Flame,
+  ChevronDown,
+  Clock,
+  FolderOpen,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,10 +46,25 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SidebarSubmenu } from "./SidebarSubmenu";
+
+interface SubmenuItem {
+  to: string;
+  label: string;
+  icon: any;
+  description?: string;
+}
+
+interface NavItem {
+  to: string;
+  label: string;
+  icon: any;
+  submenu?: SubmenuItem[];
+}
 
 /** Menu do time comercial (vendedor). */
-const NAV_VENDEDOR = [
-  { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
+const NAV_VENDEDOR: NavItem[] = [
+  { to: "/painel", label: "Dashboard", icon: LayoutDashboard },
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
@@ -46,19 +77,68 @@ const NAV_VENDEDOR = [
   { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/metas", label: "Metas", icon: BarChart3 },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
-] as const;
+];
 
-/** Menu do time de criação — sem acesso ao CRM comercial. */
-const NAV_CRIADOR = [
-  { to: "/criacao", label: "Visão geral", icon: LayoutDashboard },
-  { to: "/disponiveis", label: "Projetos disponíveis", icon: Layers },
-  { to: "/meus-projetos", label: "Meus projetos", icon: Palette },
-  { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
-  { to: "/meus-saques", label: "Meus saques", icon: Wallet },
+/** Menu do time de criação — Reorganizado V2.3. */
+const NAV_CRIADOR: NavItem[] = [
+  { 
+    to: "/criacao", 
+    label: "Dashboard", 
+    icon: LayoutDashboard,
+    submenu: [
+      { to: "/criacao", label: "Visão geral", icon: LayoutDashboard },
+      { to: "/meus-projetos", label: "Projetos ativos", icon: Palette },
+      { to: "/aprovacoes", label: "Aguardando aprovação", icon: Clock },
+      { to: "/metas", label: "Produtividade", icon: BarChart3 },
+    ]
+  },
+  { 
+    to: "/studio-new", 
+    label: "Criar Site", 
+    icon: Rocket,
+    submenu: [
+      { to: "/disponiveis", label: "Assumir novo site", icon: Plus },
+      { to: "/meus-projetos", label: "Continuar edição", icon: Palette },
+    ]
+  },
+  { 
+    to: "/meus-projetos", 
+    label: "Projetos", 
+    icon: FolderOpen,
+    submenu: [
+      { to: "/meus-projetos", label: "Todos os projetos", icon: Library },
+      { to: "/disponiveis", label: "Disponíveis", icon: Layers },
+    ]
+  },
+  { 
+    to: "/recursos", 
+    label: "Recursos", 
+    icon: Library,
+    submenu: [
+      { to: "/studio-new", label: "Biblioteca", icon: Box },
+      { to: "/studio-new", label: "Templates", icon: Layout },
+    ]
+  },
+  { 
+    to: "/metas", 
+    label: "Metas", 
+    icon: Trophy,
+    submenu: [
+      { to: "/metas", label: "Minhas Metas", icon: Target },
+      { to: "/metas", label: "Conquistas", icon: Star },
+    ]
+  },
+  { 
+    to: "/comissoes", 
+    label: "Financeiro", 
+    icon: Wallet,
+    submenu: [
+      { to: "/comissoes", label: "Minhas comissões", icon: CircleDollarSign },
+      { to: "/meus-saques", label: "Meus saques", icon: Wallet },
+    ]
+  },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
-] as const;
-
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
+];
 
 export function AppShell({
   title,
@@ -85,22 +165,23 @@ export function AppShell({
     setMobileOpen(false);
   }, [pathname]);
 
-  const base: NavItem[] = isAdmin
-    ? [...NAV_VENDEDOR]
+  const items: NavItem[] = isAdmin
+    ? [
+        ...NAV_VENDEDOR,
+        { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
+        { to: "/criacao", label: "Área do criador", icon: Layers },
+        { to: "/admin", label: "Administração", icon: ShieldCheck },
+        { to: "/perfil", label: "Meu perfil", icon: UserRound },
+      ]
     : isCriador
-      ? [...NAV_CRIADOR]
-      : [...NAV_VENDEDOR];
-  const items: NavItem[] = [
-    ...(isAdmin
       ? [
-          ...base,
-          { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
-          { to: "/criacao", label: "Área do criador", icon: Layers },
-          { to: "/admin", label: "Administração", icon: ShieldCheck },
+          ...NAV_CRIADOR,
+          { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ]
-      : base),
-    { to: "/perfil", label: "Meu perfil", icon: UserRound },
-  ];
+      : [
+          ...NAV_VENDEDOR,
+          { to: "/perfil", label: "Meu perfil", icon: UserRound },
+        ];
 
   const displayName = profile?.nickname || profile?.full_name || "Sem nome";
   const initials = displayName
@@ -131,7 +212,7 @@ export function AppShell({
   );
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background text-foreground">
       {/* Menu lateral vertical fixo (desktop) */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
         {sidebar}
@@ -157,7 +238,7 @@ export function AppShell({
                 </SheetContent>
               </Sheet>
               <div className="min-w-0">
-                <h1 className="truncate text-xl font-semibold">{title}</h1>
+                <h1 className="truncate text-xl font-semibold tracking-tight">{title}</h1>
                 {description ? (
                   <p className="text-sm text-muted-foreground">{description}</p>
                 ) : null}
@@ -196,60 +277,98 @@ function SidebarContent({
   initials: string;
   onSignOut: () => void;
 }) {
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  const toggleExpand = (label: string) => {
+    setExpandedItems((prev) =>
+      prev.includes(label) ? prev.filter((i) => i !== label) : [...prev, label]
+    );
+  };
+
   return (
     <>
       <Link to="/" className="flex items-center gap-3 px-2 transition-opacity hover:opacity-80">
-        <span className="flex size-9 items-center justify-center rounded-full bg-gradient-brand text-primary-foreground">
+        <span className="flex size-9 items-center justify-center rounded-full bg-gradient-brand text-primary-foreground shadow-glow">
           <Sparkles className="size-4" />
         </span>
         <span>
-          <span className="block text-sm font-semibold tracking-[0.28em]">ScaleNexus</span>
-          <span className="block text-[10px] tracking-[0.2em] text-muted-foreground">
+          <span className="block text-sm font-bold tracking-[0.28em] uppercase">ScaleNexus</span>
+          <span className="block text-[10px] tracking-[0.2em] text-muted-foreground font-medium">
             DIGITAL BUSINESS
           </span>
         </span>
       </Link>
 
-      <nav className="mt-8 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+      <nav className="mt-8 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto no-scrollbar">
         {items.map((item) => {
-          const active = pathname === item.to;
+          const active = pathname === item.to || (item.submenu?.some(s => s.to === pathname));
+          const isExpanded = expandedItems.includes(item.label);
+          const hasSubmenu = item.submenu && item.submenu.length > 0;
+
           return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 hover:-translate-y-0.5",
-                active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-glow"
-                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+            <div key={item.label} className="flex flex-col">
+              {hasSubmenu ? (
+                <button
+                  onClick={() => toggleExpand(item.label)}
+                  onMouseEnter={() => {
+                    if (window.innerWidth >= 1024 && !isExpanded) toggleExpand(item.label);
+                  }}
+                  className={cn(
+                    "group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                    active
+                      ? "bg-sidebar-accent/50 text-sidebar-accent-foreground shadow-glow"
+                      : "text-muted-foreground hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground",
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
+                    <span className="truncate font-medium">{item.label}</span>
+                  </div>
+                  <ChevronDown className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")} />
+                </button>
+              ) : (
+                <Link
+                  to={item.to}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 hover:-translate-y-0.5",
+                    active
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-glow"
+                      : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                  )}
+                >
+                  <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
+                  <span className="truncate font-medium">{item.label}</span>
+                </Link>
               )}
-            >
-              <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
-              <span className="truncate">{item.label}</span>
-            </Link>
+
+              {hasSubmenu && (
+                <SidebarSubmenu items={item.submenu!} pathname={pathname} isOpen={isExpanded} />
+              )}
+            </div>
           );
         })}
       </nav>
 
-      <Link
-        to="/perfil"
-        className="mt-4 flex items-center gap-3 rounded-2xl border border-sidebar-border bg-card p-3 transition-colors hover:border-primary/50"
-      >
-        <Avatar url={avatarUrl} initials={initials} />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{displayName}</span>
-          <span className="block truncate text-xs text-primary">{roleLabel}</span>
-          <span className="block truncate text-[11px] text-muted-foreground">{email}</span>
-        </span>
-      </Link>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="mt-2 w-full justify-start transition-colors hover:bg-destructive/10 hover:text-destructive"
-        onClick={onSignOut}
-      >
-        <LogOut className="size-4" /> Sair
-      </Button>
+      <div className="mt-4 flex flex-col gap-2">
+        <Link
+          to="/perfil"
+          className="flex items-center gap-3 rounded-2xl border border-sidebar-border bg-card p-3 transition-colors hover:border-primary/50 shadow-sm"
+        >
+          <Avatar url={avatarUrl} initials={initials} />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-bold">{displayName}</span>
+            <span className="block truncate text-[10px] font-bold text-primary uppercase tracking-wider">{roleLabel}</span>
+          </span>
+        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start transition-colors hover:bg-destructive/10 hover:text-destructive text-xs font-semibold"
+          onClick={onSignOut}
+        >
+          <LogOut className="size-4 mr-2" /> Sair da conta
+        </Button>
+      </div>
     </>
   );
 }
@@ -260,13 +379,13 @@ function Avatar({ url, initials }: { url: string | null; initials: string }) {
       <img
         src={url}
         alt="Foto de perfil"
-        className="size-10 shrink-0 rounded-full border border-border object-cover"
+        className="size-10 shrink-0 rounded-full border border-border object-cover shadow-sm"
       />
     );
   }
   return (
-    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-sm font-semibold text-primary-foreground">
-      {initials || "V"}
+    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-sm font-bold text-primary-foreground shadow-glow">
+      {initials || "S"}
     </span>
   );
 }

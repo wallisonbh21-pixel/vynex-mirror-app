@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Copy, ExternalLink, History, ShieldCheck, Wrench } from "lucide-react";
+import { Copy, ExternalLink, History, ShieldCheck, Wrench, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { SalesProgression } from "@/components/SalesProgression";
 import { Button } from "@/components/ui/button";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
-import { requireAdmin } from "@/lib/guard";
+import { requireCriadorOuAdmin } from "@/lib/guard";
 import { useRows } from "@/lib/data";
 import { useProfiles } from "@/lib/people";
+import { useRoles, useProfile } from "@/lib/auth";
 import {
   APPROVAL_EVENT_LABEL,
   APPROVAL_STATUS,
@@ -22,7 +24,7 @@ import {
 import { label, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/aprovacoes")({
-  beforeLoad: () => requireAdmin(),
+  beforeLoad: () => requireCriadorOuAdmin(),
   head: () => ({
     meta: [
       { title: "Sites aguardando aprovação — ScaleNexus" },
@@ -51,13 +53,20 @@ const adjustFields: Field[] = [
 ];
 
 function AprovacoesPage() {
-  const { data: projects = [] } = useApprovalQueue();
+  const { data: profile } = useProfile();
+  const { isAdmin } = useRoles();
+  const { data: allProjects = [] } = useApprovalQueue();
   const { data: clients = [] } = useRows<Client>("clients");
   const { data: profiles = [] } = useProfiles();
   const { data: events = [] } = useApprovalEvents();
   const release = useReleaseToClient();
   const adjust = useRequestInternalAdjust();
   const [links, setLinks] = useState<Record<string, string>>({});
+
+  const projects = useMemo(() => {
+    if (isAdmin) return allProjects;
+    return allProjects.filter(p => p.creator_id === profile?.id);
+  }, [allProjects, isAdmin, profile]);
 
   const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients]);
   const creatorName = useMemo(() => {
@@ -106,20 +115,25 @@ function AprovacoesPage() {
           </p>
         ) : null}
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-6 mb-8 border-t border-b border-border/50 py-4">
+          <SalesProgression status={project.status} />
+        </div>
+
+        <div className="flex flex-wrap gap-2">
           {project.delivery_link ? (
-            <Button asChild size="sm" variant="secondary">
+            <Button asChild size="sm" variant="secondary" className="gap-2">
               <a href={project.delivery_link} target="_blank" rel="noreferrer noopener">
                 <ExternalLink className="size-4" /> Visualizar site
               </a>
             </Button>
           ) : null}
 
-          {project.status === APPROVAL_STATUS.interna ? (
+          {project.status === APPROVAL_STATUS.interna && isAdmin ? (
             <>
               <Button
                 size="sm"
                 disabled={release.isPending}
+                className="bg-brand-500 hover:bg-brand-600 shadow-glow"
                 onClick={() =>
                   release.mutate(project.id, {
                     onSuccess: (result) => {
@@ -131,7 +145,7 @@ function AprovacoesPage() {
                   })
                 }
               >
-                Aprovar envio ao cliente
+                <CheckCircle2 className="size-4" /> Aprovar envio ao cliente
               </Button>
               <RecordDialog
                 title="Solicitar ajustes ao criador"
@@ -146,6 +160,12 @@ function AprovacoesPage() {
                 }
               />
             </>
+          ) : null}
+
+          {project.status === APPROVAL_STATUS.interna && !isAdmin ? (
+            <span className="text-xs text-muted-foreground italic flex items-center gap-1">
+              <ShieldCheck className="size-3" /> Aguardando revisão administrativa
+            </span>
           ) : null}
 
           {link ? (
@@ -189,7 +209,7 @@ function AprovacoesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {events.map((event) => {
+            {events.filter(e => isAdmin || projects.some(p => p.id === e.project_id)).map((event) => {
               const project = projects.find((p) => p.id === event.project_id);
               return (
                 <tr key={event.id}>

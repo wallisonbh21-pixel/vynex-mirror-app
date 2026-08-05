@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   CheckCircle2,
   Hammer,
@@ -15,6 +15,11 @@ import {
   AlertCircle,
   Calendar,
   ExternalLink,
+  Rocket,
+  ArrowRight,
+  Target,
+  History,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   Bar,
@@ -24,6 +29,9 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Cell,
+  Area,
+  AreaChart,
 } from "recharts";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
@@ -38,6 +46,9 @@ import {
 } from "@/lib/creator";
 import { currency, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useProfile } from "@/lib/auth";
+import { SalesProgression } from "@/components/SalesProgression";
+
 
 export const Route = createFileRoute("/_authenticated/criacao")({
   beforeLoad: () => requireCriador(),
@@ -58,6 +69,8 @@ export const Route = createFileRoute("/_authenticated/criacao")({
 type Withdrawal = { id: string; amount: number; status: string; created_at: string };
 
 function PainelCriador() {
+  const navigate = useNavigate();
+  const { data: profile } = useProfile();
   const { data: mine = [] } = useMyCreatorProjects();
   const { data: withdrawals = [] } = useRows<Withdrawal>("withdrawals");
 
@@ -94,43 +107,74 @@ function PainelCriador() {
   
   const completionRate = mine.length > 0 ? Math.round((delivered.length / mine.length) * 100) : 0;
 
+  const progressionData = [
+    { name: "Recebidos", value: mine.length, color: "var(--primary)" },
+    { name: "Produção", value: inProduction.length, color: "#3B82F6" },
+    { name: "Revisão", value: pendingApproval.length, color: "#F59E0B" },
+    { name: "Aprovados", value: approved.length, color: "#10B981" },
+    { name: "Entregues", value: delivered.length, color: "#8B5CF6" },
+  ];
+
   return (
     <AppShell
-      title="Painel do criador"
-      description="Dashboard de acompanhamento de projetos e comissões."
+      title="Central de Produção"
+      description="Gerencie seus projetos, prazos e desempenho profissional."
     >
+      {/* 1. HEADER BOAS-VINDAS */}
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Olá, {profile?.nickname || profile?.full_name?.split(' ')[0] || "Criador"} 👋</h1>
+          <p className="text-muted-foreground mt-1">Veja seus projetos, prazos e desempenho em tempo real.</p>
+        </div>
+        <Button asChild size="lg" className="gap-2 shadow-glow animate-pulse-subtle bg-gradient-brand border-none hover:opacity-90">
+          <Link to="/disponiveis">
+            <Rocket className="size-5" /> Criar novo site
+          </Link>
+        </Button>
+      </div>
+
       {/* 2. CARDS DE RESUMO */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard 
-          label="Projetos ativos" 
-          value={String(active.length)} 
-          hint="Total em aberto" 
-          icon={Layers} 
-        />
-        <StatCard 
-          label="Em produção" 
-          value={String(inProduction.length)} 
-          hint="Desenvolvimento" 
-          icon={Hammer} 
-        />
-        <StatCard 
-          label="Aguardando aprovação" 
-          value={String(pendingApproval.length)} 
-          hint="Revisão interna/cliente" 
-          icon={Clock} 
-        />
-        <StatCard 
-          label="Entregues" 
-          value={String(delivered.length)} 
-          hint="Concluídos" 
-          icon={PackageCheck} 
-        />
-        <StatCard 
-          label="Comissões disponíveis" 
-          value={currency(earnings.balance)} 
-          hint="Liberado para saque" 
-          icon={Wallet} 
-        />
+        <div onClick={() => navigate({ to: "/meus-projetos" })} className="cursor-pointer">
+          <StatCard 
+            label="Projetos em andamento" 
+            value={String(active.length)} 
+            hint="Acompanhar progresso" 
+            icon={Layers} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/aprovacoes" })} className="cursor-pointer">
+          <StatCard 
+            label="Aguardando aprovação" 
+            value={String(pendingApproval.length)} 
+            hint="Revisão final" 
+            icon={Clock} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/meus-projetos" })} className="cursor-pointer">
+          <StatCard 
+            label="Projetos entregues" 
+            value={String(delivered.length)} 
+            hint="Total histórico" 
+            icon={PackageCheck} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/comissoes" })} className="cursor-pointer">
+          <StatCard 
+            label="Comissão acumulada" 
+            value={currency(earnings.paid + earnings.released + earnings.pending)} 
+            hint="Total gerado" 
+            icon={Banknote} 
+          />
+        </div>
+        <div onClick={() => navigate({ to: "/meus-saques" })} className="cursor-pointer">
+          <StatCard 
+            label="Comissão disponível" 
+            value={currency(earnings.balance)} 
+            hint="Liberado para saque" 
+            icon={Wallet} 
+          />
+        </div>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -138,65 +182,114 @@ function PainelCriador() {
         <section className="lg:col-span-2 space-y-6">
           <div className="rounded-2xl border border-border bg-card shadow-panel overflow-hidden">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <h2 className="font-semibold">Meus Projetos Recentes</h2>
-              <Button asChild variant="ghost" size="sm">
+              <h2 className="font-semibold flex items-center gap-2">
+                <History className="size-4 text-brand-500" /> Projetos em Andamento
+              </h2>
+              <Button asChild variant="ghost" size="sm" className="text-brand-500 hover:text-brand-600">
                 <Link to="/meus-projetos">Ver todos</Link>
               </Button>
             </div>
             <div className="divide-y divide-border">
               {active.slice(0, 5).map((project) => (
-                <div key={project.id} className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
-                  <div className="min-w-0 flex-1 pr-4">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate font-medium">{project.title}</span>
-                      <StatusBadge status={project.status} />
+                <div key={project.id} className="p-5 hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="min-w-0 flex-1 pr-4">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate font-bold text-base">{project.title}</span>
+                        <StatusBadge status={project.status} />
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Rocket className="size-3" /> {project.site_type || "Site"}</span>
+                        <span className="flex items-center gap-1"><Calendar className="size-3" /> Início: {shortDate(project.assigned_at || project.created_at)}</span>
+                      </div>
                     </div>
-                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                      <span>{project.site_type || "Site"}</span>
-                      <span>Início: {shortDate(project.assigned_at || project.created_at)}</span>
-                      <span className={cn(
-                        project.due_date && new Date(project.due_date) < today && "text-destructive font-bold"
-                      )}>
-                        Prazo: {shortDate(project.due_date)}
-                      </span>
+                    <div className="text-right">
+                      <div className="font-bold text-brand-500 text-lg">{currency(earnings.commissionOf(project))}</div>
+                      <Button asChild size="sm" variant="outline" className="h-8 mt-1 border-brand-500/30 text-brand-500 hover:bg-brand-500/10">
+                        <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
+                          Gerenciar <ExternalLink className="size-3" />
+                        </Link>
+                      </Button>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-primary">{currency(earnings.commissionOf(project))}</div>
-                    <Button asChild size="sm" variant="ghost" className="h-8 px-2 mt-1">
-                      <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
-                        Abrir <ExternalLink className="size-3" />
-                      </Link>
-                    </Button>
-                  </div>
+                  <SalesProgression status={project.status} />
                 </div>
               ))}
               {active.length === 0 && (
-                <div className="p-8 text-center text-sm text-muted-foreground">
-                  Nenhum projeto ativo atribuído.
+                <div className="p-12 text-center text-sm text-muted-foreground flex flex-col items-center gap-3">
+                  <div className="p-4 rounded-full bg-muted">
+                    <Layers className="size-8 opacity-20" />
+                  </div>
+                  <p>Você não tem projetos ativos no momento.</p>
+                  <Button asChild variant="link" className="text-brand-500">
+                    <Link to="/disponiveis">Ver projetos disponíveis</Link>
+                  </Button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Grafico de Projetos */}
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-            <h2 className="text-sm font-semibold mb-4">Volume de Projetos (Últimos 6 meses)</h2>
+          {/* Grafico de Meu Progresso */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <TrendingUp className="size-4 text-primary" /> Meu progresso
+              </h2>
+            </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={series}>
+                <BarChart data={progressionData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-xs" />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
                   <Tooltip 
                     cursor={{ opacity: 0.1 }} 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   />
-                  < Bar dataKey="projetos" radius={[6, 6, 0, 0]} fill="var(--primary)" />
+                  <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={40}>
+                    {progressionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </section>
+
+          {/* Volume Histórico */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+              <History className="size-4 text-brand-500" /> Histórico de Volume (6 meses)
+            </h2>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={series}>
+                  <defs>
+                    <linearGradient id="colorProjetos" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
+                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
+                  <Tooltip 
+                    cursor={{ opacity: 0.1 }} 
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="projetos" 
+                    stroke="hsl(var(--primary))" 
+                    fillOpacity={1} 
+                    fill="url(#colorProjetos)" 
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+
         </section>
 
         <aside className="space-y-6">
@@ -281,8 +374,10 @@ function PainelCriador() {
                 <span className="text-muted-foreground">Já recebido</span>
                 <span className="font-medium">{currency(earnings.withdrawn)}</span>
               </div>
-              <Button asChild className="w-full mt-2" size="sm">
-                <Link to="/financeiro">Ver minhas comissões</Link>
+              <Button asChild size="sm" className="w-full mt-2 gap-2 shadow-glow bg-gradient-brand border-none hover:opacity-90">
+                <Link to="/meus-saques">
+                  Solicitar Saque <ArrowRight className="size-3" />
+                </Link>
               </Button>
             </div>
           </section>

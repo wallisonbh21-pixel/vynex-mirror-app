@@ -38,7 +38,10 @@ export async function requireRole(allowed: AppRole[]) {
 export const requireVendedor = () => requireRole(["vendedor", "diretor", "admin", "rh"]);
 
 /** Rotas exclusivas do time de criação. */
-export const requireCriador = () => requireRole(["criador"]);
+export const requireCriador = () => requireRole(["criador", "admin"]);
+
+/** Acesso compartilhado entre criadores e administradores. */
+export const requireCriadorOuAdmin = () => requireRole(["criador", "admin"]);
 
 /** Rotas administrativas. */
 export const requireAdmin = () => requireRole(["admin"]);

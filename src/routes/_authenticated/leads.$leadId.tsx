@@ -8,11 +8,13 @@ import {
   MessageSquare,
   Plus,
   Trash2,
+  Phone,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
+import { SalesProgression } from "@/components/SalesProgression";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -149,38 +151,52 @@ function LeadDetail() {
         </div>
       }
     >
+      <div className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-panel">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-6 flex items-center gap-2">
+          <CalendarClock className="size-4 text-brand-500" /> Progresso da Oportunidade
+        </h2>
+        <SalesProgression status={lead.status} />
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-3">
         <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">Dados do lead</h2>
             <StatusBadge status={lead.status} />
           </div>
-          <dl className="mt-4 space-y-2 text-sm">
-            <Row term="Empresa" value={lead.company} />
+          <dl className="mt-4 space-y-3 text-sm">
+            <Row term="Empresa" value={lead.company} icon={FileText} />
             <Row term="Nicho" value={lead.niche} />
-            <Row term="Contato" value={`${lead.name} — ${contact}`} />
-            <Row term="Telefone/WhatsApp" value={lead.whatsapp || lead.phone} />
-            <Row term="Cidade" value={lead.city} />
-            <Row term="Estado" value={lead.state} />
-            <Row term="Endereço" value={lead.address} />
+            <Row term="Contato" value={lead.name} />
+            <div className="flex justify-between gap-3 pt-1">
+              <dt className="text-muted-foreground flex items-center gap-1.5"><Phone className="size-3.5" /> Contato</dt>
+              <dd className="text-right">
+                <div className="flex flex-col items-end">
+                  {lead.whatsapp && (
+                    <a href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" className="text-brand-500 font-medium hover:underline">
+                      {lead.whatsapp}
+                    </a>
+                  )}
+                  {lead.email && <span className="text-xs">{lead.email}</span>}
+                </div>
+              </dd>
+            </div>
+            <Row term="Cidade" value={lead.city} icon={MapPin} />
             {lead.google_maps_url ? (
               <div className="flex justify-between gap-3">
-                <dt className="text-muted-foreground">Google Maps</dt>
+                <dt className="text-muted-foreground flex items-center gap-1.5"><MapPin className="size-3.5" /> Localização</dt>
                 <dd className="text-right">
-                  <a href={lead.google_maps_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center justify-end gap-1">
-                    Ver no mapa <ExternalLink className="size-3" />
+                  <a href={lead.google_maps_url} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline flex items-center justify-end gap-1 font-medium">
+                    Ver no Google Maps <ExternalLink className="size-3" />
                   </a>
                 </dd>
               </div>
             ) : null}
-            <Row term="Origem" value={lead.source} />
             <Row term="Cadastrado em" value={shortDate(lead.created_at)} />
-            <Row term="Próximo contato" value={shortDate(lead.next_contact_at)} />
             <Row
-              term="Valor"
+              term="Valor Estimado"
               value={currency(lead.closed_value || lead.estimated_value)}
             />
-            <Row term="Observações" value={lead.notes} />
           </dl>
 
           {lead.status === "fechado" ? (
@@ -346,11 +362,14 @@ function LeadDetail() {
   );
 }
 
-function Row({ term, value }: { term: string; value: string | null | undefined }) {
+function Row({ term, value, icon: Icon }: { term: string; value: string | null | undefined, icon?: any }) {
   return (
     <div className="flex justify-between gap-3">
-      <dt className="text-muted-foreground">{term}</dt>
-      <dd className="max-w-[60%] text-right">{value || "—"}</dd>
+      <dt className="text-muted-foreground flex items-center gap-1.5">
+        {Icon && <Icon className="size-3.5" />}
+        {term}
+      </dt>
+      <dd className="max-w-[60%] text-right font-medium">{value || "—"}</dd>
     </div>
   );
 }
