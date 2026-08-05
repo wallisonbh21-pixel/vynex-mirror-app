@@ -14,7 +14,7 @@ function Index() {
         <div className="size-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Palette className="size-8 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">VYNEXA Studio V2</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">ScaleNexus Studio V2</h1>
         <p className="text-slate-400 mb-8 leading-relaxed">
           Sua plataforma profissional de criação de sites agora com biblioteca premium e design system global.
         </p>

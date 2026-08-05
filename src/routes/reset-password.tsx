@@ -12,13 +12,13 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Nova senha — VYNEXA" },
+      { title: "Nova senha — ScaleNexus" },
       {
         name: "description",
-        content: "Defina uma nova senha de acesso à plataforma VYNEXA com segurança.",
+        content: "Defina uma nova senha de acesso à plataforma ScaleNexus com segurança.",
       },
-      { property: "og:title", content: "Nova senha — VYNEXA" },
-      { property: "og:description", content: "Redefinição de senha da plataforma VYNEXA." },
+      { property: "og:title", content: "Nova senha — ScaleNexus" },
+      { property: "og:description", content: "Redefinição de senha da plataforma ScaleNexus." },
     ],
   }),
   component: ResetPasswordPage,
@@ -76,7 +76,7 @@ function ResetPasswordPage() {
             <Sparkles className="size-5" />
           </span>
           <span>
-            <span className="block text-sm font-semibold tracking-[0.32em]">VYNEXA</span>
+            <span className="block text-sm font-semibold tracking-[0.32em]">ScaleNexus</span>
             <span className="block text-[10px] tracking-[0.22em] text-muted-foreground">
               DIGITAL BUSINESS
             </span>

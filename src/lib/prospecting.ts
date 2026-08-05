@@ -4,7 +4,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-export const PROSPECTING_SOURCE = "Prospecção VYNEXA";
+export const PROSPECTING_SOURCE = "Prospecção ScaleNexus";
 
 /** Nichos sugeridos para a busca de oportunidades. */
 export const NICHOS = [

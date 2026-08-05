@@ -32,13 +32,13 @@ import { currency, label, LEAD_STATUS, shortDate } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
     meta: [
-      { title: "Visão geral — VYNEXA" },
+      { title: "Visão geral — ScaleNexus" },
       {
         name: "description",
         content: "Indicadores do vendedor: leads ativos, propostas, contratos, conversão, comissão e meta do mês.",
       },
-      { property: "og:title", content: "Visão geral — VYNEXA" },
-      { property: "og:description", content: "Dashboard comercial da VYNEXA." },
+      { property: "og:title", content: "Visão geral — ScaleNexus" },
+      { property: "og:description", content: "Dashboard comercial da ScaleNexus." },
     ],
   }),
   component: Painel,

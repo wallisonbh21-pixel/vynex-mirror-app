@@ -5,7 +5,7 @@ type Theme = "dark" | "light";
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "dark";
-    const saved = localStorage.getItem("vynexa-theme");
+    const saved = localStorage.getItem("scalenexus-theme");
     return (saved as Theme) || "dark";
   });
 
@@ -16,7 +16,7 @@ export function useTheme() {
     } else {
       root.classList.remove("dark");
     }
-    localStorage.setItem("vynexa-theme", theme);
+    localStorage.setItem("scalenexus-theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
