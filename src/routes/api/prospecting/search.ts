@@ -76,7 +76,7 @@ function calculateRelevance(item: any, niche: string, precision: "alta" | "ampla
       matches.direct.push(term);
       reason = `Correspondência direta no nome: "${term}"`;
     }
-    if (categories.some(cat => cat.includes(term))) {
+    if (categories.some((cat: string) => cat.includes(term))) {
       score += 90;
       matches.direct.push(term);
       reason = reason.includes("nome") ? `${reason} + categoria` : `Correspondência direta na categoria: "${term}"`;
@@ -89,7 +89,7 @@ function calculateRelevance(item: any, niche: string, precision: "alta" | "ampla
       score += 60;
       matches.related.push(term);
     }
-    if (categories.some(cat => cat.includes(term))) {
+    if (categories.some((cat: string) => cat.includes(term))) {
       score += 50;
     }
   }
