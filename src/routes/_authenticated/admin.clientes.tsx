@@ -211,7 +211,7 @@ function AdminClientes() {
                         title="Cadastrar Login do Cliente"
                         fields={loginFields}
                         onSubmit={handleCreateLogin}
-                        onOpenChange={(open) => open && setSelectedClientId(client.id)}
+                        onOpenChange={(open: boolean) => open && setSelectedClientId(client.id)}
                         trigger={
                           <Button variant="default" className="gap-2 shadow-sm font-bold">
                             <UserPlus className="size-4" />
