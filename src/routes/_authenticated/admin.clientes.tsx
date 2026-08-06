@@ -37,8 +37,8 @@ function AdminClientes() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
 
   const clientRegistrationFields: Field[] = [
-    { name: "username", label: "Usuário", required: true, placeholder: "Ex: joaosilva" },
-    { name: "contact_email", label: "E-mail", type: "email", required: true, placeholder: "Ex: joao@email.com" },
+    { name: "username", label: "Usuário *", required: true, placeholder: "Ex: joaosilva" },
+    { name: "contact_email", label: "E-mail *", type: "email", required: true, placeholder: "Ex: joao@email.com" },
     { name: "contact_name", label: "Nome completo", placeholder: "Opcional" },
     { name: "contact_phone", label: "Telefone", placeholder: "Opcional" },
     { name: "company", label: "Empresa/Negócio", placeholder: "Opcional" },
