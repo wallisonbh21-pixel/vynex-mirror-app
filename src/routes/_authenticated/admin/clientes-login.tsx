@@ -329,32 +329,31 @@ function AdminLoginCentral() {
               <Label htmlFor="client-select">CLIENTE</Label>
               <Select value={selectedClientId} onValueChange={(val) => {
                 setSelectedClientId(val);
-                const c = clients?.find(x => x.id === val);
+                const c = activeClients?.find(x => x.id === val);
                 if (c) setUsername(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
               }}>
                 <SelectTrigger id="client-select" className="h-11 rounded-xl">
-                  <SelectValue placeholder="Selecionar cliente ▼" />
+                  <SelectValue placeholder="Selecione o cliente ▼" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[300px] overflow-y-auto">
                   {isLoading ? (
-                    <div className="p-2 text-sm text-muted-foreground text-center">Carregando clientes...</div>
+                    <div className="p-2 text-sm text-muted-foreground text-center italic">Carregando clientes...</div>
                   ) : isError ? (
                     <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg m-2">
-                      <p className="font-bold">Erro ao carregar clientes:</p>
-                      <p className="mt-1 break-words">{(error as any)?.message || "Erro desconhecido"}</p>
-                      <p className="text-[10px] mt-1 opacity-70">Código: {(error as any)?.code}</p>
+                      <p className="font-bold">Erro ao carregar clientes.</p>
                     </div>
                   ) : activeClients.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground text-center font-bold">Não existem clientes ativos cadastrados.</div>
+                    <div className="p-2 text-sm text-muted-foreground text-center font-medium">Nenhum cliente ativo disponível.</div>
                   ) : (
                     activeClients.map(c => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.contact_name || 'Sem nome'} | {c.contact_email || 'Sem e-mail'} | {c.company || 'Sem empresa'}
+                      <SelectItem key={c.id} value={c.id} className="cursor-pointer">
+                        {c.contact_name || 'Sem nome'}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
+
             </div>
 
             {selectedClient && (
