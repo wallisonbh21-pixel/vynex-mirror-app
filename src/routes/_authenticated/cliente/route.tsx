@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/cliente")({
 
     if (!isCliente && !isAdmin) {
       throw redirect({ 
-        to: "/auth", 
+        to: "/cliente/login", 
         search: { redirect: location.href },
         replace: true 
       });

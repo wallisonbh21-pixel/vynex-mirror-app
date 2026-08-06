@@ -34,6 +34,9 @@ import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
+import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
+import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.primeiro-acesso'
+import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
@@ -185,6 +188,21 @@ const AuthenticatedProspeccaoRoute = AuthenticatedProspeccaoRouteImport.update({
 const AprovacaoTokenRoute = AprovacaoTokenRouteImport.update({
   id: '/aprovacao/$token',
   path: '/aprovacao/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteLoginRoute = ClienteLoginRouteImport.update({
+  id: '/cliente/login',
+  path: '/cliente/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientePrimeiroAcessoRoute = ClientePrimeiroAcessoRouteImport.update({
+  id: '/cliente/primeiro-acesso',
+  path: '/cliente/primeiro-acesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteRecuperarSenhaRoute = ClienteRecuperarSenhaRouteImport.update({
+  id: '/cliente/recuperar-senha',
+  path: '/cliente/recuperar-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminClientesRoute =
@@ -355,6 +373,9 @@ export interface FileRoutesByFullPath {
   '/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
+  '/cliente/login': typeof ClienteLoginRoute
+  '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
+  '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -404,6 +425,9 @@ export interface FileRoutesByTo {
   '/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
+  '/cliente/login': typeof ClienteLoginRoute
+  '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
+  '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -456,6 +480,9 @@ export interface FileRoutesById {
   '/_authenticated/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
+  '/cliente/login': typeof ClienteLoginRoute
+  '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
+  '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -508,6 +535,9 @@ export interface FileRouteTypes {
     | '/projetos'
     | '/prospeccao'
     | '/aprovacao/$token'
+    | '/cliente/login'
+    | '/cliente/primeiro-acesso'
+    | '/cliente/recuperar-senha'
     | '/admin/clientes'
     | '/admin/clientes-login'
     | '/briefing/$projectId'
@@ -557,6 +587,9 @@ export interface FileRouteTypes {
     | '/projetos'
     | '/prospeccao'
     | '/aprovacao/$token'
+    | '/cliente/login'
+    | '/cliente/primeiro-acesso'
+    | '/cliente/recuperar-senha'
     | '/admin/clientes'
     | '/admin/clientes-login'
     | '/briefing/$projectId'
@@ -608,6 +641,9 @@ export interface FileRouteTypes {
     | '/_authenticated/projetos'
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
+    | '/cliente/login'
+    | '/cliente/primeiro-acesso'
+    | '/cliente/recuperar-senha'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/clientes-login'
     | '/_authenticated/briefing/$projectId'
@@ -640,6 +676,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   AprovacaoTokenRoute: typeof AprovacaoTokenRoute
+  ClienteLoginRoute: typeof ClienteLoginRoute
+  ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
+  ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
 }
 
@@ -818,6 +857,27 @@ declare module '@tanstack/react-router' {
       path: '/aprovacao/$token'
       fullPath: '/aprovacao/$token'
       preLoaderRoute: typeof AprovacaoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente/login': {
+      id: '/cliente/login'
+      path: '/cliente/login'
+      fullPath: '/cliente/login'
+      preLoaderRoute: typeof ClienteLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente/primeiro-acesso': {
+      id: '/cliente/primeiro-acesso'
+      path: '/cliente/primeiro-acesso'
+      fullPath: '/cliente/primeiro-acesso'
+      preLoaderRoute: typeof ClientePrimeiroAcessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente/recuperar-senha': {
+      id: '/cliente/recuperar-senha'
+      path: '/cliente/recuperar-senha'
+      fullPath: '/cliente/recuperar-senha'
+      preLoaderRoute: typeof ClienteRecuperarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/clientes': {
@@ -1128,6 +1188,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   AprovacaoTokenRoute: AprovacaoTokenRoute,
+  ClienteLoginRoute: ClienteLoginRoute,
+  ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
+  ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,
 }
 export const routeTree = rootRouteImport

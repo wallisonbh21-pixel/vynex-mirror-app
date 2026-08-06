@@ -10,7 +10,9 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/cliente/primeiro-acesso")({
   head: () => ({
-    title: "Primeiro Acesso — ScaleNexus",
+    meta: [
+      { title: "Primeiro Acesso — ScaleNexus" }
+    ],
   }),
   component: PrimeiroAcessoPage,
 });

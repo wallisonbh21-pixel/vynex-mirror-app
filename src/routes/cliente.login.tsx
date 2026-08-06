@@ -10,8 +10,8 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/cliente/login")({
   head: () => ({
-    title: "Login — Portal do Cliente ScaleNexus",
     meta: [
+      { title: "Login — Portal do Cliente ScaleNexus" },
       { name: "description", content: "Acesse seu painel profissional no Portal do Cliente ScaleNexus." },
       { property: "og:title", content: "Login — Portal do Cliente ScaleNexus" },
       { property: "og:description", content: "Acesse seu painel profissional no Portal do Cliente ScaleNexus." },
@@ -48,7 +48,8 @@ function ClientLoginPage() {
     const roles = rolesData?.map(r => r.role) || [];
     
     if (roles.includes("cliente")) {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
       if (user?.user_metadata?.['must_change_password']) {
         navigate({ to: "/cliente/primeiro-acesso", replace: true });
       } else {

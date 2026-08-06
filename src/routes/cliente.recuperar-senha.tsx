@@ -9,7 +9,9 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/cliente/recuperar-senha")({
   head: () => ({
-    title: "Recuperar Senha — Portal do Cliente ScaleNexus",
+    meta: [
+      { title: "Recuperar Senha — Portal do Cliente ScaleNexus" }
+    ],
   }),
   component: ClientRecoverPage,
 });
