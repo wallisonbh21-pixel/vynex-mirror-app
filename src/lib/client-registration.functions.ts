@@ -16,13 +16,14 @@ export const registerNewClient = createServerFn({ method: "POST" })
   .validator((data: unknown) => registerClientSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createAuthUser } = await import("./auth-utils.server");
     const { userId: actorId, supabase: userSupabase } = context;
 
     if (!actorId) throw new Error("Não autorizado.");
 
     // Determine actor role
     const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
-    const isAdmin = roles?.some((r: any) => r.role === 'admin');
+    const isAdmin = roles?.some((r: any) => r.role === 'admin' || r.role === 'diretor');
     const isVendedor = roles?.some((r: any) => r.role === 'vendedor');
 
     if (!isAdmin && !isVendedor) {
@@ -62,144 +63,87 @@ export const registerNewClient = createServerFn({ method: "POST" })
 
     console.log("[DEBUG] client_created", { clientId: newClient.id, email: data.contact_email });
 
-    // 4. AUTOMATIC ONBOARDING: Create access portal account
-    let onboardingResult = { success: false, message: "" };
-    
+    // 3. AUTOMATIC ONBOARDING: Create access portal account
     try {
-      // 4.1 Check if Auth user already exists
-      console.log("[DEBUG] auth_lookup", { email: data.contact_email });
+      // Check if Auth user already exists
       const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
       if (listError) throw new Error(`Erro ao listar usuários: ${listError.message}`);
       
       const existingAuthUser = users.find(u => u.email?.toLowerCase() === data.contact_email.toLowerCase());
 
-      let targetAuthUserId: string;
-
       if (existingAuthUser) {
-        console.log("[DEBUG] auth_created_or_existing", { status: "existing", authId: existingAuthUser.id });
-        targetAuthUserId = existingAuthUser.id;
+        // Link existing Auth
+        const { error: linkErr } = await supabaseAdmin.from("clients").update({ user_id: existingAuthUser.id } as any).eq("id", newClient.id);
+        if (linkErr) throw new Error(`Erro ao vincular cliente: ${linkErr.message}`);
+        
+        return {
+          success: true,
+          client: newClient,
+          onboardingSuccess: true,
+          message: "Cliente cadastrado e vinculado à conta de acesso existente."
+        };
+      } else {
+        // Create new Auth account with normal password
+        const { user: newUser, initialPassword } = await createAuthUser(supabaseAdmin, {
+          email: data.contact_email,
+          username: data.username,
+          fullName: data.contact_name || data.username,
+          role: "cliente",
+          clientId: newClient.id
+        });
 
-        // CASE: Auth exists - Check link to OTHER client
-        const { data: otherClient } = await supabaseAdmin
-          .from("clients")
-          .select("id")
-          .eq("user_id", targetAuthUserId)
-          .maybeSingle();
+        // Link client
+        const { error: linkErr } = await supabaseAdmin.from("clients").update({ user_id: newUser.id } as any).eq("id", newClient.id);
+        if (linkErr) throw new Error(`Erro ao vincular cliente novo: ${linkErr.message}`);
 
-        if (otherClient && otherClient.id !== newClient.id) {
-          console.log("[DEBUG] onboarding_failed", { reason: "email_linked_to_other_client" });
+        // Ensure Profile
+        await supabaseAdmin.from("profiles").upsert({ 
+          id: newUser.id, 
+          nickname: data.username, 
+          full_name: data.contact_name || data.username 
+        } as any);
+
+        // Ensure Role
+        await supabaseAdmin.from("user_roles").upsert({ 
+          user_id: newUser.id, 
+          role: "cliente" as any 
+        }, { onConflict: "user_id,role" });
+
+        // Trigger email with credentials
+        const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
+        const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.contact_email, {
+          redirectTo: `${siteUrl}/reset-password`,
+          data: { 
+            temp_password: initialPassword,
+            is_new_client: true,
+            platform_url: `${siteUrl}/auth`
+          }
+        });
+
+        if (inviteError) {
+          console.error("[DEBUG] email_send_failed", inviteError);
           return {
             success: true,
             client: newClient,
             onboardingSuccess: false,
-            message: "Cliente cadastrado, mas este e-mail já está vinculado a outro cliente."
+            message: "Cliente cadastrado, mas o e-mail de boas-vindas falhou. Comunique as credenciais manualmente."
           };
         }
 
-        // Link existing Auth to this new client (Case 3)
-        const { error: linkErr } = await supabaseAdmin.from("clients").update({ user_id: targetAuthUserId } as any).eq("id", newClient.id);
-        if (linkErr) throw new Error(`Erro ao vincular cliente: ${linkErr.message}`);
-        console.log("[DEBUG] client_linked", { clientId: newClient.id, authId: targetAuthUserId });
-
-      } else {
-        // CASE: Auth does NOT exist - Create it (Case 1)
-        console.log("[DEBUG] auth_created_or_existing", { status: "creating" });
-        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-          email: data.contact_email,
-          email_confirm: true, 
-          user_metadata: { 
-            full_name: data.contact_name || data.username, 
-            role: "cliente",
-            username: data.username 
-          },
-        });
-
-        if (createError) throw new Error(`Erro ao criar conta Auth: ${createError.message}`);
-        targetAuthUserId = newUser.user.id;
-        console.log("[DEBUG] auth_created_or_existing", { status: "created", authId: targetAuthUserId });
-
-        // Link client
-        const { error: linkErr } = await supabaseAdmin.from("clients").update({ user_id: targetAuthUserId } as any).eq("id", newClient.id);
-        if (linkErr) throw new Error(`Erro ao vincular cliente novo: ${linkErr.message}`);
-        console.log("[DEBUG] client_linked", { clientId: newClient.id, authId: targetAuthUserId });
-      }
-
-      // 4.2 Create/Update Profile (official structure)
-      console.log("[DEBUG] profile_created_or_updated", { authId: targetAuthUserId, nickname: data.username });
-      const { error: profileErr } = await supabaseAdmin.from("profiles").upsert({ 
-        id: targetAuthUserId, 
-        nickname: data.username, 
-        full_name: data.contact_name || data.username 
-      } as any);
-      if (profileErr) throw new Error(`Erro ao atualizar perfil: ${profileErr.message}`);
-
-      // 4.3 Ensure Role
-      const { error: roleErr } = await supabaseAdmin.from("user_roles").upsert({ 
-        user_id: targetAuthUserId, 
-        role: "cliente" as any 
-      }, { onConflict: "user_id,role" });
-      if (roleErr) throw new Error(`Erro ao definir role: ${roleErr.message}`);
-
-      // 4.4 Generate access link and trigger email
-      console.log("[DEBUG] email_prepare", { email: data.contact_email });
-      const { data: linkData, error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'recovery',
-        email: data.contact_email,
-        options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password` }
-      });
-
-      if (recoveryError) {
-        console.error("[DEBUG] email_send_failed", { error: recoveryError.message });
-        return {
-          success: true,
+        return { 
+          success: true, 
           client: newClient,
-          onboardingSuccess: false,
-          message: "A conta foi criada, mas o link de acesso não pôde ser gerado. Verifique as configurações de Auth."
+          onboardingSuccess: true,
+          message: "Cliente cadastrado e credenciais enviadas por e-mail." 
         };
       }
-
-      console.log("[DEBUG] email_link_generated", { email: data.contact_email });
-      
-      // Triggering real email delivery via Supabase resetPasswordForEmail
-      // This uses the project's configured SMTP or default Supabase SMTP
-      console.log("[DEBUG] email_send_attempt", { email: data.contact_email });
-      const { error: sendError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.contact_email, {
-        redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`,
-        data: { 
-          full_name: data.contact_name || data.username,
-          username: data.username
-        }
-      });
-
-      if (sendError) {
-        console.error("[DEBUG] email_send_failed", { error: sendError.message });
-        return {
-          success: true,
-          client: newClient,
-          onboardingSuccess: false,
-          message: "Link de acesso gerado, mas o envio do e-mail falhou. Verifique o SMTP no Lovable Cloud."
-        };
-      }
-
-      console.log("[DEBUG] email_send_success", { email: data.contact_email });
-      console.log("[DEBUG] onboarding_completed", { clientId: newClient.id });
-      onboardingResult = { success: true, message: "Link de acesso gerado e enviado ao e-mail do cliente." };
-
-
     } catch (e: any) {
       console.error("[DEBUG] onboarding_error", e);
       return {
         success: true,
         client: newClient,
         onboardingSuccess: false,
-        message: "Cliente cadastrado, mas não foi possível concluir a criação do acesso."
+        message: "Cliente cadastrado comercialmente, mas ocorreu um erro no acesso."
       };
     }
-
-    return { 
-      success: true, 
-      client: newClient,
-      onboardingSuccess: onboardingResult.success,
-      message: onboardingResult.message || "Cliente cadastrado com sucesso!" 
-    };
   });
