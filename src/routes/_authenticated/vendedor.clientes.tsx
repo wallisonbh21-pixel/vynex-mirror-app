@@ -43,7 +43,11 @@ function VendedorClientes() {
 
   const handleRegisterClient = async (values: Record<string, unknown>) => {
     try {
-      await registerClient.mutateAsync(values);
+      const submissionData = {
+        ...values,
+        notes: values.notes || "",
+      };
+      await registerClient.mutateAsync(submissionData);
     } catch (error) {
       // toast is handled by hook
     }
