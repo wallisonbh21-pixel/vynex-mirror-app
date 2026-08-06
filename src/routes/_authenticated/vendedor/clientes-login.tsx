@@ -52,13 +52,29 @@ function VendedorLoginCentral() {
   const { user } = useSession();
   const { data: allClients, isLoading, isError, error, refetch } = useClientsList(user?.id);
   
-  // Log técnico para diagnóstico
-  if (isError) console.error("Erro ao carregar clientes no modal (Vendedor):", error);
-
-  // Filter only active clients for the selection modal
+  // LOG OBRIGATÓRIO PARA DIAGNÓSTICO
+  console.log("DIAGNÓSTICO VENDEDOR - CLIENTS RECEIVED:", allClients ? allClients.map(c => ({
+    id: c.id,
+    name: c.contact_name,
+    email: c.contact_email,
+    status: c.status,
+    owner_id: c.owner_id
+  })) : "null/undefined");
+  
   const activeClients = useMemo(() => {
-    return allClients?.filter(c => c.status === "ativo") || [];
-  }, [allClients]);
+    const total = allClients?.length || 0;
+    const afterStatus = allClients?.filter(c => c.status === "ativo") || [];
+    
+    console.log("DIAGNÓSTICO VENDEDOR - FILTROS:", {
+      total_recebido: total,
+      total_apos_filtro_status: afterStatus.length,
+      status_usado: "ativo",
+      owner_id_filtro: user?.id
+    });
+
+    return afterStatus;
+  }, [allClients, user?.id]);
+  
   const clients = allClients;
   const onboarding = useClientOnboarding();
   const resendInviteFn = useServerFn(resendInvite);
@@ -305,12 +321,16 @@ function VendedorLoginCentral() {
                   <SelectValue placeholder="Selecionar cliente ▼" />
                 </SelectTrigger>
                 <SelectContent>
-                  {activeClients.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground text-center">Não existem clientes ativos cadastrados.</div>
+                  {isLoading ? (
+                    <div className="p-2 text-sm text-muted-foreground text-center">Carregando clientes...</div>
+                  ) : isError ? (
+                    <div className="p-2 text-sm text-destructive text-center font-bold">Erro ao carregar clientes.</div>
+                  ) : clients?.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground text-center font-bold">Não existem clientes ativos cadastrados.</div>
                   ) : (
-                    activeClients.map(c => (
+                    clients?.map(c => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.contact_name || 'Sem nome'} | {c.contact_email || 'Sem e-mail'} | {c.company || 'Sem empresa'}
+                        {c.contact_name || 'Sem nome'} | {c.contact_email || 'Sem e-mail'} | {c.company || 'Sem empresa'} | Status: {c.status}
                       </SelectItem>
                     ))
                   )}
