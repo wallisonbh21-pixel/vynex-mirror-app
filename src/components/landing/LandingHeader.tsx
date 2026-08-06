@@ -4,6 +4,7 @@ import { Sparkles, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth";
+import { sanitizeExternalUrl } from "@/lib/security";
 
 export function LandingHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,7 +54,7 @@ export function LandingHeader() {
           {navLinks.map((link) => (
             <a
               key={link.label}
-              href={link.href}
+              href={sanitizeExternalUrl(link.href)}
               className="text-sm font-medium text-slate-300 hover:text-primary transition-colors"
             >
               {link.label}
@@ -93,7 +94,7 @@ export function LandingHeader() {
           {navLinks.map((link) => (
             <a
               key={link.label}
-              href={link.href}
+              href={sanitizeExternalUrl(link.href)}
               className="text-lg font-medium text-slate-300"
               onClick={() => setMobileMenuOpen(false)}
             >
