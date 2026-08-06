@@ -72,13 +72,24 @@ function AdminClientesLogin() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const selectedClient = useMemo(() => availableClients.find(c => c.id === selectedClientId), [availableClients, selectedClientId]);
 
+  // Extract pending username from notes if available
+  const pendingUsername = useMemo(() => {
+    if (!selectedClient?.notes) return "";
+    try {
+      const notes = JSON.parse(selectedClient.notes);
+      return notes.pending_username || "";
+    } catch {
+      return "";
+    }
+  }, [selectedClient]);
+
   const clientFields: Field[] = [
     { 
       name: "clientId", 
-      label: "Cliente", 
+      label: "Selecione o Cliente Ativo", 
       type: "select", 
       required: true,
-      options: availableClients.map(c => ({ label: c.company, value: c.id })),
+      options: availableClients.map(c => ({ label: `${c.company} (${c.contact_name})`, value: c.id })),
       onChange: (val) => setSelectedClientId(val as string)
     },
     { 
@@ -87,14 +98,13 @@ function AdminClientesLogin() {
       required: true,
       defaultValue: selectedClient?.contact_name || "",
       disabled: true,
-      placeholder: "Selecione um cliente..."
     },
-
     { 
       name: "username", 
       label: "Nome de usuário", 
-      placeholder: "Ex: joaosilva", 
-      required: true 
+      required: true,
+      defaultValue: pendingUsername,
+      disabled: true,
     },
     { 
       name: "email", 
@@ -103,9 +113,7 @@ function AdminClientesLogin() {
       required: true,
       defaultValue: selectedClient?.contact_email || "",
       disabled: true,
-      placeholder: "Selecione um cliente..."
     },
-
   ];
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {
