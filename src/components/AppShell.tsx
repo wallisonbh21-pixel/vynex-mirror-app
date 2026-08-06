@@ -192,7 +192,15 @@ export function AppShell({
         ...NAV_VENDEDOR,
         { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
         { to: "/criacao", label: "Área do criador", icon: Layers },
-        { to: "/admin", label: "Administração", icon: ShieldCheck },
+        { 
+          to: "/admin", 
+          label: "Administração", 
+          icon: ShieldCheck,
+          submenu: [
+            { to: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
+            { to: "/admin/clientes", label: "Gerenciar Clientes", icon: Users },
+          ]
+        },
         { to: "/perfil", label: "Meu perfil", icon: UserRound },
       ]
     : isCriador
