@@ -43,6 +43,10 @@ export function useSaveRow(table: Table, invalidate: Table[] = []) {
     },
     onSuccess: () => {
       [table, ...invalidate].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
+      // Se salvamos um cliente, também invalidamos a lista de clientes para login
+      if (table === "clients") {
+        queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+      }
       toast.success("Registro salvo.");
     },
     onError: (error: Error) => toast.error(error.message),
