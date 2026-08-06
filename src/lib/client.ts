@@ -82,11 +82,11 @@ export function useClientPortalData() {
  * Busca a listagem de clientes para Admin/Vendedor.
  * @param ownerId Se fornecido, filtra pelos clientes do vendedor.
  */
-export function useClientsList(ownerId?: string) {
+export function useClientsList(ownerId?: string, statusFilter?: string) {
   return useQuery({
-    queryKey: ["clients-list", ownerId],
+    queryKey: ["clients-list", ownerId, statusFilter],
     queryFn: async () => {
-      // Importante: Buscamos diretamente de "clients" sem filtros de join que possam esconder registros sem profile/user_id
+      // Buscamos diretamente de "clients" garantindo que campos necessários para o seletor estejam presentes
       let query = supabase
         .from("clients")
         .select(`
@@ -96,8 +96,11 @@ export function useClientsList(ownerId?: string) {
         `);
       
       if (ownerId) {
-        // Se for vendedor, filtramos apenas pelos dele
         query = query.eq("owner_id", ownerId);
+      }
+
+      if (statusFilter) {
+        query = query.eq("status", statusFilter);
       }
 
       const { data, error } = await query.order("created_at", { ascending: false });
