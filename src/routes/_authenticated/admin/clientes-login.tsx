@@ -347,12 +347,12 @@ function AdminLoginCentral() {
                     <div className="p-2 text-sm text-muted-foreground text-center">Carregando clientes...</div>
                   ) : isError ? (
                     <div className="p-2 text-sm text-destructive text-center font-bold">Erro ao carregar clientes.</div>
-                  ) : clients?.length === 0 ? (
+                  ) : activeClients.length === 0 ? (
                     <div className="p-2 text-sm text-muted-foreground text-center font-bold">Não existem clientes ativos cadastrados.</div>
                   ) : (
-                    clients?.map(c => (
+                    activeClients.map(c => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.contact_name || 'Sem nome'} | {c.contact_email || 'Sem e-mail'} | {c.company || 'Sem empresa'} | Status: {c.status}
+                        {c.contact_name || 'Sem nome'} | {c.contact_email || 'Sem e-mail'} | {c.company || 'Sem empresa'}
                       </SelectItem>
                     ))
                   )}
