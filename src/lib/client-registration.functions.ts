@@ -3,12 +3,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const registerClientSchema = z.object({
-  contact_name: z.string().optional().nullable(),
   username: z.string().min(3, "O nome de usuário é obrigatório"),
   contact_email: z.string().email("E-mail inválido"),
-  contact_phone: z.string().optional().nullable(),
-  company: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
 });
 
 export const registerNewClient = createServerFn({ method: "POST" })
@@ -55,13 +51,11 @@ export const registerNewClient = createServerFn({ method: "POST" })
     const { data: newClient, error: insertError } = await supabaseAdmin
       .from("clients")
       .insert({
-        contact_name: data.contact_name || null,
+        contact_name: data.username,
         contact_email: data.contact_email,
-        contact_phone: data.contact_phone || null,
-        company: data.company || null,
         status: "active",
         owner_id: actorId,
-        notes: JSON.stringify({ pending_username: data.username, user_notes: data.notes }),
+        notes: JSON.stringify({ pending_username: data.username }),
       } as any)
       .select()
       .single();
