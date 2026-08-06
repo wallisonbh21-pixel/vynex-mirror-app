@@ -22,6 +22,7 @@ import {
   LayoutDashboard,
   Brain
 } from "lucide-react";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
 import { StatusBadge } from "@/components/StatusBadge";

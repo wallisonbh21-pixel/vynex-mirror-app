@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { shortDate } from '@/lib/format';
+import { sanitizeExternalUrl } from '@/lib/security';
 
 export const Route = createFileRoute('/aprovacao/$token')({
   component: ClientApprovalPage,
