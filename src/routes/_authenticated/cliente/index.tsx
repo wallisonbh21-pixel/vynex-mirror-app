@@ -4,6 +4,8 @@ import { useClientData, useClientProjects } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Rocket } from "lucide-react";
 import { PROJECT_STATUS } from "@/lib/format";
 import { ProjectProgression } from "@/components/ProjectProgression";
 
