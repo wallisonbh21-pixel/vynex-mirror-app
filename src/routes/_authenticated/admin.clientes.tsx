@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList, useRegisterClient, useClientOnboarding } from "@/lib/client";
+import { useClientsList, useRegisterClient, useClientOnboarding, useDeleteClient } from "@/lib/client";
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -18,8 +18,10 @@ import {
   ExternalLink,
   Key,
   Bell,
-  Calendar
+  Calendar,
+  Trash2
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +43,8 @@ function AdminClientes() {
   const { data: clients, isLoading, refetch } = useClientsList();
   const registerClient = useRegisterClient();
   const onboarding = useClientOnboarding();
+  const deleteClient = useDeleteClient();
+
   const resendInviteFn = useServerFn(resendInvite);
   const sendNotificationFn = useServerFn(sendNotification);
   
@@ -120,7 +124,24 @@ function AdminClientes() {
     }
   };
 
+  const handleDelete = async (client: any) => {
+    const hasAuth = !!client.user_id;
+    let confirmMsg = `Tem certeza que deseja excluir o cliente "${client.contact_name}"?\nEsta ação removerá o cadastro comercial do cliente.`;
+    
+    if (hasAuth) {
+      confirmMsg = `⚠️ ESTE CLIENTE POSSUI UM LOGIN VINCULADO!\n\n${confirmMsg}\n\nA exclusão poderá afetar o acesso ao Portal do Cliente. Deseja continuar?`;
+    }
+
+    if (window.confirm(confirmMsg)) {
+      try {
+        await deleteClient.mutateAsync(client.id);
+        refetch();
+      } catch (e) {}
+    }
+  };
+
   const filteredClients = clients?.filter((c) => {
+
     return c.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
@@ -284,9 +305,15 @@ function AdminClientes() {
                         </Button>
                       </>
                     )}
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                      <MoreVertical className="size-4" />
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDelete(client)}
+                    >
+                      <Trash2 className="size-4" />
                     </Button>
+
                   </div>
                 </div>
               );

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { createClientPortalAccount } from "./onboarding.functions";
 import { registerNewClient } from "./client-registration.functions";
+import { deleteClient } from "./client-deletion.functions";
+
 
 
 /**
@@ -163,3 +165,28 @@ export function useRegisterClient() {
     },
   });
 }
+
+/**
+ * Hook para excluir um cliente.
+ */
+export function useDeleteClient() {
+  const queryClient = useQueryClient();
+  const deleteFn = useServerFn(deleteClient);
+
+  return useMutation({
+    mutationFn: async (clientId: string) => {
+      return deleteFn({ data: { clientId } });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+      if (data.success) {
+        toast.success(data.message || "Cliente excluído.");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao excluir cliente.");
+    },
+  });
+}
+
