@@ -3,6 +3,49 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 
 /**
+ * Hook legado mantido para compatibilidade com o Portal do Cliente existente.
+ */
+export function useClientData() {
+  const { user } = useSession();
+  return useQuery({
+    queryKey: ["client-profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("*")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+/**
+ * Hook legado mantido para compatibilidade com o Portal do Cliente existente.
+ */
+export function useClientProjects() {
+  const { user } = useSession();
+  return useQuery({
+    queryKey: ["client-projects", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("projects")
+        .select(`
+          *,
+          contracts(title, amount),
+          clients(company, contact_name)
+        `)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+/**
  * Busca dados detalhados do cliente para o portal.
  */
 export function useClientPortalData() {
