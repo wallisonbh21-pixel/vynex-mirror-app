@@ -167,8 +167,8 @@ function AdminClientes() {
           ) : (
             filteredClients?.map((client) => {
               const hasLogin = !!client.user_id;
-              const profile = Array.isArray(client.profiles) ? client.profiles[0] : client.profiles;
-              const username = (profile as any)?.nickname;
+              const profile = (client as any).profiles;
+              const username = Array.isArray(profile) ? profile[0]?.nickname : profile?.nickname;
 
               return (
                 <div key={client.id} className="group relative flex flex-col md:flex-row md:items-center justify-between p-6 rounded-xl border border-border bg-card hover:shadow-md transition-all gap-4">

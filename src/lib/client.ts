@@ -89,13 +89,10 @@ export function useClientsList(ownerId?: string, statusFilter?: string) {
       // Reutilizando a mesma fonte de dados e lógica da página CLIENTES
       // Buscamos diretamente de "clients" garantindo que campos necessários para o seletor estejam presentes
 
+      // CONSULTA SIMPLIFICADA PARA TESTE DE DIAGNÓSTICO (REQUISITO 3)
       let query = supabase
         .from("clients")
-        .select(`
-          *,
-          projects(id, title, status),
-          profiles:user_id(full_name, nickname, avatar_url)
-        `);
+        .select("id, company, contact_name, contact_email, status, owner_id, user_id, created_at");
       
       if (ownerId) {
         query = query.eq("owner_id", ownerId);
