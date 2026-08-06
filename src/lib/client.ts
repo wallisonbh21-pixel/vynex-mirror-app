@@ -92,14 +92,7 @@ export function useClientsList(ownerId?: string, statusFilter?: string) {
       let query = supabase
         .from("clients")
         .select(`
-          id,
-          company,
-          contact_name,
-          contact_email,
-          status,
-          user_id,
-          owner_id,
-          created_at,
+          *,
           projects(id, title, status)
         `);
       
