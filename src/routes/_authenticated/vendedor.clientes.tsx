@@ -45,7 +45,7 @@ function VendedorClientes() {
     try {
       const submissionData = {
         ...values,
-        notes: values.notes || "",
+        notes: (values as any).notes || "",
       };
       await registerClient.mutateAsync(submissionData);
     } catch (error) {

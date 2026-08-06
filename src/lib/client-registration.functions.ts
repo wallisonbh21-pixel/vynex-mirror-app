@@ -40,6 +40,26 @@ export const registerNewClient = createServerFn({ method: "POST" })
       throw new Error("Este nome de usuário já está sendo utilizado.");
     }
 
+    // 2. Create the commercial client record first
+    const { data: newClient, error: clientError } = await supabaseAdmin
+      .from("clients")
+      .insert({
+        contact_name: data.contact_name,
+        contact_email: data.contact_email,
+        contact_phone: data.contact_phone,
+        company: data.company,
+        notes: data.notes,
+        owner_id: actorId,
+        status: "ativo"
+      } as any)
+      .select()
+      .single();
+
+    if (clientError || !newClient) {
+      console.error("[DEBUG] client_creation_failed", clientError);
+      throw new Error(`Erro ao salvar o registro do cliente: ${clientError?.message || "Registro não criado"}`);
+    }
+
     console.log("[DEBUG] client_created", { clientId: newClient.id, email: data.contact_email });
 
     // 4. AUTOMATIC ONBOARDING: Create access portal account
