@@ -125,13 +125,8 @@ function AdminLoginCentral() {
 
   const handleOpenModal = (clientId?: string) => {
     if (clientId) {
-      const client = clients?.find(c => c.id === clientId);
-      if (client?.user_id) {
-        toast.info("Este cliente já possui um acesso ao Portal do Cliente.");
-        // Could open a different management view here if needed
-        return;
-      }
       setSelectedClientId(clientId);
+      const client = clients?.find(c => c.id === clientId);
       setUsername(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
     } else {
       setSelectedClientId("");
