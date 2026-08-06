@@ -45,3 +45,6 @@ export const requireCriadorOuAdmin = () => requireRole(["criador", "admin"]);
 
 /** Rotas administrativas. */
 export const requireAdmin = () => requireRole(["admin"]);
+
+/** Rotas exclusivas do cliente. */
+export const requireCliente = () => requireRole(["cliente"]);

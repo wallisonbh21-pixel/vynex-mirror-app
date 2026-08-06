@@ -31,6 +31,7 @@ export type Database = {
           owner_id: string
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           city?: string | null
@@ -48,6 +49,7 @@ export type Database = {
           owner_id: string
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           city?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           owner_id?: string
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1475,7 +1478,7 @@ export type Database = {
       set_client_token: { Args: { token: string }; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "vendedor" | "criador" | "diretor" | "rh"
+      app_role: "admin" | "vendedor" | "criador" | "diretor" | "rh" | "cliente"
       meeting_participant_status:
         | "PENDING"
         | "ACCEPTED"
@@ -1623,7 +1626,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "vendedor", "criador", "diretor", "rh"],
+      app_role: ["admin", "vendedor", "criador", "diretor", "rh", "cliente"],
       meeting_participant_status: [
         "PENDING",
         "ACCEPTED",
