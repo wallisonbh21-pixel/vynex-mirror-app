@@ -48,7 +48,7 @@ function PrimeiroAcessoPage() {
     e.preventDefault();
     const result = schema.safeParse({ password, confirm });
     if (!result.success) {
-      toast.error(result.error.issues[0].message);
+      toast.error(result.error.issues?.[0]?.message || "Entrada inválida");
       return;
     }
 
