@@ -3,11 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const registerClientSchema = z.object({
-  contact_name: z.string().min(2, "O nome completo é obrigatório e deve ter pelo menos 2 caracteres"),
-  username: z.string().min(3, "O nome de usuário é obrigatório e deve ter pelo menos 3 caracteres"), // This goes to profile nickname later
+  contact_name: z.string().min(2, "O nome completo é obrigatório"),
+  username: z.string().min(3, "O nome de usuário é obrigatório"),
   contact_email: z.string().email("E-mail inválido"),
   contact_phone: z.string().optional().nullable(),
-  company: z.string().optional().nullable(),
+  company: z.string().min(2, "O nome da empresa/negócio é obrigatório"),
 });
 
 export const registerNewClient = createServerFn({ method: "POST" })

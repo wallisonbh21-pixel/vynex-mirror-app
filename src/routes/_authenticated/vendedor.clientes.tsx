@@ -45,7 +45,7 @@ function VendedorClientes() {
     { name: "username", label: "Nome de usuário", required: true, placeholder: "Ex: joaosilva" },
     { name: "contact_email", label: "E-mail", type: "email", required: true, placeholder: "Ex: joao@email.com" },
     { name: "contact_phone", label: "Telefone", placeholder: "Ex: (11) 99999-9999" },
-    { name: "company", label: "Empresa/Negócio", placeholder: "Ex: Nexus Corp" },
+    { name: "company", label: "Empresa/Negócio", required: true, placeholder: "Ex: Nexus Corp" },
   ];
 
   const handleRegisterClient = async (values: Record<string, unknown>) => {
