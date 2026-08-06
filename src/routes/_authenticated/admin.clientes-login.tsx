@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { 
   Search, 
   Plus, 
-  UserPlus, 
   Ban, 
   CheckCircle2, 
   Mail, 
@@ -26,8 +25,7 @@ import {
 } from "lucide-react";
 import { useClientsList, useClientOnboarding } from "@/lib/client";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +54,7 @@ function AdminClientesLogin() {
   const updateStatusFn = useServerFn(updateLoginStatus);
   const queryClient = useQueryClient();
 
-  const filteredClients = clients?.filter(c => !!c.user_id && (
+  const filteredClients = (clients as any[])?.filter(c => !!c.user_id && (
     c.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
     (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
@@ -71,13 +69,13 @@ function AdminClientesLogin() {
       label: "Cliente Vinculado", 
       type: "select", 
       required: true,
-      options: clients?.filter(c => !c.user_id).map(c => ({ label: c.company, value: c.id })) || []
+      options: (clients as any[])?.filter(c => !c.user_id).map(c => ({ label: c.company, value: c.id })) || []
     },
   ];
 
-  const handleCreateAccess = async (data: any) => {
+  const handleCreateAccess = async (values: Record<string, unknown>) => {
     try {
-      await onboarding.mutateAsync(data);
+      await onboarding.mutateAsync(values as any);
     } catch (error: any) {
       console.error(error);
     }
@@ -109,16 +107,15 @@ function AdminClientesLogin() {
       actions={
         <RecordDialog
           title="Criar Acesso ao Portal"
-          description="Preencha os dados abaixo para enviar um convite de acesso ao cliente."
           fields={clientFields}
-          onSave={handleCreateAccess}
-          isLoading={onboarding.isPending}
-        >
-          <Button className="gap-2">
-            <Plus className="size-4" />
-            Criar acesso
-          </Button>
-        </RecordDialog>
+          onSubmit={handleCreateAccess}
+          trigger={
+            <Button className="gap-2" disabled={onboarding.isPending}>
+              <Plus className="size-4" />
+              {onboarding.isPending ? "Criando..." : "Criar acesso"}
+            </Button>
+          }
+        />
       }
     >
       <div className="space-y-6">
@@ -168,7 +165,6 @@ function AdminClientesLogin() {
                     <TableCell className="text-sm font-semibold">{client.company}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize text-[10px] font-bold">
-                        {/* Status logic depends on database column, for now assuming Active if linked */}
                         Ativo
                       </Badge>
                     </TableCell>
@@ -217,3 +213,4 @@ function AdminClientesLogin() {
     </AppShell>
   );
 }
+
