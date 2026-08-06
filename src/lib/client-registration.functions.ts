@@ -140,8 +140,8 @@ export const registerNewClient = createServerFn({ method: "POST" })
       }, { onConflict: "user_id,role" });
       if (roleErr) throw new Error(`Erro ao definir role: ${roleErr.message}`);
 
-      // 4.4 Generate access link
-      console.log("[DEBUG] invite_generated", { email: data.contact_email });
+      // 4.4 Generate access link and trigger email
+      console.log("[DEBUG] email_prepare", { email: data.contact_email });
       const { data: linkData, error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: data.contact_email,
@@ -149,18 +149,42 @@ export const registerNewClient = createServerFn({ method: "POST" })
       });
 
       if (recoveryError) {
-        console.error("[DEBUG] email_failed", { error: recoveryError.message });
+        console.error("[DEBUG] email_send_failed", { error: recoveryError.message });
         return {
           success: true,
           client: newClient,
           onboardingSuccess: false,
-          message: "Cliente e acesso criados, mas não foi possível enviar o e-mail. Use 'Reenviar Acesso'."
+          message: "A conta foi criada, mas o link de acesso não pôde ser gerado. Verifique as configurações de Auth."
         };
       }
 
-      console.log("[DEBUG] email_sent", { email: data.contact_email });
+      console.log("[DEBUG] email_link_generated", { email: data.contact_email });
+      
+      // Triggering real email delivery via Supabase resetPasswordForEmail
+      // This uses the project's configured SMTP or default Supabase SMTP
+      console.log("[DEBUG] email_send_attempt", { email: data.contact_email });
+      const { error: sendError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.contact_email, {
+        redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`,
+        data: { 
+          full_name: data.contact_name || data.username,
+          username: data.username
+        }
+      });
+
+      if (sendError) {
+        console.error("[DEBUG] email_send_failed", { error: sendError.message });
+        return {
+          success: true,
+          client: newClient,
+          onboardingSuccess: false,
+          message: "Link de acesso gerado, mas o envio do e-mail falhou. Verifique o SMTP no Lovable Cloud."
+        };
+      }
+
+      console.log("[DEBUG] email_send_success", { email: data.contact_email });
       console.log("[DEBUG] onboarding_completed", { clientId: newClient.id });
-      onboardingResult = { success: true, message: "Cliente cadastrado e acesso enviado por e-mail." };
+      onboardingResult = { success: true, message: "Link de acesso gerado e enviado ao e-mail do cliente." };
+
 
     } catch (e: any) {
       console.error("[DEBUG] onboarding_error", e);
