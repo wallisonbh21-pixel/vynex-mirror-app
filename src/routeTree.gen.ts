@@ -35,7 +35,6 @@ import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
-import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin.clientes-login'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
 import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
@@ -56,7 +55,6 @@ import { Route as AuthenticatedReunioesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
 import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor.clientes'
-import { Route as AuthenticatedVendedorClientesLoginRouteImport } from './routes/_authenticated/vendedor.clientes-login'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 
 const IndexRoute = IndexRouteImport.update({
@@ -193,12 +191,6 @@ const AuthenticatedAdminClientesRoute =
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminClientesLoginRoute =
-  AuthenticatedAdminClientesLoginRouteImport.update({
-    id: '/clientes-login',
-    path: '/clientes-login',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedBriefingProjectIdRoute =
   AuthenticatedBriefingProjectIdRouteImport.update({
     id: '/briefing/$projectId',
@@ -318,12 +310,6 @@ const AuthenticatedVendedorClientesRoute =
     path: '/vendedor/clientes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedVendedorClientesLoginRoute =
-  AuthenticatedVendedorClientesLoginRouteImport.update({
-    id: '/vendedor/clientes-login',
-    path: '/vendedor/clientes-login',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const ApiProspectingSearchRoute = ApiProspectingSearchRouteImport.update({
   id: '/api/prospecting/search',
   path: '/api/prospecting/search',
@@ -356,7 +342,6 @@ export interface FileRoutesByFullPath {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
-  '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -374,7 +359,6 @@ export interface FileRoutesByFullPath {
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
-  '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/cliente/': typeof AuthenticatedClienteIndexRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -405,7 +389,6 @@ export interface FileRoutesByTo {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
-  '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -423,7 +406,6 @@ export interface FileRoutesByTo {
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
-  '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/cliente': typeof AuthenticatedClienteIndexRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
@@ -457,7 +439,6 @@ export interface FileRoutesById {
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
-  '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/_authenticated/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -475,7 +456,6 @@ export interface FileRoutesById {
   '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/_authenticated/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
-  '/_authenticated/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/_authenticated/cliente/': typeof AuthenticatedClienteIndexRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -509,7 +489,6 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/admin/clientes'
-    | '/admin/clientes-login'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
@@ -527,7 +506,6 @@ export interface FileRouteTypes {
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/vendedor/clientes'
-    | '/vendedor/clientes-login'
     | '/api/prospecting/search'
     | '/cliente/'
     | '/leads/'
@@ -558,7 +536,6 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/admin/clientes'
-    | '/admin/clientes-login'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
@@ -576,7 +553,6 @@ export interface FileRouteTypes {
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/vendedor/clientes'
-    | '/vendedor/clientes-login'
     | '/api/prospecting/search'
     | '/cliente'
     | '/leads'
@@ -609,7 +585,6 @@ export interface FileRouteTypes {
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
     | '/_authenticated/admin/clientes'
-    | '/_authenticated/admin/clientes-login'
     | '/_authenticated/briefing/$projectId'
     | '/_authenticated/cliente/aprovacoes'
     | '/_authenticated/cliente/documentos'
@@ -627,7 +602,6 @@ export interface FileRouteTypes {
     | '/_authenticated/site-planner/$projectId'
     | '/_authenticated/studio/$projectId'
     | '/_authenticated/vendedor/clientes'
-    | '/_authenticated/vendedor/clientes-login'
     | '/api/prospecting/search'
     | '/_authenticated/cliente/'
     | '/_authenticated/leads/'
@@ -827,13 +801,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/clientes-login': {
-      id: '/_authenticated/admin/clientes-login'
-      path: '/clientes-login'
-      fullPath: '/admin/clientes-login'
-      preLoaderRoute: typeof AuthenticatedAdminClientesLoginRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/briefing/$projectId': {
       id: '/_authenticated/briefing/$projectId'
       path: '/briefing/$projectId'
@@ -974,13 +941,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVendedorClientesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/vendedor/clientes-login': {
-      id: '/_authenticated/vendedor/clientes-login'
-      path: '/vendedor/clientes-login'
-      fullPath: '/vendedor/clientes-login'
-      preLoaderRoute: typeof AuthenticatedVendedorClientesLoginRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/api/prospecting/search': {
       id: '/api/prospecting/search'
       path: '/api/prospecting/search'
@@ -1029,12 +989,10 @@ const AuthenticatedClienteRouteRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
-  AuthenticatedAdminClientesLoginRoute: typeof AuthenticatedAdminClientesLoginRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
-  AuthenticatedAdminClientesLoginRoute: AuthenticatedAdminClientesLoginRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -1080,7 +1038,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSitePlannerProjectIdRoute: typeof AuthenticatedSitePlannerProjectIdRoute
   AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedVendedorClientesRoute: typeof AuthenticatedVendedorClientesRoute
-  AuthenticatedVendedorClientesLoginRoute: typeof AuthenticatedVendedorClientesLoginRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
   AuthenticatedReunioesIndexRoute: typeof AuthenticatedReunioesIndexRoute
 }
@@ -1113,8 +1070,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSitePlannerProjectIdRoute,
   AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
   AuthenticatedVendedorClientesRoute: AuthenticatedVendedorClientesRoute,
-  AuthenticatedVendedorClientesLoginRoute:
-    AuthenticatedVendedorClientesLoginRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
   AuthenticatedReunioesIndexRoute: AuthenticatedReunioesIndexRoute,
 }

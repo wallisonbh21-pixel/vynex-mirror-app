@@ -70,15 +70,7 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
-  { 
-    to: "/clientes", 
-    label: "CLIENTE", 
-    icon: UserRound,
-    submenu: [
-      { to: "/clientes", label: "Clientes", icon: Users },
-      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
-    ]
-  },
+  { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/historico", label: "Histórico", icon: History },
@@ -90,15 +82,6 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ];
 
-const CLIENTE_SUBMENU: NavItem = {
-  to: "/clientes",
-  label: "CLIENTE",
-  icon: UserRound,
-  submenu: [
-    { to: "/clientes", label: "Clientes", icon: Users },
-    { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
-  ]
-};
 
 /** Menu do time de criação — Reorganizado V2.3. */
 const NAV_CRIADOR: NavItem[] = [
@@ -211,15 +194,7 @@ export function AppShell({
         ...NAV_VENDEDOR,
         { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
         { to: "/criacao", label: "Área do criador", icon: Layers },
-        { 
-          to: "/admin/clientes", 
-          label: "CLIENTE", 
-          icon: UserRound,
-          submenu: [
-            { to: "/admin/clientes", label: "Clientes", icon: Users },
-            { to: "/admin/clientes-login", label: "Login do Cliente", icon: Lock },
-          ]
-        },
+        { to: "/admin/clientes", label: "Clientes", icon: Users },
         { 
           to: "/admin", 
           label: "Administração", 

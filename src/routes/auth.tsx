@@ -92,11 +92,12 @@ function AuthPage() {
       
     const roles = rolesData?.map(r => r.role) || [];
     
-    if (roles.includes("cliente")) {
-      navigate({ to: "/cliente", replace: true });
-    } else {
-      navigate({ to: "/painel", replace: true });
-    }
+    // Get redirect path from state or role
+    const state = (window.history.state as any);
+    const from = state?.usr?.from || (roles.includes("cliente") ? "/cliente" : "/painel");
+    
+    navigate({ to: from, replace: true });
+
   }
 
 
@@ -161,7 +162,9 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/painel", replace: true });
+    // The Google callback will handle the user session, but we also want to ensure correct redirect if they were just logged in
+    // This is handled by the useEffect above which checks getSession()
+
   }
 
   const required = <span className="ml-1 text-destructive">*</span>;

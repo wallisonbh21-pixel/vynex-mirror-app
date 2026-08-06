@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 export type Field = {
   name: string;
   label: string;
-  type?: "text" | "number" | "date" | "textarea" | "select" | "email";
+  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "hidden";
   options?: { value: string; label: string }[];
   required?: boolean;
   disabled?: boolean;
@@ -39,12 +39,14 @@ export function RecordDialog({
   fields,
   initial,
   onSubmit,
+  onOpenChange,
 }: {
   title: string;
   trigger: ReactNode;
   fields: Field[];
   initial?: Record<string, unknown>;
   onSubmit: (values: Record<string, unknown>) => void | Promise<void>;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
@@ -104,7 +106,10 @@ export function RecordDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(val) => {
+      setOpen(val);
+      onOpenChange?.(val);
+    }}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
@@ -113,6 +118,9 @@ export function RecordDialog({
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {fields.map((field) => {
             const error = errors[field.name];
+            if (field.type === "hidden") {
+              return <input key={field.name} type="hidden" name={field.name} value={values[field.name] ?? ""} />;
+            }
             return (
               <div key={field.name} className="space-y-2">
                 <Label htmlFor={field.name}>
