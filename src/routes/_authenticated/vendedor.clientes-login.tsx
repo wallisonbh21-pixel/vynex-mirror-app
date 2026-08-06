@@ -113,7 +113,8 @@ function VendedorClientesLogin() {
             filteredClients?.map((client) => {
               const hasLogin = !!client.user_id;
               const status = hasLogin ? "Acesso ativo" : "Acesso pendente";
-              const username = client.profiles?.nickname || (()=>{
+              const profile = Array.isArray(client.profiles) ? client.profiles[0] : client.profiles;
+              const username = (profile as any)?.nickname || (()=>{
                 try { return JSON.parse(client.notes || '{}').pending_username || '-'; } catch { return '-'; }
               })();
 
