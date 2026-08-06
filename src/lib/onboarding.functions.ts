@@ -24,7 +24,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     const { data: client, error: clientErr } = await userSupabase
       .from("clients")
-      .select("owner_id, status, user_id, company, contact_email, contact_name, username")
+      .select("owner_id, status, user_id, company, contact_email, contact_name")
       .eq("id", data.clientId)
       .single();
     
