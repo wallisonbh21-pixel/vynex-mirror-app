@@ -41,6 +41,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       if (!clientEmail) throw new Error("[CLIENT_LOGIN_ERROR] etapa=client_data error=missing_email");
 
       // 3. Search for Auth user by email
+      console.log("[DEBUG] auth_lookup", { email: clientEmail });
       const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
       if (listError) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=auth_lookup error=${listError.message}`);
       
@@ -50,7 +51,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
       if (existingAuthUser) {
         // CASE: Auth user exists
-        targetAuthUserId = existingAuthUser.id;
+        console.log("[DEBUG] auth_created_or_existing", { status: "existing", authId: existingAuthUser.id });
 
         // Check if linked to ANOTHER client
         const { data: otherClient } = await supabaseAdmin
@@ -116,6 +117,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       if (roleErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=role_assign error=${roleErr.message}`);
 
       // 6. Generate and send recovery link
+      console.log("[DEBUG] invite_generated", { email: clientEmail });
       const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: clientEmail,
@@ -125,6 +127,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       });
 
       if (recoveryError) {
+        console.error("[DEBUG] email_failed", { error: recoveryError.message });
         return {
           success: false,
           error: "AUTH_LINK_FAILED",
@@ -132,6 +135,8 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         };
       }
 
+      console.log("[DEBUG] email_sent", { email: clientEmail });
+      console.log("[DEBUG] onboarding_completed", { clientId: data.clientId });
       return { 
         success: true, 
         userId: targetAuthUserId,
