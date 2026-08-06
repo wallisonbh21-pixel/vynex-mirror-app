@@ -84,12 +84,12 @@ function AdminClientesLogin() {
     { 
       name: "fullName", 
       label: "Nome completo", 
-      placeholder: "Selecione um cliente...", 
       required: true,
       defaultValue: selectedClient?.contact_name || "",
       disabled: true,
       placeholder: "Selecione um cliente..."
     },
+
     { 
       name: "username", 
       label: "Nome de usuário", 
