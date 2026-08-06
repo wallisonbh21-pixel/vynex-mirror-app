@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "diretor" | "rh" | "vendedor" | "criador";
+export type AppRole = "admin" | "diretor" | "rh" | "vendedor" | "criador" | "cliente";
 
 /** Nomes em português das funções da plataforma. */
 export const ROLE_LABEL: Record<string, string> = {
@@ -12,6 +12,7 @@ export const ROLE_LABEL: Record<string, string> = {
   rh: "Administrativo (RH)",
   vendedor: "Vendedor",
   criador: "Criador",
+  cliente: "Cliente",
 };
 
 export const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
@@ -20,6 +21,7 @@ export const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
   { value: "rh", label: ROLE_LABEL['rh']! },
   { value: "vendedor", label: ROLE_LABEL['vendedor']! },
   { value: "criador", label: ROLE_LABEL['criador']! },
+  { value: "cliente", label: ROLE_LABEL['cliente']! },
 ];
 
 export type Profile = {
