@@ -112,7 +112,7 @@ export function useClientOnboarding() {
 
   return useMutation({
     mutationFn: async (params: { email: string; fullName: string; clientId: string }) => {
-      return onboardFn(params);
+      return onboardFn({ data: params });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients-list"] });
