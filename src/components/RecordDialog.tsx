@@ -26,7 +26,9 @@ export type Field = {
   type?: "text" | "number" | "date" | "textarea" | "select" | "email";
   options?: { value: string; label: string }[];
   required?: boolean;
+  disabled?: boolean;
   placeholder?: string;
+  onChange?: (value: string | number | null) => void;
 };
 
 export function RecordDialog({
@@ -65,6 +67,13 @@ export function RecordDialog({
       delete next[name];
       return next;
     });
+
+    // Handle field specific onChange
+    const field = fields.find(f => f.name === name);
+    if (field?.onChange) {
+      if (field.type === "number") field.onChange(value === "" ? 0 : Number(value));
+      else field.onChange(value === "" ? null : value);
+    }
   }
 
   function handleSubmit(event: React.FormEvent) {
@@ -113,6 +122,7 @@ export function RecordDialog({
                     maxLength={1000}
                     aria-invalid={!!error}
                     className={cn(error && "border-destructive")}
+                    disabled={field.disabled}
                     value={values[field.name] ?? ""}
                     onChange={(e) => setValue(field.name, e.target.value)}
                   />
@@ -120,6 +130,7 @@ export function RecordDialog({
                   <Select
                     value={values[field.name] ?? ""}
                     onValueChange={(value) => setValue(field.name, value)}
+                    disabled={field.disabled}
                   >
                     <SelectTrigger
                       id={field.name}
@@ -145,6 +156,7 @@ export function RecordDialog({
                     aria-invalid={!!error}
                     className={cn("transition-colors", error && "border-destructive")}
                     value={values[field.name] ?? ""}
+                    disabled={field.disabled}
                     onChange={(e) => setValue(field.name, e.target.value)}
                   />
                 )}
