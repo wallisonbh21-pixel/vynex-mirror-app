@@ -4,6 +4,7 @@ import { useClientData, useClientProjects } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PROJECT_STATUS } from "@/lib/format";
 import { ProjectProgression } from "@/components/ProjectProgression";
 
 export const Route = createFileRoute("/_authenticated/cliente/")({
@@ -61,7 +62,7 @@ function ClientDashboard() {
                 </div>
                 
                 <div className="py-4">
-                  <ProjectProgression status={activeProject.status} />
+                  <ProjectProgression steps={[...PROJECT_STATUS]} currentStatus={activeProject.status} />
                 </div>
               </CardContent>
             </Card>

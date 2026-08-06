@@ -63,14 +63,14 @@ function MyProfile() {
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <Input id="email" defaultValue={client?.email || ""} className="pl-10 bg-background/50 border-sidebar-border/50" readOnly />
+                  <Input id="email" defaultValue={client?.contact_email || ""} className="pl-10 bg-background/50 border-sidebar-border/50" readOnly />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone / WhatsApp</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <Input id="phone" defaultValue={client?.phone || ""} className="pl-10 bg-background/50 border-sidebar-border/50" readOnly />
+                  <Input id="phone" defaultValue={client?.contact_phone || ""} className="pl-10 bg-background/50 border-sidebar-border/50" readOnly />
                 </div>
               </div>
             </CardContent>
