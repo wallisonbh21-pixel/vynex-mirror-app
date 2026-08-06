@@ -33,9 +33,8 @@ function ClientResetPassword() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       
-      // Mark first access as completed in user_roles if we had the column
-      // For now, just redirect
       toast.success("Senha definida com sucesso!");
+      // O redirect automático para /cliente já está configurado no handleReset pós-sucesso
       navigate({ to: "/cliente", replace: true });
     } catch (error: any) {
       toast.error(error.message || "Erro ao definir senha.");

@@ -194,13 +194,20 @@ export function AppShell({
         { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
         { to: "/criacao", label: "Área do criador", icon: Layers },
         { 
+          to: "/admin/clientes", 
+          label: "CLIENTE", 
+          icon: UserRound,
+          submenu: [
+            { to: "/admin/clientes", label: "Clientes", icon: Users },
+            { to: "/admin/clientes-login", label: "Login do Cliente", icon: Lock },
+          ]
+        },
+        { 
           to: "/admin", 
           label: "Administração", 
           icon: ShieldCheck,
           submenu: [
             { to: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
-            { to: "/admin/clientes", label: "Gerenciar Clientes", icon: Users },
-            { to: "/admin/clientes-login", label: "Login dos Clientes", icon: Lock },
           ]
         },
         { to: "/perfil", label: "Meu perfil", icon: UserRound },
