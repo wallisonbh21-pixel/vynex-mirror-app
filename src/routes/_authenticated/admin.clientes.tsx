@@ -90,12 +90,14 @@ function AdminClientes() {
       
       const result = await onboarding.mutateAsync(payload as any);
       if (result.success) {
-        toast.success("Login do cliente criado com sucesso. Os dados de acesso foram enviados para o e-mail cadastrado.");
+        toast.success(result.message);
         setIsLoginDialogOpen(false);
         setSelectedClientId("");
         refetch();
       }
-    } catch (error) {}
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar login.");
+    }
   };
 
   const handleResend = async (email: string) => {

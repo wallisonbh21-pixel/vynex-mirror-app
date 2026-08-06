@@ -84,22 +84,26 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     await supabaseAdmin.from("profiles").upsert({ id: newUser.id, nickname: data.username, full_name: client.contact_name || data.username } as any);
     await supabaseAdmin.from("user_roles").upsert({ user_id: newUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
 
-    // Send email with credentials
+    // 6. Send access e-mail using REAL SMTP flow (inviteUserByEmail)
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
     const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
       redirectTo: `${siteUrl}/reset-password`,
       data: { 
-        temp_password: initialPassword,
-        is_new_client: true,
-        platform_url: `${siteUrl}/auth`
+        full_name: client.contact_name || data.username,
+        username: data.username,
+        platform_name: "ScaleNexus"
       }
     });
 
     if (inviteError) {
-      return { success: true, message: "Login criado, mas não foi possível enviar o e-mail. Verifique a configuração de SMTP." };
+      console.error("[ONBOARDING_EMAIL_ERROR]", inviteError);
+      throw new Error(`O login foi criado, mas houve um erro real no envio do e-mail: ${inviteError.message}`);
     }
 
-    return { success: true, message: "Login do cliente criado com sucesso e credenciais enviadas." };
+    return { 
+      success: true, 
+      message: "Login do cliente criado com sucesso. O e-mail de acesso real foi disparado para a caixa de entrada do cliente." 
+    };
   });
 
 export const resendInvite = createServerFn({ method: "POST" })

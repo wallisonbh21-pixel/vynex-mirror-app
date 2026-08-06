@@ -71,12 +71,13 @@ function ResetPasswordPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Senha atualizada. Bem-vindo!");
+    toast.success("Sua senha foi definida com sucesso!");
     
     // Identify role to redirect
     const { data: { user } } = await supabase.auth.getUser();
     const isCliente = user?.user_metadata?.['role'] === 'cliente';
     
+    // Auto redirect to /cliente after password creation
     navigate({ to: isCliente ? "/cliente" : "/painel", replace: true });
   }
 
@@ -97,11 +98,11 @@ function ResetPasswordPage() {
         </Link>
 
         <div className="rounded-3xl border border-border bg-card p-6 shadow-panel">
-          <h1 className="text-lg font-semibold">Definir nova senha</h1>
+          <h1 className="text-lg font-semibold">Crie sua senha</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {ready
-              ? "Escolha uma nova senha para acessar a plataforma."
-              : "Abra esta página pelo link enviado no seu e-mail de recuperação."}
+              ? "Defina uma senha segura para acessar seu Portal do Cliente."
+              : "Aguardando validação da sessão..."}
           </p>
 
           <form onSubmit={submit} noValidate className="mt-6 space-y-4">
@@ -134,7 +135,7 @@ function ResetPasswordPage() {
               className="w-full transition-transform hover:-translate-y-0.5"
               disabled={loading || !ready}
             >
-              {loading ? "Salvando..." : "Salvar nova senha"}
+              {loading ? "Salvando..." : "Criar senha"}
             </Button>
           </form>
 
