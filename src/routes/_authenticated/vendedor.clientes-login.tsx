@@ -7,18 +7,21 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { 
   Building2, 
   Search, 
-  UserPlus,
-  Mail,
   ShieldCheck,
   Send,
   Plus,
-  Circle
+  Circle,
+  Mail,
+  User,
+  Ban,
+  CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute('/_authenticated/vendedor/clientes-login')({
   beforeLoad: () => requireVendedor(),
@@ -31,105 +34,44 @@ function VendedorClientesLogin() {
   const onboarding = useClientOnboarding();
   const register = useRegisterClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
-
-  const selectedClient = clients?.find(c => c.id === selectedClientId);
-  
-  const pendingUsername = (() => {
-    if (!selectedClient?.notes) return "";
-    try {
-      const notes = JSON.parse(selectedClient.notes);
-      return notes.pending_username || "";
-    } catch {
-      return "";
-    }
-  })();
 
   const registerFields: Field[] = [
-    { 
-      name: "username", 
-      label: "Usuário", 
-      required: true,
-      placeholder: "Ex: joao_silva"
-    },
-    { 
-      name: "contact_email", 
-      label: "E-mail", 
-      type: "email", 
-      required: true,
-      placeholder: "Ex: joao@email.com"
-    }
+    { name: "username", label: "Usuário *", required: true, placeholder: "Ex: joaosilva" },
+    { name: "contact_email", label: "E-mail *", type: "email", required: true, placeholder: "Ex: joao@email.com" },
+    { name: "contact_name", label: "Nome completo", placeholder: "Opcional" },
+    { name: "contact_phone", label: "Telefone", placeholder: "Opcional" },
+    { name: "company", label: "Empresa/Negócio", placeholder: "Opcional" },
+    { name: "notes", label: "Observações", type: "textarea", placeholder: "Opcional" },
   ];
 
-  const loginFields: Field[] = [
-    { 
-      name: "fullName", 
-      label: "Cliente", 
-      defaultValue: selectedClient?.contact_name || selectedClient?.contact_email || "Cliente",
-      disabled: true,
-    },
-    { 
-      name: "email", 
-      label: "E-mail", 
-      type: "email", 
-      defaultValue: selectedClient?.contact_email || "",
-      disabled: true,
-    },
-    { 
-      name: "username", 
-      label: "Usuário de Acesso", 
-      defaultValue: pendingUsername,
-      required: true,
-      placeholder: "Defina o usuário de acesso al portal"
-    },
-    { 
-      name: "clientId", 
-      label: "Client ID", 
-      type: "hidden",
-      defaultValue: selectedClientId,
-    }
-  ];
+  const filteredClients = clients?.filter((c) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (c.contact_name?.toLowerCase() || "").includes(searchLower) ||
+      (c.contact_email?.toLowerCase() || "").includes(searchLower) ||
+      (c.company?.toLowerCase() || "").includes(searchLower)
+    );
+  });
 
-  const handleCreateLogin = async (values: Record<string, unknown>) => {
+  const handleResendAccess = async (client: any) => {
     try {
-      const payload = {
-        clientId: selectedClientId,
-        username: values["username"] as string,
-      };
+      const result = await onboarding.mutateAsync({
+        clientId: client.id,
+        username: (client as any).profiles?.nickname || JSON.parse(client.notes || '{}').pending_username || client.contact_name
+      } as any);
       
-      const result = await onboarding.mutateAsync(payload as any);
       if (result.success) {
         toast.success(result.message);
-        setSelectedClientId("");
       } else {
         toast.error(result.message);
       }
-    } catch (error) {
-      // handled by hook
-    }
+    } catch (e) {}
   };
-
-  const clientsWithoutLogin = clients?.filter((c) => !c.user_id && (c.status === 'active' || c.status === 'ativo'));
-  const clientsWithLogin = clients?.filter((c) => !!c.user_id && (c.status === 'active' || c.status === 'ativo'));
-
-  const filteredWithoutLogin = clientsWithoutLogin?.filter((c) => {
-    const matchesSearch = 
-      (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
-
-  const filteredWithLogin = clientsWithLogin?.filter((c) => {
-    const matchesSearch = 
-      (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
 
   return (
     <AppShell 
       title="Gerenciamento de Acessos" 
-      description="Gerencie os acessos, reenvie convites e monitore o status dos seus clientes."
+      description="Gerencie os acessos, reenvie convites e monitore o status dos clientes."
     >
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -158,105 +100,88 @@ function VendedorClientesLogin() {
           />
         </div>
 
-        <div className="space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground px-1">
-            Meus clientes sem login
-          </h2>
-          
-          <div className="grid gap-4">
-            {isLoading ? (
-              Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="h-24 rounded-xl border bg-card animate-pulse" />
-              ))
-            ) : filteredWithoutLogin?.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground border rounded-xl bg-card">
-                {searchTerm ? "Nenhum cliente sem login encontrado." : "Você não possui clientes sem login."}
-              </div>
-            ) : (
-              filteredWithoutLogin?.map((client) => (
-                <div key={client.id} className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-xl border border-border bg-card hover:shadow-sm transition-all gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500 shrink-0">
-                      <Building2 className="size-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base leading-none mb-1">
-                        {client.contact_name || "Sem nome"}
-                      </h3>
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Mail className="size-3.5" />
-                        {client.contact_email}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                      <Circle className="size-4" />
-                      <span className="text-sm font-bold">Acesso pendente</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {filteredWithLogin && filteredWithLogin.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground px-1">
-              Meus clientes com acesso
-            </h2>
-            <div className="grid gap-4">
-              {filteredWithLogin.map((client) => (
-                <div key={client.id} className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-xl border border-border bg-muted/30 gap-4 opacity-80">
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 shrink-0">
-                      <ShieldCheck className="size-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base leading-none mb-1">
-                        {client.contact_name || "Sem nome"}
-                      </h3>
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Mail className="size-3.5" />
-                        {client.contact_email}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 font-bold px-3 py-1">
-                      Login cadastrado
-                    </Badge>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="gap-2 text-primary hover:text-primary hover:bg-primary/5 font-bold"
-                      onClick={async () => {
-                        try {
-                          const result = await onboarding.mutateAsync({
-                            clientId: client.id,
-                            username: (client as any).profiles?.nickname || ""
-                          } as any);
-                          
-                          if (result.success) {
-                            toast.success(result.message);
-                          } else {
-                            toast.error(result.message);
-                          }
-                        } catch (e) {}
-                      }}
-                    >
-                      <Send className="size-3.5" />
-                      Reenviar acesso
-                    </Button>
-                  </div>
-                </div>
-              ))}
+        <div className="grid gap-4">
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-24 rounded-xl border bg-card animate-pulse" />
+            ))
+          ) : filteredClients?.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground border rounded-xl bg-card">
+              Nenhum cliente encontrado.
             </div>
-          </div>
-        )}
+          ) : (
+            filteredClients?.map((client) => {
+              const hasLogin = !!client.user_id;
+              const username = (client as any).profiles?.nickname || (()=>{
+                try { return JSON.parse(client.notes || '{}').pending_username || '-'; } catch { return '-'; }
+              })();
+
+              return (
+                <div key={client.id} className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-xl border border-border bg-card hover:shadow-sm transition-all gap-4">
+                  <div className="flex items-start gap-4">
+                    <div className={cn(
+                      "flex size-10 items-center justify-center rounded-lg shrink-0",
+                      hasLogin ? "bg-emerald-500/10 text-emerald-500" : "bg-orange-500/10 text-orange-500"
+                    )}>
+                      <User className="size-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base leading-none mb-2">
+                        {client.contact_name || "Sem nome"}
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <User className="size-3.5" />
+                          <span className="font-medium text-foreground">Usuário:</span> {username}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="size-3.5" />
+                          <span className="font-medium text-foreground">E-mail:</span> {client.contact_email}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <div className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider",
+                      hasLogin 
+                        ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" 
+                        : "bg-orange-500/10 text-orange-500 border-orange-500/20"
+                    )}>
+                      {hasLogin ? (
+                        <>
+                          <CheckCircle className="size-3.5" />
+                          Acesso ativo
+                        </>
+                      ) : (
+                        <>
+                          <Circle className="size-3.5" />
+                          Acesso pendente
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="gap-2 text-primary hover:text-primary hover:bg-primary/5 font-bold"
+                        onClick={() => handleResendAccess(client)}
+                      >
+                        <Send className="size-3.5" />
+                        Reenviar Acesso
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
+                        <Ban className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </AppShell>
   );
