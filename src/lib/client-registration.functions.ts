@@ -5,10 +5,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const registerClientSchema = z.object({
   username: z.string().min(3, "O nome de usuário deve ter pelo menos 3 caracteres"),
   contact_email: z.string().email("E-mail inválido"),
-  contact_name: z.string().optional(),
-  contact_phone: z.string().optional(),
-  company: z.string().optional(),
-  notes: z.string().optional(),
+  contact_name: z.string().optional().nullable().transform(val => val ?? ""),
+  contact_phone: z.string().optional().nullable().transform(val => val ?? ""),
+  company: z.string().optional().nullable().transform(val => val ?? ""),
+  notes: z.string().default("").transform(val => val ?? ""),
 });
 
 export const registerNewClient = createServerFn({ method: "POST" })
@@ -57,8 +57,8 @@ export const registerNewClient = createServerFn({ method: "POST" })
       .insert({
         contact_name: data.contact_name || data.username,
         contact_email: data.contact_email,
-        contact_phone: data.contact_phone,
-        company: data.company,
+        contact_phone: data.contact_phone || "",
+        company: data.company || "",
         status: "active",
         owner_id: actorId,
         notes: data.notes || JSON.stringify({ pending_username: data.username }),
