@@ -148,9 +148,13 @@ export const resendInvite = createServerFn({ method: "POST" })
     }
 
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
-    await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
-      redirectTo: `${siteUrl}/reset-password`,
+    const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
+      redirectTo: `${siteUrl}/cliente/login`,
     });
+
+    if (inviteError) {
+      throw new Error(`Falha ao reenviar e-mail: ${inviteError.message}`);
+    }
 
     return { success: true, message: "E-mail de redefinição enviado." };
   });
