@@ -18,17 +18,37 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     // Verificar se o ator (vendedor/admin) tem permissão sobre este cliente
     const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
-    const isAdmin = roles?.some(r => r.role === 'admin');
+    const isAdmin = roles?.some((r: any) => r.role === 'admin');
 
     if (!isAdmin) {
       const { data: client, error: clientErr } = await userSupabase
         .from("clients")
-        .select("owner_id")
+        .select("owner_id, status, user_id")
         .eq("id", data.clientId)
         .single();
       
       if (clientErr || client?.owner_id !== actorId) {
         throw new Error("Você não tem permissão para gerenciar este cliente.");
+      }
+      if (client.status !== 'ativo') {
+        throw new Error("Somente clientes ativos podem receber acesso ao portal.");
+      }
+      if (client.user_id) {
+        throw new Error("Este cliente já possui um login vinculado.");
+      }
+    } else {
+      const { data: client, error: clientErr } = await userSupabase
+        .from("clients")
+        .select("status, user_id")
+        .eq("id", data.clientId)
+        .single();
+      
+      if (clientErr) throw new Error("Cliente não encontrado.");
+      if (client.status !== 'ativo') {
+        throw new Error("Somente clientes ativos podem receber acesso ao portal.");
+      }
+      if (client.user_id) {
+        throw new Error("Este cliente já possui um login vinculado.");
       }
     }
 
@@ -116,7 +136,7 @@ export const resendInvite = createServerFn({ method: "POST" })
 
     // Segurança: Verificar se o e-mail pertence a um cliente que o ator pode gerenciar
     const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
-    const isAdmin = roles?.some(r => r.role === 'admin');
+    const isAdmin = roles?.some((r: any) => r.role === 'admin');
 
     if (!isAdmin) {
       const { data: client, error } = await userSupabase

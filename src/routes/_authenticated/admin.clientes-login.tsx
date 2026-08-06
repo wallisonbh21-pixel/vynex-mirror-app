@@ -23,8 +23,11 @@ import {
   MoreVertical,
   Eye,
   User,
-  Lock
+  Lock,
+  ShieldCheck
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { cn } from "@/lib/utils";
 import { useClientsList, useClientOnboarding } from "@/lib/client";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,23 +59,43 @@ function AdminClientesLogin() {
   const updateStatusFn = useServerFn(updateLoginStatus);
   const queryClient = useQueryClient();
 
-  const filteredClients = (clients as any[])?.filter(c => !!c.user_id && (
+  const filteredLogins = (clients as any[])?.filter(c => !!c.user_id && (
     c.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
     (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   ));
 
+  const availableClients = (clients as any[])?.filter(c => !c.user_id && c.status === 'ativo') || [];
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const selectedClient = availableClients.find(c => c.id === selectedClientId);
+
   const clientFields: Field[] = [
     { 
       name: "clientId", 
-      label: "Cliente", 
+      label: "Selecionar cliente", 
       type: "select", 
       required: true,
-      options: (clients as any[])?.filter(c => !c.user_id).map(c => ({ label: c.company, value: c.id })) || []
+      options: availableClients.map(c => ({ label: c.company, value: c.id })),
+      onChange: (val) => setSelectedClientId(val as string)
     },
-    { name: "fullName", label: "Nome completo", placeholder: "Ex: João Silva", required: true },
+    { 
+      name: "fullName", 
+      label: "Nome completo", 
+      placeholder: "Selecione um cliente...", 
+      required: true,
+      defaultValue: selectedClient?.contact_name || "",
+      disabled: true 
+    },
     { name: "username", label: "Nome de usuário", placeholder: "Ex: joaosilva", required: true },
-    { name: "email", label: "E-mail", placeholder: "Ex: joao@empresa.com", type: "email", required: true },
+    { 
+      name: "email", 
+      label: "E-mail", 
+      placeholder: "Selecione um cliente...", 
+      type: "email", 
+      required: true,
+      defaultValue: selectedClient?.contact_email || "",
+      disabled: true
+    },
   ];
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {
@@ -108,19 +131,30 @@ function AdminClientesLogin() {
   return (
     <AppShell 
       title="Login do Cliente" 
-      description="Gerencie os acessos dos clientes ao Portal ScaleNexus."
+      description="Crie e gerencie o acesso dos seus clientes ao Portal do Cliente."
       actions={
-        <RecordDialog
-          title="Criar Login do Cliente"
-          fields={clientFields}
-          onSubmit={handleCreateAccess}
-          trigger={
-            <Button className="gap-2" disabled={onboarding.isPending}>
-              <Plus className="size-4" />
-              {onboarding.isPending ? "Criando..." : "Criar Login do Cliente"}
-            </Button>
-          }
-        />
+        availableClients.length > 0 ? (
+          <RecordDialog
+            title="Criar Login do Cliente"
+            fields={clientFields}
+            onSubmit={handleCreateAccess}
+            trigger={
+              <Button className="gap-2" disabled={onboarding.isPending}>
+                <Plus className="size-4" />
+                {onboarding.isPending ? "Criando..." : "Criar Login do Cliente"}
+              </Button>
+            }
+          />
+        ) : (
+          <div className="flex flex-col items-end gap-1">
+            <Badge variant="outline" className="text-muted-foreground bg-muted/20">
+              Nenhum cliente ativo disponível para criar acesso.
+            </Badge>
+            <Link to="/admin/clientes" className="text-[10px] text-primary hover:underline font-medium">
+              Cadastre ou ative um cliente primeiro na área Clientes.
+            </Link>
+          </div>
+        )
       }
     >
       <div className="space-y-6">
@@ -134,6 +168,7 @@ function AdminClientesLogin() {
           />
         </div>
 
+        <h3 className="text-lg font-semibold">Clientes com acesso ao portal</h3>
         <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/50">
@@ -153,14 +188,14 @@ function AdminClientesLogin() {
                     <TableCell colSpan={6} className="h-12 animate-pulse bg-muted/20" />
                   </TableRow>
                 ))
-              ) : filteredClients?.length === 0 ? (
+              ) : filteredLogins?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                     Nenhum login de cliente configurado.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredClients?.map((client) => (
+                filteredLogins?.map((client) => (
                   <TableRow key={client.user_id}>
                     <TableCell className="font-semibold">{client.company}</TableCell>
                     <TableCell>
