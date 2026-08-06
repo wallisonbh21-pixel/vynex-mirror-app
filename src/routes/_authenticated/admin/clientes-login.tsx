@@ -48,9 +48,16 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 });
 
 function AdminLoginCentral() {
-  const { data: allClients, isLoading, refetch } = useClientsList();
+  const { data: allClients, isLoading, isError, error, refetch } = useClientsList();
+  
+  // Log técnico para diagnóstico
+  if (isError) console.error("Erro ao carregar clientes no modal:", error);
+  
   // Filter only active clients for the selection modal
-  const activeClients = useMemo(() => allClients?.filter(c => c.status === "ativo") || [], [allClients]);
+  const activeClients = useMemo(() => {
+    console.log("AdminLoginCentral - allClients:", allClients);
+    return allClients?.filter(c => c.status === "ativo") || [];
+  }, [allClients]);
   const clients = allClients;
   const onboarding = useClientOnboarding();
   const resendInviteFn = useServerFn(resendInvite);

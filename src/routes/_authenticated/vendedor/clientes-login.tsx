@@ -50,9 +50,16 @@ export const Route = createFileRoute('/_authenticated/vendedor/clientes-login')(
 
 function VendedorLoginCentral() {
   const { user } = useSession();
-  const { data: allClients, isLoading, refetch } = useClientsList(user?.id);
+  const { data: allClients, isLoading, isError, error, refetch } = useClientsList(user?.id);
+  
+  // Log técnico para diagnóstico
+  if (isError) console.error("Erro ao carregar clientes no modal (Vendedor):", error);
+
   // Filter only active clients for the selection modal
-  const activeClients = useMemo(() => allClients?.filter(c => c.status === "ativo") || [], [allClients]);
+  const activeClients = useMemo(() => {
+    console.log("VendedorLoginCentral - allClients:", allClients);
+    return allClients?.filter(c => c.status === "ativo") || [];
+  }, [allClients]);
   const clients = allClients;
   const onboarding = useClientOnboarding();
   const resendInviteFn = useServerFn(resendInvite);

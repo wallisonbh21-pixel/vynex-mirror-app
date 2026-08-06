@@ -86,13 +86,21 @@ export function useClientsList(ownerId?: string, statusFilter?: string) {
   return useQuery({
     queryKey: ["clients-list", ownerId, statusFilter],
     queryFn: async () => {
-      // Buscamos diretamente de "clients" garantindo que campos necessários para o seletor estejam presentes
+      // DEBUG: Verificando parâmetros
+      console.log("useClientsList - Fetching with:", { ownerId, statusFilter });
+
       let query = supabase
         .from("clients")
         .select(`
-          *,
-          projects(id, title, status),
-          profiles:user_id(full_name, nickname, avatar_url)
+          id,
+          company,
+          contact_name,
+          contact_email,
+          status,
+          user_id,
+          owner_id,
+          created_at,
+          projects(id, title, status)
         `);
       
       if (ownerId) {
@@ -104,9 +112,18 @@ export function useClientsList(ownerId?: string, statusFilter?: string) {
       }
 
       const { data, error } = await query.order("created_at", { ascending: false });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("useClientsList - Supabase Error:", error);
+        throw error;
+      }
+      
+      console.log("useClientsList - Data returned:", data?.length, "rows");
       return data;
     },
+    // Garantir que a query seja renovada ao abrir o modal
+    staleTime: 0,
+    gcTime: 0,
   });
 }
 
