@@ -86,7 +86,7 @@ function AuthPage() {
     // Identificar o papel e redirecionar
     const { data: { user } } = await supabase.auth.getUser();
     
-    if (user?.user_metadata?.must_change_password) {
+    if (user?.user_metadata?.['must_change_password']) {
       navigate({ to: "/reset-password", replace: true });
       return;
     }

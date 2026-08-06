@@ -75,7 +75,7 @@ function ResetPasswordPage() {
     
     // Identify role to redirect
     const { data: { user } } = await supabase.auth.getUser();
-    const isCliente = user?.user_metadata?.role === 'cliente';
+    const isCliente = user?.user_metadata?.['role'] === 'cliente';
     
     navigate({ to: isCliente ? "/cliente" : "/painel", replace: true });
   }
