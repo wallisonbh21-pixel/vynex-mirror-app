@@ -127,12 +127,8 @@ function VendedorLoginCentral() {
 
   const handleOpenModal = (clientId?: string) => {
     if (clientId) {
-      const client = clients?.find(c => c.id === clientId);
-      if (client?.user_id) {
-        toast.info("Este cliente já possui um acesso ao Portal do Cliente.");
-        return;
-      }
       setSelectedClientId(clientId);
+      const client = clients?.find(c => c.id === clientId);
       setUsername(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
     } else {
       setSelectedClientId("");
@@ -337,6 +333,13 @@ function VendedorLoginCentral() {
               />
             </div>
 
+            {selectedClient && selectedClient.user_id && (
+              <p className="text-xs text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-200 flex items-center gap-2">
+                <CheckCircle className="size-4" />
+                Este cliente já possui acesso ao Portal do Cliente.
+              </p>
+            )}
+
             {selectedClient && !selectedClient.contact_email && (
               <p className="text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20">
                 Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.
@@ -349,7 +352,7 @@ function VendedorLoginCentral() {
               onClick={handleCreateAccess} 
               disabled={onboarding.isPending || !selectedClient || !username || !selectedClient.contact_email}
             >
-              {onboarding.isPending ? 'CRIANDO...' : 'CRIAR PAINEL DO CLIENTE'}
+              {onboarding.isPending ? 'PROCESSANDO...' : selectedClient?.user_id ? 'GERENCIAR ACESSO' : 'CRIAR PAINEL DO CLIENTE'}
             </Button>
           </DialogFooter>
         </DialogContent>

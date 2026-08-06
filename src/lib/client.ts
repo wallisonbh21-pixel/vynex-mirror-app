@@ -86,15 +86,17 @@ export function useClientsList(ownerId?: string) {
   return useQuery({
     queryKey: ["clients-list", ownerId],
     queryFn: async () => {
+      // Importante: Buscamos diretamente de "clients" sem filtros de join que possam esconder registros sem profile/user_id
       let query = supabase
         .from("clients")
         .select(`
           *,
           projects(id, title, status),
-          profiles!user_id(full_name, nickname, avatar_url)
+          profiles:user_id(full_name, nickname, avatar_url)
         `);
       
       if (ownerId) {
+        // Se for vendedor, filtramos apenas pelos dele
         query = query.eq("owner_id", ownerId);
       }
 
