@@ -93,8 +93,6 @@ function VendedorClientesLogin() {
     try {
       const payload = {
         clientId: selectedClientId,
-        email: selectedClient?.contact_email!,
-        fullName: selectedClient?.contact_name || "Cliente",
         username: values["username"] as string,
       };
       
@@ -246,8 +244,6 @@ function VendedorClientesLogin() {
                         try {
                           const result = await onboarding.mutateAsync({
                             clientId: client.id,
-                            email: client.contact_email!,
-                            fullName: client.contact_name || "Cliente",
                             username: (client as any).profiles?.nickname || ""
                           } as any);
                           

@@ -243,8 +243,6 @@ function AdminClientesLogin() {
                         try {
                           const result = await onboarding.mutateAsync({
                             clientId: client.id,
-                            email: client.contact_email!,
-                            fullName: client.contact_name || "Cliente",
                             username: (client as any).profiles?.nickname || ""
                           } as any);
                           
