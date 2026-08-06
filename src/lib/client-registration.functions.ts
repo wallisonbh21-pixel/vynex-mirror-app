@@ -8,7 +8,7 @@ const registerClientSchema = z.object({
   contact_name: z.string().optional().nullable().transform(val => val ?? ""),
   contact_phone: z.string().optional().nullable().transform(val => val ?? ""),
   company: z.string().optional().nullable().transform(val => val ?? ""),
-  notes: z.string().default("").transform(val => val ?? ""),
+  notes: z.string().optional().nullable().transform(val => val ?? ""),
 });
 
 export const registerNewClient = createServerFn({ method: "POST" })
