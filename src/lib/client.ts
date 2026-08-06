@@ -102,3 +102,24 @@ export function useClientsList(ownerId?: string) {
     },
   });
 }
+
+/**
+ * Hook para gerenciar o onboarding de clientes (criação de conta e vínculo).
+ */
+export function useClientOnboarding() {
+  const queryClient = useQueryClient();
+  const onboardFn = useServerFn(createClientPortalAccount);
+
+  return useMutation({
+    mutationFn: async (params: { email: string; fullName: string; clientId: string }) => {
+      return onboardFn(params);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+      toast.success("Acesso ao portal ativado com sucesso.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao ativar acesso ao portal.");
+    },
+  });
+}
