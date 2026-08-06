@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const createClientAccountSchema = z.object({
   email: z.string().email(),
@@ -9,12 +10,11 @@ const createClientAccountSchema = z.object({
 });
 
 export const createClientPortalAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => createClientAccountSchema.parse(data))
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getContext } = await import("@tanstack/react-start/server");
-    const ctx = getContext();
-    const { supabase: userSupabase, userId: actorId } = ctx as any;
+    const { supabase: userSupabase, userId: actorId } = context;
 
     if (!actorId) throw new Error("Não autorizado.");
 
@@ -109,18 +109,18 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
   });
 
 export const updateLoginStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ userId: z.string(), status: z.string() }).parse(data))
   .handler(async ({ data }) => {
     return { success: true };
   });
 
 export const resendInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ email: z.string().email() }).parse(data))
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getContext } = await import("@tanstack/react-start/server");
-    const ctx = getContext();
-    const { supabase: userSupabase, userId: actorId } = ctx as any;
+    const { supabase: userSupabase, userId: actorId } = context;
 
     if (!actorId) throw new Error("Não autorizado.");
 
