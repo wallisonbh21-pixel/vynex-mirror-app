@@ -3,8 +3,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const registerClientSchema = z.object({
-  username: z.string().min(3, "O nome de usuário é obrigatório"),
+  username: z.string().min(3, "O nome de usuário deve ter pelo menos 3 caracteres"),
   contact_email: z.string().email("E-mail inválido"),
+  contact_name: z.string().optional(),
+  contact_phone: z.string().optional(),
+  company: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export const registerNewClient = createServerFn({ method: "POST" })
@@ -25,7 +29,7 @@ export const registerNewClient = createServerFn({ method: "POST" })
       throw new Error("Você não tem permissão para cadastrar clientes.");
     }
 
-    // Check username uniqueness in profiles
+    // 1. Check username uniqueness in profiles
     const { data: existingProfile } = await supabaseAdmin
       .from("profiles")
       .select("id")
@@ -33,10 +37,10 @@ export const registerNewClient = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (existingProfile) {
-      throw new Error("Este nome de usuário já está em uso.");
+      throw new Error("Este nome de usuário já está sendo utilizado.");
     }
 
-    // Check email uniqueness in clients
+    // 2. Check email uniqueness in clients
     const { data: existingClient } = await supabaseAdmin
       .from("clients")
       .select("id")
@@ -47,27 +51,121 @@ export const registerNewClient = createServerFn({ method: "POST" })
       throw new Error("Este e-mail já está cadastrado para outro cliente.");
     }
 
-    // Insert the client
+    // 3. Insert the client in 'clients' table
     const { data: newClient, error: insertError } = await supabaseAdmin
       .from("clients")
       .insert({
-        contact_name: data.username,
+        contact_name: data.contact_name || data.username,
         contact_email: data.contact_email,
+        contact_phone: data.contact_phone,
+        company: data.company,
         status: "active",
         owner_id: actorId,
-        notes: JSON.stringify({ pending_username: data.username }),
+        notes: data.notes || JSON.stringify({ pending_username: data.username }),
       } as any)
       .select()
       .single();
 
     if (insertError) {
       console.error("Erro ao inserir cliente:", insertError);
-      throw new Error("Erro ao salvar o registro do cliente.");
+      throw new Error("Não foi possível cadastrar o cliente.");
+    }
+
+    // 4. AUTOMATIC ONBOARDING: Create access portal account
+    let onboardingResult = { success: false, message: "" };
+    
+    try {
+      // 4.1 Check if Auth user already exists
+      const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
+      const existingAuthUser = users.find(u => u.email?.toLowerCase() === data.contact_email.toLowerCase());
+
+      if (existingAuthUser) {
+        // CASE: Auth exists - Check link to OTHER client
+        const { data: otherClient } = await supabaseAdmin
+          .from("clients")
+          .select("id")
+          .eq("user_id", existingAuthUser.id)
+          .maybeSingle();
+
+        if (otherClient && otherClient.id !== newClient.id) {
+          return {
+            success: true,
+            client: newClient,
+            onboardingSuccess: false,
+            message: "Cliente cadastrado, mas este e-mail já está vinculado a outro cliente."
+          };
+        }
+
+        // Link existing Auth to this new client
+        await supabaseAdmin.from("clients").update({ user_id: existingAuthUser.id } as any).eq("id", newClient.id);
+        
+        // Update profile/role
+        await supabaseAdmin.from("profiles").upsert({ id: existingAuthUser.id, nickname: data.username, full_name: data.contact_name || data.username } as any);
+        await supabaseAdmin.from("user_roles").upsert({ user_id: existingAuthUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
+
+        // Send access link
+        await supabaseAdmin.auth.admin.generateLink({
+          type: 'recovery',
+          email: data.contact_email,
+          options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password` }
+        });
+
+        onboardingResult = { success: true, message: "Cliente cadastrado e acesso enviado por e-mail." };
+      } else {
+        // CASE: Auth does NOT exist - Create it
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: data.contact_email,
+          email_confirm: true, 
+          user_metadata: { 
+            full_name: data.contact_name || data.username, 
+            role: "cliente",
+            username: data.username 
+          },
+        });
+
+        if (createError) throw new Error(createError.message);
+
+        const targetAuthUserId = newUser.user.id;
+        
+        // Link client
+        await supabaseAdmin.from("clients").update({ user_id: targetAuthUserId } as any).eq("id", newClient.id);
+        
+        // Create Profile and Role
+        await supabaseAdmin.from("profiles").upsert({ id: targetAuthUserId, nickname: data.username, full_name: data.contact_name || data.username } as any);
+        await supabaseAdmin.from("user_roles").upsert({ user_id: targetAuthUserId, role: "cliente" as any }, { onConflict: "user_id,role" });
+
+        // Send access link
+        const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'recovery',
+          email: data.contact_email,
+          options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password` }
+        });
+
+        if (recoveryError) {
+          return {
+            success: true,
+            client: newClient,
+            onboardingSuccess: false,
+            message: "Cliente e acesso criados, mas não foi possível enviar o e-mail. Use 'Reenviar Acesso'."
+          };
+        }
+
+        onboardingResult = { success: true, message: "Cliente cadastrado e acesso enviado por e-mail." };
+      }
+    } catch (e: any) {
+      console.error("Erro no onboarding automático:", e);
+      return {
+        success: true,
+        client: newClient,
+        onboardingSuccess: false,
+        message: "Cliente cadastrado, mas não foi possível criar o acesso."
+      };
     }
 
     return { 
       success: true, 
       client: newClient,
-      message: "Cliente cadastrado com sucesso." 
+      onboardingSuccess: onboardingResult.success,
+      message: onboardingResult.message || "Cliente cadastrado com sucesso!" 
     };
   });

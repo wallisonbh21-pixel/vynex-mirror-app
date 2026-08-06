@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   Mail,
   Send,
-  Plus
+  Plus,
+  Circle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -126,8 +127,8 @@ function AdminClientesLogin() {
 
   return (
     <AppShell 
-      title="Login do Cliente" 
-      description="Crie e gerencie o acesso dos clientes ao Portal ScaleNexus."
+      title="Gerenciamento de Acessos" 
+      description="Gerencie os acessos, reenvie convites e monitore o status dos clientes."
     >
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -189,18 +190,10 @@ function AdminClientesLogin() {
                   </div>
 
                   <div className="shrink-0">
-                    <RecordDialog
-                      title="Cadastrar Login"
-                      fields={loginFields}
-                      onSubmit={handleCreateLogin}
-                      onOpenChange={(open: boolean) => open && setSelectedClientId(client.id)}
-                      trigger={
-                        <Button variant="default" className="gap-2 font-bold shadow-sm">
-                          <UserPlus className="size-4" />
-                          Cadastrar Login
-                        </Button>
-                      }
-                    />
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                      <Circle className="size-4" />
+                      <span className="text-sm font-bold">Acesso pendente</span>
+                    </div>
                   </div>
                 </div>
               ))
