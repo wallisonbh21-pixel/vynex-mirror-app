@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
+import { Route as AuthenticatedClienteRouteRouteImport } from './routes/_authenticated/cliente/route'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedComissoesRouteImport } from './routes/_authenticated/comissoes'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
@@ -34,6 +35,7 @@ import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
+import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
@@ -72,6 +74,12 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedClienteRouteRoute =
+  AuthenticatedClienteRouteRouteImport.update({
+    id: '/cliente',
+    path: '/cliente',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
@@ -171,6 +179,12 @@ const AuthenticatedBriefingProjectIdRoute =
     path: '/briefing/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedClienteIndexRoute =
+  AuthenticatedClienteIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
 const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   id: '/leads/',
   path: '/leads/',
@@ -222,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
@@ -249,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
+  '/cliente/': typeof AuthenticatedClienteIndexRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
   '/reunioes/': typeof AuthenticatedReunioesIndexRoute
 }
@@ -283,6 +299,7 @@ export interface FileRoutesByTo {
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
+  '/cliente': typeof AuthenticatedClienteIndexRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
   '/reunioes': typeof AuthenticatedReunioesIndexRoute
 }
@@ -292,6 +309,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
@@ -319,6 +337,7 @@ export interface FileRoutesById {
   '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
+  '/_authenticated/cliente/': typeof AuthenticatedClienteIndexRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
   '/_authenticated/reunioes/': typeof AuthenticatedReunioesIndexRoute
 }
@@ -328,6 +347,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/cliente'
     | '/admin'
     | '/aprovacoes'
     | '/clientes'
@@ -355,6 +375,7 @@ export interface FileRouteTypes {
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/api/prospecting/search'
+    | '/cliente/'
     | '/leads/'
     | '/reunioes/'
   fileRoutesByTo: FileRoutesByTo
@@ -389,6 +410,7 @@ export interface FileRouteTypes {
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/api/prospecting/search'
+    | '/cliente'
     | '/leads'
     | '/reunioes'
   id:
@@ -397,6 +419,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/cliente'
     | '/_authenticated/admin'
     | '/_authenticated/aprovacoes'
     | '/_authenticated/clientes'
@@ -424,6 +447,7 @@ export interface FileRouteTypes {
     | '/_authenticated/site-planner/$projectId'
     | '/_authenticated/studio/$projectId'
     | '/api/prospecting/search'
+    | '/_authenticated/cliente/'
     | '/_authenticated/leads/'
     | '/_authenticated/reunioes/'
   fileRoutesById: FileRoutesById
@@ -479,6 +503,13 @@ declare module '@tanstack/react-router' {
       path: '/aprovacoes'
       fullPath: '/aprovacoes'
       preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cliente': {
+      id: '/_authenticated/cliente'
+      path: '/cliente'
+      fullPath: '/cliente'
+      preLoaderRoute: typeof AuthenticatedClienteRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clientes': {
@@ -614,6 +645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBriefingProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cliente/': {
+      id: '/_authenticated/cliente/'
+      path: '/'
+      fullPath: '/cliente/'
+      preLoaderRoute: typeof AuthenticatedClienteIndexRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
     '/_authenticated/leads/': {
       id: '/_authenticated/leads/'
       path: '/leads'
@@ -673,6 +711,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedClienteRouteRouteChildren {
+  AuthenticatedClienteIndexRoute: typeof AuthenticatedClienteIndexRoute
+}
+
+const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChildren =
+  {
+    AuthenticatedClienteIndexRoute: AuthenticatedClienteIndexRoute,
+  }
+
+const AuthenticatedClienteRouteRouteWithChildren =
+  AuthenticatedClienteRouteRoute._addFileChildren(
+    AuthenticatedClienteRouteRouteChildren,
+  )
+
 interface AuthenticatedProjetosRouteChildren {
   AuthenticatedProjetosProjectIdRoute: typeof AuthenticatedProjetosProjectIdRoute
 }
@@ -687,6 +739,7 @@ const AuthenticatedProjetosRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedClienteRouteRoute: typeof AuthenticatedClienteRouteRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
@@ -716,6 +769,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedClienteRouteRoute: AuthenticatedClienteRouteRouteWithChildren,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
@@ -759,13 +813,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
