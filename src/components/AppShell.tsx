@@ -148,6 +148,20 @@ const NAV_CRIADOR: NavItem[] = [
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ];
 
+/** Menu do portal do cliente. */
+const NAV_CLIENTE: NavItem[] = [
+  { to: "/cliente", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/cliente/projeto", label: "Meu Projeto", icon: Palette },
+  { to: "/cliente/site", label: "Meu Site", icon: Monitor },
+  { to: "/cliente/reunioes", label: "Reuniões", icon: CalendarClock },
+  { to: "/cliente/mensagens", label: "Mensagens", icon: Send },
+  { to: "/cliente/documentos", label: "Documentos", icon: FileSignature },
+  { to: "/cliente/pagamentos", label: "Pagamentos", icon: Wallet },
+  { to: "/cliente/aprovacoes", label: "Aprovações", icon: ShieldCheck },
+  { to: "/cliente/notificacoes", label: "Notificações", icon: BellRing },
+  { to: "/cliente/perfil", label: "Meu Perfil", icon: UserRound },
+];
+
 export function AppShell({
   title,
   description,
@@ -164,7 +178,7 @@ export function AppShell({
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
-  const { isAdmin, isCriador, primaryRole } = useRoles();
+  const { isAdmin, isCriador, isCliente, primaryRole } = useRoles() as any;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -185,6 +199,10 @@ export function AppShell({
       ? [
           ...NAV_CRIADOR,
           { to: "/perfil", label: "Meu perfil", icon: UserRound },
+        ]
+      : isCliente
+      ? [
+          ...NAV_CLIENTE,
         ]
       : [
           ...NAV_VENDEDOR,
