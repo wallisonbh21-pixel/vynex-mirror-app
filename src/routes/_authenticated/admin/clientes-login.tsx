@@ -281,7 +281,7 @@ function AdminLoginCentral() {
                           clientId: client.id, 
                           username, 
                           email: client.contact_email!, 
-                          fullName: client.contact_name! 
+                          fullName: client.contact_name || username
                         });
                       }
                     }}
