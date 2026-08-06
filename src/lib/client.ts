@@ -1,6 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
+import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { createClientPortalAccount } from "./onboarding.functions";
 
 /**
  * Hook legado mantido para compatibilidade com o Portal do Cliente existente.
@@ -96,6 +99,27 @@ export function useClientsList(ownerId?: string) {
       const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+  });
+}
+
+/**
+ * Hook para gerenciar o onboarding de clientes (criação de conta e vínculo).
+ */
+export function useClientOnboarding() {
+  const queryClient = useQueryClient();
+  const onboardFn = useServerFn(createClientPortalAccount);
+
+  return useMutation({
+    mutationFn: async (params: { email: string; fullName: string; clientId: string }) => {
+      return onboardFn({ data: params });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+      toast.success("Acesso ao portal ativado com sucesso.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao ativar acesso ao portal.");
     },
   });
 }

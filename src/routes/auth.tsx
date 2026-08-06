@@ -82,8 +82,23 @@ function AuthPage() {
       toast.error("Não foi possível entrar. Verifique e-mail e senha.");
       return;
     }
-    navigate({ to: "/painel", replace: true });
+    
+    // Identificar o papel e redirecionar
+    const { data: userResponse } = await supabase.auth.getUser();
+    const { data: rolesData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userResponse.user?.id || "");
+      
+    const roles = rolesData?.map(r => r.role) || [];
+    
+    if (roles.includes("cliente")) {
+      navigate({ to: "/cliente", replace: true });
+    } else {
+      navigate({ to: "/painel", replace: true });
+    }
   }
+
 
   async function recoverPassword(event: React.FormEvent) {
     event.preventDefault();
