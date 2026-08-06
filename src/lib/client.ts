@@ -90,10 +90,14 @@ export function useClientsList(ownerId?: string, statusFilter?: string) {
       // Buscamos diretamente de "clients" garantindo que campos necessários para o seletor estejam presentes
 
       // USANDO A MESMA CONSULTA DA PÁGINA CLIENTES (useRows)
-      // SEM JOINS COMPLEXOS PARA EVITAR ERROS DE RELACIONAMENTO
+      // BUSCANDO PROFILES SEPARADAMENTE SE NECESSÁRIO NO COMPONENTE
       let query = supabase
         .from("clients")
-        .select("id, company, contact_name, contact_email, status, owner_id, user_id, created_at");
+        .select(`
+          *,
+          projects(id, title, status),
+          profiles:user_id(nickname)
+        `);
       
       if (ownerId) {
         query = query.eq("owner_id", ownerId);
