@@ -40,14 +40,21 @@ export function RecordDialog({
   initial,
   onSubmit,
   onOpenChange,
+  open,
+  description,
 }: {
   title: string;
-  trigger: ReactNode;
+  trigger?: ReactNode;
   fields: Field[];
   initial?: Record<string, unknown>;
   onSubmit: (values: Record<string, unknown>) => void | Promise<void>;
   onOpenChange?: (open: boolean) => void;
+  open?: boolean;
+  description?: ReactNode;
 }) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
   
   const [values, setValues] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -62,7 +69,7 @@ export function RecordDialog({
     setValues(next);
     setErrors({});
 
-  }, [isOpen]);
+  }, [isOpen, fields, initial]);
 
   function setValue(name: string, value: string) {
     setValues((current) => ({ ...current, [name]: value }));
@@ -102,7 +109,9 @@ export function RecordDialog({
     }
 
     void onSubmit(payload);
-    if (!isControlled) setInternalOpen(false);
+    if (!isControlled) {
+      setInternalOpen(false);
+    }
   }
 
   return (
@@ -114,7 +123,7 @@ export function RecordDialog({
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {description && <div className="text-sm text-muted-foreground">{description}</div>}
+          {description && <div className="text-sm text-muted-foreground mt-2">{description}</div>}
         </DialogHeader>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {fields.map((field) => {
