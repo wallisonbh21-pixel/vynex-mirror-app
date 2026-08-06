@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
 import { AppShell } from "@/components/AppShell";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { 
   Table, 
   TableBody, 
@@ -19,12 +19,8 @@ import {
   CheckCircle2, 
   Mail, 
   Key,
-  ShieldAlert,
   MoreVertical,
-  Eye,
-  User,
-  Lock,
-  ShieldCheck
+  Users
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
@@ -52,27 +48,34 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 });
 
 function AdminClientesLogin() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+
   const { data: clients, isLoading } = useClientsList();
   const onboarding = useClientOnboarding();
   const resendInviteFn = useServerFn(resendInvite);
   const updateStatusFn = useServerFn(updateLoginStatus);
   const queryClient = useQueryClient();
 
-  const filteredLogins = (clients as any[])?.filter(c => !!c.user_id && (
-    c.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-    (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-  ));
+  const filteredLogins = useMemo(() => {
+    return (clients as any[])?.filter(c => !!c.user_id && (
+      c.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+    ));
+  }, [clients, searchTerm]);
 
-  const availableClients = (clients as any[])?.filter(c => !c.user_id && c.status === 'ativo') || [];
+  const availableClients = useMemo(() => {
+    return (clients as any[])?.filter(c => !c.user_id && (c.status === 'ativo' || c.status === 'active')) || [];
+  }, [clients]);
+
   const [selectedClientId, setSelectedClientId] = useState<string>("");
-  const selectedClient = availableClients.find(c => c.id === selectedClientId);
+  const selectedClient = useMemo(() => availableClients.find(c => c.id === selectedClientId), [availableClients, selectedClientId]);
 
   const clientFields: Field[] = [
     { 
       name: "clientId", 
-      label: "Selecionar cliente", 
+      label: "Cliente", 
       type: "select", 
       required: true,
       options: availableClients.map(c => ({ label: c.company, value: c.id })),
@@ -81,27 +84,34 @@ function AdminClientesLogin() {
     { 
       name: "fullName", 
       label: "Nome completo", 
-      placeholder: "Selecione um cliente...", 
       required: true,
       defaultValue: selectedClient?.contact_name || "",
-      disabled: true 
+      disabled: true,
+      placeholder: "Selecione um cliente..."
     },
-    { name: "username", label: "Nome de usuário", placeholder: "Ex: joaosilva", required: true },
+
+    { 
+      name: "username", 
+      label: "Nome de usuário", 
+      placeholder: "Ex: joaosilva", 
+      required: true 
+    },
     { 
       name: "email", 
       label: "E-mail", 
-      placeholder: "Selecione um cliente...", 
       type: "email", 
       required: true,
       defaultValue: selectedClient?.contact_email || "",
-      disabled: true
+      disabled: true,
+      placeholder: "Selecione um cliente..."
     },
+
   ];
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {
     try {
       await onboarding.mutateAsync(values as any);
-      toast.success("Convite de ativação enviado com sucesso.");
+      toast.success("Login do cliente criado com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["clients-list"] });
     } catch (error: any) {
       console.error(error);
@@ -148,10 +158,10 @@ function AdminClientesLogin() {
         ) : (
           <div className="flex flex-col items-end gap-1">
             <Badge variant="outline" className="text-muted-foreground bg-muted/20">
-              Nenhum cliente ativo disponível para criar acesso.
+              Nenhum cliente disponível para criar login.
             </Badge>
             <Link to="/admin/clientes" className="text-[10px] text-primary hover:underline font-medium">
-              Cadastre ou ative um cliente primeiro na área Clientes.
+              Cadastre ou ative um cliente primeiro.
             </Link>
           </div>
         )
@@ -168,15 +178,13 @@ function AdminClientesLogin() {
           />
         </div>
 
-        <h3 className="text-lg font-semibold">Clientes com acesso ao portal</h3>
         <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead>Cliente</TableHead>
-                <TableHead>Nome</TableHead>
                 <TableHead>E-mail</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Status do acesso</TableHead>
                 <TableHead>Último acesso</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -185,22 +193,21 @@ function AdminClientesLogin() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={6} className="h-12 animate-pulse bg-muted/20" />
+                    <TableCell colSpan={5} className="h-12 animate-pulse bg-muted/20" />
                   </TableRow>
                 ))
               ) : filteredLogins?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                     Nenhum login de cliente configurado.
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredLogins?.map((client) => (
                   <TableRow key={client.user_id}>
-                    <TableCell className="font-semibold">{client.company}</TableCell>
                     <TableCell>
-                      <div className="font-medium">{client.contact_name}</div>
-                      <div className="text-xs text-muted-foreground">@{client.profiles?.nickname || 'sem-username'}</div>
+                      <div className="font-semibold">{client.company}</div>
+                      <div className="text-xs text-muted-foreground">{client.contact_name}</div>
                     </TableCell>
                     <TableCell className="text-sm">{client.contact_email}</TableCell>
                     <TableCell>
@@ -227,16 +234,13 @@ function AdminClientesLogin() {
                           <DropdownMenuLabel>Ações de Acesso</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="gap-2" onClick={() => handleResendInvite(client.contact_email!)}>
-                            <Mail className="size-4" /> Enviar convite
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2" onClick={() => handleResendInvite(client.contact_email!)}>
-                            <Key className="size-4" /> Reenviar convite
+                            <Mail className="size-4" /> Reenviar convite
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2 text-destructive" onClick={() => handleUpdateStatus(client.user_id!, 'bloqueado')}>
-                            <Ban className="size-4" /> Bloquear
+                            <Ban className="size-4" /> Bloquear acesso
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2 text-emerald-500" onClick={() => handleUpdateStatus(client.user_id!, 'ativo')}>
-                            <CheckCircle2 className="size-4" /> Ativar
+                            <CheckCircle2 className="size-4" /> Ativar acesso
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
