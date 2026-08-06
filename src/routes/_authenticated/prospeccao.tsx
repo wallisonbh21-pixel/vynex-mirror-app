@@ -15,6 +15,7 @@ import {
   X,
   MessageSquare,
 } from "lucide-react";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatCard } from "@/components/StatCard";
@@ -738,8 +739,8 @@ function ExternalOpportunityCard({
         )}
         <li className="flex items-center gap-2">
           <Globe className="size-4 text-muted-foreground" />
-          {opportunity.website ? (
-            <a href={opportunity.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
+          {sanitizeExternalUrl(opportunity.website) ? (
+            <a href={sanitizeExternalUrl(opportunity.website)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
               {opportunity.website} <ExternalLink className="size-3" />
             </a>
           ) : (
@@ -766,7 +767,7 @@ function ExternalOpportunityCard({
         </Button>
         <Button variant="outline" size="sm" asChild>
           <a 
-            href={(() => {
+            href={sanitizeExternalUrl((() => {
               const name = opportunity.business_name;
               const address = opportunity.address;
               const city = opportunity.city;
@@ -788,7 +789,7 @@ function ExternalOpportunityCard({
               }
 
               return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
-            })()} 
+            })())} 
             target="_blank" 
             rel="noopener noreferrer" 
             className="gap-1"
@@ -869,7 +870,7 @@ function OpportunityCard({
         <li className="flex items-center gap-2">
           <MapPin className="size-4 text-muted-foreground" />
           <a 
-            href={(() => {
+            href={sanitizeExternalUrl((() => {
               const name = opportunity.business_name;
               const address = opportunity.address;
               const city = opportunity.city;
