@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList } from "@/lib/client";
-import { createFileRoute } from '@tanstack/react-router';
+import { useClientsList, useClientOnboarding } from "@/lib/client";
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
+import { RecordDialog, type Field } from "@/components/RecordDialog";
+import { useSaveRow } from "@/lib/data";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/lib/auth";
 import {
   Table,
   TableBody,

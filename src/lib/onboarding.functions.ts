@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-query";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const createClientAccountSchema = z.object({
@@ -9,7 +9,7 @@ const createClientAccountSchema = z.object({
 
 export const createClientPortalAccount = createServerFn({ method: "POST" })
   .validator((data: unknown) => createClientAccountSchema.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: z.infer<typeof createClientAccountSchema> }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1. Check if user already exists
@@ -33,14 +33,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     // 3. Assign 'cliente' role
     const { error: roleError } = await supabaseAdmin
       .from("user_roles")
-      .upsert({ user_id: user.id, role: "cliente" }, { onConflict: "user_id,role" });
+      .upsert({ user_id: user.id, role: "cliente" as any }, { onConflict: "user_id,role" });
 
     if (roleError) throw roleError;
 
     // 4. Link auth user to client record
     const { error: linkError } = await supabaseAdmin
       .from("clients")
-      .update({ user_id: user.id })
+      .update({ user_id: user.id } as any)
       .eq("id", data.clientId);
 
     if (linkError) throw linkError;
