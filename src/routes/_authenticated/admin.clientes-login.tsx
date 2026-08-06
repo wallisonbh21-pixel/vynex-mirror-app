@@ -92,8 +92,6 @@ function AdminClientesLogin() {
     try {
       const payload = {
         clientId: selectedClientId,
-        email: selectedClient?.contact_email!,
-        fullName: selectedClient?.contact_name || "Cliente",
         username: values["username"] as string,
       };
       
