@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute('/_authenticated/vendedor/clientes-login')({
   beforeLoad: () => requireVendedor(),
