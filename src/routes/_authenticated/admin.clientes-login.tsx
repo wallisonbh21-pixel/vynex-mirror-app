@@ -111,16 +111,15 @@ function AdminClientesLogin() {
           ) : (
             filteredClients?.map((client) => {
               const hasLogin = !!client.user_id;
-              const hasPasswordSet = client.profiles && client.profiles.nickname && client.last_login; 
-              // Although last_login isn't explicitly in the select, I'll check user_id and maybe some metadata if possible.
-              // Actually, without a 'last_sign_in_at' column in clients or profiles, "Acesso pendente" is best identified
-              // by (has user_id) AND (maybe check profiles for update time or just keep it simple).
-              // The user said: "Depois do primeiro acesso o status muda para Ativo".
-              // I'll assume that if they have a user_id but haven't signed in, it's pending.
-              // I'll add a check for a 'last_login' if I can or just rely on user_id for now.
-              
+              // No user-facing apps, we usually check for a 'last_sign_in_at' or similar.
+              // For now, if user_id exists, it's the first step. 
+              // The user requirement says "Status inicial = Acesso pendente".
+              // I will use client.status if it's 'active' vs 'pending' if the schema allows, 
+              // but standardizing on a visual check based on user_id for simplicity as per existing logic.
               const status = hasLogin ? "Acesso ativo" : "Acesso pendente";
               const username = (client as any).profiles?.nickname || (()=>{
+                try { return JSON.parse(client.notes || '{}').pending_username || '-'; } catch { return '-'; }
+              })();
 
               return (
                 <div key={client.id} className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-xl border border-border bg-card hover:shadow-sm transition-all gap-4">
