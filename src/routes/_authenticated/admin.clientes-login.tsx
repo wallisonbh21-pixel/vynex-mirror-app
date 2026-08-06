@@ -99,8 +99,10 @@ function AdminClientesLogin() {
       
       const result = await onboarding.mutateAsync(payload as any);
       if (result.success) {
-        toast.success(result.message || "Acesso criado!");
+        toast.success(result.message);
         setSelectedClientId("");
+      } else {
+        toast.error(result.message);
       }
     } catch (error) {
       // handled by hook
