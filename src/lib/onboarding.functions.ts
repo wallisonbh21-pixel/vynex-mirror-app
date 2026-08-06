@@ -85,7 +85,10 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     await supabaseAdmin.from("user_roles").upsert({ user_id: newUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
 
     // 6. Send access e-mail using REAL SMTP flow (inviteUserByEmail)
+    console.log("[ONBOARDING] email_prepare", { email: client.contact_email });
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
+    
+    console.log("[ONBOARDING] email_send_attempt", { email: client.contact_email });
     const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
       redirectTo: `${siteUrl}/reset-password`,
       data: { 
@@ -96,13 +99,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     });
 
     if (inviteError) {
-      console.error("[ONBOARDING_EMAIL_ERROR]", inviteError);
-      throw new Error(`O login foi criado, mas houve um erro real no envio do e-mail: ${inviteError.message}`);
+      console.error("[ONBOARDING] email_send_failed", { email: client.contact_email, error: inviteError.message });
+      throw new Error(`Login criado, mas não foi possível enviar o e-mail. Verifique a configuração do serviço de e-mail. (Erro: ${inviteError.message})`);
     }
 
+    console.log("[ONBOARDING] email_send_success", { email: client.contact_email });
     return { 
       success: true, 
-      message: "Login do cliente criado com sucesso. O e-mail de acesso real foi disparado para a caixa de entrada do cliente." 
+      message: "Login criado e acesso enviado para o e-mail do cliente." 
     };
   });
 
