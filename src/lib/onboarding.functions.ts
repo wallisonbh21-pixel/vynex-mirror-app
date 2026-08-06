@@ -23,12 +23,32 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     if (!isAdmin) {
       const { data: client, error: clientErr } = await userSupabase
         .from("clients")
-        .select("owner_id")
+        .select("owner_id, status, user_id")
         .eq("id", data.clientId)
         .single();
       
       if (clientErr || client?.owner_id !== actorId) {
         throw new Error("Você não tem permissão para gerenciar este cliente.");
+      }
+      if (client.status !== 'ativo') {
+        throw new Error("Somente clientes ativos podem receber acesso ao portal.");
+      }
+      if (client.user_id) {
+        throw new Error("Este cliente já possui um login vinculado.");
+      }
+    } else {
+      const { data: client, error: clientErr } = await userSupabase
+        .from("clients")
+        .select("status, user_id")
+        .eq("id", data.clientId)
+        .single();
+      
+      if (clientErr) throw new Error("Cliente não encontrado.");
+      if (client.status !== 'ativo') {
+        throw new Error("Somente clientes ativos podem receber acesso ao portal.");
+      }
+      if (client.user_id) {
+        throw new Error("Este cliente já possui um login vinculado.");
       }
     }
 
