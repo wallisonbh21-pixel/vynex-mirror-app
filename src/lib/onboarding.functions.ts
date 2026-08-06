@@ -10,9 +10,11 @@ const createClientAccountSchema = z.object({
 
 export const createClientPortalAccount = createServerFn({ method: "POST" })
   .validator((data: unknown) => createClientAccountSchema.parse(data))
-  .handler(async ({ data }, ctx) => {
+  .handler(async ({ data, request }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { supabase: userSupabase, userId: actorId } = ctx;
+    const { getContext } = await import("@tanstack/react-start/server");
+    const ctx = getContext();
+    const { supabase: userSupabase, userId: actorId } = ctx as any;
 
     if (!actorId) throw new Error("Não autorizado.");
 
@@ -114,9 +116,11 @@ export const updateLoginStatus = createServerFn({ method: "POST" })
 
 export const resendInvite = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ email: z.string().email() }).parse(data))
-  .handler(async ({ data }, ctx) => {
+  .handler(async ({ data, request }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { supabase: userSupabase, userId: actorId } = ctx;
+    const { getContext } = await import("@tanstack/react-start/server");
+    const ctx = getContext();
+    const { supabase: userSupabase, userId: actorId } = ctx as any;
 
     if (!actorId) throw new Error("Não autorizado.");
 

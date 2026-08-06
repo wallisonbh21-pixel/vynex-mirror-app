@@ -28,8 +28,10 @@ export type Field = {
   required?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  defaultValue?: string;
   onChange?: (value: string | number | null) => void;
 };
+
 
 export function RecordDialog({
   title,
@@ -52,11 +54,12 @@ export function RecordDialog({
     if (!open) return;
     const next: Record<string, string> = {};
     fields.forEach((field) => {
-      const raw = initial?.[field.name];
+      const raw = initial?.[field.name] ?? field.defaultValue;
       next[field.name] = raw === null || raw === undefined ? "" : String(raw);
     });
     setValues(next);
     setErrors({});
+
   }, [open]);
 
   function setValue(name: string, value: string) {
@@ -130,7 +133,8 @@ export function RecordDialog({
                   <Select
                     value={values[field.name] ?? ""}
                     onValueChange={(value) => setValue(field.name, value)}
-                    disabled={field.disabled}
+                    disabled={field.disabled ?? false}
+
                   >
                     <SelectTrigger
                       id={field.name}
