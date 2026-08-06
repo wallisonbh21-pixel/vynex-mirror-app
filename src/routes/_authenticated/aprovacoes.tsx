@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Copy, ExternalLink, History, ShieldCheck, Wrench, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -122,7 +123,7 @@ function AprovacoesPage() {
         <div className="flex flex-wrap gap-2">
           {project.delivery_link ? (
             <Button asChild size="sm" variant="secondary" className="gap-2">
-              <a href={project.delivery_link} target="_blank" rel="noreferrer noopener">
+              <a href={sanitizeExternalUrl(project.delivery_link)} target="_blank" rel="noreferrer noopener">
                 <ExternalLink className="size-4" /> Visualizar site
               </a>
             </Button>

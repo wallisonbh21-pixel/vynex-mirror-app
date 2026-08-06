@@ -22,6 +22,7 @@ import {
   LayoutDashboard,
   Brain
 } from "lucide-react";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
 import { ProjectProgression } from "@/components/ProjectProgression";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -289,7 +290,7 @@ function DetalhesProjetoPage() {
                      </div>
                      <div className="flex gap-2">
                        <Button className="flex-1 gap-2" asChild>
-                         <a href={project.delivery_link} target="_blank"><ExternalLink className="size-4" /> Abrir Site</a>
+                         <a href={sanitizeExternalUrl(project.delivery_link)} target="_blank"><ExternalLink className="size-4" /> Abrir Site</a>
                        </Button>
                        <Button variant="outline" onClick={() => {
                          navigator.clipboard.writeText(project.delivery_link || "");
