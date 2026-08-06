@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Copy, ExternalLink, History, ShieldCheck, Wrench, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
