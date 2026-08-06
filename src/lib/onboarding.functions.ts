@@ -47,11 +47,12 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       
       const existingAuthUser = users.find((u) => u.email?.toLowerCase() === clientEmail.toLowerCase());
       
-      let targetAuthUserId: string;
+      let targetAuthUserId: string = "";
 
       if (existingAuthUser) {
         // CASE: Auth user exists
         console.log("[DEBUG] auth_created_or_existing", { status: "existing", authId: existingAuthUser.id });
+        targetAuthUserId = existingAuthUser.id;
 
         // Check if linked to ANOTHER client
         const { data: otherClient } = await supabaseAdmin
