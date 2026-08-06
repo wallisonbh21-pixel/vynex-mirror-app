@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList } from "@/lib/client";
+import { useClientsList, useRegisterClient } from "@/lib/client";
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { RecordDialog, type Field } from "@/components/RecordDialog";
+
 import { requireVendedor } from '@/lib/guard';
 import {
   Table,
@@ -35,7 +37,36 @@ export const Route = createFileRoute('/_authenticated/vendedor/clientes')({
 function VendedorClientes() {
   const { user } = useSession();
   const { data: clients, isLoading } = useClientsList(user?.id);
+  const registerClient = useRegisterClient();
   const [searchTerm, setSearchTerm] = useState("");
+
+  const clientRegistrationFields: Field[] = [
+    { name: "contact_name", label: "Nome completo", required: true, placeholder: "Ex: João Silva" },
+    { name: "username", label: "Nome de usuário", required: true, placeholder: "Ex: joaosilva" },
+    { name: "contact_email", label: "E-mail", type: "email", required: true, placeholder: "Ex: joao@email.com" },
+    { name: "contact_phone", label: "Telefone", placeholder: "Ex: (11) 99999-9999" },
+    { name: "company", label: "Empresa", placeholder: "Ex: Nexus Corp" },
+    { 
+      name: "status", 
+      label: "Status", 
+      type: "select", 
+      required: true, 
+      defaultValue: "active",
+      options: [
+        { label: "Ativo", value: "active" },
+        { label: "Inativo", value: "inactive" }
+      ]
+    },
+  ];
+
+  const handleRegisterClient = async (values: Record<string, unknown>) => {
+    try {
+      await registerClient.mutateAsync(values);
+    } catch (error) {
+      // toast handled by hook
+    }
+  };
+
 
   const filteredClients = clients?.filter((c) => {
     return c.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,10 +85,18 @@ function VendedorClientes() {
               Logins
             </Link>
           </Button>
-          <Button className="gap-2">
-            <Plus className="size-4" />
-            Novo Cliente
-          </Button>
+          <RecordDialog
+            title="Novo Cliente"
+            fields={clientRegistrationFields}
+            onSubmit={handleRegisterClient}
+            trigger={
+              <Button className="gap-2">
+                <Plus className="size-4" />
+                Novo Cliente
+              </Button>
+            }
+          />
+
         </div>
       }
     >

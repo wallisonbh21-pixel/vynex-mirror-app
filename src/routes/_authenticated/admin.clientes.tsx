@@ -5,6 +5,8 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { useSaveRow } from "@/lib/data";
+import { useRegisterClient } from "@/lib/client";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
@@ -41,8 +43,37 @@ export const Route = createFileRoute('/_authenticated/admin/clientes')({
 
 function AdminClientes() {
   const { data: clients, isLoading } = useClientsList();
+  const registerClient = useRegisterClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
+
+  const clientRegistrationFields: Field[] = [
+    { name: "contact_name", label: "Nome completo", required: true, placeholder: "Ex: João Silva" },
+    { name: "username", label: "Nome de usuário", required: true, placeholder: "Ex: joaosilva" },
+    { name: "contact_email", label: "E-mail", type: "email", required: true, placeholder: "Ex: joao@email.com" },
+    { name: "contact_phone", label: "Telefone", placeholder: "Ex: (11) 99999-9999" },
+    { name: "company", label: "Empresa", placeholder: "Ex: Nexus Corp" },
+    { 
+      name: "status", 
+      label: "Status", 
+      type: "select", 
+      required: true, 
+      defaultValue: "active",
+      options: [
+        { label: "Ativo", value: "active" },
+        { label: "Inativo", value: "inactive" }
+      ]
+    },
+  ];
+
+  const handleRegisterClient = async (values: Record<string, unknown>) => {
+    try {
+      await registerClient.mutateAsync(values);
+    } catch (error) {
+      // toast is handled by hook
+    }
+  };
+
 
   const filteredClients = clients?.filter((c) => {
     const matchesSearch = 
@@ -63,11 +94,19 @@ function AdminClientes() {
       title="Gerenciamento de Clientes" 
       description="Visualize e gerencie todos os clientes da plataforma e seus acessos ao portal."
       actions={
-        <Button className="gap-2">
-          <Plus className="size-4" />
-          Novo Cliente
-        </Button>
+        <RecordDialog
+          title="Novo Cliente"
+          fields={clientRegistrationFields}
+          onSubmit={handleRegisterClient}
+          trigger={
+            <Button className="gap-2">
+              <Plus className="size-4" />
+              Novo Cliente
+            </Button>
+          }
+        />
       }
+
     >
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

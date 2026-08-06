@@ -4,6 +4,8 @@ import { useSession } from "@/lib/auth";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { createClientPortalAccount } from "./onboarding.functions";
+import { registerNewClient } from "./client-registration.functions";
+
 
 /**
  * Hook legado mantido para compatibilidade com o Portal do Cliente existente.
@@ -120,6 +122,27 @@ export function useClientOnboarding() {
     },
     onError: (error: any) => {
       toast.error(error.message || "Erro ao ativar acesso ao portal.");
+    },
+  });
+}
+
+/**
+ * Hook para cadastrar um novo cliente.
+ */
+export function useRegisterClient() {
+  const queryClient = useQueryClient();
+  const registerFn = useServerFn(registerNewClient);
+
+  return useMutation({
+    mutationFn: async (values: any) => {
+      return registerFn({ data: values });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+      toast.success("Cliente cadastrado com sucesso.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erro ao cadastrar cliente.");
     },
   });
 }
