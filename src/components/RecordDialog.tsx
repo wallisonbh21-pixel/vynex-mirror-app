@@ -48,12 +48,12 @@ export function RecordDialog({
   onSubmit: (values: Record<string, unknown>) => void | Promise<void>;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  
   const [values, setValues] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     const next: Record<string, string> = {};
     fields.forEach((field) => {
       const raw = field.defaultValue ?? initial?.[field.name];
@@ -62,7 +62,7 @@ export function RecordDialog({
     setValues(next);
     setErrors({});
 
-  }, [open]);
+  }, [isOpen]);
 
   function setValue(name: string, value: string) {
     setValues((current) => ({ ...current, [name]: value }));
@@ -102,18 +102,19 @@ export function RecordDialog({
     }
 
     void onSubmit(payload);
-    setOpen(false);
+    if (!isControlled) setInternalOpen(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={(val) => {
-      setOpen(val);
+    <Dialog open={isOpen} onOpenChange={(val) => {
+      if (!isControlled) setInternalOpen(val);
       onOpenChange?.(val);
     }}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          {description && <div className="text-sm text-muted-foreground">{description}</div>}
         </DialogHeader>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {fields.map((field) => {
