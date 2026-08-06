@@ -3,12 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const registerClientSchema = z.object({
-  contact_name: z.string().min(2, "Nome muito curto"),
-  username: z.string().min(3, "Nome de usuário deve ter pelo menos 3 caracteres"),
+  contact_name: z.string().min(2, "O nome completo é obrigatório e deve ter pelo menos 2 caracteres"),
+  username: z.string().min(3, "O nome de usuário é obrigatório e deve ter pelo menos 3 caracteres"), // This goes to profile nickname later
   contact_email: z.string().email("E-mail inválido"),
-  contact_phone: z.string().optional(),
-  company: z.string().optional(),
-  status: z.enum(["active", "inactive"]),
+  contact_phone: z.string().optional().nullable(),
+  company: z.string().optional().nullable(),
 });
 
 export const registerNewClient = createServerFn({ method: "POST" })
@@ -16,9 +15,18 @@ export const registerNewClient = createServerFn({ method: "POST" })
   .validator((data: unknown) => registerClientSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { userId: actorId } = context;
+    const { userId: actorId, supabase: userSupabase } = context;
 
     if (!actorId) throw new Error("Não autorizado.");
+
+    // Determine actor role
+    const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
+    const isAdmin = roles?.some((r: any) => r.role === 'admin');
+    const isVendedor = roles?.some((r: any) => r.role === 'vendedor');
+
+    if (!isAdmin && !isVendedor) {
+      throw new Error("Você não tem permissão para cadastrar clientes.");
+    }
 
     // Check username uniqueness in profiles
     const { data: existingProfile } = await supabaseAdmin
@@ -49,14 +57,18 @@ export const registerNewClient = createServerFn({ method: "POST" })
         contact_name: data.contact_name,
         contact_email: data.contact_email,
         contact_phone: data.contact_phone || null,
-        company: data.company || data.contact_name, // fallback to name if no company
-        status: data.status,
-        owner_id: actorId, // Set the creator as owner
+        company: data.company || null,
+        status: "active", // Always active as requested
+        owner_id: actorId, // Link to the creator (admin or vendedor)
+        notes: JSON.stringify({ pending_username: data.username }), // Store intended username until login creation
       } as any)
       .select()
       .single();
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error("Erro ao inserir cliente:", insertError);
+      throw new Error("Erro ao salvar o registro do cliente.");
+    }
 
     return { 
       success: true, 

@@ -54,7 +54,7 @@ export function RecordDialog({
     if (!open) return;
     const next: Record<string, string> = {};
     fields.forEach((field) => {
-      const raw = initial?.[field.name] ?? field.defaultValue;
+      const raw = field.defaultValue ?? initial?.[field.name];
       next[field.name] = raw === null || raw === undefined ? "" : String(raw);
     });
     setValues(next);
