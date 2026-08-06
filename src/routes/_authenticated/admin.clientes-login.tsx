@@ -243,13 +243,18 @@ function AdminClientesLogin() {
                       className="gap-2 text-primary hover:text-primary hover:bg-primary/5 font-bold"
                       onClick={async () => {
                         try {
-                          await onboarding.mutateAsync({
+                          const result = await onboarding.mutateAsync({
                             clientId: client.id,
                             email: client.contact_email!,
                             fullName: client.contact_name || "Cliente",
                             username: (client as any).profiles?.nickname || ""
                           } as any);
-                          toast.success("Acesso enviado com sucesso!");
+                          
+                          if (result.success) {
+                            toast.success(result.message);
+                          } else {
+                            toast.error(result.message);
+                          }
                         } catch (e) {}
                       }}
                     >
