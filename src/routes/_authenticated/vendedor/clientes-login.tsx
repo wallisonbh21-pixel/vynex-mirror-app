@@ -57,7 +57,6 @@ function VendedorLoginCentral() {
 
   // Filter only active clients for the selection modal
   const activeClients = useMemo(() => {
-    console.log("VendedorLoginCentral - allClients:", allClients);
     return allClients?.filter(c => c.status === "ativo") || [];
   }, [allClients]);
   const clients = allClients;
