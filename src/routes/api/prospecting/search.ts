@@ -244,15 +244,14 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // The check above is absolute. Any request reaching here is authenticated and authorized.
-          // Internal Audit headers (X-ScaleNexus-Audit) are NOT checked or used here to prevent bypass.
-
+          
           // Input
           const body = await request.json();
           const { niche, state, city, precision, rawMode } = searchSchema.parse(body);
           const apiKey = process.env["GEOAPIFY_API_KEY"];
           if (!apiKey) {
             console.error("GEOAPIFY_API_KEY is missing in server environment");
-            return new Response(JSON.stringify({ error: "Erro de configuração do servidor", requestId }), { status: 500 });
+            return new Response(JSON.stringify({ error: "Erro interno do servidor", requestId }), { status: 500 });
           }
 
           // Geocoding

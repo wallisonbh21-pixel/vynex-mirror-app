@@ -856,7 +856,18 @@ function OpportunityCard({
         </li>
         <li className="flex items-center gap-2">
           <Globe className="size-4 text-muted-foreground" />
-          {opportunity.website || "Site: Não encontrado"}
+          {sanitizeExternalUrl(opportunity.website) ? (
+            <a 
+              href={sanitizeExternalUrl(opportunity.website)} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-primary hover:underline flex items-center gap-1"
+            >
+              {opportunity.website} <ExternalLink className="size-3" />
+            </a>
+          ) : (
+            <span>{opportunity.website || "Site: Não informado"}</span>
+          )}
         </li>
         <li className="flex items-center gap-2">
           <MessageSquare className="size-4 text-muted-foreground" />
