@@ -146,19 +146,19 @@ function VendedorClientesLogin() {
                   <div className="flex flex-col sm:flex-row items-center gap-3">
                     <div className={cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider",
-                      hasLogin 
+                      status === "Acesso ativo" 
                         ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" 
                         : "bg-orange-500/10 text-orange-500 border-orange-500/20"
                     )}>
-                      {hasLogin ? (
+                      {status === "Acesso ativo" ? (
                         <>
                           <CheckCircle className="size-3.5" />
-                          Acesso ativo
+                          {status}
                         </>
                       ) : (
                         <>
                           <Circle className="size-3.5" />
-                          Acesso pendente
+                          {status}
                         </>
                       )}
                     </div>
