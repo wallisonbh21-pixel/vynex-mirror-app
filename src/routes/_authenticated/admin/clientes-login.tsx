@@ -61,12 +61,12 @@ function AdminLoginCentral() {
   
   const activeClients = useMemo(() => {
     const total = allClients?.length || 0;
-    const afterStatus = allClients?.filter(c => c.status === "ativo") || [];
+    const afterStatus = allClients?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
     
     console.log("DIAGNÓSTICO ADMIN - FILTROS:", {
       total_recebido: total,
       total_apos_filtro_status: afterStatus.length,
-      status_usado: "ativo"
+      status_comparado: "ativo"
     });
 
     return afterStatus;
