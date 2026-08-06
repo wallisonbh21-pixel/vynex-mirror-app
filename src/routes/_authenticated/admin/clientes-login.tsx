@@ -48,7 +48,10 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 });
 
 function AdminLoginCentral() {
-  const { data: clients, isLoading, refetch } = useClientsList();
+  const { data: allClients, isLoading, refetch } = useClientsList();
+  // Filter only active clients for the selection modal
+  const activeClients = useMemo(() => allClients?.filter(c => c.status === "ativo") || [], [allClients]);
+  const clients = allClients;
   const onboarding = useClientOnboarding();
   const resendInviteFn = useServerFn(resendInvite);
   const sendNotificationFn = useServerFn(sendNotification);
@@ -319,11 +322,15 @@ function AdminLoginCentral() {
                   <SelectValue placeholder="Selecionar cliente ▼" />
                 </SelectTrigger>
                 <SelectContent>
-                  {clients?.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.contact_name} {c.company ? `(${c.company})` : ''}
-                    </SelectItem>
-                  ))}
+                  {activeClients.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground text-center">Não existem clientes ativos cadastrados.</div>
+                  ) : (
+                    activeClients.map(c => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.contact_name || 'Sem nome'} | {c.contact_email || 'Sem e-mail'} | {c.company || 'Sem empresa'}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
