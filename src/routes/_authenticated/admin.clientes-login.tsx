@@ -21,7 +21,9 @@ import {
   Key,
   ShieldAlert,
   MoreVertical,
-  Eye
+  Eye,
+  User,
+  Lock
 } from "lucide-react";
 import { useClientsList, useClientOnboarding } from "@/lib/client";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -61,23 +63,26 @@ function AdminClientesLogin() {
   ));
 
   const clientFields: Field[] = [
-    { name: "fullName", label: "Nome Completo", placeholder: "Ex: João Silva", required: true },
-    { name: "username", label: "Nome de Usuário", placeholder: "Ex: joaosilva", required: true },
-    { name: "email", label: "E-mail", placeholder: "Ex: joao@empresa.com", type: "email", required: true },
     { 
       name: "clientId", 
-      label: "Cliente Vinculado", 
+      label: "Cliente", 
       type: "select", 
       required: true,
       options: (clients as any[])?.filter(c => !c.user_id).map(c => ({ label: c.company, value: c.id })) || []
     },
+    { name: "fullName", label: "Nome completo", placeholder: "Ex: João Silva", required: true },
+    { name: "username", label: "Nome de usuário", placeholder: "Ex: joaosilva", required: true },
+    { name: "email", label: "E-mail", placeholder: "Ex: joao@empresa.com", type: "email", required: true },
   ];
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {
     try {
       await onboarding.mutateAsync(values as any);
+      toast.success("Convite de ativação enviado com sucesso.");
+      queryClient.invalidateQueries({ queryKey: ["clients-list"] });
     } catch (error: any) {
       console.error(error);
+      toast.error(error.message || "Erro ao criar acesso.");
     }
   };
 
@@ -102,17 +107,17 @@ function AdminClientesLogin() {
 
   return (
     <AppShell 
-      title="Login dos Clientes" 
+      title="Login do Cliente" 
       description="Gerencie os acessos dos clientes ao Portal ScaleNexus."
       actions={
         <RecordDialog
-          title="Criar Acesso ao Portal"
+          title="Criar Login do Cliente"
           fields={clientFields}
           onSubmit={handleCreateAccess}
           trigger={
             <Button className="gap-2" disabled={onboarding.isPending}>
               <Plus className="size-4" />
-              {onboarding.isPending ? "Criando..." : "Criar acesso"}
+              {onboarding.isPending ? "Criando..." : "Criar Login do Cliente"}
             </Button>
           }
         />
@@ -133,11 +138,11 @@ function AdminClientesLogin() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Nome / Usuário</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Nome</TableHead>
                 <TableHead>E-mail</TableHead>
-                <TableHead>Cliente Vinculado</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Último Acesso</TableHead>
+                <TableHead>Último acesso</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -157,15 +162,20 @@ function AdminClientesLogin() {
               ) : (
                 filteredClients?.map((client) => (
                   <TableRow key={client.user_id}>
+                    <TableCell className="font-semibold">{client.company}</TableCell>
                     <TableCell>
                       <div className="font-medium">{client.contact_name}</div>
                       <div className="text-xs text-muted-foreground">@{client.profiles?.nickname || 'sem-username'}</div>
                     </TableCell>
                     <TableCell className="text-sm">{client.contact_email}</TableCell>
-                    <TableCell className="text-sm font-semibold">{client.company}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize text-[10px] font-bold">
-                        Ativo
+                      <Badge variant="outline" className={cn(
+                        "capitalize text-[10px] font-bold",
+                        client.status === 'bloqueado' ? "border-destructive text-destructive" : 
+                        client.status === 'pendente' ? "border-amber-500 text-amber-500" : 
+                        "border-emerald-500 text-emerald-500"
+                      )}>
+                        {client.status || 'Ativo'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground italic">
@@ -181,24 +191,17 @@ function AdminClientesLogin() {
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Ações de Acesso</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="gap-2">
-                            <Eye className="size-4" /> Visualizar
+                          <DropdownMenuItem className="gap-2" onClick={() => handleResendInvite(client.contact_email!)}>
+                            <Mail className="size-4" /> Enviar convite
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2" onClick={() => handleResendInvite(client.contact_email!)}>
-                            <Mail className="size-4" /> Reenviar convite
+                            <Key className="size-4" /> Reenviar convite
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2 text-destructive" onClick={() => handleUpdateStatus(client.user_id!, 'bloqueado')}>
-                            <Ban className="size-4" /> Bloquear acesso
+                            <Ban className="size-4" /> Bloquear
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2 text-emerald-500" onClick={() => handleUpdateStatus(client.user_id!, 'ativo')}>
-                            <CheckCircle2 className="size-4" /> Ativar acesso
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Key className="size-4" /> Redefinir senha
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="gap-2 text-destructive">
-                            <ShieldAlert className="size-4" /> Desvincular acesso
+                            <CheckCircle2 className="size-4" /> Ativar
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -213,4 +216,3 @@ function AdminClientesLogin() {
     </AppShell>
   );
 }
-
