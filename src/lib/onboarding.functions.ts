@@ -118,7 +118,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       if (roleErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=role_assign error=${roleErr.message}`);
 
       // 6. Generate and send recovery link
-      console.log("[DEBUG] invite_generated", { email: clientEmail });
+      console.log("[DEBUG] email_prepare", { email: clientEmail });
       const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: clientEmail,
@@ -128,7 +128,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       });
 
       if (recoveryError) {
-        console.error("[DEBUG] email_failed", { error: recoveryError.message });
+        console.error("[DEBUG] email_send_failed", { error: recoveryError.message });
         return {
           success: false,
           error: "AUTH_LINK_FAILED",
@@ -136,15 +136,35 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         };
       }
 
-      console.log("[DEBUG] email_sent", { email: clientEmail });
+      console.log("[DEBUG] email_link_generated", { email: clientEmail });
+
+      // Trigger real email delivery via invite
+      console.log("[DEBUG] email_send_attempt", { email: clientEmail });
+      const { error: sendError } = await supabaseAdmin.auth.admin.inviteUserByEmail(clientEmail, {
+        redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`,
+        data: { 
+          full_name: client.contact_name || "Cliente",
+          username: data.username
+        }
+      });
+
+      if (sendError) {
+        console.error("[DEBUG] email_send_failed", { error: sendError.message });
+        return {
+          success: false,
+          error: "EMAIL_SEND_FAILED",
+          message: "Link de acesso gerado, mas o envio do e-mail falhou. Verifique o SMTP no Lovable Cloud."
+        };
+      }
+
+      console.log("[DEBUG] email_send_success", { email: clientEmail });
       console.log("[DEBUG] onboarding_completed", { clientId: data.clientId });
       return { 
         success: true, 
         userId: targetAuthUserId,
-        message: existingAuthUser 
-          ? "Este cliente já possui uma conta. Um novo link para definir a senha foi enviado."
-          : "Login criado com sucesso. O link para definir a senha foi enviado para o cliente."
+        message: "Link de acesso gerado e enviado ao e-mail do cliente."
       };
+
     } catch (e: any) {
       if (e.message?.includes('[CLIENT_LOGIN_ERROR]')) {
         throw e;
@@ -187,15 +207,34 @@ export const resendInvite = createServerFn({ method: "POST" })
       }
     }
 
-    const { error } = await supabaseAdmin.auth.admin.generateLink({
+    console.log("[DEBUG] email_prepare", { email: data.email });
+    const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: data.email,
       options: {
         redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`
       }
     });
-    if (error) {
-      throw new Error("Erro ao enviar link. Tente novamente mais tarde.");
+
+    if (recoveryError) {
+      console.error("[DEBUG] email_send_failed", { error: recoveryError.message });
+      throw new Error("Erro ao gerar link de acesso. Verifique as configurações de Auth.");
     }
-    return { success: true, message: "Um novo link de acesso foi enviado para o e-mail cadastrado." };
+
+    console.log("[DEBUG] email_link_generated", { email: data.email });
+
+    // Trigger real email delivery
+    console.log("[DEBUG] email_send_attempt", { email: data.email });
+    const { error: sendError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
+      redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`
+    });
+
+    if (sendError) {
+      console.error("[DEBUG] email_send_failed", { error: sendError.message });
+      throw new Error("Link de acesso gerado, mas o envio do e-mail falhou. Verifique o SMTP no Lovable Cloud.");
+    }
+
+    console.log("[DEBUG] email_send_success", { email: data.email });
+    return { success: true, message: "Link de acesso gerado e enviado ao e-mail do cliente." };
+
   });
