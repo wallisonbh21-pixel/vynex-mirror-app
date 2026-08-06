@@ -109,11 +109,6 @@ export function useClientsList(ownerId?: string, statusFilter?: string) {
     },
   });
 }
-      if (error) throw error;
-      return data;
-    },
-  });
-}
 
 /**
  * Hook para gerenciar o onboarding de clientes (criação de conta e vínculo).
