@@ -49,7 +49,7 @@ function VendedorClientes() {
       actions={
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2" asChild>
-            <Link to="/admin/clientes-login">
+            <Link to="/vendedor/clientes-login">
               <Lock className="size-4" />
               Logins
             </Link>

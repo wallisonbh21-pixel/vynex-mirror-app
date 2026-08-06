@@ -70,7 +70,15 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
-  { to: "/clientes", label: "Clientes", icon: Building2 },
+  { 
+    to: "/clientes", 
+    label: "CLIENTE", 
+    icon: UserRound,
+    submenu: [
+      { to: "/clientes", label: "Clientes", icon: Users },
+      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
+    ]
+  },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/historico", label: "Histórico", icon: History },
@@ -81,6 +89,16 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/metas", label: "Metas", icon: BarChart3 },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ];
+
+const CLIENTE_SUBMENU: NavItem = {
+  to: "/clientes",
+  label: "CLIENTE",
+  icon: UserRound,
+  submenu: [
+    { to: "/clientes", label: "Clientes", icon: Users },
+    { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
+  ]
+};
 
 /** Menu do time de criação — Reorganizado V2.3. */
 const NAV_CRIADOR: NavItem[] = [
