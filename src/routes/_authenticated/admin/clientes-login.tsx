@@ -50,26 +50,19 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 function AdminLoginCentral() {
   const { data: allClients, isLoading, isError, error, refetch } = useClientsList();
   
-  // LOG OBRIGATÓRIO PARA DIAGNÓSTICO
-  console.log("DIAGNÓSTICO ADMIN - CLIENTS RECEIVED:", allClients ? allClients.map(c => ({
-    id: c.id,
-    name: c.contact_name,
-    email: c.contact_email,
-    status: c.status,
-    owner_id: c.owner_id
-  })) : "null/undefined");
-  
-  const activeClients = useMemo(() => {
-    const total = allClients?.length || 0;
-    const afterStatus = allClients?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
-    
-    console.log("DIAGNÓSTICO ADMIN - FILTROS:", {
-      total_recebido: total,
-      total_apos_filtro_status: afterStatus.length,
-      status_comparado: "ativo"
+  // DIAGNÓSTICO OBRIGATÓRIO (REQUISITO 1 E 10)
+  if (isError) {
+    const errorObj = error as any;
+    console.error("CLIENTES_ATIVOS_ERROR", {
+      message: errorObj?.message,
+      code: errorObj?.code,
+      details: errorObj?.details,
+      hint: errorObj?.hint
     });
+  }
 
-    return afterStatus;
+  const activeClients = useMemo(() => {
+    return allClients?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
   }, [allClients]);
   
   const clients = allClients;
@@ -346,7 +339,11 @@ function AdminLoginCentral() {
                   {isLoading ? (
                     <div className="p-2 text-sm text-muted-foreground text-center">Carregando clientes...</div>
                   ) : isError ? (
-                    <div className="p-2 text-sm text-destructive text-center font-bold">Erro ao carregar clientes.</div>
+                    <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg m-2">
+                      <p className="font-bold">Erro ao carregar clientes:</p>
+                      <p className="mt-1 break-words">{(error as any)?.message || "Erro desconhecido"}</p>
+                      <p className="text-[10px] mt-1 opacity-70">Código: {(error as any)?.code}</p>
+                    </div>
                   ) : activeClients.length === 0 ? (
                     <div className="p-2 text-sm text-muted-foreground text-center font-bold">Não existem clientes ativos cadastrados.</div>
                   ) : (
