@@ -34,7 +34,7 @@ import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
-import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin/clientes'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
 import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
@@ -53,7 +53,7 @@ import { Route as AuthenticatedReuniaoMeetingIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedReunioesIndexRouteImport } from './routes/_authenticated/reunioes/index'
 import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
-import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor/clientes'
+import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor.clientes'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 
 const IndexRoute = IndexRouteImport.update({
@@ -1065,3 +1065,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
