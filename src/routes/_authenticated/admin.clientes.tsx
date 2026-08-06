@@ -201,24 +201,11 @@ function AdminClientes() {
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0">
-                    {hasLogin ? (
+                    {hasLogin && (
                       <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                        <ShieldCheck className="size-4" />
-                        <span className="text-sm font-bold">Login cadastrado</span>
+                        <CheckCircle2 className="size-4" />
+                        <span className="text-sm font-bold">Acesso ativo</span>
                       </div>
-                    ) : (
-                      <RecordDialog
-                        title="Cadastrar Login do Cliente"
-                        fields={loginFields}
-                        onSubmit={handleCreateLogin}
-                        onOpenChange={(open: boolean) => open && setSelectedClientId(client.id)}
-                        trigger={
-                          <Button variant="default" className="gap-2 shadow-sm font-bold">
-                            <UserPlus className="size-4" />
-                            Cadastrar Login
-                          </Button>
-                        }
-                      />
                     )}
                   </div>
                 </div>

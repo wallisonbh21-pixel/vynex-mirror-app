@@ -70,7 +70,15 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
-  { to: "/clientes", label: "Clientes", icon: Users },
+  { 
+    to: "/clientes", 
+    label: "Clientes", 
+    icon: Users,
+    submenu: [
+      { to: "/clientes", label: "Meus Clientes", icon: Users },
+      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
+    ]
+  },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/historico", label: "Histórico", icon: History },
@@ -194,7 +202,15 @@ export function AppShell({
         ...NAV_VENDEDOR,
         { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
         { to: "/criacao", label: "Área do criador", icon: Layers },
-        { to: "/admin/clientes", label: "Clientes", icon: Users },
+        { 
+          to: "/admin/clientes", 
+          label: "Clientes", 
+          icon: Users,
+          submenu: [
+            { to: "/admin/clientes", label: "Gerenciar Clientes", icon: Users },
+            { to: "/admin/clientes-login", label: "Login do Cliente", icon: Lock },
+          ]
+        },
         { 
           to: "/admin", 
           label: "Administração", 
