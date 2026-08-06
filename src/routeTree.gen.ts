@@ -36,7 +36,10 @@ import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authentic
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
+import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
+import { Route as AuthenticatedClienteMensagensRouteImport } from './routes/_authenticated/cliente/mensagens'
 import { Route as AuthenticatedClienteProjetoRouteImport } from './routes/_authenticated/cliente/projeto'
+import { Route as AuthenticatedClienteReunioesRouteImport } from './routes/_authenticated/cliente/reunioes'
 import { Route as AuthenticatedClienteSiteRouteImport } from './routes/_authenticated/cliente/site'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
@@ -187,10 +190,28 @@ const AuthenticatedClienteIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedClienteRouteRoute,
   } as any)
+const AuthenticatedClienteAprovacoesRoute =
+  AuthenticatedClienteAprovacoesRouteImport.update({
+    id: '/aprovacoes',
+    path: '/aprovacoes',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
+const AuthenticatedClienteMensagensRoute =
+  AuthenticatedClienteMensagensRouteImport.update({
+    id: '/mensagens',
+    path: '/mensagens',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
 const AuthenticatedClienteProjetoRoute =
   AuthenticatedClienteProjetoRouteImport.update({
     id: '/projeto',
     path: '/projeto',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
+const AuthenticatedClienteReunioesRoute =
+  AuthenticatedClienteReunioesRouteImport.update({
+    id: '/reunioes',
+    path: '/reunioes',
     getParentRoute: () => AuthenticatedClienteRouteRoute,
   } as any)
 const AuthenticatedClienteSiteRoute =
@@ -272,7 +293,10 @@ export interface FileRoutesByFullPath {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
+  '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
+  '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
   '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
   '/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
@@ -309,7 +333,10 @@ export interface FileRoutesByTo {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
+  '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
+  '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
   '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
   '/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
@@ -349,7 +376,10 @@ export interface FileRoutesById {
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
+  '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
+  '/_authenticated/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
   '/_authenticated/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/_authenticated/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
   '/_authenticated/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
@@ -389,7 +419,10 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/briefing/$projectId'
+    | '/cliente/aprovacoes'
+    | '/cliente/mensagens'
     | '/cliente/projeto'
+    | '/cliente/reunioes'
     | '/cliente/site'
     | '/leads/$leadId'
     | '/projetos/$projectId'
@@ -426,7 +459,10 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/briefing/$projectId'
+    | '/cliente/aprovacoes'
+    | '/cliente/mensagens'
     | '/cliente/projeto'
+    | '/cliente/reunioes'
     | '/cliente/site'
     | '/leads/$leadId'
     | '/projetos/$projectId'
@@ -465,7 +501,10 @@ export interface FileRouteTypes {
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
     | '/_authenticated/briefing/$projectId'
+    | '/_authenticated/cliente/aprovacoes'
+    | '/_authenticated/cliente/mensagens'
     | '/_authenticated/cliente/projeto'
+    | '/_authenticated/cliente/reunioes'
     | '/_authenticated/cliente/site'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/projetos/$projectId'
@@ -678,11 +717,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClienteIndexRouteImport
       parentRoute: typeof AuthenticatedClienteRouteRoute
     }
+    '/_authenticated/cliente/aprovacoes': {
+      id: '/_authenticated/cliente/aprovacoes'
+      path: '/aprovacoes'
+      fullPath: '/cliente/aprovacoes'
+      preLoaderRoute: typeof AuthenticatedClienteAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
+    '/_authenticated/cliente/mensagens': {
+      id: '/_authenticated/cliente/mensagens'
+      path: '/mensagens'
+      fullPath: '/cliente/mensagens'
+      preLoaderRoute: typeof AuthenticatedClienteMensagensRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
     '/_authenticated/cliente/projeto': {
       id: '/_authenticated/cliente/projeto'
       path: '/projeto'
       fullPath: '/cliente/projeto'
       preLoaderRoute: typeof AuthenticatedClienteProjetoRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
+    '/_authenticated/cliente/reunioes': {
+      id: '/_authenticated/cliente/reunioes'
+      path: '/reunioes'
+      fullPath: '/cliente/reunioes'
+      preLoaderRoute: typeof AuthenticatedClienteReunioesRouteImport
       parentRoute: typeof AuthenticatedClienteRouteRoute
     }
     '/_authenticated/cliente/site': {
@@ -752,14 +812,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedClienteRouteRouteChildren {
+  AuthenticatedClienteAprovacoesRoute: typeof AuthenticatedClienteAprovacoesRoute
+  AuthenticatedClienteMensagensRoute: typeof AuthenticatedClienteMensagensRoute
   AuthenticatedClienteProjetoRoute: typeof AuthenticatedClienteProjetoRoute
+  AuthenticatedClienteReunioesRoute: typeof AuthenticatedClienteReunioesRoute
   AuthenticatedClienteSiteRoute: typeof AuthenticatedClienteSiteRoute
   AuthenticatedClienteIndexRoute: typeof AuthenticatedClienteIndexRoute
 }
 
 const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChildren =
   {
+    AuthenticatedClienteAprovacoesRoute: AuthenticatedClienteAprovacoesRoute,
+    AuthenticatedClienteMensagensRoute: AuthenticatedClienteMensagensRoute,
     AuthenticatedClienteProjetoRoute: AuthenticatedClienteProjetoRoute,
+    AuthenticatedClienteReunioesRoute: AuthenticatedClienteReunioesRoute,
     AuthenticatedClienteSiteRoute: AuthenticatedClienteSiteRoute,
     AuthenticatedClienteIndexRoute: AuthenticatedClienteIndexRoute,
   }
