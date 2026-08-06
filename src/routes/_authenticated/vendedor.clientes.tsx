@@ -84,7 +84,7 @@ function VendedorClientes() {
         clientId: selectedClientId,
         email: selectedClient.contact_email,
         fullName: selectedClient.contact_name || "Cliente",
-        username: values.username as string,
+        username: values["username"] as string,
       };
       
       const result = await onboarding.mutateAsync(payload as any);
@@ -209,7 +209,6 @@ function VendedorClientes() {
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <RecordDialog
                       title="Cadastrar Login do Cliente"
-                      description={`Cliente: ${client.contact_name}`}
                       fields={loginFields}
                       onSubmit={handleCreateLogin}
                       open={isLoginDialogOpen && selectedClientId === client.id}
