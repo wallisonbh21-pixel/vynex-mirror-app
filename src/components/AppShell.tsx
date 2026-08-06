@@ -72,10 +72,10 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { 
     to: "/clientes", 
-    label: "Clientes", 
+    label: "Cliente", 
     icon: Users,
     submenu: [
-      { to: "/clientes", label: "Meus Clientes", icon: Users },
+      { to: "/clientes", label: "Clientes", icon: Users },
       { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
     ]
   },
@@ -204,10 +204,10 @@ export function AppShell({
         { to: "/criacao", label: "Área do criador", icon: Layers },
         { 
           to: "/admin/clientes", 
-          label: "Clientes", 
+          label: "Cliente", 
           icon: Users,
           submenu: [
-            { to: "/admin/clientes", label: "Gerenciar Clientes", icon: Users },
+            { to: "/admin/clientes", label: "Clientes", icon: Users },
             { to: "/admin/clientes-login", label: "Login do Cliente", icon: Lock },
           ]
         },

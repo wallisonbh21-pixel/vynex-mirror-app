@@ -53,6 +53,6 @@ export const registerNewClient = createServerFn({ method: "POST" })
     return { 
       success: true, 
       client: newClient,
-      message: "Cliente comercial cadastrado com sucesso. Agora você pode criar o login de acesso na Central de Login." 
+      message: "Cliente cadastrado com sucesso. Agora você pode cadastrar o login do cliente." 
     };
   });
