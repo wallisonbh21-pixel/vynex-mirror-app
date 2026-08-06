@@ -66,7 +66,7 @@ function AdminClientesLogin() {
   }, [clients, searchTerm]);
 
   const availableClients = useMemo(() => {
-    return (clients as any[])?.filter(c => !c.user_id && (c.status === 'ativo' || c.status === 'active')) || [];
+    return (clients as any[])?.filter(c => (c.status === 'ativo' || c.status === 'active')) || [];
   }, [clients]);
 
   const [selectedClientId, setSelectedClientId] = useState<string>("");
