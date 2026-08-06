@@ -43,6 +43,7 @@ import {
   shortDate,
   today,
 } from "@/lib/format";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { leadFields } from "./leads.index";
 
 export const Route = createFileRoute("/_authenticated/leads/$leadId")({
@@ -173,7 +174,7 @@ function LeadDetail() {
               <dd className="text-right">
                 <div className="flex flex-col items-end">
                   {lead.whatsapp && (
-                    <a href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" className="text-brand-500 font-medium hover:underline">
+                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" className="text-brand-500 font-medium hover:underline">
                       {lead.whatsapp}
                     </a>
                   )}
@@ -186,7 +187,7 @@ function LeadDetail() {
               <div className="flex justify-between gap-3">
                 <dt className="text-muted-foreground flex items-center gap-1.5"><MapPin className="size-3.5" /> Localização</dt>
                 <dd className="text-right">
-                  <a href={lead.google_maps_url} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline flex items-center justify-end gap-1 font-medium">
+                  <a href={sanitizeExternalUrl(lead.google_maps_url)} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline flex items-center justify-end gap-1 font-medium">
                     Ver no Google Maps <ExternalLink className="size-3" />
                   </a>
                 </dd>
