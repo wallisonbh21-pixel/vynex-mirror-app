@@ -330,7 +330,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
                   
                   if (!res.ok) {
                     currentQuery.error = true;
-                    currentQuery.message = `API Externa retornou erro`;
+                    // Generic message for security
+                    currentQuery.message = "API Externa retornou erro";
                     diagnostic.queries.push(currentQuery);
                     break; 
                   }
@@ -384,7 +385,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
 
                 } catch (err: any) {
                   currentQuery.error = true;
-                  currentQuery.message = err.message;
+                  // Never return raw error messages to avoid leaks
+                  currentQuery.message = "Erro interno na consulta";
                   diagnostic.queries.push(currentQuery);
                   hasMore = false; // Stop this specific loop
                 }

@@ -122,7 +122,7 @@ function AprovacoesPage() {
         <div className="flex flex-wrap gap-2">
           {project.delivery_link ? (
             <Button asChild size="sm" variant="secondary" className="gap-2">
-              <a href={project.delivery_link} target="_blank" rel="noreferrer noopener">
+              <a href={sanitizeExternalUrl(project.delivery_link)} target="_blank" rel="noreferrer noopener">
                 <ExternalLink className="size-4" /> Visualizar site
               </a>
             </Button>

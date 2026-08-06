@@ -212,12 +212,12 @@ function ClientApprovalPage() {
                       <p className="text-slate-300 font-medium">O link de pré-visualização está disponível abaixo:</p>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 rounded-2xl" asChild>
-                          <a href={project.delivery_link} target="_blank">
+                          <a href={sanitizeExternalUrl(project.delivery_link)} target="_blank">
                             🖥️ Visualizar meu site
                           </a>
                         </Button>
                         <Button variant="outline" size="lg" className="h-14 px-8 text-lg font-bold gap-2 rounded-2xl border-slate-700 hover:bg-slate-800" asChild>
-                          <a href={project.delivery_link} target="_blank">
+                          <a href={sanitizeExternalUrl(project.delivery_link)} target="_blank">
                             <ExternalLink className="size-5" /> Abrir em nova aba
                           </a>
                         </Button>
