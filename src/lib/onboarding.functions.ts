@@ -84,29 +84,39 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     await supabaseAdmin.from("profiles").upsert({ id: newUser.id, nickname: data.username, full_name: client.contact_name || data.username } as any);
     await supabaseAdmin.from("user_roles").upsert({ user_id: newUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
 
-    // 6. Send access e-mail using REAL SMTP flow (inviteUserByEmail)
+    // 6. Enviar e-mail de acesso usando o fluxo de convite do Supabase
+    // O conteúdo customizado requer configuração de domínio em Cloud -> Emails
     console.log("[ONBOARDING] email_prepare", { email: client.contact_email });
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
     
     console.log("[ONBOARDING] email_send_attempt", { email: client.contact_email });
+    
+    // Passamos os dados necessários para o template (que deve ser configurado via auth-email-hook após setup do domínio)
     const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
-      redirectTo: `${siteUrl}/reset-password`,
+      redirectTo: `${siteUrl}/cliente/login`,
       data: { 
         full_name: client.contact_name || data.username,
         username: data.username,
-        platform_name: "ScaleNexus"
+        temporary_password: initialPassword,
+        platform_name: "ScaleNexus",
+        login_url: `${siteUrl}/cliente/login`
       }
     });
 
     if (inviteError) {
       console.error("[ONBOARDING] email_send_failed", { email: client.contact_email, error: inviteError.message });
-      throw new Error(`Login criado, mas não foi possível enviar o e-mail. Verifique a configuração do serviço de e-mail. (Erro: ${inviteError.message})`);
+      // IMPORTANTE: Se o envio falhar, mostramos o erro real e não informamos sucesso.
+      throw new Error(`O login foi criado no banco de dados, mas o envio do e-mail falhou: ${inviteError.message}. Verifique a configuração de SMTP.`);
     }
 
     console.log("[ONBOARDING] email_send_success", { email: client.contact_email });
     return { 
       success: true, 
-      message: "Login criado e acesso enviado para o e-mail do cliente." 
+      message: `Acesso criado com sucesso! E-mail enviado para ${client.contact_email}.`,
+      debug: {
+        username: data.username,
+        tempPassword: initialPassword
+      }
     };
   });
 
