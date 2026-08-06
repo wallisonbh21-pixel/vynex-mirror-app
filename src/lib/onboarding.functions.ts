@@ -18,10 +18,12 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     if (!actorId) throw new Error("Não autorizado.");
 
+    // Validate actor roles
     const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
     const isAdmin = roles?.some((r: any) => r.role === 'admin');
     const isVendedor = roles?.some((r: any) => r.role === 'vendedor');
 
+    // Fetch client and validate ownership
     const { data: client, error: clientErr } = await userSupabase
       .from("clients")
       .select("id, owner_id, status, user_id, contact_email, contact_name")
@@ -36,50 +38,43 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       }
     }
 
-    if (client.status !== 'ativo' && client.status !== 'active') {
-      throw new Error("Somente clientes ativos podem receber acesso ao portal.");
-    }
-
     // Check if user already exists in Auth by email
     const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    if (listError) throw new Error("Erro ao verificar usuários existentes.");
+    if (listError) throw new Error("Erro ao acessar dados de autenticação.");
     
-    const existingUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+    const existingAuthUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
     
-    if (existingUser) {
-      // User exists in Auth.
-      
-      // Check if this existing user is already linked to ANOTHER client
+    if (existingAuthUser) {
+      // Auth user exists - check if it's already linked to ANOTHER client
       const { data: otherClient } = await supabaseAdmin
         .from("clients")
-        .select("id, contact_name, contact_email")
-        .eq("user_id", existingUser.id)
+        .select("id")
+        .eq("user_id", existingAuthUser.id)
         .maybeSingle();
 
       if (otherClient && otherClient.id !== client.id) {
-        throw new Error(`Este e-mail já está vinculado a outro cliente. Solicite a análise de um administrador.`);
+        throw new Error("Este e-mail já está vinculado a outro cliente. Entre em contato com um administrador.");
       }
 
-      // If it exists in Auth but is NOT linked to any client (or linked to this one)
-      // We perform the linkage/update and send/resend invite.
-      
-      // 1. Ensure Role
+      // Ensure 'cliente' role
       await supabaseAdmin.from("user_roles").upsert({ 
-        user_id: existingUser.id, 
+        user_id: existingAuthUser.id, 
         role: "cliente" as any,
       }, { onConflict: "user_id,role" });
 
-      // 2. Link Client
-      await supabaseAdmin.from("clients").update({ user_id: existingUser.id } as any).eq("id", client.id);
+      // Link client if not already linked
+      if (client.user_id !== existingAuthUser.id) {
+        await supabaseAdmin.from("clients").update({ user_id: existingAuthUser.id } as any).eq("id", client.id);
+      }
 
-      // 3. Ensure Profile (Update nickname/username if provided)
+      // Ensure Profile
       await supabaseAdmin.from("profiles").upsert({
-        id: existingUser.id,
+        id: existingAuthUser.id,
         full_name: data.fullName || client.contact_name || null,
         nickname: data.username
       } as any);
 
-      // 4. Generate recovery link (Resend access)
+      // Generate recovery link (resend access)
       const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: data.email,
@@ -92,19 +87,19 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         return {
           success: false,
           error: "AUTH_LINK_FAILED",
-          message: "A conta já existe e está vinculada, mas não foi possível enviar o e-mail de acesso. Verifique a configuração de e-mail do sistema."
+          message: "A conta já existe, mas não foi possível enviar o e-mail de acesso. Tente novamente mais tarde."
         };
       }
 
       return { 
         success: true, 
-        userId: existingUser.id,
-        message: "Um novo link de acesso foi enviado para o e-mail cadastrado."
+        userId: existingAuthUser.id,
+        message: "Este cliente já possui uma conta. Um novo link de acesso foi enviado para o e-mail cadastrado."
       };
     }
 
-    // New User flow
-    // Check if username is in use in profiles
+    // Create New Auth User flow
+    // Check if username is already in use in profiles
     const { data: existingProfile } = await supabaseAdmin
       .from("profiles")
       .select("id")
@@ -123,7 +118,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       },
     });
 
-    if (createError) throw new Error(`Erro ao criar usuário: ${createError.message}`);
+    if (createError) throw new Error(`Erro ao criar conta: ${createError.message}`);
 
     const authUser = newUser.user;
 
@@ -134,7 +129,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     }, { onConflict: "user_id,role" });
 
     // Link Client
-    await supabaseAdmin.from("clients").update({ user_id: authUser.id } as any).eq("id", data.clientId);
+    await supabaseAdmin.from("clients").update({ user_id: authUser.id } as any).eq("id", client.id);
 
     // Create Profile
     await supabaseAdmin.from("profiles").upsert({
@@ -143,7 +138,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       nickname: data.username
     } as any);
 
-    // Generate recovery link
+    // Generate recovery link for first access
     const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: data.email,
@@ -153,20 +148,18 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     });
 
     if (recoveryError) {
-      // If auth creation succeeded but email failed, we still have the user linked,
-      // but we return success: false to the UI can show "Reenviar acesso"
       return {
         success: false,
         error: "AUTH_LINK_FAILED",
         userId: authUser.id,
-        message: "Login criado com sucesso, mas não foi possível enviar o e-mail de acesso. Verifique a configuração de e-mail do sistema."
+        message: "Login criado com sucesso, mas não foi possível enviar o e-mail. Use 'Reenviar acesso' na lista."
       };
     }
 
     return { 
       success: true, 
       userId: authUser.id,
-      message: "Login criado com sucesso. Um e-mail de acesso foi enviado para o cliente."
+      message: "Login criado com sucesso. O link de acesso foi enviado para o e-mail do cliente."
     };
   });
 
@@ -212,7 +205,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       }
     });
     if (error) {
-      throw new Error("Não foi possível enviar o e-mail de acesso. Verifique a configuração de e-mail do sistema.");
+      throw new Error("Erro ao enviar link. Tente novamente mais tarde.");
     }
     return { success: true, message: "Um novo link de acesso foi enviado para o e-mail cadastrado." };
   });
