@@ -58,7 +58,7 @@ function AdminClientesLogin() {
   const queryClient = useQueryClient();
 
   const filteredLogins = useMemo(() => {
-    return (clients as any[])?.filter(c => !!c.user_id && (
+    return (clients as any[])?.filter(c => (
       c.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
@@ -217,50 +217,66 @@ function AdminClientesLogin() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredLogins?.map((client) => (
-                  <TableRow key={client.user_id}>
-                    <TableCell>
-                      <div className="font-semibold">{client.company}</div>
-                      <div className="text-xs text-muted-foreground">{client.contact_name}</div>
-                    </TableCell>
-                    <TableCell className="text-sm">{client.contact_email}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={cn(
-                        "capitalize text-[10px] font-bold",
-                        client.status === 'bloqueado' ? "border-destructive text-destructive" : 
-                        client.status === 'pendente' ? "border-amber-500 text-amber-500" : 
-                        "border-emerald-500 text-emerald-500"
-                      )}>
-                        {client.status || 'Ativo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground italic">
-                      {client.last_access ? format(new Date(client.last_access), "dd/MM/yyyy HH:mm") : "Nunca"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="size-8">
-                            <MoreVertical className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel>Ações de Acesso</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="gap-2" onClick={() => handleResendInvite(client.contact_email!)}>
-                            <Mail className="size-4" /> Reenviar convite
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 text-destructive" onClick={() => handleUpdateStatus(client.user_id!, 'bloqueado')}>
-                            <Ban className="size-4" /> Bloquear acesso
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 text-emerald-500" onClick={() => handleUpdateStatus(client.user_id!, 'ativo')}>
-                            <CheckCircle2 className="size-4" /> Ativar acesso
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
+                filteredLogins?.map((client) => {
+                  const hasLogin = !!client.user_id;
+                  return (
+                    <TableRow key={client.id}>
+                      <TableCell>
+                        <div className="font-semibold">{client.company}</div>
+                        <div className="text-xs text-muted-foreground">{client.contact_name}</div>
+                      </TableCell>
+                      <TableCell className="text-sm">{client.contact_email}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn(
+                          "capitalize text-[10px] font-bold",
+                          !hasLogin ? "border-slate-500 text-slate-500" :
+                          client.status === 'bloqueado' ? "border-destructive text-destructive" : 
+                          client.status === 'pendente' ? "border-amber-500 text-amber-500" : 
+                          "border-emerald-500 text-emerald-500"
+                        )}>
+                          {!hasLogin ? "Sem login" : (client.status || 'Ativo')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground italic">
+                        {client.last_access ? format(new Date(client.last_access), "dd/MM/yyyy HH:mm") : "Nunca"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="size-8">
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Ações de Acesso</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {hasLogin ? (
+                              <>
+                                <DropdownMenuItem className="gap-2" onClick={() => handleResendInvite(client.contact_email!)}>
+                                  <Mail className="size-4" /> Reenviar convite
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2 text-destructive" onClick={() => handleUpdateStatus(client.user_id!, 'bloqueado')}>
+                                  <Ban className="size-4" /> Bloquear acesso
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2 text-emerald-500" onClick={() => handleUpdateStatus(client.user_id!, 'ativo')}>
+                                  <CheckCircle2 className="size-4" /> Ativar acesso
+                                </DropdownMenuItem>
+                              </>
+                            ) : (
+                              <DropdownMenuItem className="gap-2 text-primary" onClick={() => {
+                                setSelectedClientId(client.id);
+                                // Trigger dialog open would be better but RecordDialog is a wrapper
+                                toast.info("Use o botão 'Criar Login' acima para este cliente.");
+                              }}>
+                                <Plus className="size-4" /> Criar Login
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
