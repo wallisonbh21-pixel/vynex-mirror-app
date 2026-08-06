@@ -39,6 +39,7 @@ import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
 import { Route as AuthenticatedClienteDocumentosRouteImport } from './routes/_authenticated/cliente/documentos'
 import { Route as AuthenticatedClienteMensagensRouteImport } from './routes/_authenticated/cliente/mensagens'
+import { Route as AuthenticatedClienteNotificacoesRouteImport } from './routes/_authenticated/cliente/notificacoes'
 import { Route as AuthenticatedClientePagamentosRouteImport } from './routes/_authenticated/cliente/pagamentos'
 import { Route as AuthenticatedClientePerfilRouteImport } from './routes/_authenticated/cliente/perfil'
 import { Route as AuthenticatedClienteProjetoRouteImport } from './routes/_authenticated/cliente/projeto'
@@ -211,6 +212,12 @@ const AuthenticatedClienteMensagensRoute =
     path: '/mensagens',
     getParentRoute: () => AuthenticatedClienteRouteRoute,
   } as any)
+const AuthenticatedClienteNotificacoesRoute =
+  AuthenticatedClienteNotificacoesRouteImport.update({
+    id: '/notificacoes',
+    path: '/notificacoes',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
 const AuthenticatedClientePagamentosRoute =
   AuthenticatedClientePagamentosRouteImport.update({
     id: '/pagamentos',
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
   '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
+  '/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
   '/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
   '/cliente/perfil': typeof AuthenticatedClientePerfilRoute
   '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
@@ -360,6 +368,7 @@ export interface FileRoutesByTo {
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
   '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
+  '/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
   '/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
   '/cliente/perfil': typeof AuthenticatedClientePerfilRoute
   '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
@@ -406,6 +415,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/_authenticated/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
   '/_authenticated/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
+  '/_authenticated/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
   '/_authenticated/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
   '/_authenticated/cliente/perfil': typeof AuthenticatedClientePerfilRoute
   '/_authenticated/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
     | '/cliente/mensagens'
+    | '/cliente/notificacoes'
     | '/cliente/pagamentos'
     | '/cliente/perfil'
     | '/cliente/projeto'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
     | '/cliente/mensagens'
+    | '/cliente/notificacoes'
     | '/cliente/pagamentos'
     | '/cliente/perfil'
     | '/cliente/projeto'
@@ -540,6 +552,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente/aprovacoes'
     | '/_authenticated/cliente/documentos'
     | '/_authenticated/cliente/mensagens'
+    | '/_authenticated/cliente/notificacoes'
     | '/_authenticated/cliente/pagamentos'
     | '/_authenticated/cliente/perfil'
     | '/_authenticated/cliente/projeto'
@@ -777,6 +790,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClienteMensagensRouteImport
       parentRoute: typeof AuthenticatedClienteRouteRoute
     }
+    '/_authenticated/cliente/notificacoes': {
+      id: '/_authenticated/cliente/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/cliente/notificacoes'
+      preLoaderRoute: typeof AuthenticatedClienteNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
     '/_authenticated/cliente/pagamentos': {
       id: '/_authenticated/cliente/pagamentos'
       path: '/pagamentos'
@@ -875,6 +895,7 @@ interface AuthenticatedClienteRouteRouteChildren {
   AuthenticatedClienteAprovacoesRoute: typeof AuthenticatedClienteAprovacoesRoute
   AuthenticatedClienteDocumentosRoute: typeof AuthenticatedClienteDocumentosRoute
   AuthenticatedClienteMensagensRoute: typeof AuthenticatedClienteMensagensRoute
+  AuthenticatedClienteNotificacoesRoute: typeof AuthenticatedClienteNotificacoesRoute
   AuthenticatedClientePagamentosRoute: typeof AuthenticatedClientePagamentosRoute
   AuthenticatedClientePerfilRoute: typeof AuthenticatedClientePerfilRoute
   AuthenticatedClienteProjetoRoute: typeof AuthenticatedClienteProjetoRoute
@@ -888,6 +909,8 @@ const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChil
     AuthenticatedClienteAprovacoesRoute: AuthenticatedClienteAprovacoesRoute,
     AuthenticatedClienteDocumentosRoute: AuthenticatedClienteDocumentosRoute,
     AuthenticatedClienteMensagensRoute: AuthenticatedClienteMensagensRoute,
+    AuthenticatedClienteNotificacoesRoute:
+      AuthenticatedClienteNotificacoesRoute,
     AuthenticatedClientePagamentosRoute: AuthenticatedClientePagamentosRoute,
     AuthenticatedClientePerfilRoute: AuthenticatedClientePerfilRoute,
     AuthenticatedClienteProjetoRoute: AuthenticatedClienteProjetoRoute,
