@@ -108,7 +108,7 @@ function VendedorClientes() {
               <TableRow>
                 <TableHead>Empresa / Nome</TableHead>
                 <TableHead>Contato</TableHead>
-                <TableHead>Projetos</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Cadastro</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -153,17 +153,9 @@ function VendedorClientes() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {client.projects && client.projects.length > 0 ? (
-                          client.projects.map((p: any) => (
-                            <Badge key={p.id} variant="secondary" className="text-[10px] py-0">
-                              {p.title}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-xs text-muted-foreground italic">Nenhum</span>
-                        )}
-                      </div>
+                      <Badge variant="outline" className="capitalize text-[10px] font-bold border-emerald-500 text-emerald-500">
+                        Ativo
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="text-xs text-muted-foreground">

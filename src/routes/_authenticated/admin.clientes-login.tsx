@@ -118,12 +118,18 @@ function AdminClientesLogin() {
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {
     try {
-      await onboarding.mutateAsync(values as any);
-      toast.success("Login do cliente criado com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+      const result = await onboarding.mutateAsync(values as any);
+      if (result.success) {
+        toast.success(result.message || "Login do cliente criado com sucesso!");
+        queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+        setSelectedClientId("");
+      } else {
+        toast.error(result.message || "Erro ao criar acesso.");
+      }
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || "Erro ao criar acesso.");
+      const errorMessage = error.message || "Erro ao criar acesso. Verifique os dados e tente novamente.";
+      toast.error(errorMessage);
     }
   };
 
