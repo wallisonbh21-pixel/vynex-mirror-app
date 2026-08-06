@@ -10,8 +10,27 @@ const createClientAccountSchema = z.object({
 
 export const createClientPortalAccount = createServerFn({ method: "POST" })
   .validator((data: unknown) => createClientAccountSchema.parse(data))
-  .handler(async ({ data }: { data: z.infer<typeof createClientAccountSchema> }) => {
+  .handler(async ({ data }, ctx) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase: userSupabase, userId: actorId } = ctx;
+
+    if (!actorId) throw new Error("Não autorizado.");
+
+    // Verificar se o ator (vendedor/admin) tem permissão sobre este cliente
+    const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
+    const isAdmin = roles?.some(r => r.role === 'admin');
+
+    if (!isAdmin) {
+      const { data: client, error: clientErr } = await userSupabase
+        .from("clients")
+        .select("owner_id")
+        .eq("id", data.clientId)
+        .single();
+      
+      if (clientErr || client?.owner_id !== actorId) {
+        throw new Error("Você não tem permissão para gerenciar este cliente.");
+      }
+    }
 
     const { data: existingUserList } = await supabaseAdmin.auth.admin.listUsers();
     let user = existingUserList.users.find((u) => u.email === data.email);
@@ -89,8 +108,28 @@ export const updateLoginStatus = createServerFn({ method: "POST" })
 
 export const resendInvite = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ email: z.string().email() }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }, ctx) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase: userSupabase, userId: actorId } = ctx;
+
+    if (!actorId) throw new Error("Não autorizado.");
+
+    // Segurança: Verificar se o e-mail pertence a um cliente que o ator pode gerenciar
+    const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
+    const isAdmin = roles?.some(r => r.role === 'admin');
+
+    if (!isAdmin) {
+      const { data: client, error } = await userSupabase
+        .from("clients")
+        .select("owner_id")
+        .eq("contact_email", data.email)
+        .single();
+      
+      if (error || client?.owner_id !== actorId) {
+        throw new Error("Você não tem permissão para gerenciar este cliente.");
+      }
+    }
+
     const { error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: data.email,
