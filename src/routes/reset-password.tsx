@@ -64,7 +64,7 @@ function ResetPasswordPage() {
       return;
     }
     toast.success("Senha atualizada. Bem-vindo de volta!");
-    navigate({ to: "/painel", replace: true });
+    navigate({ to: "/cliente", replace: true });
   }
 
   return (

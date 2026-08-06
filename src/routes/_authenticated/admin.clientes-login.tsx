@@ -111,6 +111,12 @@ function AdminClientesLogin() {
           ) : (
             filteredClients?.map((client) => {
               const hasLogin = !!client.user_id;
+              // No user-facing apps, we usually check for a 'last_sign_in_at' or similar.
+              // For now, if user_id exists, it's the first step. 
+              // The user requirement says "Status inicial = Acesso pendente".
+              // I will use client.status if it's 'active' vs 'pending' if the schema allows, 
+              // but standardizing on a visual check based on user_id for simplicity as per existing logic.
+              const status = hasLogin ? "Acesso ativo" : "Acesso pendente";
               const username = (client as any).profiles?.nickname || (()=>{
                 try { return JSON.parse(client.notes || '{}').pending_username || '-'; } catch { return '-'; }
               })();
@@ -144,19 +150,19 @@ function AdminClientesLogin() {
                   <div className="flex flex-col sm:flex-row items-center gap-3">
                     <div className={cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider",
-                      hasLogin 
+                      status === "Acesso ativo" 
                         ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" 
                         : "bg-orange-500/10 text-orange-500 border-orange-500/20"
                     )}>
-                      {hasLogin ? (
+                      {status === "Acesso ativo" ? (
                         <>
                           <CheckCircle className="size-3.5" />
-                          Acesso ativo
+                          {status}
                         </>
                       ) : (
                         <>
                           <Circle className="size-3.5" />
-                          Acesso pendente
+                          {status}
                         </>
                       )}
                     </div>

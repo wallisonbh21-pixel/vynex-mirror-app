@@ -107,7 +107,7 @@ export const registerNewClient = createServerFn({ method: "POST" })
         await supabaseAdmin.auth.admin.generateLink({
           type: 'recovery',
           email: data.contact_email,
-          options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password` }
+          options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password` }
         });
 
         onboardingResult = { success: true, message: "Cliente cadastrado e acesso enviado por e-mail." };
@@ -138,7 +138,7 @@ export const registerNewClient = createServerFn({ method: "POST" })
         const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
           type: 'recovery',
           email: data.contact_email,
-          options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password` }
+          options: { redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password` }
         });
 
         if (recoveryError) {

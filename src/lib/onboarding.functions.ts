@@ -120,7 +120,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         type: 'recovery',
         email: clientEmail,
         options: {
-          redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
+          redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`
         }
       });
 
@@ -185,7 +185,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       type: 'recovery',
       email: data.email,
       options: {
-        redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
+        redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/reset-password`
       }
     });
     if (error) {
