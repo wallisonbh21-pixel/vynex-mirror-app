@@ -243,8 +243,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
             });
           }
 
-          // IGNORE ANY BYPASS HEADERS - THEY HAVE NO EFFECT
           // The check above is absolute. Any request reaching here is authenticated and authorized.
+          // Internal Audit headers (X-ScaleNexus-Audit) are NOT checked or used here to prevent bypass.
 
           // Input
           const body = await request.json();
