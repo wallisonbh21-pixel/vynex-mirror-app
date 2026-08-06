@@ -1,12 +1,9 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { crypto } from "node:crypto";
+import crypto from "node:crypto";
 
 export function generateInitialPassword(): string {
   // Gera uma senha segura de 12 caracteres (letras e números)
-  return Array.from(crypto.randomBytes(9))
-    .map(b => b.toString(36))
-    .join('')
-    .slice(0, 12);
+  return crypto.randomBytes(9).toString('base64').slice(0, 12).replace(/\+/g, '0').replace(/\//g, '1');
 }
 
 export async function createAuthUser(

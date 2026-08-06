@@ -84,15 +84,20 @@ function AuthPage() {
     }
     
     // Identificar o papel e redirecionar
-    const { data: userResponse } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user?.user_metadata?.must_change_password) {
+      navigate({ to: "/reset-password", replace: true });
+      return;
+    }
+
     const { data: rolesData } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userResponse.user?.id || "");
+      .eq("user_id", user?.id || "");
       
     const roles = rolesData?.map(r => r.role) || [];
     
-    // Get redirect path from state or role
     const state = (window.history.state as any);
     const from = state?.usr?.from || (roles.includes("cliente") ? "/cliente" : "/painel");
     

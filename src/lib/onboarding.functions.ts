@@ -111,7 +111,7 @@ export const resendInvite = createServerFn({ method: "POST" })
     }
 
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
-    await supabaseAdmin.auth.admin.resetPasswordForEmail(data.email, {
+    await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, {
       redirectTo: `${siteUrl}/reset-password`,
     });
 

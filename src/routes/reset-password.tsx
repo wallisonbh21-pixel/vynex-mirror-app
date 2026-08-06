@@ -42,7 +42,9 @@ function ResetPasswordPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setReady(!!data.session));
+    supabase.auth.getSession().then(({ data }) => {
+      setReady(!!data.session);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) setReady(true);
     });
@@ -57,14 +59,25 @@ function ResetPasswordPage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
+    
+    // Update password AND remove the must_change_password flag
+    const { error } = await supabase.auth.updateUser({ 
+      password: parsed.data.password,
+      data: { must_change_password: false }
+    });
+    
     setLoading(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Senha atualizada. Bem-vindo de volta!");
-    navigate({ to: "/cliente", replace: true });
+    toast.success("Senha atualizada. Bem-vindo!");
+    
+    // Identify role to redirect
+    const { data: { user } } = await supabase.auth.getUser();
+    const isCliente = user?.user_metadata?.role === 'cliente';
+    
+    navigate({ to: isCliente ? "/cliente" : "/painel", replace: true });
   }
 
   return (
