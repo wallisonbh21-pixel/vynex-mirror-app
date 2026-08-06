@@ -45,18 +45,7 @@ function VendedorClientes() {
     { name: "username", label: "Nome de usuário", required: true, placeholder: "Ex: joaosilva" },
     { name: "contact_email", label: "E-mail", type: "email", required: true, placeholder: "Ex: joao@email.com" },
     { name: "contact_phone", label: "Telefone", placeholder: "Ex: (11) 99999-9999" },
-    { name: "company", label: "Empresa", placeholder: "Ex: Nexus Corp" },
-    { 
-      name: "status", 
-      label: "Status", 
-      type: "select", 
-      required: true, 
-      defaultValue: "active",
-      options: [
-        { label: "Ativo", value: "active" },
-        { label: "Inativo", value: "inactive" }
-      ]
-    },
+    { name: "company", label: "Empresa/Negócio", placeholder: "Ex: Nexus Corp" },
   ];
 
   const handleRegisterClient = async (values: Record<string, unknown>) => {
