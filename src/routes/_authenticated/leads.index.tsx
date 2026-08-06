@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { Plus, Search, Trash2, Globe } from "lucide-react";
+import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
 import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -169,8 +170,18 @@ function LeadsPage() {
                 </td>
                 <td className="px-4 py-3">
                   <span className="block">{lead.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {lead.whatsapp || lead.phone || lead.email || "sem contato"}
+                  <span className="text-xs text-muted-foreground flex flex-col gap-0.5">
+                    <span>{lead.whatsapp || lead.phone || lead.email || "sem contato"}</span>
+                    {lead.website && sanitizeExternalUrl(lead.website) && (
+                      <a 
+                        href={sanitizeExternalUrl(lead.website)} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-primary hover:underline flex items-center gap-1"
+                      >
+                        <Globe className="size-2" /> {lead.website}
+                      </a>
+                    )}
                   </span>
                 </td>
                 <td className="px-4 py-3">

@@ -15,6 +15,7 @@ import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { sanitizeExternalUrl } from '@/lib/security';
 
 interface MeetingRoomLayoutProps {
   meeting: MeetingWithParticipants & { project?: { title: string }, client?: { name: string } };
@@ -205,7 +206,15 @@ export function MeetingRoomLayout({
                         <span className="text-[10px] text-slate-600">{format(new Date(m.created_at), 'HH:mm')}</span>
                       </div>
                       <div className={`px-4 py-2 rounded-2xl text-sm max-w-[85%] ${m.sender_id === user.id ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none'}`}>
-                        {m.message}
+                        {m.message.split(/\s+/).some(word => word.startsWith('http')) ? (
+                           m.message.split(/\s+/).map((word, i) => {
+                             if (word.startsWith('http') || word.startsWith('www.')) {
+                               const sanitized = sanitizeExternalUrl(word);
+                               return sanitized ? <a key={i} href={sanitized} target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80 break-all">{word} </a> : word + ' ';
+                             }
+                             return word + ' ';
+                           })
+                        ) : m.message}
                       </div>
                     </div>
                   ))}
