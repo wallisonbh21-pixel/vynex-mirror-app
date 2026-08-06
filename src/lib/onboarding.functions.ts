@@ -18,7 +18,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     // Verificar se o ator (vendedor/admin) tem permissão sobre este cliente
     const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
-    const isAdmin = roles?.some(r => r.role === 'admin');
+    const isAdmin = roles?.some((r: any) => r.role === 'admin');
 
     if (!isAdmin) {
       const { data: client, error: clientErr } = await userSupabase
@@ -136,7 +136,7 @@ export const resendInvite = createServerFn({ method: "POST" })
 
     // Segurança: Verificar se o e-mail pertence a um cliente que o ator pode gerenciar
     const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
-    const isAdmin = roles?.some(r => r.role === 'admin');
+    const isAdmin = roles?.some((r: any) => r.role === 'admin');
 
     if (!isAdmin) {
       const { data: client, error } = await userSupabase

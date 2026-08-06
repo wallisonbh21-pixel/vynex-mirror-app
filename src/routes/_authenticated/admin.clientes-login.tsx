@@ -27,6 +27,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { cn } from "@/lib/utils";
 import { useClientsList, useClientOnboarding } from "@/lib/client";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { useQueryClient } from "@tanstack/react-query";

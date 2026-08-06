@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { requireVendedor } from '@/lib/guard';
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
