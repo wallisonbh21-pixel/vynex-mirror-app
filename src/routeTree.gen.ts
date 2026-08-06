@@ -36,6 +36,8 @@ import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authentic
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
+import { Route as AuthenticatedClienteProjetoRouteImport } from './routes/_authenticated/cliente/projeto'
+import { Route as AuthenticatedClienteSiteRouteImport } from './routes/_authenticated/cliente/site'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
 import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
@@ -185,6 +187,18 @@ const AuthenticatedClienteIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedClienteRouteRoute,
   } as any)
+const AuthenticatedClienteProjetoRoute =
+  AuthenticatedClienteProjetoRouteImport.update({
+    id: '/projeto',
+    path: '/projeto',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
+const AuthenticatedClienteSiteRoute =
+  AuthenticatedClienteSiteRouteImport.update({
+    id: '/site',
+    path: '/site',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
 const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   id: '/leads/',
   path: '/leads/',
@@ -258,6 +272,8 @@ export interface FileRoutesByFullPath {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
+  '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
   '/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
@@ -293,6 +309,8 @@ export interface FileRoutesByTo {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
+  '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
   '/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
@@ -331,6 +349,8 @@ export interface FileRoutesById {
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
+  '/_authenticated/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/_authenticated/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
   '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
   '/_authenticated/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
@@ -369,6 +389,8 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/briefing/$projectId'
+    | '/cliente/projeto'
+    | '/cliente/site'
     | '/leads/$leadId'
     | '/projetos/$projectId'
     | '/reuniao/$meetingId'
@@ -404,6 +426,8 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/briefing/$projectId'
+    | '/cliente/projeto'
+    | '/cliente/site'
     | '/leads/$leadId'
     | '/projetos/$projectId'
     | '/reuniao/$meetingId'
@@ -441,6 +465,8 @@ export interface FileRouteTypes {
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
     | '/_authenticated/briefing/$projectId'
+    | '/_authenticated/cliente/projeto'
+    | '/_authenticated/cliente/site'
     | '/_authenticated/leads/$leadId'
     | '/_authenticated/projetos/$projectId'
     | '/_authenticated/reuniao/$meetingId'
@@ -652,6 +678,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClienteIndexRouteImport
       parentRoute: typeof AuthenticatedClienteRouteRoute
     }
+    '/_authenticated/cliente/projeto': {
+      id: '/_authenticated/cliente/projeto'
+      path: '/projeto'
+      fullPath: '/cliente/projeto'
+      preLoaderRoute: typeof AuthenticatedClienteProjetoRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
+    '/_authenticated/cliente/site': {
+      id: '/_authenticated/cliente/site'
+      path: '/site'
+      fullPath: '/cliente/site'
+      preLoaderRoute: typeof AuthenticatedClienteSiteRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
     '/_authenticated/leads/': {
       id: '/_authenticated/leads/'
       path: '/leads'
@@ -712,11 +752,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedClienteRouteRouteChildren {
+  AuthenticatedClienteProjetoRoute: typeof AuthenticatedClienteProjetoRoute
+  AuthenticatedClienteSiteRoute: typeof AuthenticatedClienteSiteRoute
   AuthenticatedClienteIndexRoute: typeof AuthenticatedClienteIndexRoute
 }
 
 const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChildren =
   {
+    AuthenticatedClienteProjetoRoute: AuthenticatedClienteProjetoRoute,
+    AuthenticatedClienteSiteRoute: AuthenticatedClienteSiteRoute,
     AuthenticatedClienteIndexRoute: AuthenticatedClienteIndexRoute,
   }
 
