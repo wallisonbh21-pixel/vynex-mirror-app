@@ -74,7 +74,7 @@ function VendedorClientesLogin() {
         clientId: selectedClientId,
         email: selectedClient?.contact_email!,
         fullName: selectedClient?.contact_name || "Cliente",
-        username: values.username as string,
+        username: values["username"] as string,
       };
       
       const result = await onboarding.mutateAsync(payload as any);
