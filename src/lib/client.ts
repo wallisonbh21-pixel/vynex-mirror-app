@@ -113,7 +113,7 @@ export function useClientOnboarding() {
   const onboardFn = useServerFn(createClientPortalAccount);
 
   return useMutation({
-    mutationFn: async (params: { email: string; fullName: string; clientId: string }) => {
+    mutationFn: async (params: { email: string; fullName: string; clientId: string; username: string }) => {
       return onboardFn({ data: params });
     },
     onSuccess: () => {

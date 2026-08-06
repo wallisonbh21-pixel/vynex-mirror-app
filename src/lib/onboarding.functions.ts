@@ -47,24 +47,21 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     const existingUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
     
     if (existingUser) {
-      // User exists in Auth. Check if already linked to THIS client.
-      if (client.user_id === existingUser.id) {
-        throw new Error("Este cliente já possui acesso ao Portal.");
-      }
-
-      // Check if this existing user is already linked to ANY client
+      // User exists in Auth.
+      
+      // Check if this existing user is already linked to ANOTHER client
       const { data: otherClient } = await supabaseAdmin
         .from("clients")
-        .select("id, company")
+        .select("id, contact_name, contact_email")
         .eq("user_id", existingUser.id)
         .maybeSingle();
 
       if (otherClient && otherClient.id !== client.id) {
-        throw new Error(`Este e-mail já possui uma conta no sistema vinculada ao cliente "${otherClient.company}". Entre em contato com um administrador para realizar a vinculação.`);
+        throw new Error(`Este e-mail já está vinculado a outro cliente. Solicite a análise de um administrador.`);
       }
 
-      // If it exists in Auth but is NOT linked to any client (or linked to this one but client.user_id was null for some reason)
-      // We perform the linkage.
+      // If it exists in Auth but is NOT linked to any client (or linked to this one)
+      // We perform the linkage/update and send/resend invite.
       
       // 1. Ensure Role
       await supabaseAdmin.from("user_roles").upsert({ 
@@ -75,21 +72,31 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       // 2. Link Client
       await supabaseAdmin.from("clients").update({ user_id: existingUser.id } as any).eq("id", client.id);
 
-      // 3. Ensure Profile
+      // 3. Ensure Profile (Update nickname/username if provided)
       await supabaseAdmin.from("profiles").upsert({
         id: existingUser.id,
-        full_name: data.fullName || null,
+        full_name: data.fullName || client.contact_name || null,
         nickname: data.username
       } as any);
+
+      // 4. Generate recovery link (Resend access)
+      await supabaseAdmin.auth.admin.generateLink({
+        type: 'recovery',
+        email: data.email,
+        options: {
+          redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
+        }
+      });
 
       return { 
         success: true, 
         userId: existingUser.id,
-        message: "Acesso vinculado com sucesso. O e-mail já possuía uma conta ativa."
+        message: "O e-mail já possui uma conta ativa. Um novo link de acesso foi enviado."
       };
     }
 
     // New User flow
+    // Check if username is in use in profiles
     const { data: existingProfile } = await supabaseAdmin
       .from("profiles")
       .select("id")
@@ -102,8 +109,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       email: data.email,
       email_confirm: true, 
       user_metadata: { 
-        full_name: data.fullName || null, 
-
+        full_name: data.fullName || client.contact_name || null, 
         role: "cliente",
         username: data.username 
       },
@@ -125,7 +131,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     // Create Profile
     await supabaseAdmin.from("profiles").upsert({
       id: authUser.id,
-      full_name: data.fullName || null,
+      full_name: data.fullName || client.contact_name || null,
       nickname: data.username
     } as any);
 
