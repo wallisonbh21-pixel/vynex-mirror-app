@@ -118,7 +118,9 @@ export function useClientOnboarding() {
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["clients-list"] });
-      // Removed global toast to let component handle specific messages
+      if (data.success) {
+        toast.success(data.message || "Acesso ao portal ativado!");
+      }
     },
     onError: (error: any) => {
       toast.error(error.message || "Erro ao ativar acesso ao portal.");

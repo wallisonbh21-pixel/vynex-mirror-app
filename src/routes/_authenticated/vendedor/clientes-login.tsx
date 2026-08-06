@@ -45,7 +45,6 @@ function VendedorLoginCentral() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const registerFields: Field[] = [
-    { name: "username", label: "Usuário *", required: true, placeholder: "Ex: joaosilva" },
     { name: "contact_email", label: "E-mail *", type: "email", required: true, placeholder: "Ex: joao@email.com" },
     { name: "contact_name", label: "Nome completo", placeholder: "Opcional" },
     { name: "contact_phone", label: "Telefone", placeholder: "Opcional" },
@@ -229,7 +228,7 @@ function VendedorLoginCentral() {
                           clientId: client.id, 
                           username, 
                           email: client.contact_email!, 
-                          fullName: client.contact_name! 
+                          fullName: client.contact_name || username
                         });
                       }
                     }}

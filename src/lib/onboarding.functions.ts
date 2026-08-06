@@ -39,7 +39,18 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     if (!client.contact_email) throw new Error("E-mail do cliente não informado.");
 
-    // 3. Search for Auth user by email
+    // 3. Search for username uniqueness in profiles
+    const { data: existingProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("nickname", data.username)
+      .maybeSingle();
+
+    if (existingProfile) {
+      throw new Error("Este nome de usuário já está sendo utilizado.");
+    }
+
+    // 4. Search for Auth user by email
     const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
     if (listError) throw new Error(`Erro ao listar usuários: ${listError.message}`);
     
@@ -50,10 +61,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       if (client.user_id !== existingAuthUser.id) {
         await supabaseAdmin.from("clients").update({ user_id: existingAuthUser.id } as any).eq("id", client.id);
       }
+      
+      // Update status or ensure roles/profiles if needed
+      await supabaseAdmin.from("user_roles").upsert({ user_id: existingAuthUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
+
       return { success: true, message: "Conta já existente vinculada com sucesso." };
     }
 
-    // 4. Create new account
+    // 5. Create new account
     const { user: newUser, initialPassword } = await createAuthUser(supabaseAdmin, {
       email: client.contact_email,
       username: data.username,
@@ -69,9 +84,9 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     await supabaseAdmin.from("profiles").upsert({ id: newUser.id, nickname: data.username, full_name: client.contact_name || data.username } as any);
     await supabaseAdmin.from("user_roles").upsert({ user_id: newUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
 
-    // Send email
+    // Send email with credentials
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
-    await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
+    const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
       redirectTo: `${siteUrl}/reset-password`,
       data: { 
         temp_password: initialPassword,
@@ -80,7 +95,11 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       }
     });
 
-    return { success: true, message: "Acesso criado e credenciais enviadas." };
+    if (inviteError) {
+      return { success: true, message: "Login criado, mas não foi possível enviar o e-mail. Verifique a configuração de SMTP." };
+    }
+
+    return { success: true, message: "Login do cliente criado com sucesso e credenciais enviadas." };
   });
 
 export const resendInvite = createServerFn({ method: "POST" })
