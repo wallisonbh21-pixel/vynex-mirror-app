@@ -4,6 +4,8 @@ import { useClientData, useClientProjects } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Rocket } from "lucide-react";
 import { PROJECT_STATUS } from "@/lib/format";
 import { ProjectProgression } from "@/components/ProjectProgression";
 
@@ -18,13 +20,33 @@ function ClientDashboard() {
   if (loadingClient || loadingProjects) {
     return (
       <AppShell title="Dashboard">
-        <div className="space-y-6">
-          <Skeleton className="h-32 w-full" />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+          <Skeleton className="h-32 w-full max-w-4xl" />
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-4xl">
             <Skeleton className="h-40" />
             <Skeleton className="h-40" />
             <Skeleton className="h-40" />
           </div>
+          <p className="text-sm text-muted-foreground animate-pulse">Carregando seu painel...</p>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (!client) {
+    return (
+      <AppShell title="Dashboard">
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+          <div className="rounded-full bg-destructive/10 p-6">
+            <Rocket className="size-12 text-destructive opacity-50" />
+          </div>
+          <h2 className="text-2xl font-bold">Não foi possível carregar seu painel.</h2>
+          <p className="text-muted-foreground max-w-md">
+            Seu vínculo comercial não foi encontrado ou você ainda não possui informações vinculadas à sua conta.
+          </p>
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Tentar novamente
+          </Button>
         </div>
       </AppShell>
     );
