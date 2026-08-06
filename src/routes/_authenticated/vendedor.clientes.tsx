@@ -9,6 +9,7 @@ import {
   Plus, 
   Search, 
   ShieldCheck,
+  Circle,
   UserPlus,
   Lock,
   ExternalLink,
@@ -61,10 +62,7 @@ function VendedorClientes() {
         notes: (values as any).notes || "",
       };
       const result = await registerClient.mutateAsync(submissionData);
-      if (result.success && result.client) {
-        setSelectedClientId(result.client.id);
-        setIsLoginDialogOpen(true);
-      }
+      // No automatic redirection
     } catch (error) {}
   };
 
@@ -86,7 +84,7 @@ function VendedorClientes() {
         clientId: selectedClientId,
         email: selectedClient.contact_email,
         fullName: selectedClient.contact_name || "Cliente",
-        username: values.username as string,
+        username: values["username"] as string,
       };
       
       const result = await onboarding.mutateAsync(payload as any);
@@ -181,11 +179,13 @@ function VendedorClientes() {
                           {client.contact_name || "Sem nome"}
                         </h3>
                         {hasLogin ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] uppercase font-bold h-5">
+                          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] uppercase font-bold h-5 gap-1">
+                            <ShieldCheck className="size-3" />
                             Acesso Ativo
                           </Badge>
                         ) : (
-                          <Badge variant="secondary" className="text-[10px] uppercase tracking-wider font-bold h-5">
+                          <Badge variant="secondary" className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px] uppercase tracking-wider font-bold h-5 gap-1">
+                            <Circle className="size-2 fill-amber-500" />
                             Sem Login
                           </Badge>
                         )}
@@ -207,26 +207,43 @@ function VendedorClientes() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <RecordDialog
+                      title="Cadastrar Login do Cliente"
+                      fields={loginFields}
+                      onSubmit={handleCreateLogin}
+                      open={isLoginDialogOpen && selectedClientId === client.id}
+                      onOpenChange={(open) => {
+                        setIsLoginDialogOpen(open);
+                        if (open) setSelectedClientId(client.id);
+                      }}
+                    />
                     {!hasLogin ? (
-                      <RecordDialog
-                        title="Cadastrar Login do Cliente"
-                        description={`Cliente: ${client.contact_name} (${client.contact_email})`}
-                        fields={loginFields}
-                        onSubmit={handleCreateLogin}
-                        open={isLoginDialogOpen && selectedClientId === client.id}
-                        onOpenChange={(open) => {
-                          setIsLoginDialogOpen(open);
-                          if (open) setSelectedClientId(client.id);
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        className="gap-2 font-bold bg-primary hover:bg-primary/90"
+                        onClick={() => {
+                          setSelectedClientId(client.id);
+                          setIsLoginDialogOpen(true);
                         }}
-                        trigger={
-                          <Button variant="outline" size="sm" className="gap-2 font-bold border-primary/20 text-primary hover:bg-primary/10">
-                            <Lock className="size-3.5" />
-                            Cadastrar Login
-                          </Button>
-                        }
-                      />
+                      >
+                        <Lock className="size-3.5" />
+                        Cadastrar Login do Cliente
+                      </Button>
                     ) : (
                       <>
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="h-8 px-3 rounded-lg gap-2 font-bold"
+                          onClick={() => {
+                            setSelectedClientId(client.id);
+                            setIsLoginDialogOpen(true);
+                          }}
+                        >
+                          <UserPlus className="size-3.5" /> 
+                          Fazer Cadastro do Painel do Cliente
+                        </Button>
                         <Button 
                           variant="secondary" 
                           size="sm" 
