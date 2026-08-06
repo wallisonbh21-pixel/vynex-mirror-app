@@ -50,7 +50,7 @@ function ClientLoginPage() {
     if (roles.includes("cliente")) {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData?.user;
-      if (user?.user_metadata?.['must_change_password']) {
+      if (user?.user_metadata && user.user_metadata['must_change_password']) {
         navigate({ to: "/cliente/primeiro-acesso", replace: true });
       } else {
         navigate({ to: "/cliente", replace: true });
