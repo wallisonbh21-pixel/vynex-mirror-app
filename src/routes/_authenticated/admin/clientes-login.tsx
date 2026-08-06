@@ -1,41 +1,46 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList, useClientOnboarding, useRegisterClient } from "@/lib/client";
+import { useClientsList, useClientOnboarding } from "@/lib/client";
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
-import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { 
   Search, 
   Plus, 
-  Send,
   Mail,
   User,
-  Ban,
-  CheckCircle,
-  Circle,
-  MoreVertical,
   Calendar,
   Lock,
   Bell,
   Key,
   Building2,
   Clock,
-  ExternalLink,
-  ChevronDown,
-  Filter
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useServerFn } from "@tanstack/react-start";
 import { resendInvite } from "@/lib/onboarding.functions";
-import { sendNotification, getClientAccessLogs } from "@/lib/client-login.functions";
-import { useQuery } from "@tanstack/react-query";
+import { sendNotification } from "@/lib/client-login.functions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
   beforeLoad: () => requireAdmin(),
@@ -45,36 +50,58 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 function AdminLoginCentral() {
   const { data: clients, isLoading, refetch } = useClientsList();
   const onboarding = useClientOnboarding();
-  const register = useRegisterClient();
   const resendInviteFn = useServerFn(resendInvite);
   const sendNotificationFn = useServerFn(sendNotification);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [username, setUsername] = useState("");
 
-  const registerFields: Field[] = [
-    { name: "contact_email", label: "E-mail *", type: "email", required: true, placeholder: "Ex: joao@email.com" },
-    { name: "contact_name", label: "Nome completo", placeholder: "Opcional" },
-    { name: "contact_phone", label: "Telefone", placeholder: "Opcional" },
-    { name: "company", label: "Empresa/Negócio", placeholder: "Opcional" },
-    { name: "notes", label: "Observações", type: "textarea", placeholder: "Opcional" },
-  ];
+  const filteredClients = useMemo(() => {
+    return clients?.filter((c) => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        (c.contact_name?.toLowerCase() || "").includes(searchLower) ||
+        (c.contact_email?.toLowerCase() || "").includes(searchLower) ||
+        (c.company?.toLowerCase() || "").includes(searchLower)
+      );
+    }) || [];
+  }, [clients, searchTerm]);
 
-  const filteredClients = clients?.filter((c) => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = (
-      (c.contact_name?.toLowerCase() || "").includes(searchLower) ||
-      (c.contact_email?.toLowerCase() || "").includes(searchLower) ||
-      (c.company?.toLowerCase() || "").includes(searchLower)
-    );
-    
-    if (statusFilter === "all") return matchesSearch;
-    if (statusFilter === "ativos") return matchesSearch && !!c.user_id;
-    if (statusFilter === "pendente") return matchesSearch && !c.user_id;
-    return matchesSearch;
-  });
+  const selectedClient = useMemo(() => clients?.find(c => c.id === selectedClientId), [clients, selectedClientId]);
 
-  const clientsWithLogin = filteredClients?.filter(c => !!c.user_id) || [];
-  const clientsWithoutLogin = filteredClients?.filter(c => !c.user_id) || [];
+  const clientsWithLogin = useMemo(() => filteredClients.filter(c => !!c.user_id), [filteredClients]);
+  const clientsWithoutLogin = useMemo(() => filteredClients.filter(c => !c.user_id), [filteredClients]);
+
+  const handleCreateAccess = async () => {
+    if (!selectedClient) {
+      toast.error("Selecione um cliente.");
+      return;
+    }
+    if (!username) {
+      toast.error("Informe um nome de usuário.");
+      return;
+    }
+    if (!selectedClient.contact_email) {
+      toast.error("Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.");
+      return;
+    }
+
+    try {
+      await onboarding.mutateAsync({
+        clientId: selectedClient.id,
+        username,
+        email: selectedClient.contact_email,
+        fullName: selectedClient.contact_name || username
+      });
+      setIsModalOpen(false);
+      setSelectedClientId("");
+      setUsername("");
+      refetch();
+    } catch (e: any) {
+      // toast is handled by mutation
+    }
+  };
 
   const handleResend = async (email: string) => {
     try {
@@ -96,52 +123,53 @@ function AdminLoginCentral() {
     }
   };
 
+  const handleOpenModal = (clientId?: string) => {
+    if (clientId) {
+      const client = clients?.find(c => c.id === clientId);
+      if (client?.user_id) {
+        toast.info("Este cliente já possui um acesso ao Portal do Cliente.");
+        // Could open a different management view here if needed
+        return;
+      }
+      setSelectedClientId(clientId);
+      setUsername(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
+    } else {
+      setSelectedClientId("");
+      setUsername("");
+    }
+    setIsModalOpen(true);
+  };
+
   return (
     <AppShell 
       title="Login do Cliente" 
       description="Gerencie os acessos, comunique-se e acompanhe seus clientes."
+      actions={
+        <Button className="gap-2 font-bold shadow-lg shadow-primary/20 h-10 px-6 rounded-xl" onClick={() => handleOpenModal()}>
+          <Plus className="size-4" />
+          ABRIR PAINEL DO CLIENTE
+        </Button>
+      }
     >
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card/50 p-4 rounded-2xl border border-border/50">
-          <div className="flex flex-1 items-center gap-3">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="🔎 Buscar cliente..."
-                className="pl-9 bg-background/50 border-border/50 focus:ring-primary/20 transition-all"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2 text-xs font-semibold uppercase tracking-wider h-10 px-4 rounded-xl border-border/50">
-                <Filter className="size-3.5" />
-                Filtrar
-              </Button>
-            </div>
+        <div className="bg-card/50 p-4 rounded-2xl border border-border/50">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="🔎 Buscar cliente..."
+              className="pl-9 bg-background/50 border-border/50"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <RecordDialog
-            title="Novo Cliente"
-            fields={registerFields}
-            onSubmit={async (values) => {
-              await register.mutateAsync(values);
-              refetch();
-            }}
-            trigger={
-              <Button className="gap-2 font-bold shadow-lg shadow-primary/20 h-10 px-6 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]">
-                <Plus className="size-4" />
-                Cadastrar Cliente
-              </Button>
-            }
-          />
         </div>
 
         <Tabs defaultValue="with-access" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md bg-muted/30 p-1 rounded-2xl mb-6">
-            <TabsTrigger value="with-access" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="with-access" className="rounded-xl">
               Clientes com Login ({clientsWithLogin.length})
             </TabsTrigger>
-            <TabsTrigger value="no-access" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="no-access" className="rounded-xl">
               Clientes sem acesso ({clientsWithoutLogin.length})
             </TabsTrigger>
           </TabsList>
@@ -153,35 +181,33 @@ function AdminLoginCentral() {
               </div>
             ) : clientsWithLogin.length === 0 ? (
               <div className="py-20 text-center text-muted-foreground border-2 border-dashed rounded-3xl bg-card/30">
-                <div className="size-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                   <User className="size-8 opacity-20" />
-                </div>
+                <User className="size-12 opacity-20 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground">Nenhum cliente com login</h3>
-                <p className="mt-1">Tente cadastrar um novo cliente ou ativar o acesso de um existente.</p>
+                <p>Tente ativar o acesso de um cliente comercial.</p>
               </div>
             ) : (
               clientsWithLogin.map(client => {
                 const profile = Array.isArray(client.profiles) ? client.profiles[0] : client.profiles;
-                const username = (profile as any)?.nickname || '-';
+                const usernameDisplay = (profile as any)?.nickname || '-';
                 
                 return (
-                  <div key={client.id} className="group relative p-6 rounded-3xl border border-border/50 bg-card hover:border-primary/30 transition-all hover:shadow-xl hover:shadow-primary/5">
+                  <div key={client.id} className="p-6 rounded-3xl border border-border/50 bg-card hover:border-primary/30 transition-all">
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                       <div className="flex items-start gap-5">
-                        <div className="size-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-emerald-500 shrink-0 shadow-inner border border-emerald-500/20">
+                        <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-500/20">
                           <User className="size-7" />
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
                             <h3 className="font-bold text-xl tracking-tight">{client.contact_name}</h3>
-                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-2 py-0 text-[10px] uppercase font-black tracking-widest">
-                              🟢 Ativo
+                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                              🟢 Acesso Ativo
                             </Badge>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 pt-1">
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <User className="size-3.5 text-primary/60" />
-                                <span className="font-medium text-foreground/80">Usuário:</span> {username}
+                                <span className="font-medium text-foreground/80">Usuário:</span> {usernameDisplay}
                              </div>
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Mail className="size-3.5 text-primary/60" />
@@ -199,15 +225,14 @@ function AdminLoginCentral() {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 pt-4 xl:pt-0 border-t xl:border-none border-border/50">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Button 
                           variant="secondary" 
                           size="sm" 
-                          className="h-9 px-4 rounded-xl gap-2 font-bold transition-all hover:bg-primary hover:text-white group/btn"
+                          className="h-9 px-4 rounded-xl gap-2 font-bold"
                           onClick={() => window.open('/cliente', '_blank')}
                         >
-                          <Lock className="size-3.5 transition-transform group-hover/btn:scale-110" /> 
-                          Acesso
+                          <Lock className="size-3.5" /> ABRIR PAINEL
                         </Button>
                         <Button 
                           variant="outline" 
@@ -215,8 +240,7 @@ function AdminLoginCentral() {
                           className="h-9 px-4 rounded-xl gap-2 font-bold border-border/50 hover:border-primary/30"
                           onClick={() => handleResend(client.contact_email!)}
                         >
-                          <Mail className="size-3.5" /> 
-                          Enviar E-mail
+                          <Mail className="size-3.5" /> ENVIAR E-MAIL
                         </Button>
                         <Button 
                           variant="outline" 
@@ -224,8 +248,7 @@ function AdminLoginCentral() {
                           className="h-9 px-4 rounded-xl gap-2 font-bold border-border/50 hover:border-primary/30"
                           onClick={() => handleResend(client.contact_email!)}
                         >
-                          <Key className="size-3.5" /> 
-                          Trocar Senha
+                          <Key className="size-3.5" /> TROCAR SENHA
                         </Button>
                         <Button 
                           variant="outline" 
@@ -233,8 +256,7 @@ function AdminLoginCentral() {
                           className="h-9 px-4 rounded-xl gap-2 font-bold border-border/50 hover:border-primary/30"
                           onClick={() => handleNotify(client.id, client.user_id!, client.contact_name!)}
                         >
-                          <Bell className="size-3.5" /> 
-                          Notificar
+                          <Bell className="size-3.5" /> NOTIFICAR CLIENTE
                         </Button>
                         <Button 
                           variant="outline" 
@@ -242,8 +264,7 @@ function AdminLoginCentral() {
                           className="h-9 px-4 rounded-xl gap-2 font-bold border-border/50 hover:border-primary/30"
                           onClick={() => window.location.href = '/reunioes'}
                         >
-                          <Calendar className="size-3.5" /> 
-                          Reunião
+                          <Calendar className="size-3.5" /> REUNIÃO
                         </Button>
                       </div>
                     </div>
@@ -258,12 +279,11 @@ function AdminLoginCentral() {
               <div className="py-20 text-center text-muted-foreground border-2 border-dashed rounded-3xl bg-card/30">
                 <CheckCircle className="size-12 opacity-20 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground">Todos os clientes possuem acesso</h3>
-                <p>Bom trabalho! Todos os seus clientes comerciais já estão no portal.</p>
               </div>
             ) : (
               clientsWithoutLogin.map(client => (
                 <div key={client.id} className="p-6 rounded-3xl border border-border/50 bg-card/50 hover:bg-card transition-all flex flex-col sm:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4 text-center sm:text-left">
+                  <div className="flex items-center gap-4">
                     <div className="size-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border/50">
                       <User className="size-6" />
                     </div>
@@ -274,21 +294,11 @@ function AdminLoginCentral() {
                   </div>
                   <Button 
                     className="w-full sm:w-auto gap-2 font-bold rounded-xl h-11 px-6 bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 transition-all"
-                    onClick={() => {
-                      const username = window.prompt("Defina um nome de usuário para este cliente:", client.contact_name?.toLowerCase().replace(/\s+/g, ''));
-                      if (username) {
-                        onboarding.mutate({ 
-                          clientId: client.id, 
-                          username, 
-                          email: client.contact_email!, 
-                          fullName: client.contact_name || username
-                        });
-                      }
-                    }}
+                    onClick={() => handleOpenModal(client.id)}
                     disabled={onboarding.isPending}
                   >
                     <Plus className="size-4" /> 
-                    {onboarding.isPending ? 'Cadastrando...' : 'Cadastrar Login'}
+                    {onboarding.isPending ? 'Cadastrando...' : 'CRIAR PAINEL DO CLIENTE'}
                   </Button>
                 </div>
               ))
@@ -296,6 +306,78 @@ function AdminLoginCentral() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>ABRIR PAINEL DO CLIENTE</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="client-select">CLIENTE</Label>
+              <Select value={selectedClientId} onValueChange={(val) => {
+                setSelectedClientId(val);
+                const c = clients?.find(x => x.id === val);
+                if (c) setUsername(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
+              }}>
+                <SelectTrigger id="client-select" className="h-11 rounded-xl">
+                  <SelectValue placeholder="Selecionar cliente ▼" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients?.map(c => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.contact_name} {c.company ? `(${c.company})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedClient && (
+              <div className="space-y-4 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Cliente:</Label>
+                  <p className="font-semibold">{selectedClient.contact_name}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">E-mail:</Label>
+                  <p className="font-semibold">{selectedClient.contact_email || <span className="text-destructive font-normal italic">Não cadastrado!</span>}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Empresa:</Label>
+                  <p className="font-semibold">{selectedClient.company || "—"}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="username">NOME DE USUÁRIO</Label>
+              <Input 
+                id="username"
+                value={username} 
+                onChange={e => setUsername(e.target.value)}
+                placeholder="Ex: joao123"
+                className="h-11 rounded-xl"
+              />
+            </div>
+
+            {selectedClient && !selectedClient.contact_email && (
+              <p className="text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20">
+                Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button 
+              className="w-full h-11 rounded-xl font-bold gap-2"
+              onClick={handleCreateAccess} 
+              disabled={onboarding.isPending || !selectedClient || !username || !selectedClient.contact_email}
+            >
+              {onboarding.isPending ? 'CRIANDO...' : 'CRIAR PAINEL DO CLIENTE'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
