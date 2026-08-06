@@ -767,29 +767,28 @@ function ExternalOpportunityCard({
         </Button>
         <Button variant="outline" size="sm" asChild>
           <a 
-            href={sanitizeExternalUrl((() => {
+            href={(() => {
               const name = opportunity.business_name;
               const address = opportunity.address;
               const city = opportunity.city;
               const state = opportunity.state;
               const country = "Brasil";
               
+              let url = "";
               if (name && (address || city || state)) {
                 const queryParts = [name];
                 if (address) queryParts.push(address);
                 if (city) queryParts.push(city);
                 if (state) queryParts.push(state);
                 queryParts.push(country);
-                
-                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
+                url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
+              } else if (opportunity.lat && opportunity.lon) {
+                url = `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`;
+              } else {
+                url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
               }
-
-              if (opportunity.lat && opportunity.lon) {
-                return `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`;
-              }
-
-              return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
-            })())} 
+              return sanitizeExternalUrl(url);
+            })()}
             target="_blank" 
             rel="noopener noreferrer" 
             className="gap-1"
@@ -870,28 +869,27 @@ function OpportunityCard({
         <li className="flex items-center gap-2">
           <MapPin className="size-4 text-muted-foreground" />
           <a 
-            href={sanitizeExternalUrl((() => {
+            href={(() => {
               const name = opportunity.business_name;
               const address = opportunity.address;
               const city = opportunity.city;
               const state = opportunity.state;
               const country = "Brasil";
               
+              let url = "";
               if (name && (address || city || state)) {
                 const queryParts = [name];
                 if (address) queryParts.push(address);
                 if (city) queryParts.push(city);
                 if (state) queryParts.push(state);
                 queryParts.push(country);
-                
-                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
+                url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
+              } else if (opportunity.lat && opportunity.lon) {
+                url = `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`;
+              } else {
+                url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
               }
-
-              if (opportunity.lat && opportunity.lon) {
-                return `https://www.google.com/maps/search/?api=1&query=${opportunity.lat},${opportunity.lon}`;
-              }
-
-              return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || "")}`;
+              return sanitizeExternalUrl(url);
             })()}
             target="_blank" 
             rel="noopener noreferrer"
