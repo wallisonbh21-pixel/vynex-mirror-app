@@ -245,7 +245,7 @@ function AdminClientesLogin() {
                             clientId: client.id,
                             email: client.contact_email!,
                             fullName: client.contact_name || "Cliente",
-                            username: client.profiles?.nickname || ""
+                            username: (client as any).profiles?.nickname || ""
                           } as any);
                           toast.success("Acesso enviado com sucesso!");
                         } catch (e) {}
