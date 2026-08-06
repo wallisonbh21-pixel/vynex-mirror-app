@@ -194,7 +194,7 @@ function AuthPage() {
           <Tabs defaultValue="entrar">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="entrar">Entrar</TabsTrigger>
-              <TabsTrigger value="criar">Criar conta</TabsTrigger>
+              {!adminExists && <TabsTrigger value="criar">Criar conta</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="entrar" className="mt-6">
@@ -335,19 +335,23 @@ function AuthPage() {
             </TabsContent>
           </Tabs>
 
-          <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            ou
-            <span className="h-px flex-1 bg-border" />
-          </div>
+          {!adminExists && (
+            <>
+              <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                ou
+                <span className="h-px flex-1 bg-border" />
+              </div>
 
-          <Button
-            variant="secondary"
-            className="w-full transition-transform hover:-translate-y-0.5"
-            onClick={signInWithGoogle}
-          >
-            Continuar com Google
-          </Button>
+              <Button
+                variant="secondary"
+                className="w-full transition-transform hover:-translate-y-0.5"
+                onClick={signInWithGoogle}
+              >
+                Continuar com Google
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
