@@ -3,8 +3,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const createClientAccountSchema = z.object({
-  email: z.string().email(),
-  fullName: z.string().optional().nullable(),
   clientId: z.string().uuid(),
   username: z.string().min(3),
 });
@@ -19,12 +17,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     if (!actorId) throw new Error("[CLIENT_LOGIN_ERROR] etapa=auth_verify status=unauthorized");
 
     try {
-      // Validate actor roles
+      // 1. Validate actor roles (Admin or Vendedor)
       const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
       const isAdmin = roles?.some((r: any) => r.role === 'admin');
       const isVendedor = roles?.some((r: any) => r.role === 'vendedor');
 
-      // Fetch client and validate ownership
+      if (!isAdmin && !isVendedor) throw new Error("[CLIENT_LOGIN_ERROR] etapa=permission_check status=forbidden");
+
+      // 2. Fetch client and validate ownership
       const { data: client, error: clientErr } = await userSupabase
         .from("clients")
         .select("id, owner_id, status, user_id, contact_email, contact_name")
@@ -33,122 +33,92 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       
       if (clientErr || !client) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=client_lookup error=${clientErr?.message || "not_found"}`);
 
-      if (!isAdmin) {
-        if (!isVendedor || client.owner_id !== actorId) {
-          throw new Error("[CLIENT_LOGIN_ERROR] etapa=permission_check status=forbidden");
-        }
+      if (!isAdmin && client.owner_id !== actorId) {
+        throw new Error("[CLIENT_LOGIN_ERROR] etapa=permission_check status=forbidden");
       }
 
-      // Check if user already exists in Auth by email
+      const clientEmail = client.contact_email;
+      if (!clientEmail) throw new Error("[CLIENT_LOGIN_ERROR] etapa=client_data error=missing_email");
+
+      // 3. Search for Auth user by email
       const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
       if (listError) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=auth_lookup error=${listError.message}`);
       
-      const existingAuthUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+      const existingAuthUser = users.find((u) => u.email?.toLowerCase() === clientEmail.toLowerCase());
       
+      let targetAuthUserId: string;
+
       if (existingAuthUser) {
-        // Auth user exists - check if it's already linked to ANOTHER client
+        // CASE: Auth user exists
+        targetAuthUserId = existingAuthUser.id;
+
+        // Check if linked to ANOTHER client
         const { data: otherClient } = await supabaseAdmin
           .from("clients")
           .select("id")
-          .eq("user_id", existingAuthUser.id)
+          .eq("user_id", targetAuthUserId)
           .maybeSingle();
 
         if (otherClient && otherClient.id !== client.id) {
+          // Verify if the actor owns this other client too (rare but possible)
+          // Actually, the instruction says BLOQUEAR if linked to another client.
           throw new Error("Este e-mail já está vinculado a outro cliente. Entre em contato com um administrador.");
         }
 
-        // Link client if not already linked (No insert here!)
-        if (client.user_id !== existingAuthUser.id) {
-          const { error: linkErr } = await supabaseAdmin.from("clients").update({ user_id: existingAuthUser.id } as any).eq("id", client.id);
+        // Link client if not already linked (No insert, just update)
+        if (client.user_id !== targetAuthUserId) {
+          const { error: linkErr } = await supabaseAdmin.from("clients").update({ user_id: targetAuthUserId } as any).eq("id", client.id);
           if (linkErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=client_link error=${linkErr.message}`);
         }
+      } else {
+        // CASE: Auth user does NOT exist - Create it
+        // Check username uniqueness in profiles before creating Auth
+        const { data: existingProfile } = await supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .eq("nickname", data.username)
+          .maybeSingle();
+          
+        if (existingProfile) throw new Error("Este nome de usuário já está em uso.");
 
-        // Ensure Profile
-        const { error: profileErr } = await supabaseAdmin.from("profiles").upsert({
-          id: existingAuthUser.id,
-          full_name: data.fullName || client.contact_name || null,
-          nickname: data.username
-        } as any);
-        if (profileErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=profile_upsert error=${profileErr.message}`);
-
-        // Ensure 'cliente' role
-        const { error: roleErr } = await supabaseAdmin.from("user_roles").upsert({ 
-          user_id: existingAuthUser.id, 
-          role: "cliente" as any,
-        }, { onConflict: "user_id,role" });
-        if (roleErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=role_assign error=${roleErr.message}`);
-
-        // Generate recovery link (resend access)
-        const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
-          type: 'recovery',
-          email: data.email,
-          options: {
-            redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
-          }
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: clientEmail,
+          email_confirm: true, 
+          user_metadata: { 
+            full_name: client.contact_name || "Cliente", 
+            role: "cliente",
+            username: data.username 
+          },
         });
 
-        if (recoveryError) {
-          return {
-            success: false,
-            error: "AUTH_LINK_FAILED",
-            message: `[CLIENT_LOGIN_ERROR] etapa=send_email error=${recoveryError.message}`
-          };
-        }
+        if (createError) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=auth_create error=${createError.message}`);
+        
+        targetAuthUserId = newUser.user.id;
 
-        return { 
-          success: true, 
-          userId: existingAuthUser.id,
-          message: "Este cliente já possui uma conta. Um novo link de acesso foi enviado para o e-mail cadastrado."
-        };
+        // Link Client (Update only!)
+        const { error: linkNewErr } = await supabaseAdmin.from("clients").update({ user_id: targetAuthUserId } as any).eq("id", client.id);
+        if (linkNewErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=client_link_new error=${linkNewErr.message}`);
       }
 
-      // Create New Auth User flow
-      // Check if username is already in use in profiles
-      const { data: existingProfile } = await supabaseAdmin
-        .from("profiles")
-        .select("id")
-        .eq("nickname", data.username)
-        .maybeSingle();
-        
-      if (existingProfile) throw new Error("Este nome de usuário já está em uso.");
-
-      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: data.email,
-        email_confirm: true, 
-        user_metadata: { 
-          full_name: data.fullName || client.contact_name || null, 
-          role: "cliente",
-          username: data.username 
-        },
-      });
-
-      if (createError) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=auth_create error=${createError.message}`);
-
-      const authUser = newUser.user;
-
-      // Assign Role
-      const { error: roleNewErr } = await supabaseAdmin.from("user_roles").upsert({ 
-        user_id: authUser.id, 
-        role: "cliente" as any,
-      }, { onConflict: "user_id,role" });
-      if (roleNewErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=role_assign_new error=${roleNewErr.message}`);
-
-      // Link Client (Update only!)
-      const { error: linkNewErr } = await supabaseAdmin.from("clients").update({ user_id: authUser.id } as any).eq("id", client.id);
-      if (linkNewErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=client_link_new error=${linkNewErr.message}`);
-
-      // Create Profile
-      const { error: profileNewErr } = await supabaseAdmin.from("profiles").upsert({
-        id: authUser.id,
-        full_name: data.fullName || client.contact_name || null,
+      // 4. Ensure Profile exists and is correct
+      const { error: profileErr } = await supabaseAdmin.from("profiles").upsert({
+        id: targetAuthUserId,
+        full_name: client.contact_name || "Cliente",
         nickname: data.username
       } as any);
-      if (profileNewErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=profile_create error=${profileNewErr.message}`);
+      if (profileErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=profile_upsert error=${profileErr.message}`);
 
-      // Generate recovery link for first access
+      // 5. Ensure 'cliente' role
+      const { error: roleErr } = await supabaseAdmin.from("user_roles").upsert({ 
+        user_id: targetAuthUserId, 
+        role: "cliente" as any,
+      }, { onConflict: "user_id,role" });
+      if (roleErr) throw new Error(`[CLIENT_LOGIN_ERROR] etapa=role_assign error=${roleErr.message}`);
+
+      // 6. Generate and send recovery link
       const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
-        email: data.email,
+        email: clientEmail,
         options: {
           redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
         }
@@ -158,15 +128,16 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         return {
           success: false,
           error: "AUTH_LINK_FAILED",
-          userId: authUser.id,
-          message: "Login criado com sucesso, mas não foi possível enviar o e-mail. Use 'Reenviar acesso' na lista."
+          message: `[CLIENT_LOGIN_ERROR] etapa=send_email error=${recoveryError.message}`
         };
       }
 
       return { 
         success: true, 
-        userId: authUser.id,
-        message: "Login criado com sucesso. O link de acesso foi enviado para o e-mail do cliente."
+        userId: targetAuthUserId,
+        message: existingAuthUser 
+          ? "Este cliente já possui uma conta. Um novo link para definir a senha foi enviado."
+          : "Login criado com sucesso. O link para definir a senha foi enviado para o cliente."
       };
     } catch (e: any) {
       if (e.message?.includes('[CLIENT_LOGIN_ERROR]')) {
