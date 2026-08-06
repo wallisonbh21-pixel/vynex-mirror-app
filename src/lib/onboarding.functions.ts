@@ -80,7 +80,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       } as any);
 
       // 4. Generate recovery link (Resend access)
-      await supabaseAdmin.auth.admin.generateLink({
+      const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: data.email,
         options: {
@@ -88,10 +88,18 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         }
       });
 
+      if (recoveryError) {
+        return {
+          success: false,
+          error: "AUTH_LINK_FAILED",
+          message: "A conta já existe e está vinculada, mas não foi possível enviar o e-mail de acesso. Verifique a configuração de e-mail do sistema."
+        };
+      }
+
       return { 
         success: true, 
         userId: existingUser.id,
-        message: "O e-mail já possui uma conta ativa. Um novo link de acesso foi enviado."
+        message: "Um novo link de acesso foi enviado para o e-mail cadastrado."
       };
     }
 
@@ -136,7 +144,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     } as any);
 
     // Generate recovery link
-    await supabaseAdmin.auth.admin.generateLink({
+    const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: data.email,
       options: {
@@ -144,10 +152,21 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       }
     });
 
+    if (recoveryError) {
+      // If auth creation succeeded but email failed, we still have the user linked,
+      // but we return success: false to the UI can show "Reenviar acesso"
+      return {
+        success: false,
+        error: "AUTH_LINK_FAILED",
+        userId: authUser.id,
+        message: "Login criado com sucesso, mas não foi possível enviar o e-mail de acesso. Verifique a configuração de e-mail do sistema."
+      };
+    }
+
     return { 
       success: true, 
       userId: authUser.id,
-      message: "Acesso ao portal configurado com sucesso. Convite enviado para o e-mail."
+      message: "Login criado com sucesso. Um e-mail de acesso foi enviado para o cliente."
     };
   });
 
@@ -192,6 +211,8 @@ export const resendInvite = createServerFn({ method: "POST" })
         redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
       }
     });
-    if (error) throw error;
-    return { success: true };
+    if (error) {
+      throw new Error("Não foi possível enviar o e-mail de acesso. Verifique a configuração de e-mail do sistema.");
+    }
+    return { success: true, message: "Um novo link de acesso foi enviado para o e-mail cadastrado." };
   });

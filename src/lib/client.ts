@@ -116,9 +116,9 @@ export function useClientOnboarding() {
     mutationFn: async (params: { email: string; fullName: string; clientId: string; username: string }) => {
       return onboardFn({ data: params });
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["clients-list"] });
-      toast.success("Acesso ao portal ativado com sucesso.");
+      // Removed global toast to let component handle specific messages
     },
     onError: (error: any) => {
       toast.error(error.message || "Erro ao ativar acesso ao portal.");
