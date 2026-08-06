@@ -65,9 +65,10 @@ function AdminClientesLogin() {
     (c.contact_email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   ));
 
-  const availableClients = (clients as any[])?.filter(c => !c.user_id && c.status === 'ativo') || [];
+  const availableClients = (clients as any[])?.filter(c => !c.user_id && (c.status === 'ativo' || c.status === 'active')) || [];
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const selectedClient = availableClients.find(c => c.id === selectedClientId);
+
 
   const clientFields: Field[] = [
     { 
