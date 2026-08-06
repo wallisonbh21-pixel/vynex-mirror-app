@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { requireVendedor } from '@/lib/guard';
 import { AppShell } from "@/components/AppShell";
 import { useState, useMemo } from "react";
@@ -47,7 +47,9 @@ export const Route = createFileRoute('/_authenticated/vendedor/clientes-login')(
 });
 
 function VendedorClientesLogin() {
+  const navigate = useNavigate();
   const { user } = useSession();
+
   const [searchTerm, setSearchTerm] = useState("");
   const { data: clients, isLoading } = useClientsList(user?.id);
   const onboarding = useClientOnboarding();
@@ -85,7 +87,8 @@ function VendedorClientesLogin() {
       placeholder: "Selecione um cliente...", 
       required: true,
       defaultValue: selectedClient?.contact_name || "",
-      disabled: true 
+      disabled: true,
+      placeholder: "Selecione um cliente..."
     },
     { 
       name: "username", 
@@ -96,12 +99,13 @@ function VendedorClientesLogin() {
     { 
       name: "email", 
       label: "E-mail", 
-      placeholder: "Selecione um cliente...", 
       type: "email", 
       required: true,
       defaultValue: selectedClient?.contact_email || "",
-      disabled: true
+      disabled: true,
+      placeholder: "Selecione um cliente..."
     },
+
   ];
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {

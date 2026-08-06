@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
 import { AppShell } from "@/components/AppShell";
 import { useState, useMemo } from "react";
@@ -48,7 +48,9 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 });
 
 function AdminClientesLogin() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+
   const { data: clients, isLoading } = useClientsList();
   const onboarding = useClientOnboarding();
   const resendInviteFn = useServerFn(resendInvite);
@@ -85,18 +87,25 @@ function AdminClientesLogin() {
       placeholder: "Selecione um cliente...", 
       required: true,
       defaultValue: selectedClient?.contact_name || "",
-      disabled: true 
+      disabled: true,
+      placeholder: "Selecione um cliente..."
     },
-    { name: "username", label: "Nome de usuário", placeholder: "Ex: joaosilva", required: true },
+    { 
+      name: "username", 
+      label: "Nome de usuário", 
+      placeholder: "Ex: joaosilva", 
+      required: true 
+    },
     { 
       name: "email", 
       label: "E-mail", 
-      placeholder: "Selecione um cliente...", 
       type: "email", 
       required: true,
       defaultValue: selectedClient?.contact_email || "",
-      disabled: true
+      disabled: true,
+      placeholder: "Selecione um cliente..."
     },
+
   ];
 
   const handleCreateAccess = async (values: Record<string, unknown>) => {
