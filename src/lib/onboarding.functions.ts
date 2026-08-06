@@ -24,7 +24,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     const { data: client, error: clientErr } = await userSupabase
       .from("clients")
-      .select("owner_id, status, user_id, company, contact_email, contact_name")
+      .select("owner_id, status, user_id, contact_email, contact_name")
       .eq("id", data.clientId)
       .single();
     
@@ -36,16 +36,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       }
     }
 
-    if (client.status !== 'ativo') {
+    if (client.status !== 'ativo' && client.status !== 'active') {
       throw new Error("Somente clientes ativos podem receber acesso ao portal.");
     }
     if (client.user_id) {
       throw new Error("Este cliente já possui um login vinculado.");
     }
 
-    const { data: existingUserList } = await supabaseAdmin.auth.admin.listUsers();
-    let user = existingUserList.users.find((u) => u.email === data.email);
-    
+    // Double check nickname uniqueness in profiles
     const { data: existingProfile } = await supabaseAdmin
       .from("profiles")
       .select("id")
@@ -54,7 +52,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       
     if (existingProfile) throw new Error("Este nome de usuário já está em uso.");
 
-    if (!user) {
+    // Check if user already exists in Auth
+    const { data: existingUserList, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    if (listError) throw new Error("Erro ao verificar usuários existentes.");
+    
+    let authUser = existingUserList.users.find((u) => u.email === data.email);
+    
+    if (!authUser) {
+      // Create new user in Supabase Auth
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: data.email,
         email_confirm: true, 
@@ -65,46 +70,62 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         },
       });
 
-      if (createError) throw createError;
-      user = newUser.user;
+      if (createError) {
+        console.error("Auth Create Error:", createError);
+        throw new Error(`Erro ao criar usuário: ${createError.message}`);
+      }
+      authUser = newUser.user;
 
-      await supabaseAdmin.auth.admin.generateLink({
+      // Generate recovery link (invite flow)
+      const { data: linkData, error: linkGenError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: data.email,
         options: {
           redirectTo: `${process.env['SITE_URL'] || 'http://localhost:8080'}/cliente/reset-password`
         }
       });
+
+      if (linkGenError) {
+        console.error("Invite Link Error:", linkGenError);
+        // We don't throw here yet, but we should log it. The user exists now.
+      }
+    } else {
+      throw new Error("Já existe um usuário com este e-mail no sistema.");
     }
 
-    if (!user) throw new Error("Falha ao criar ou localizar usuário.");
+    if (!authUser) throw new Error("Falha ao criar usuário no sistema de autenticação.");
 
+    // 1. Assign Role
     const { error: roleError } = await supabaseAdmin
       .from("user_roles")
       .upsert({ 
-        user_id: user.id, 
+        user_id: authUser.id, 
         role: "cliente" as any,
       }, { onConflict: "user_id,role" });
 
-    if (roleError) throw roleError;
+    if (roleError) throw new Error("Erro ao atribuir papel de cliente.");
 
-    const { error: linkError } = await supabaseAdmin
+    // 2. Link Client to User
+    const { error: updateClientError } = await supabaseAdmin
       .from("clients")
-      .update({ user_id: user.id } as any)
+      .update({ user_id: authUser.id } as any)
       .eq("id", data.clientId);
 
-    if (linkError) throw linkError;
+    if (updateClientError) throw new Error("Erro ao vincular cliente ao usuário.");
 
-    await supabaseAdmin.from("profiles").upsert({
-      id: user.id,
+    // 3. Create/Update Profile
+    const { error: profileError } = await supabaseAdmin.from("profiles").upsert({
+      id: authUser.id,
       full_name: data.fullName,
       nickname: data.username
     } as any);
 
+    if (profileError) throw new Error("Erro ao criar perfil do cliente.");
+
     return { 
       success: true, 
-      userId: user.id,
-      message: "Acesso ao portal configurado com sucesso. Convite enviado."
+      userId: authUser.id,
+      message: "Acesso ao portal configurado com sucesso. Convite enviado para o e-mail."
     };
   });
 
