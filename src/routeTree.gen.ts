@@ -35,6 +35,7 @@ import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin.clientes-login'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
 import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedClienteNotificacoesRouteImport } from './routes/_
 import { Route as AuthenticatedClientePagamentosRouteImport } from './routes/_authenticated/cliente/pagamentos'
 import { Route as AuthenticatedClientePerfilRouteImport } from './routes/_authenticated/cliente/perfil'
 import { Route as AuthenticatedClienteProjetoRouteImport } from './routes/_authenticated/cliente/projeto'
+import { Route as AuthenticatedClienteResetPasswordRouteImport } from './routes/_authenticated/cliente.reset-password'
 import { Route as AuthenticatedClienteReunioesRouteImport } from './routes/_authenticated/cliente/reunioes'
 import { Route as AuthenticatedClienteSiteRouteImport } from './routes/_authenticated/cliente/site'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
@@ -190,6 +192,12 @@ const AuthenticatedAdminClientesRoute =
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminClientesLoginRoute =
+  AuthenticatedAdminClientesLoginRouteImport.update({
+    id: '/clientes-login',
+    path: '/clientes-login',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedBriefingProjectIdRoute =
   AuthenticatedBriefingProjectIdRouteImport.update({
     id: '/briefing/$projectId',
@@ -242,6 +250,12 @@ const AuthenticatedClienteProjetoRoute =
   AuthenticatedClienteProjetoRouteImport.update({
     id: '/projeto',
     path: '/projeto',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
+const AuthenticatedClienteResetPasswordRoute =
+  AuthenticatedClienteResetPasswordRouteImport.update({
+    id: '/reset-password',
+    path: '/reset-password',
     getParentRoute: () => AuthenticatedClienteRouteRoute,
   } as any)
 const AuthenticatedClienteReunioesRoute =
@@ -335,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -343,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
   '/cliente/perfil': typeof AuthenticatedClientePerfilRoute
   '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/cliente/reset-password': typeof AuthenticatedClienteResetPasswordRoute
   '/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
   '/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
@@ -381,6 +397,7 @@ export interface FileRoutesByTo {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -389,6 +406,7 @@ export interface FileRoutesByTo {
   '/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
   '/cliente/perfil': typeof AuthenticatedClientePerfilRoute
   '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/cliente/reset-password': typeof AuthenticatedClienteResetPasswordRoute
   '/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
   '/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
@@ -430,6 +448,7 @@ export interface FileRoutesById {
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/_authenticated/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -438,6 +457,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
   '/_authenticated/cliente/perfil': typeof AuthenticatedClientePerfilRoute
   '/_authenticated/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
+  '/_authenticated/cliente/reset-password': typeof AuthenticatedClienteResetPasswordRoute
   '/_authenticated/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
   '/_authenticated/cliente/site': typeof AuthenticatedClienteSiteRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
@@ -479,6 +499,7 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/admin/clientes'
+    | '/admin/clientes-login'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
@@ -487,6 +508,7 @@ export interface FileRouteTypes {
     | '/cliente/pagamentos'
     | '/cliente/perfil'
     | '/cliente/projeto'
+    | '/cliente/reset-password'
     | '/cliente/reunioes'
     | '/cliente/site'
     | '/leads/$leadId'
@@ -525,6 +547,7 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/aprovacao/$token'
     | '/admin/clientes'
+    | '/admin/clientes-login'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
@@ -533,6 +556,7 @@ export interface FileRouteTypes {
     | '/cliente/pagamentos'
     | '/cliente/perfil'
     | '/cliente/projeto'
+    | '/cliente/reset-password'
     | '/cliente/reunioes'
     | '/cliente/site'
     | '/leads/$leadId'
@@ -573,6 +597,7 @@ export interface FileRouteTypes {
     | '/_authenticated/prospeccao'
     | '/aprovacao/$token'
     | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/clientes-login'
     | '/_authenticated/briefing/$projectId'
     | '/_authenticated/cliente/aprovacoes'
     | '/_authenticated/cliente/documentos'
@@ -581,6 +606,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente/pagamentos'
     | '/_authenticated/cliente/perfil'
     | '/_authenticated/cliente/projeto'
+    | '/_authenticated/cliente/reset-password'
     | '/_authenticated/cliente/reunioes'
     | '/_authenticated/cliente/site'
     | '/_authenticated/leads/$leadId'
@@ -788,6 +814,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/clientes-login': {
+      id: '/_authenticated/admin/clientes-login'
+      path: '/clientes-login'
+      fullPath: '/admin/clientes-login'
+      preLoaderRoute: typeof AuthenticatedAdminClientesLoginRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/briefing/$projectId': {
       id: '/_authenticated/briefing/$projectId'
       path: '/briefing/$projectId'
@@ -849,6 +882,13 @@ declare module '@tanstack/react-router' {
       path: '/projeto'
       fullPath: '/cliente/projeto'
       preLoaderRoute: typeof AuthenticatedClienteProjetoRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
+    '/_authenticated/cliente/reset-password': {
+      id: '/_authenticated/cliente/reset-password'
+      path: '/reset-password'
+      fullPath: '/cliente/reset-password'
+      preLoaderRoute: typeof AuthenticatedClienteResetPasswordRouteImport
       parentRoute: typeof AuthenticatedClienteRouteRoute
     }
     '/_authenticated/cliente/reunioes': {
@@ -939,6 +979,7 @@ interface AuthenticatedClienteRouteRouteChildren {
   AuthenticatedClientePagamentosRoute: typeof AuthenticatedClientePagamentosRoute
   AuthenticatedClientePerfilRoute: typeof AuthenticatedClientePerfilRoute
   AuthenticatedClienteProjetoRoute: typeof AuthenticatedClienteProjetoRoute
+  AuthenticatedClienteResetPasswordRoute: typeof AuthenticatedClienteResetPasswordRoute
   AuthenticatedClienteReunioesRoute: typeof AuthenticatedClienteReunioesRoute
   AuthenticatedClienteSiteRoute: typeof AuthenticatedClienteSiteRoute
   AuthenticatedClienteIndexRoute: typeof AuthenticatedClienteIndexRoute
@@ -954,6 +995,8 @@ const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChil
     AuthenticatedClientePagamentosRoute: AuthenticatedClientePagamentosRoute,
     AuthenticatedClientePerfilRoute: AuthenticatedClientePerfilRoute,
     AuthenticatedClienteProjetoRoute: AuthenticatedClienteProjetoRoute,
+    AuthenticatedClienteResetPasswordRoute:
+      AuthenticatedClienteResetPasswordRoute,
     AuthenticatedClienteReunioesRoute: AuthenticatedClienteReunioesRoute,
     AuthenticatedClienteSiteRoute: AuthenticatedClienteSiteRoute,
     AuthenticatedClienteIndexRoute: AuthenticatedClienteIndexRoute,
@@ -966,10 +1009,12 @@ const AuthenticatedClienteRouteRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminClientesLoginRoute: typeof AuthenticatedAdminClientesLoginRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+  AuthenticatedAdminClientesLoginRoute: AuthenticatedAdminClientesLoginRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

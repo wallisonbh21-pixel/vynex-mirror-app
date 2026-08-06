@@ -208,8 +208,10 @@ function AdminClientes() {
                         <Button variant="ghost" size="icon" className="size-8 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Eye className="size-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="size-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <UserPlus className="size-4" />
+                        <Button variant="ghost" size="icon" className="size-8 opacity-0 group-hover:opacity-100 transition-opacity" asChild>
+                          <Link to="/admin/clientes-login" search={{ email: client.contact_email }}>
+                            <UserPlus className="size-4" />
+                          </Link>
                         </Button>
                       </div>
                     </TableCell>

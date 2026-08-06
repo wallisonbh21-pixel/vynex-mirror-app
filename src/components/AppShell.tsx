@@ -37,6 +37,7 @@ import {
   ChevronDown,
   Clock,
   FolderOpen,
+  Lock,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,6 +200,7 @@ export function AppShell({
           submenu: [
             { to: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
             { to: "/admin/clientes", label: "Gerenciar Clientes", icon: Users },
+            { to: "/admin/clientes-login", label: "Login dos Clientes", icon: Lock },
           ]
         },
         { to: "/perfil", label: "Meu perfil", icon: UserRound },

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useClientsList } from "@/lib/client";
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { requireVendedor } from '@/lib/guard';
 import {
   Table,
@@ -18,7 +18,8 @@ import {
   Plus, 
   Search, 
   Eye, 
-  Link as LinkIcon
+  Link as LinkIcon,
+  Lock
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -46,10 +47,18 @@ function VendedorClientes() {
       title="Meus Clientes" 
       description="Gerencie seus clientes e acompanhe o progresso de cada projeto."
       actions={
-        <Button className="gap-2">
-          <Plus className="size-4" />
-          Novo Cliente
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2" asChild>
+            <Link to="/admin/clientes-login">
+              <Lock className="size-4" />
+              Logins
+            </Link>
+          </Button>
+          <Button className="gap-2">
+            <Plus className="size-4" />
+            Novo Cliente
+          </Button>
+        </div>
       }
     >
       <div className="space-y-6">
