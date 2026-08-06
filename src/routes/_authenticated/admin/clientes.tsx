@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useClientsList } from "@/lib/client";
+import { createFileRoute } from '@tanstack/react-router';
+import { requireAdmin } from '@/lib/guard';
 import {
   Table,
   TableBody,
@@ -17,18 +19,22 @@ import {
   Search, 
   UserPlus, 
   Eye, 
-  ExternalLink,
   ShieldCheck,
-  Clock,
-  Circle
+  Circle,
+  LayoutDashboard,
+  Users
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function AdminClientes() {
+export const Route = createFileRoute('/_authenticated/admin/clientes')({
+  beforeLoad: () => requireAdmin(),
+  component: AdminClientes,
+});
+
+function AdminClientes() {
   const { data: clients, isLoading } = useClientsList();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
