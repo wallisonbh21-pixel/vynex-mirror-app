@@ -56,6 +56,7 @@ import { Route as AuthenticatedReunioesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
 import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor.clientes'
+import { Route as AuthenticatedVendedorClientesLoginRouteImport } from './routes/_authenticated/vendedor.clientes-login'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 
 const IndexRoute = IndexRouteImport.update({
@@ -317,6 +318,12 @@ const AuthenticatedVendedorClientesRoute =
     path: '/vendedor/clientes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedVendedorClientesLoginRoute =
+  AuthenticatedVendedorClientesLoginRouteImport.update({
+    id: '/vendedor/clientes-login',
+    path: '/vendedor/clientes-login',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiProspectingSearchRoute = ApiProspectingSearchRouteImport.update({
   id: '/api/prospecting/search',
   path: '/api/prospecting/search',
@@ -367,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
+  '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/cliente/': typeof AuthenticatedClienteIndexRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -415,6 +423,7 @@ export interface FileRoutesByTo {
   '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
+  '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/cliente': typeof AuthenticatedClienteIndexRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
@@ -466,6 +475,7 @@ export interface FileRoutesById {
   '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/_authenticated/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
+  '/_authenticated/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/_authenticated/cliente/': typeof AuthenticatedClienteIndexRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
@@ -517,6 +527,7 @@ export interface FileRouteTypes {
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/vendedor/clientes'
+    | '/vendedor/clientes-login'
     | '/api/prospecting/search'
     | '/cliente/'
     | '/leads/'
@@ -565,6 +576,7 @@ export interface FileRouteTypes {
     | '/site-planner/$projectId'
     | '/studio/$projectId'
     | '/vendedor/clientes'
+    | '/vendedor/clientes-login'
     | '/api/prospecting/search'
     | '/cliente'
     | '/leads'
@@ -615,6 +627,7 @@ export interface FileRouteTypes {
     | '/_authenticated/site-planner/$projectId'
     | '/_authenticated/studio/$projectId'
     | '/_authenticated/vendedor/clientes'
+    | '/_authenticated/vendedor/clientes-login'
     | '/api/prospecting/search'
     | '/_authenticated/cliente/'
     | '/_authenticated/leads/'
@@ -961,6 +974,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVendedorClientesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/vendedor/clientes-login': {
+      id: '/_authenticated/vendedor/clientes-login'
+      path: '/vendedor/clientes-login'
+      fullPath: '/vendedor/clientes-login'
+      preLoaderRoute: typeof AuthenticatedVendedorClientesLoginRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/prospecting/search': {
       id: '/api/prospecting/search'
       path: '/api/prospecting/search'
@@ -1060,6 +1080,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSitePlannerProjectIdRoute: typeof AuthenticatedSitePlannerProjectIdRoute
   AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
   AuthenticatedVendedorClientesRoute: typeof AuthenticatedVendedorClientesRoute
+  AuthenticatedVendedorClientesLoginRoute: typeof AuthenticatedVendedorClientesLoginRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
   AuthenticatedReunioesIndexRoute: typeof AuthenticatedReunioesIndexRoute
 }
@@ -1092,6 +1113,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSitePlannerProjectIdRoute,
   AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
   AuthenticatedVendedorClientesRoute: AuthenticatedVendedorClientesRoute,
+  AuthenticatedVendedorClientesLoginRoute:
+    AuthenticatedVendedorClientesLoginRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
   AuthenticatedReunioesIndexRoute: AuthenticatedReunioesIndexRoute,
 }
@@ -1110,13 +1133,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
