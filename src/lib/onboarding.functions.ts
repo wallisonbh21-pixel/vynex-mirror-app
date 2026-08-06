@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const createClientAccountSchema = z.object({
   email: z.string().email(),
-  fullName: z.string().min(2),
+  fullName: z.string().optional().nullable(),
   clientId: z.string().uuid(),
   username: z.string().min(3),
 });
@@ -78,7 +78,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       // 3. Ensure Profile
       await supabaseAdmin.from("profiles").upsert({
         id: existingUser.id,
-        full_name: data.fullName,
+        full_name: data.fullName || null,
         nickname: data.username
       } as any);
 
@@ -102,7 +102,8 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       email: data.email,
       email_confirm: true, 
       user_metadata: { 
-        full_name: data.fullName, 
+        full_name: data.fullName || null, 
+
         role: "cliente",
         username: data.username 
       },
@@ -124,7 +125,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     // Create Profile
     await supabaseAdmin.from("profiles").upsert({
       id: authUser.id,
-      full_name: data.fullName,
+      full_name: data.fullName || null,
       nickname: data.username
     } as any);
 
