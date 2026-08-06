@@ -117,7 +117,7 @@ function AdminClientesLogin() {
               // I will use client.status if it's 'active' vs 'pending' if the schema allows, 
               // but standardizing on a visual check based on user_id for simplicity as per existing logic.
               const status = hasLogin ? "Acesso ativo" : "Acesso pendente";
-              const username = (client as any).profiles?.nickname || (()=>{
+              const username = client.profiles?.nickname || (()=>{
                 try { return JSON.parse(client.notes || '{}').pending_username || '-'; } catch { return '-'; }
               })();
 

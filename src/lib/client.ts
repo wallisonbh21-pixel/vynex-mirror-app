@@ -91,7 +91,7 @@ export function useClientsList(ownerId?: string) {
         .select(`
           *,
           projects(id, title, status),
-          profiles:user_id(full_name, avatar_url)
+          profiles!user_id(full_name, nickname, avatar_url)
         `);
       
       if (ownerId) {
