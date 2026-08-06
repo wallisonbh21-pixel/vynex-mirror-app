@@ -137,9 +137,13 @@ export function useRegisterClient() {
     mutationFn: async (values: any) => {
       return registerFn({ data: values });
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["clients-list"] });
-      toast.success("Cliente cadastrado com sucesso.");
+      if (data.success) {
+        toast.success(data.message || "Cliente cadastrado com sucesso!");
+      } else {
+        toast.error(data.message || "Erro no cadastro.");
+      }
     },
     onError: (error: any) => {
       toast.error(error.message || "Erro ao cadastrar cliente.");
