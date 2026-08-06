@@ -201,8 +201,8 @@ function VendedorLoginCentral() {
               </div>
             ) : (
               clientsWithLogin.map(client => {
-                const profile = Array.isArray(client.profiles) ? client.profiles[0] : client.profiles;
-                const usernameDisplay = (profile as any)?.nickname || '-';
+                const profile = (client as any).profiles;
+                const usernameDisplay = Array.isArray(profile) ? profile[0]?.nickname : profile?.nickname || '-';
                 
                 return (
                   <div key={client.id} className="p-6 rounded-3xl border border-border/50 bg-card hover:border-primary/30 transition-all">
