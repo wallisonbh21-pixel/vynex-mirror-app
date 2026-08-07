@@ -1,3 +1,4 @@
+
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Sparkles, ArrowRight, Lock, User } from "lucide-react";
@@ -13,15 +14,13 @@ export const Route = createFileRoute("/cliente/login")({
     meta: [
       { title: "Login — Portal do Cliente ScaleNexus" },
       { name: "description", content: "Acesse seu painel profissional no Portal do Cliente ScaleNexus." },
-      { property: "og:title", content: "Login — Portal do Cliente ScaleNexus" },
-      { property: "og:description", content: "Acesse seu painel profissional no Portal do Cliente ScaleNexus." },
     ],
   }),
   component: ClientLoginPage,
 });
 
 const loginSchema = z.object({
-  email: z.string().trim().email("E-mail inválido"),
+  email: z.string().trim().min(1, "Informe o usuário ou e-mail"),
   password: z.string().min(1, "Informe a senha"),
 });
 
@@ -33,30 +32,22 @@ function ClientLoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        checkRoleAndRedirect(data.session.user.id);
-      }
+      if (data.session) checkRoleAndRedirect(data.session.user.id);
     });
   }, []);
 
   async function checkRoleAndRedirect(userId: string) {
-    const { data: rolesData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-      
+    const { data: rolesData } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     const roles = rolesData?.map(r => r.role) || [];
     
     if (roles.includes("cliente")) {
       const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
-      if (user?.user_metadata && user.user_metadata['must_change_password']) {
+      if (userData?.user?.user_metadata?.['must_change_password']) {
         navigate({ to: "/cliente/primeiro-acesso", replace: true });
       } else {
         navigate({ to: "/cliente", replace: true });
       }
     } else {
-      // Not a client, sign out or block
       toast.error("Este acesso não pertence ao Portal do Cliente.");
       await supabase.auth.signOut();
     }
@@ -64,17 +55,10 @@ function ClientLoginPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    const result = loginSchema.safeParse({ email, password });
-    if (!result.success) {
-      toast.error(result.error.issues?.[0]?.message || "Entrada inválida");
-      return;
-    }
-
+    if (loading) return;
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setLoading(false);
@@ -82,46 +66,34 @@ function ClientLoginPage() {
       return;
     }
 
-    if (data.user) {
-      await checkRoleAndRedirect(data.user.id);
-    }
+    if (data.user) await checkRoleAndRedirect(data.user.id);
     setLoading(false);
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-12 bg-[#0F172A] text-white">
-      {/* Halo Effect */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-halo opacity-50" />
-      
-      <div className="relative w-full max-w-md">
-        <div className="mb-12 flex flex-col items-center justify-center gap-4">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-brand shadow-lg shadow-primary/20">
+    <div className="flex min-h-screen items-center justify-center bg-[#0F172A] text-white px-5">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary mb-4">
             <Sparkles className="size-8 text-white" />
           </div>
-          <div className="text-center">
-            <h1 className="text-xl font-bold tracking-[0.32em] uppercase">ScaleNexus</h1>
-            <p className="text-sm tracking-[0.22em] text-primary font-medium mt-1">Portal do Cliente</p>
-          </div>
+          <h1 className="text-xl font-bold tracking-widest uppercase">ScaleNexus</h1>
+          <p className="text-sm text-primary font-medium">Portal do Cliente</p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold">Entre para acessar seu painel</h2>
-            <p className="text-white/60 text-sm mt-2">Utilize suas credenciais enviadas por e-mail.</p>
-          </div>
-
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+          <h2 className="text-2xl font-bold mb-6">Entre no seu painel</h2>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white/80 font-medium">Usuário (E-mail)</Label>
+              <Label htmlFor="email">Usuário / E-mail</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-white/40" />
                 <Input
                   id="email"
-                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu@email.com"
-                  className="bg-white/5 border-white/10 h-12 pl-10 focus:ring-primary focus:border-primary rounded-xl"
+                  className="bg-white/5 border-white/10 pl-10 h-12 rounded-xl"
+                  placeholder="Seu usuário ou e-mail"
                   required
                 />
               </div>
@@ -136,36 +108,25 @@ function ClientLoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="bg-white/5 border-white/10 pl-10 h-12 rounded-xl"
                   placeholder="••••••••"
-                  className="bg-white/5 border-white/10 h-12 pl-10 focus:ring-primary focus:border-primary rounded-xl"
                   required
                 />
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20"
-              disabled={loading}
-            >
-              {loading ? "Verificando..." : "ENTRAR"}
+            <Button type="submit" className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold" disabled={loading}>
+              {loading ? "Entrando..." : "ENTRAR"}
               {!loading && <ArrowRight className="ml-2 size-4" />}
             </Button>
 
-            <div className="pt-2">
-              <Link
-                to="/cliente/recuperar-senha"
-                className="block text-center text-sm text-white/40 hover:text-primary transition-colors font-medium"
-              >
+            <div className="text-center">
+              <Link to="/cliente/recuperar-senha" className="text-sm text-white/40 hover:text-primary transition-colors">
                 Esqueci minha senha
               </Link>
             </div>
           </form>
         </div>
-
-        <p className="mt-8 text-center text-xs text-white/20">
-          &copy; 2026 ScaleNexus Digital Business. Todos os direitos reservados.
-        </p>
       </div>
     </div>
   );

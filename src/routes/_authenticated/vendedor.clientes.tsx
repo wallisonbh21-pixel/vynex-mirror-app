@@ -92,8 +92,8 @@ function VendedorClientes() {
       };
       
       const result = await onboarding.mutateAsync(payload as any);
-      if (result.success) {
-        toast.success(result.message);
+      if (result && (result as any).success) {
+        toast.success((result as any).message);
         setIsLoginDialogOpen(false);
         setSelectedClientId("");
         refetch();
@@ -106,7 +106,7 @@ function VendedorClientes() {
   const handleResend = async (email: string) => {
     try {
       const res = await resendInviteFn({ data: { email } });
-      if (res.success) toast.success(res.message);
+      if (res && (res as any).success) toast.success((res as any).message);
     } catch (e: any) {
       toast.error(e.message || "Erro ao reenviar acesso.");
     }
