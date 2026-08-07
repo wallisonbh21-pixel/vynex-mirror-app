@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, Download, File, Lock, Loader2, AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/cliente/documentos")({
   component: MyDocuments,
