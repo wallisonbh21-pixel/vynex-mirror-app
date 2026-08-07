@@ -3,7 +3,9 @@ import crypto from "node:crypto";
 
 export function generateInitialPassword(): string {
   // Gera uma senha segura de 12 caracteres (letras e números)
-  return crypto.randomBytes(9).toString('base64').slice(0, 12).replace(/\+/g, '0').replace(/\//g, '1');
+  // Replaced crypto.randomBytes(9).toString('base64') with something simpler for Worker compatibility if needed, 
+  // though crypto is supported in nodejs_compat.
+  return crypto.randomBytes(12).toString('hex').slice(0, 12);
 }
 
 export async function createAuthUser(

@@ -84,40 +84,69 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     await supabaseAdmin.from("profiles").upsert({ id: newUser.id, nickname: data.username, full_name: client.contact_name || data.username } as any);
     await supabaseAdmin.from("user_roles").upsert({ user_id: newUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
 
-    // 6. Enviar e-mail de acesso usando o fluxo de convite do Supabase
-    // O conteúdo customizado requer configuração de domínio em Cloud -> Emails
+    // 6. Enviar e-mail de acesso usando Resend
     console.log("[ONBOARDING] email_prepare", { email: client.contact_email });
     const siteUrl = process.env['SITE_URL'] || 'http://localhost:8080';
     
-    console.log("[ONBOARDING] email_send_attempt", { email: client.contact_email });
-    
-    // Passamos os dados necessários para o template (que deve ser configurado via auth-email-hook após setup do domínio)
-    const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
-      redirectTo: `${siteUrl}/cliente/login`,
-      data: { 
-        full_name: client.contact_name || data.username,
-        username: data.username,
-        temporary_password: initialPassword,
-        platform_name: "ScaleNexus",
-        login_url: `${siteUrl}/cliente/login`
-      }
-    });
+    const emailHtml = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333; line-height: 1.6;">
+        <h2 style="color: #0F172A; margin-bottom: 24px;">Olá, ${client.contact_name || data.username}! 👋</h2>
+        
+        <p>Seu acesso ao <strong>Portal do Cliente ScaleNexus</strong> foi criado com sucesso pela nossa equipe.</p>
+        
+        <p>Agora você poderá acessar seu painel para acompanhar seus projetos, informações, reuniões, notificações e demais serviços disponibilizados pela ScaleNexus.</p>
+        
+        <div style="background-color: #F8FAFC; border-radius: 8px; padding: 20px; margin: 24px 0; border: 1px solid #E2E8F0;">
+          <h3 style="margin-top: 0; color: #0F172A; font-size: 18px;">🔐 Seus dados de acesso</h3>
+          <p style="margin-bottom: 0;"><strong>Usuário:</strong> ${data.username}</p>
+        </div>
 
-    if (inviteError) {
-      console.error("[ONBOARDING] email_send_failed", { email: client.contact_email, error: inviteError.message });
-      // IMPORTANTE: Se o envio falhar, mostramos o erro real e não informamos sucesso.
-      throw new Error(`O login foi criado no banco de dados, mas o envio do e-mail falhou: ${inviteError.message}. Verifique a configuração de SMTP.`);
+        <p>Para acessar seu portal, clique no botão abaixo:</p>
+        
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${siteUrl}/cliente/login" 
+             style="background-color: #3B82F6; color: white; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            ACESSAR MEU PORTAL
+          </a>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #E2E8F0; margin: 32px 0;" />
+        
+        <p style="font-size: 14px; color: #64748B;">
+          Atenciosamente,<br>
+          <strong>Equipe ScaleNexus</strong><br>
+          Soluções digitais para empresas.
+        </p>
+        
+        <p style="font-size: 12px; color: #94A3B8; margin-top: 20px;">
+          Este é um e-mail automático enviado pela equipe ScaleNexus.
+        </p>
+      </div>
+    `;
+
+    try {
+      const { sendResendEmail } = await import("./resend.server");
+      await sendResendEmail({
+        to: client.contact_email,
+        subject: "Seu acesso ao Portal do Cliente ScaleNexus foi criado",
+        html: emailHtml,
+        fromName: "Equipe ScaleNexus"
+      });
+      
+      console.log("[ONBOARDING] email_send_success", { email: client.contact_email });
+      return { 
+        success: true, 
+        message: "Login criado e e-mail de acesso enviado para o cliente.",
+      };
+    } catch (emailError: any) {
+      console.error("[ONBOARDING] email_send_failed", { email: client.contact_email, error: emailError.message });
+      // Se falhar, informamos que o login foi criado mas o e-mail não.
+      return {
+        success: false,
+        message: "Login criado, mas não foi possível enviar o e-mail.",
+        error: emailError.message
+      };
     }
-
-    console.log("[ONBOARDING] email_send_success", { email: client.contact_email });
-    return { 
-      success: true, 
-      message: `Acesso criado com sucesso! E-mail enviado para ${client.contact_email}.`,
-      debug: {
-        username: data.username,
-        tempPassword: initialPassword
-      }
-    };
   });
 
 export const resendInvite = createServerFn({ method: "POST" })
