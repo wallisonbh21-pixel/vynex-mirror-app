@@ -132,7 +132,9 @@ export function useClientOnboarding() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["clients-list"] });
       if (data.success) {
-        toast.success(data.message || "Acesso ao portal ativado!");
+        toast.success(data.message || "Acesso ao portal ativado!", { duration: 6000 });
+      } else {
+        toast.warning(data.message, { duration: 8000 });
       }
     },
     onError: (error: any) => {
