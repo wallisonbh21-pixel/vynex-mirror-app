@@ -31,6 +31,37 @@ export const PROJECT_STATUS = [
   "cancelado",
 ] as const;
 export type ProjectStatus = (typeof PROJECT_STATUS)[number];
+
+export const getProjectProgress = (status: string): number => {
+  const progressMap: Record<string, number> = {
+    disponivel: 10,
+    briefing: 20,
+    em_producao: 35,
+    aguardando_aprovacao: 55,
+    aguardando_cliente: 70,
+    ajustes: 80,
+    ajustes_solicitados: 85,
+    aprovado: 95,
+    entregue: 100,
+  };
+  return progressMap[status] ?? 0;
+};
+
+export const getProjectNextStep = (status: string): string => {
+  const nextStepMap: Record<string, string> = {
+    disponivel: "Iniciando a fase de briefing.",
+    briefing: "Coletando informações para o seu site.",
+    em_producao: "Seu site está sendo desenvolvido.",
+    aguardando_aprovacao: "Aguardando revisão interna.",
+    aguardando_cliente: "Estamos aguardando sua aprovação.",
+    ajustes: "Realizando ajustes internos.",
+    ajustes_solicitados: "Os ajustes solicitados estão sendo realizados.",
+    aprovado: "Tudo pronto! Preparando entrega.",
+    entregue: "Projeto concluído.",
+  };
+  return nextStepMap[status] ?? "Aguardando definição.";
+};
+
 export const COMMISSION_STATUS = ["pendente", "disponivel", "pago"] as const;
 export const CLIENT_STATUS = ["ativo", "pausado", "cancelado"] as const;
 export const PROPOSAL_STATUS = ["rascunho", "enviada", "aceita", "recusada"] as const;
