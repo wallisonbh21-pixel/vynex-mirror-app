@@ -7,13 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle2, AlertCircle, Eye, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/cliente/aprovacoes")({
   component: MyApprovals,
 });
 
 function MyApprovals() {
+  const queryClient = useQueryClient();
   const { data: projects, isLoading: loadingProjects } = useClientProjects();
   
   const projectId = projects?.[0]?.id;
@@ -63,11 +65,46 @@ function MyApprovals() {
                 </div>
               </div>
               <div className="flex gap-3 w-full md:w-auto">
-                <Button variant="outline" className="flex-1 md:flex-none">
-                  <Eye className="mr-2 size-4" />
-                  Visualizar
+                <Button 
+                  variant="outline" 
+                  className="flex-1 md:flex-none"
+                  asChild
+                >
+                  <a href={project.delivery_link || "#"} target="_blank" rel="noopener noreferrer">
+                    <Eye className="mr-2 size-4" />
+                    Visualizar
+                  </a>
                 </Button>
-                <Button className="flex-1 md:flex-none shadow-glow">
+                <Button 
+                  className="flex-1 md:flex-none shadow-glow"
+                  onClick={async () => {
+                    const { error } = await supabase
+                      .from("project_approval_events")
+                      .insert({
+                        project_id: project.id,
+                        event_type: "APPROVAL",
+                        actor_label: "Cliente",
+                        message: "Projeto aprovado pelo cliente via Portal.",
+                        new_status: "aprovado"
+                      });
+                    
+                    if (!error) {
+                      await supabase
+                        .from("projects")
+                        .update({ 
+                          status: "aprovado",
+                          client_approved_at: new Date().toISOString()
+                        })
+                        .eq("id", project.id);
+                      
+                      toast.success("Projeto aprovado com sucesso!");
+                      queryClient.invalidateQueries({ queryKey: ["client-projects"] });
+                      queryClient.invalidateQueries({ queryKey: ["client-approval-events", project.id] });
+                    } else {
+                      toast.error("Erro ao aprovar projeto.");
+                    }
+                  }}
+                >
                   <CheckCircle2 className="mr-2 size-4" />
                   Aprovar Agora
                 </Button>
