@@ -9,6 +9,15 @@ import { CheckCircle2, AlertCircle, Eye, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription, 
+  DialogFooter 
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/cliente/aprovacoes")({
   component: MyApprovals,
@@ -17,6 +26,9 @@ export const Route = createFileRoute("/_authenticated/cliente/aprovacoes")({
 function MyApprovals() {
   const queryClient = useQueryClient();
   const { data: projects, isLoading: loadingProjects } = useClientProjects();
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   
   const projectId = projects?.[0]?.id;
 
@@ -76,6 +88,14 @@ function MyApprovals() {
                   </a>
                 </Button>
                 <Button 
+                  variant="outline"
+                  className="flex-1 md:flex-none"
+                  onClick={() => setFeedbackModalOpen(true)}
+                >
+                  <MessageSquare className="mr-2 size-4" />
+                  Solicitar Ajustes
+                </Button>
+                <Button 
                   className="flex-1 md:flex-none shadow-glow"
                   onClick={async () => {
                     const { error } = await supabase
@@ -112,6 +132,65 @@ function MyApprovals() {
             </CardContent>
           </Card>
         )}
+
+        <Dialog open={feedbackModalOpen} onOpenChange={setFeedbackModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Solicitar Ajustes</DialogTitle>
+              <DialogDescription>
+                Descreva detalhadamente o que precisa ser alterado para que nossa equipe possa realizar os ajustes.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Textarea 
+                placeholder="Ex: Gostaria de mudar a cor do botão principal e ajustar o texto da seção sobre..."
+                className="min-h-32"
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+              />
+            </div>
+            <DialogFooter className="flex gap-2 sm:gap-0">
+              <Button variant="ghost" onClick={() => setFeedbackModalOpen(false)}>Cancelar</Button>
+              <Button 
+                disabled={!feedbackText.trim() || isSubmittingFeedback}
+                onClick={async () => {
+                  setIsSubmittingFeedback(true);
+                  try {
+                    const { error } = await supabase
+                      .from("project_approval_events")
+                      .insert({
+                        project_id: project!.id,
+                        event_type: "FEEDBACK",
+                        actor_label: "Cliente",
+                        message: feedbackText,
+                        new_status: "em_revisao"
+                      });
+                    
+                    if (error) throw error;
+
+                    await supabase
+                      .from("projects")
+                      .update({ status: "em_revisao" })
+                      .eq("id", project!.id);
+
+                    toast.success("Feedback enviado com sucesso!");
+                    setFeedbackModalOpen(false);
+                    setFeedbackText("");
+                    queryClient.invalidateQueries({ queryKey: ["client-projects"] });
+                    queryClient.invalidateQueries({ queryKey: ["client-approval-events", project!.id] });
+                  } catch (err: any) {
+                    toast.error("Erro ao enviar feedback: " + err.message);
+                  } finally {
+                    setIsSubmittingFeedback(false);
+                  }
+                }}
+              >
+                {isSubmittingFeedback && <Loader2 className="mr-2 size-4 animate-spin" />}
+                Enviar Solicitação
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <div className="grid gap-6 md:grid-cols-3">
           <div className="md:col-span-2 space-y-6">
