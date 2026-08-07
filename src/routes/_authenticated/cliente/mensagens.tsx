@@ -65,9 +65,7 @@ function MyMessages() {
 
   // Auto-scroll to bottom
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // Realtime subscription
@@ -137,7 +135,7 @@ function MyMessages() {
             </div>
           </div>
           
-          <ScrollArea className="flex-1 p-4" viewportRef={scrollRef}>
+          <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
               {messages && messages.length > 0 ? (
                 messages.map((msg) => {
@@ -175,6 +173,7 @@ function MyMessages() {
                   <p className="text-sm">Inicie uma conversa com nossa equipe sobre seu projeto.</p>
                 </div>
               )}
+              <div ref={scrollRef} />
             </div>
           </ScrollArea>
           
