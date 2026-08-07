@@ -34,7 +34,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     const logAudit = async (action: string, details: any) => {
       try {
-        await supabaseAdmin.from("audit_logs").insert({
+        await supabaseAdmin.from("audit_logs" as any).insert({
           action,
           actor_id: actorId,
           target_id: data.clientId,

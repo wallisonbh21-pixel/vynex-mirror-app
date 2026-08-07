@@ -92,8 +92,8 @@ function VendedorClientes() {
       };
       
       const result = await onboarding.mutateAsync(payload as any);
-      if (result.success) {
-        toast.success(result.message);
+      if (result && (result as any).success) {
+        toast.success((result as any).message);
         setIsLoginDialogOpen(false);
         setSelectedClientId("");
         refetch();
