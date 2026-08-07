@@ -17,8 +17,8 @@ export type SendEmailInput = z.infer<typeof sendEmailSchema>;
  * This is server-side only.
  */
 export async function sendResendEmail(input: SendEmailInput) {
-  const lovableApiKey = process.env.LOVABLE_API_KEY;
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const lovableApiKey = process.env['LOVABLE_API_KEY'];
+  const resendApiKey = process.env['RESEND_API_KEY'];
 
   if (!lovableApiKey || !resendApiKey) {
     console.error("[RESEND] Missing API keys", { 
