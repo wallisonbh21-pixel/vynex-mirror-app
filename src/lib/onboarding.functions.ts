@@ -121,18 +121,57 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     `;
 
     try {
-      const result = await sendResendEmail({
-        to: client.contact_email,
-        subject: "Seu acesso ao Portal do Cliente ScaleNexus foi criado",
-        html: emailHtml,
-        fromName: "Equipe ScaleNexus"
-      });
-      
-      auditData.email_send_success = true;
-      auditData.resend_message_id = result.id;
-      await logAudit("client_access_created_success", auditData);
+      // 7.1 Try Resend first (Professional method)
+      let emailSent = false;
+      let resendMessageId = null;
 
-      return { success: true, message: "Acesso configurado e e-mail enviado." };
+      try {
+        const result = await sendResendEmail({
+          to: client.contact_email,
+          subject: "Seu acesso ao Portal do Cliente ScaleNexus foi criado",
+          html: emailHtml,
+          fromName: "Equipe ScaleNexus"
+        });
+        emailSent = true;
+        resendMessageId = result.id;
+        console.log("[DEBUG] Email sent via Resend", { resendMessageId });
+      } catch (resendError: any) {
+        console.warn("[DEBUG] Resend failed, falling back to Supabase Auth Invite/Recovery", resendError.message);
+        
+        // 7.2 Fallback to Supabase Auth (Temporary/Test method)
+        if (existingAuthUser) {
+          // If user already exists, send a password recovery link
+          const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
+            type: 'recovery',
+            email: client.contact_email,
+            options: { redirectTo: `${siteUrl}/cliente/login` }
+          });
+          if (recoveryError) throw recoveryError;
+          console.log("[DEBUG] Password recovery link generated via Supabase Auth as fallback");
+        } else {
+          // If user is new, send a standard invite
+          const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
+            data: { 
+              full_name: client.contact_name || data.username,
+              username: data.username,
+              client_id: client.id
+            },
+            redirectTo: `${siteUrl}/cliente/login`
+          });
+          if (inviteError) throw inviteError;
+          console.log("[DEBUG] Invite sent via Supabase Auth as fallback");
+        }
+        emailSent = true;
+      }
+      
+      if (emailSent) {
+        auditData.email_send_success = true;
+        auditData.resend_message_id = resendMessageId;
+        await logAudit("client_access_created_success", auditData);
+        return { success: true, message: "Acesso configurado e e-mail enviado." };
+      } else {
+        throw new Error("Falha total no envio de e-mail.");
+      }
     } catch (emailError: any) {
       auditData.email_send_failed = true;
       await logAudit("client_access_created_warning", { ...auditData, error: emailError.message });
