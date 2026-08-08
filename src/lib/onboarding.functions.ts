@@ -223,7 +223,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
-    const contactName = client?.contact_name || targetUser.user_metadata?.full_name || "Cliente";
+    const contactName = client?.contact_name || (targetUser.user_metadata as any)?.full_name || "Cliente";
 
     // Scenario: Reuse Auth + Redefinition email
     try {
