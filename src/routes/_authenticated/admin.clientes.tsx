@@ -104,9 +104,9 @@ function AdminClientes() {
     }
   };
 
-  const handleResend = async (email: string) => {
+  const handleResend = async (email: string, clientId?: string) => {
     try {
-      const res = await resendInviteFn({ data: { email } });
+      const res = await resendInviteFn({ data: { email, clientId } });
       if (res && (res as any).success) toast.success((res as any).message);
     } catch (e: any) {
       toast.error(e.message || "Erro ao reenviar acesso.");
@@ -275,7 +275,8 @@ function AdminClientes() {
                           variant="outline" 
                           size="sm" 
                           className="h-8 px-3 rounded-lg gap-1.5 font-bold"
-                          onClick={() => handleResend(client.contact_email!)}
+                          onClick={() => handleResend(client.contact_email!, client.id)}
+                          title="Reenviar Acesso"
                         >
                           <Mail className="size-3.5" /> 
                         </Button>
@@ -283,7 +284,8 @@ function AdminClientes() {
                           variant="outline" 
                           size="sm" 
                           className="h-8 px-3 rounded-lg gap-1.5 font-bold"
-                          onClick={() => handleResend(client.contact_email!)}
+                          onClick={() => handleResend(client.contact_email!, client.id)}
+                          title="Redefinir Senha"
                         >
                           <Key className="size-3.5" /> 
                         </Button>

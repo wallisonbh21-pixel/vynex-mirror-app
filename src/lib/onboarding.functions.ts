@@ -63,18 +63,24 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     if (!isAdmin && client.owner_id !== actorId) throw new Error("Sem permissão.");
     if (!client.contact_email) throw new Error("E-mail não informado.");
 
-    // 4. Check Username uniqueness
+    // 4. Check Username uniqueness (Scenario 2)
     const { data: existingProfile } = await supabaseAdmin.from("profiles").select("id").eq("nickname", data.username).maybeSingle();
-    if (existingProfile) throw new Error("Usuário já em uso.");
+    
+    // If username exists but belongs to ANOTHER user
+    if (existingProfile && existingProfile.id !== client.user_id) {
+      throw new Error("Este nome de usuário já está sendo utilizado por outro cliente. Escolha outro nome.");
+    }
 
     // 5. Auth User logic
     let targetUser: any = null;
     const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
+    
+    // Find by email (Scenario 1 & 3)
     const existingAuthUser = users.find((u) => u.email?.toLowerCase() === client.contact_email!.toLowerCase());
 
     if (existingAuthUser) {
       targetUser = existingAuthUser;
-      // Link if needed
+      // Link if needed (e.g. if the commercial record is not yet linked to the Auth account)
       if (client.user_id !== targetUser.id) {
         await supabaseAdmin.from("clients").update({ user_id: targetUser.id } as any).eq("id", client.id);
       }
@@ -166,7 +172,13 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         auditData.email_send_success = true;
         auditData.resend_message_id = resendMessageId;
         await logAudit("client_access_created_success", auditData);
-        return { success: true, message: "Login criado e e-mail de acesso enviado." };
+        
+        const isExisting = !!existingAuthUser;
+        return { 
+          success: true, 
+          message: isExisting ? "Este cliente já possui login. E-mail de redefinição enviado." : "Login criado e e-mail de acesso enviado.",
+          isExisting
+        };
       } else {
         throw new Error("Falha total no envio de e-mail.");
       }
@@ -183,8 +195,67 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
 export const resendInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => z.object({ email: z.string().email() }).parse(data))
+  .validator((data: unknown) => z.object({ email: z.string().email(), clientId: z.string().uuid().optional() }).parse(data))
   .handler(async ({ data, context }) => {
-    // Legacy support or simplified resend if needed, but the main flow is above.
-    return { success: true };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendResendEmail } = await import("./resend.server");
+    const { supabase: userSupabase, userId: actorId } = context;
+
+    if (!actorId) throw new Error("Não autorizado.");
+
+    // Validate actor
+    const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
+    if (!roles?.some((r: any) => r.role === 'admin' || r.role === 'diretor' || r.role === 'vendedor')) {
+      throw new Error("Não autorizado.");
+    }
+
+    // Find the user in Auth
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
+    const targetUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+
+    if (!targetUser) throw new Error("Usuário não encontrado no sistema de autenticação.");
+
+    // Fetch client to get contact name
+    const { data: client } = await userSupabase
+      .from("clients")
+      .select("contact_name, contact_email")
+      .eq("user_id", targetUser.id)
+      .maybeSingle();
+
+    const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
+    const contactName = client?.contact_name || (targetUser.user_metadata as any)?.full_name || "Cliente";
+
+    // Scenario: Reuse Auth + Redefinition email
+    try {
+      // Try Resend first
+      await sendResendEmail({
+        to: data.email,
+        subject: "Redefinição de senha do seu Portal ScaleNexus",
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+            <h2 style="color: #0F172A;">Olá, ${contactName}! 👋</h2>
+            <p>Você solicitou um novo acesso ao Portal do Cliente ScaleNexus.</p>
+            <p>Para sua segurança, pedimos que redefina sua senha clicando no botão abaixo:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${siteUrl}/cliente/login" style="background: #3B82F6; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                REDEFINIR MINHA SENHA
+              </a>
+            </div>
+            <p style="font-size: 14px;">Se o botão não funcionar, clique no link abaixo:</p>
+            <p style="font-size: 14px; color: #3B82F6;">${siteUrl}/cliente/login</p>
+            <hr style="border: 0; border-top: 1px solid #E2E8F0; margin: 30px 0;">
+            <p style="font-size: 12px; color: #64748B;">Equipe ScaleNexus</p>
+          </div>
+        `,
+        fromName: "Equipe ScaleNexus"
+      });
+      return { success: true, message: "E-mail de redefinição enviado com sucesso." };
+    } catch (e) {
+      // Fallback to Supabase
+      const { error } = await supabaseAdmin.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${siteUrl}/cliente/login`
+      });
+      if (error) throw error;
+      return { success: true, message: "E-mail de redefinição enviado via sistema de segurança." };
+    }
   });
