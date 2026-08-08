@@ -140,16 +140,14 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         
         // 7.2 Fallback to Supabase Auth (Temporary/Test method)
         if (existingAuthUser) {
-          // If user already exists, send a password recovery link
-          const { error: recoveryError } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'recovery',
-            email: client.contact_email,
-            options: { redirectTo: `${siteUrl}/cliente/login` }
+          // If user already exists, send a real password reset email
+          const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(client.contact_email, {
+            redirectTo: `${siteUrl}/cliente/login`
           });
-          if (recoveryError) throw recoveryError;
-          console.log("[DEBUG] Password recovery link generated via Supabase Auth as fallback");
+          if (resetError) throw resetError;
+          console.log("[DEBUG] Password reset email sent via Supabase Auth as fallback");
         } else {
-          // If user is new, send a standard invite
+          // If user is new, send a standard invite (which also sends an email)
           const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
             data: { 
               full_name: client.contact_name || data.username,
@@ -168,7 +166,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         auditData.email_send_success = true;
         auditData.resend_message_id = resendMessageId;
         await logAudit("client_access_created_success", auditData);
-        return { success: true, message: "Acesso configurado e e-mail enviado." };
+        return { success: true, message: "Login criado e e-mail de acesso enviado." };
       } else {
         throw new Error("Falha total no envio de e-mail.");
       }
@@ -177,7 +175,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       await logAudit("client_access_created_warning", { ...auditData, error: emailError.message });
       return { 
         success: false, 
-        message: "Login configurado, mas houve falha no envio do e-mail.",
+        message: "Login criado, mas o e-mail de acesso não pôde ser enviado.",
         error: emailError.message 
       };
     }
