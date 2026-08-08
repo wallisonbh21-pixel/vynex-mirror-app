@@ -175,7 +175,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       await logAudit("client_access_created_warning", { ...auditData, error: emailError.message });
       return { 
         success: false, 
-        message: "Login configurado, mas houve falha no envio do e-mail.",
+        message: "Login criado, mas o e-mail de acesso não pôde ser enviado.",
         error: emailError.message 
       };
     }
