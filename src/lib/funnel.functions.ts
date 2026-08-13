@@ -22,7 +22,7 @@ const leadFormSchema = z.object({
 });
 
 export const submitLeadForm = createServerFn({ method: "POST" })
-  .inputValidator((data) => leadFormSchema.parse(data))
+  .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
     // Importação dinâmica para evitar vazamento de tipos de servidor para o cliente
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

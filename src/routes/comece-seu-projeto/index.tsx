@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { FunnelLayout } from '@/components/funnel/FunnelLayout'
 import { FunnelForm } from '@/components/funnel/FunnelForm'
 
-export const Route = createFileRoute('/comece-seu-projeto/index')({
+export const Route = createFileRoute('/comece-seu-projeto/')({
   component: () => (
     <FunnelLayout>
       <div className="max-w-2xl mx-auto py-12 px-4">
