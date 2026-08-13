@@ -200,23 +200,51 @@ function LeadDetail() {
             />
           </dl>
 
-          {lead.status === "fechado" ? (
-            <Button
-              className="mt-4 w-full"
-              disabled={convert.isPending}
-              onClick={() =>
-                convert.mutate({
-                  lead,
-                  userId: user.id,
-                  amount: accepted?.amount ?? lead.closed_value ?? lead.estimated_value,
-                  monthlyFee: accepted?.monthly_fee ?? 0,
-                  proposalId: accepted?.id ?? null,
-                })
-              }
-            >
-              Converter em contrato
-            </Button>
-          ) : null}
+          <div className="mt-6 pt-6 border-t border-border space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Origem do Lead</span>
+                <div className="text-sm font-medium">{lead.source || "Direto / Site"}</div>
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Acesso ao Portal</span>
+                <div className="flex items-center gap-2">
+                  <div className={cn("size-2 rounded-full", lead.status === 'fechado' ? "bg-amber-500" : "bg-muted")} />
+                  <span className="text-sm font-medium">
+                    {lead.status === 'fechado' ? "PENDENTE" : "Indisponível"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {lead.status !== "fechado" ? (
+              <Button
+                className="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold"
+                disabled={convert.isPending}
+                onClick={() =>
+                  convert.mutate({
+                    lead,
+                    userId: user.id,
+                    amount: accepted?.amount ?? lead.closed_value ?? lead.estimated_value,
+                    monthlyFee: accepted?.monthly_fee ?? 0,
+                    proposalId: accepted?.id ?? null,
+                  })
+                }
+              >
+                Converter em Cliente & Projeto
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="w-full border-brand-500/50 text-brand-500 hover:bg-brand-500/5"
+                asChild
+              >
+                <Link to="/admin/clientes">
+                  Ver Cliente no Painel
+                </Link>
+              </Button>
+            )}
+          </div>
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5 shadow-panel lg:col-span-2">
