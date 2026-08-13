@@ -97,7 +97,7 @@ function ReferralPage() {
   const getFriendlyStatus = (status: string) => {
     const map: Record<string, string> = {
       novo: "Novo",
-      contatado: "Aguardando Contato",
+      contatado: "Contatado",
       interessado: "Em Negociação",
       proposta: "Em Negociação",
       negociacao: "Em Negociação",
