@@ -37,6 +37,7 @@ import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
 import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
 import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.primeiro-acesso'
 import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
+import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
@@ -61,6 +62,7 @@ import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor.clientes'
 import { Route as AuthenticatedVendedorClientesLoginRouteImport } from './routes/_authenticated/vendedor/clientes-login'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
+import { Route as ComeceSeuProjetoRefTokenRouteImport } from './routes/comece-seu-projeto/ref.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -205,6 +207,11 @@ const ClienteRecuperarSenhaRoute = ClienteRecuperarSenhaRouteImport.update({
   path: '/cliente/recuperar-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComeceSeuProjetoIndexRoute = ComeceSeuProjetoIndexRouteImport.update({
+  id: '/comece-seu-projeto/',
+  path: '/comece-seu-projeto/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminClientesRoute =
   AuthenticatedAdminClientesRouteImport.update({
     id: '/clientes',
@@ -347,6 +354,12 @@ const ApiProspectingSearchRoute = ApiProspectingSearchRouteImport.update({
   path: '/api/prospecting/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComeceSeuProjetoRefTokenRoute =
+  ComeceSeuProjetoRefTokenRouteImport.update({
+    id: '/comece-seu-projeto/ref/$token',
+    path: '/comece-seu-projeto/ref/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -376,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/cliente/login': typeof ClienteLoginRoute
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -397,6 +411,7 @@ export interface FileRoutesByFullPath {
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
   '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
+  '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
   '/cliente/': typeof AuthenticatedClienteIndexRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
   '/reunioes/': typeof AuthenticatedReunioesIndexRoute
@@ -428,6 +443,7 @@ export interface FileRoutesByTo {
   '/cliente/login': typeof ClienteLoginRoute
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/comece-seu-projeto': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -449,6 +465,7 @@ export interface FileRoutesByTo {
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
   '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
+  '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
   '/cliente': typeof AuthenticatedClienteIndexRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
   '/reunioes': typeof AuthenticatedReunioesIndexRoute
@@ -483,6 +500,7 @@ export interface FileRoutesById {
   '/cliente/login': typeof ClienteLoginRoute
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -504,6 +522,7 @@ export interface FileRoutesById {
   '/_authenticated/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
   '/_authenticated/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
+  '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
   '/_authenticated/cliente/': typeof AuthenticatedClienteIndexRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
   '/_authenticated/reunioes/': typeof AuthenticatedReunioesIndexRoute
@@ -538,6 +557,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
+    | '/comece-seu-projeto/'
     | '/admin/clientes'
     | '/admin/clientes-login'
     | '/briefing/$projectId'
@@ -559,6 +579,7 @@ export interface FileRouteTypes {
     | '/vendedor/clientes'
     | '/vendedor/clientes-login'
     | '/api/prospecting/search'
+    | '/comece-seu-projeto/ref/$token'
     | '/cliente/'
     | '/leads/'
     | '/reunioes/'
@@ -590,6 +611,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
+    | '/comece-seu-projeto'
     | '/admin/clientes'
     | '/admin/clientes-login'
     | '/briefing/$projectId'
@@ -611,6 +633,7 @@ export interface FileRouteTypes {
     | '/vendedor/clientes'
     | '/vendedor/clientes-login'
     | '/api/prospecting/search'
+    | '/comece-seu-projeto/ref/$token'
     | '/cliente'
     | '/leads'
     | '/reunioes'
@@ -644,6 +667,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
+    | '/comece-seu-projeto/'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/clientes-login'
     | '/_authenticated/briefing/$projectId'
@@ -665,6 +689,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vendedor/clientes'
     | '/_authenticated/vendedor/clientes-login'
     | '/api/prospecting/search'
+    | '/comece-seu-projeto/ref/$token'
     | '/_authenticated/cliente/'
     | '/_authenticated/leads/'
     | '/_authenticated/reunioes/'
@@ -679,7 +704,9 @@ export interface RootRouteChildren {
   ClienteLoginRoute: typeof ClienteLoginRoute
   ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
   ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
+  ComeceSeuProjetoIndexRoute: typeof ComeceSeuProjetoIndexRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
+  ComeceSeuProjetoRefTokenRoute: typeof ComeceSeuProjetoRefTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -880,6 +907,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClienteRecuperarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comece-seu-projeto/': {
+      id: '/comece-seu-projeto/'
+      path: '/comece-seu-projeto'
+      fullPath: '/comece-seu-projeto/'
+      preLoaderRoute: typeof ComeceSeuProjetoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/clientes': {
       id: '/_authenticated/admin/clientes'
       path: '/clientes'
@@ -1048,6 +1082,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProspectingSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comece-seu-projeto/ref/$token': {
+      id: '/comece-seu-projeto/ref/$token'
+      path: '/comece-seu-projeto/ref/$token'
+      fullPath: '/comece-seu-projeto/ref/$token'
+      preLoaderRoute: typeof ComeceSeuProjetoRefTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1191,7 +1232,9 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteLoginRoute: ClienteLoginRoute,
   ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
   ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
+  ComeceSeuProjetoIndexRoute: ComeceSeuProjetoIndexRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,
+  ComeceSeuProjetoRefTokenRoute: ComeceSeuProjetoRefTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
