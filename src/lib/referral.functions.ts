@@ -6,7 +6,6 @@ export const getReferralToken = createServerFn({ method: "GET" })
     const userId = (context as any).userId;
     if (!userId) throw new Error("Não autorizado");
 
-    // Verificar papéis do usuário
     const { data: roles } = await supabaseAdmin
       .from("user_roles")
       .select("role")
@@ -16,7 +15,6 @@ export const getReferralToken = createServerFn({ method: "GET" })
     const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
     if (isAdmin) {
-      // Admin vê o token institucional
       const { data: token } = await supabaseAdmin
         .from("referral_tokens")
         .select("*")
@@ -27,7 +25,6 @@ export const getReferralToken = createServerFn({ method: "GET" })
       return token;
     }
 
-    // Vendedor vê seu próprio token
     const { data: token } = await supabaseAdmin
       .from("referral_tokens")
       .select("*")
@@ -62,11 +59,11 @@ export const getReferralMetrics = createServerFn({ method: "GET" })
     const { data: attributionData, error } = await query;
     if (error) throw error;
 
-    const leads = (attributionData as any[])?.map(a => a.leads) || [];
+    const leads = (attributionData as any[])?.map(a => a.leads).filter(Boolean) || [];
     const total = leads.length;
-    const novos = leads.filter(l => l && l.status === "novo").length;
-    const emNegociacao = leads.filter(l => l && ["contatado", "interessado", "proposta", "negociacao"].includes(l.status)).length;
-    const convertidos = leads.filter(l => l && l.status === "fechado").length;
+    const novos = leads.filter(l => l.status === "novo").length;
+    const emNegociacao = leads.filter(l => ["contatado", "interessado", "proposta", "negociacao"].includes(l.status)).length;
+    const convertidos = leads.filter(l => l.status === "fechado").length;
     const taxaConversao = total > 0 ? Math.round((convertidos / total) * 100) : 0;
 
     return { total, novos, emNegociacao, convertidos, taxaConversao };
@@ -85,8 +82,6 @@ export const getReferralLeads = createServerFn({ method: "GET" })
     const userRoles = roles?.map(r => r.role) || [];
     const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
-    // Mudando a estratégia de join para evitar o erro de relação
-    // Buscamos as atribuições primeiro
     let query = supabaseAdmin
       .from("lead_attribution")
       .select(`
@@ -108,7 +103,6 @@ export const getReferralLeads = createServerFn({ method: "GET" })
     const leadIds = attributions.map(a => a.lead_id);
     const responsibleIds = Array.from(new Set(attributions.map(a => a.current_responsible_id).filter(Boolean)));
 
-    // Buscamos os leads e perfis separadamente para garantir compatibilidade
     const { data: leads } = await supabaseAdmin
       .from("leads")
       .select("id, name, company, status, created_at, niche")
@@ -119,7 +113,6 @@ export const getReferralLeads = createServerFn({ method: "GET" })
       .select("id, full_name, nickname")
       .in("id", responsibleIds);
 
-    // Combinamos os dados
     return attributions.map(attr => {
       const lead = leads?.find(l => l.id === attr.lead_id);
       const responsible = profiles?.find(p => p.id === attr.current_responsible_id);
@@ -135,6 +128,14 @@ export const getAdminReferralStats = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const userId = (context as any).userId;
     if (!userId) throw new Error("Não autorizado");
+
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    
+    const isAdmin = roles?.some(r => r.role === "admin" || r.role === "diretor");
+    if (!isAdmin) throw new Error("Acesso negado");
 
     const { data: leads } = await supabaseAdmin
       .from("leads")
