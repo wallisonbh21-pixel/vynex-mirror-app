@@ -1,11 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export const getReferralToken = createServerFn({ method: "GET" })
-  .handler(async ({ context }) => {
-    const userId = (context as any).userId;
-    if (!userId) throw new Error("Não autorizado");
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export const getReferralToken = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const userId = context.userId;
+    
+    // 1. Verificar papéis do usuário
     const { data: roles } = await supabaseAdmin
       .from("user_roles")
       .select("role")
@@ -14,35 +17,41 @@ export const getReferralToken = createServerFn({ method: "GET" })
     const userRoles = roles?.map(r => r.role) || [];
     const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
+    // 2. Buscar token (Institucional para Admin, Pessoal para Vendedor)
+    let query = supabaseAdmin
+      .from("referral_tokens")
+      .select("token, is_active, is_institutional")
+      .eq("is_active", true);
+
     if (isAdmin) {
-      const { data: token, error } = await supabaseAdmin
-        .from("referral_tokens")
-        .select("*")
-        .eq("is_institutional", true)
-        .eq("is_active", true)
-        .maybeSingle();
-      
-      if (error) {
-        console.error("Erro ao buscar token institucional:", error);
-        throw new Error("Erro ao carregar token institucional");
-      }
-      
-      return token;
+      query = query.eq("is_institutional", true);
+    } else {
+      query = query.eq("seller_id", userId).eq("is_institutional", false);
     }
 
-    const { data: token, error } = await supabaseAdmin
-      .from("referral_tokens")
-      .select("*")
-      .eq("seller_id", userId)
-      .eq("is_active", true)
-      .maybeSingle();
+    const { data: token, error } = await query.maybeSingle();
 
     if (error) {
-      console.error("Erro ao buscar token do vendedor:", error);
-      throw new Error("Erro ao carregar token do vendedor");
+      console.error("Error fetching referral token:", error);
+      throw new Error("Erro ao carregar link de indicação");
     }
-    
-    return token;
+
+    // 3. Retorno serializável e limpo
+    if (!token) {
+      return {
+        token: null,
+        is_active: false,
+        is_institutional: false,
+        exists: false
+      };
+    }
+
+    return {
+      token: token.token,
+      is_active: token.is_active,
+      is_institutional: token.is_institutional,
+      exists: true
+    };
   });
 
 export const getReferralMetrics = createServerFn({ method: "GET" })
