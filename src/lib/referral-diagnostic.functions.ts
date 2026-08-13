@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const runDiagnosticDirect = createServerFn({ method: "POST" })
@@ -6,17 +7,6 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     // Agora o userId virá do requireSupabaseAuth
     const userId = (context as any).userId;
-    
-    // Se falhar, tenta extrair do header Authorization manualmente para diagnóstico
-    if (!userId) {
-       console.log("DIAGNOSTIC: userId não encontrado no contexto. Verificando headers...");
-       // Note: em createServerFn, o request está disponível no context
-       const request = (context as any).request;
-       if (request) {
-           const authHeader = request.headers.get("Authorization");
-           console.log("DIAGNOSTIC: Authorization Header presente:", !!authHeader);
-       }
-    }
 
     if (!userId) return { error: "Sem userId no contexto" };
 
@@ -27,7 +17,7 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
         .select("role")
         .eq("user_id", userId);
       
-      const userRoles = roles?.map(r => r.role) || [];
+      const userRoles = roles?.map((r: any) => r.role) || [];
       const isVendedor = userRoles.includes("vendedor");
       const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
@@ -66,8 +56,8 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
         .from("referral_tokens")
         .select("seller_id, is_active, is_institutional");
 
-      const validSellerIds = allTokens?.filter(t => t.seller_id && !t.is_institutional).length || 0;
-      const activeTokens = allTokens?.filter(t => t.is_active).length || 0;
+      const validSellerIds = allTokens?.filter((t: any) => t.seller_id && !t.is_institutional).length || 0;
+      const activeTokens = allTokens?.filter((t: any) => t.is_active).length || 0;
 
       // Log para o console do servidor conforme solicitado no item 6
       if (sellerTokenError) {
