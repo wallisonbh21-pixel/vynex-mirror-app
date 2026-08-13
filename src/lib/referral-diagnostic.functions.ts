@@ -1,14 +1,27 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export const runDiagnostic = createServerFn({ method: "POST" })
+export const runDiagnosticDirect = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
-    const userId = (context as any).userId;
+    // Tenta pegar o userId do contexto injetado pelo middleware
+    let userId = (context as any).userId;
+    
+    // Se falhar, tenta extrair do header Authorization manualmente para diagnóstico
+    if (!userId) {
+       console.log("DIAGNOSTIC: userId não encontrado no contexto. Verificando headers...");
+       // Note: em createServerFn, o request está disponível no context
+       const request = (context as any).request;
+       if (request) {
+           const authHeader = request.headers.get("Authorization");
+           console.log("DIAGNOSTIC: Authorization Header presente:", !!authHeader);
+       }
+    }
+
     if (!userId) return { error: "Sem userId no contexto" };
 
     try {
       // 1. Verificar roles
-      const { data: roles, error: rolesError } = await supabaseAdmin
+      const { data: roles } = await supabaseAdmin
         .from("user_roles")
         .select("role")
         .eq("user_id", userId);
@@ -18,7 +31,7 @@ export const runDiagnostic = createServerFn({ method: "POST" })
       const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
       // 2. Verificar Profile
-      const { data: profile, error: profileError } = await supabaseAdmin
+      const { data: profile } = await supabaseAdmin
         .from("profiles")
         .select("id")
         .eq("id", userId)
@@ -32,7 +45,7 @@ export const runDiagnostic = createServerFn({ method: "POST" })
         .maybeSingle();
 
       // 4. Verificar Token Institucional
-      const { data: instToken, error: instTokenError } = await supabaseAdmin
+      const { data: instToken } = await supabaseAdmin
         .from("referral_tokens")
         .select("*")
         .eq("is_institutional", true)
@@ -54,6 +67,16 @@ export const runDiagnostic = createServerFn({ method: "POST" })
 
       const validSellerIds = allTokens?.filter(t => t.seller_id && !t.is_institutional).length || 0;
       const activeTokens = allTokens?.filter(t => t.is_active).length || 0;
+
+      // Log para o console do servidor conforme solicitado no item 6
+      if (sellerTokenError) {
+          console.error("REFERRAL_TOKEN_ERROR:", {
+              message: sellerTokenError.message,
+              code: sellerTokenError.code,
+              details: sellerTokenError.details,
+              hint: sellerTokenError.hint
+          });
+      }
 
       return {
         userId,

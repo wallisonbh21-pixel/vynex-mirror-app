@@ -40,7 +40,7 @@ import {
   getReferralLeads,
   getAdminReferralStats
 } from "@/lib/referral.functions";
-import { runDiagnostic } from "@/lib/referral-diagnostic.functions";
+import { runDiagnosticDirect } from "@/lib/referral-diagnostic.functions";
 import { useRoles } from "@/lib/auth";
 import { requireVendedor } from "@/lib/guard";
 import { STATUS_LABEL, shortDate } from "@/lib/format";
@@ -89,7 +89,7 @@ function ReferralPage() {
 
   const { data: diagnostic } = useQuery({
     queryKey: ["referral-diagnostic"],
-    queryFn: () => runDiagnostic(),
+    queryFn: () => runDiagnosticDirect(),
   });
 
   if (diagnostic) {
