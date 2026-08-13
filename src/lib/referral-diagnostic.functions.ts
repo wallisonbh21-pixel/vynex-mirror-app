@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const runDiagnosticDirect = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // Tenta pegar o userId do contexto injetado pelo middleware
-    let userId = (context as any).userId;
+    // Agora o userId virá do requireSupabaseAuth
+    const userId = (context as any).userId;
     
     // Se falhar, tenta extrair do header Authorization manualmente para diagnóstico
     if (!userId) {
