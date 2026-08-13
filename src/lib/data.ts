@@ -11,7 +11,8 @@ export type Table =
   | "goals"
   | "lead_activities"
   | "proposals"
-  | "contracts";
+  | "contracts"
+  | "lead_attribution";
 
 export function useRows<T = Record<string, unknown>>(
   table: Table,

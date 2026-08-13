@@ -27,6 +27,7 @@ interface FunnelConfig {
   bg: string;
   border: string;
   text: string;
+  label?: string;
 }
 
 export const FUNNEL_CONFIG: Record<string, FunnelConfig> = {
