@@ -59,9 +59,15 @@ export const Route = createFileRoute("/_authenticated/indicar")({
 function ReferralPage() {
   const { isAdmin } = useRoles() as any;
   
-  const { data: tokenData } = useQuery({
+  const { 
+    data: tokenData, 
+    isLoading: isLoadingToken, 
+    isError: isErrorToken,
+    refetch: refetchToken
+  } = useQuery({
     queryKey: ["referral-token"],
     queryFn: () => getReferralToken(),
+    retry: 1,
   });
 
   const { data: metrics } = useQuery({
@@ -159,7 +165,29 @@ function ReferralPage() {
           </div>
           
           <div className="mt-6 flex items-center gap-3 rounded-2xl bg-muted/50 p-4 font-mono text-sm">
-            <span className="truncate text-muted-foreground">{referralUrl || "Carregando seu link..."}</span>
+            {isLoadingToken ? (
+              <span className="flex items-center gap-2 text-muted-foreground italic">
+                <Clock className="size-4 animate-spin" />
+                Carregando seu link...
+              </span>
+            ) : isErrorToken ? (
+              <div className="flex items-center justify-between w-full gap-2 text-destructive">
+                <span className="italic">Não foi possível carregar seu link de indicação.</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => refetchToken()}
+                  className="h-7 text-xs gap-1"
+                >
+                  <Clock className="size-3" />
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : tokenData ? (
+              <span className="truncate text-foreground font-medium">{referralUrl}</span>
+            ) : (
+              <span className="text-muted-foreground italic">Seu link de indicação ainda não está disponível.</span>
+            )}
           </div>
         </section>
 

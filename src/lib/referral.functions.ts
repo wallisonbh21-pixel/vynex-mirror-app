@@ -15,22 +15,32 @@ export const getReferralToken = createServerFn({ method: "GET" })
     const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
     if (isAdmin) {
-      const { data: token } = await supabaseAdmin
+      const { data: token, error } = await supabaseAdmin
         .from("referral_tokens")
         .select("*")
         .eq("is_institutional", true)
         .eq("is_active", true)
         .maybeSingle();
       
+      if (error) {
+        console.error("Erro ao buscar token institucional:", error);
+        throw new Error("Erro ao carregar token institucional");
+      }
+      
       return token;
     }
 
-    const { data: token } = await supabaseAdmin
+    const { data: token, error } = await supabaseAdmin
       .from("referral_tokens")
       .select("*")
       .eq("seller_id", userId)
       .eq("is_active", true)
       .maybeSingle();
+
+    if (error) {
+      console.error("Erro ao buscar token do vendedor:", error);
+      throw new Error("Erro ao carregar token do vendedor");
+    }
     
     return token;
   });
