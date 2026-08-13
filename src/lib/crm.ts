@@ -176,32 +176,36 @@ export function useConvertLead() {
       amount,
       monthlyFee,
       proposalId,
+      clientId, // Adicionado para permitir reutilizar cliente existente
     }: {
       lead: Lead;
       userId: string;
       amount: number;
       monthlyFee: number;
       proposalId?: string | null;
+      clientId?: string | null;
     }) => {
       // 1. Normalização para verificação de duplicidade
       const email = lead.email?.toLowerCase().trim();
       const whatsapp = lead.whatsapp?.replace(/\D/g, "");
 
-      // 2. Verificar duplicidade de cliente
-      if (email || whatsapp) {
+      // 2. Verificar duplicidade de cliente (se não foi passado um clientId)
+      if (!clientId && (email || whatsapp)) {
         let query = supabase.from("clients").select("id, contact_name");
-        if (email && whatsapp) {
-          query = query.or(`contact_email.eq.${email},contact_phone.eq.${whatsapp}`);
-        } else if (email) {
-          query = query.eq("contact_email", email);
-        } else if (whatsapp) {
-          query = query.eq("contact_phone", whatsapp);
-        }
-
-        const { data: existingClients } = await query;
-        if (existingClients && existingClients.length > 0) {
-          toast.warning(`Atenção: Já existe um cliente com este e-mail/WhatsApp (${existingClients[0]?.contact_name}). Verifique antes de prosseguir.`);
-          // Não paramos a execução, mas alertamos o usuário conforme regra 3 (não fundir automático, sinalizar).
+        
+        const filters: string[] = [];
+        if (email) filters.push(`contact_email.eq.${email}`);
+        if (whatsapp) filters.push(`contact_phone.eq.${whatsapp}`);
+        
+        if (filters.length > 0) {
+          query = query.or(filters.join(","));
+          const { data: existingClients } = await query;
+          if (existingClients && existingClients.length > 0) {
+            // Lançar erro customizado para ser capturado pela UI
+            const error = new Error("DUPLICATE_CLIENT");
+            (error as any).clients = existingClients;
+            throw error;
+          }
         }
       }
 
@@ -215,41 +219,52 @@ export function useConvertLead() {
         .maybeSingle();
 
       const attribution = attributionData as any;
+      const ownerId = attribution?.current_responsible_id || userId;
 
-      // 4. Criar o Cliente (Comercial)
-      const { data: client, error: clientError } = await supabase
-        .from("clients")
-        .insert({
-          owner_id: attribution?.current_responsible_id || userId,
-          company: companyName,
-          niche: lead.niche,
-          city: lead.city,
-          contact_name: lead.name,
-          contact_email: lead.email,
-          contact_phone: lead.whatsapp || lead.phone,
-          monthly_fee: monthlyFee,
-          status: "ativo",
-          lead_id: lead.id,
-        } as never)
-        .select("id")
-        .single();
-      if (clientError) throw clientError;
+      let finalClientId = clientId;
 
-      const clientId = (client as { id: string }).id;
+      // 4. Criar o Cliente (Comercial) - SOMENTE se não houver um existente
+      if (!finalClientId) {
+        const { data: client, error: clientError } = await supabase
+          .from("clients")
+          .insert({
+            owner_id: ownerId,
+            company: companyName,
+            niche: lead.niche,
+            city: lead.city,
+            contact_name: lead.name,
+            contact_email: lead.email,
+            contact_phone: lead.whatsapp || lead.phone,
+            monthly_fee: monthlyFee,
+            status: "ativo",
+            lead_id: lead.id,
+          } as never)
+          .select("id")
+          .single();
+        if (clientError) throw clientError;
+        finalClientId = (client as { id: string }).id;
+      } else {
+        // Se usar cliente existente, vincular o lead se ainda não estiver vinculado
+        await supabase
+          .from("clients")
+          .update({ lead_id: lead.id } as never)
+          .eq("id", finalClientId)
+          .is("lead_id", null);
+      }
 
-      // 5. Criar Contrato
+      // 5. Criar Contrato (como RASCUNHO e sem signed_at)
       const { data: contract, error: contractError } = await supabase
         .from("contracts")
         .insert({
-          owner_id: attribution?.current_responsible_id || userId,
+          owner_id: ownerId,
           lead_id: lead.id,
-          client_id: clientId,
+          client_id: finalClientId,
           proposal_id: proposalId ?? null,
           title: `Contrato — ${companyName}`,
           amount,
           monthly_fee: monthlyFee,
-          status: "ativo",
-          signed_at: today(),
+          status: "rascunho", // Alterado de "ativo" para "rascunho"
+          signed_at: null,    // Removido today()
         } as never)
         .select("id")
         .single();
@@ -257,15 +272,10 @@ export function useConvertLead() {
 
       const contractId = (contract as { id: string }).id;
 
-      await supabase
-        .from("clients")
-        .update({ contract_id: contractId } as never)
-        .eq("id", clientId);
-
       // 6. Criar Projeto
       const { error: projectError } = await supabase.from("projects").insert({
-        owner_id: attribution?.current_responsible_id || userId,
-        client_id: clientId,
+        owner_id: ownerId,
+        client_id: finalClientId,
         contract_id: contractId,
         title: `Site — ${companyName}`,
         status: "disponivel",
@@ -290,7 +300,9 @@ export function useConvertLead() {
         lead_id: lead.id,
         user_id: userId,
         type: "status",
-        description: `Lead convertido em cliente. Originador: ${attribution?.originator_id || 'N/A'}. Acesso ao Portal: PENDENTE.`,
+        description: clientId 
+          ? `Lead convertido utilizando cliente existente. Acesso ao Portal: PENDENTE.`
+          : `Lead convertido em cliente. Originador: ${attribution?.originator_id || 'N/A'}. Acesso ao Portal: PENDENTE.`,
         happened_at: today(),
       } as never);
     },
@@ -300,6 +312,9 @@ export function useConvertLead() {
       );
       toast.success("Conversão comercial concluída com sucesso. Acesso ao Portal pendente.");
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => {
+      if (error.message === "DUPLICATE_CLIENT") return; // Tratado na UI
+      toast.error(error.message);
+    },
   });
 }

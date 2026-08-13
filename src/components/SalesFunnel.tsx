@@ -236,7 +236,13 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
 
 export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => void }) {
   const { data: attributions } = useRows<any>("lead_attribution");
+  const { data: profiles } = useRows<any>("profiles");
   const attribution = attributions?.find(a => a.lead_id === lead.id);
+
+  const getProfileName = (id: string) => {
+    const p = profiles?.find(p => p.id === id);
+    return p?.full_name || p?.email || id.slice(0, 8);
+  };
 
   const allSteps = LEAD_STATUS.filter(s => s !== 'perdido');
   const currentIndex = allSteps.indexOf(lead.status as any);
@@ -305,10 +311,10 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
       {attribution && (
         <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border/50 pt-2 text-[9px] text-muted-foreground">
           <div className="truncate">
-            <span className="opacity-70">Orig:</span> {attribution.originator_id.slice(0, 8)}
+            <span className="opacity-70">Indicado por:</span> {getProfileName(attribution.originator_id)}
           </div>
           <div className="text-right truncate">
-            <span className="opacity-70">Resp:</span> {attribution.current_responsible_id.slice(0, 8)}
+            <span className="opacity-70">Responsável:</span> {getProfileName(attribution.current_responsible_id)}
           </div>
         </div>
       )}

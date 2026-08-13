@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowLeft,
   CalendarClock,
@@ -9,6 +10,7 @@ import {
   Plus,
   Trash2,
   Phone,
+  AlertTriangle,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { requireVendedor } from "@/lib/guard";
@@ -23,6 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useSession } from "@/lib/auth";
 import {
   useActivities,
@@ -84,6 +96,8 @@ const proposalFields: Field[] = [
 function LeadDetail() {
   const { leadId } = Route.useParams();
   const { user } = useSession();
+  const [duplicateClient, setDuplicateClient] = useState<any>(null);
+  const [conversionData, setConversionData] = useState<any>(null);
   const { data: lead, isLoading } = useLead(leadId);
   const { data: activities = [] } = useActivities(leadId);
   const { data: allProposals = [] } = useRows<Proposal>("proposals");
@@ -93,6 +107,17 @@ function LeadDetail() {
   const logActivity = useLogActivity();
   const changeStatus = useChangeLeadStatus();
   const convert = useConvertLead();
+
+  const handleConvert = (data: any) => {
+    setConversionData(data);
+    convert.mutate(data, {
+      onError: (error: any) => {
+        if (error.message === "DUPLICATE_CLIENT") {
+          setDuplicateClient(error.clients[0]);
+        }
+      }
+    });
+  };
 
   const proposals = allProposals.filter((p) => p.lead_id === leadId);
   const accepted = proposals.find((p) => p.status === "aceita");
@@ -223,7 +248,7 @@ function LeadDetail() {
                 className="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold"
                 disabled={convert.isPending}
                 onClick={() =>
-                  convert.mutate({
+                  handleConvert({
                     lead,
                     userId: user.id,
                     amount: accepted?.amount ?? lead.closed_value ?? lead.estimated_value,
@@ -352,7 +377,7 @@ function LeadDetail() {
                     size="sm"
                     disabled={convert.isPending}
                     onClick={() =>
-                      convert.mutate({
+                      handleConvert({
                         lead,
                         userId: user.id,
                         amount: proposal.amount,
@@ -388,6 +413,52 @@ function LeadDetail() {
           ) : null}
         </ul>
       </section>
+
+      <AlertDialog open={!!duplicateClient} onOpenChange={(open) => !open && setDuplicateClient(null)}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-warning">
+              <AlertTriangle className="size-5" /> Possível cliente já cadastrado
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>Encontramos um cliente com o mesmo e-mail ou WhatsApp.</p>
+              <div className="rounded-xl border border-border bg-muted/30 p-3 text-sm">
+                <div className="font-bold text-foreground">{duplicateClient?.company}</div>
+                <div className="text-muted-foreground">{duplicateClient?.contact_name}</div>
+              </div>
+              <p className="text-xs text-muted-foreground">O que deseja fazer? Você pode utilizar este cliente existente para vincular o novo projeto.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel asChild>
+              <Button variant="ghost" className="sm:flex-1">Cancelar</Button>
+            </AlertDialogCancel>
+            <Button 
+              variant="outline" 
+              className="sm:flex-1"
+              asChild
+            >
+              <Link to="/admin/clientes">
+                Ver Cliente Existente
+              </Link>
+            </Button>
+            <AlertDialogAction asChild>
+              <Button 
+                className="sm:flex-1 bg-brand-500 hover:bg-brand-600"
+                onClick={() => {
+                  convert.mutate({
+                    ...conversionData,
+                    clientId: duplicateClient.id
+                  });
+                  setDuplicateClient(null);
+                }}
+              >
+                Usar Cliente Existente
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
