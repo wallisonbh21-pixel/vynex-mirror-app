@@ -6,14 +6,16 @@ Integração dos leads do funil ao CRM e refatoração da conversão comercial p
 - **Visualização**: Atualizar `LeadFunnelCard.tsx` e `pipeline.tsx` para exibir dados da `lead_attribution` (Originador/Responsável).
 - **Status Inicial**: Garantir que o status "novo" seja tratado como "NOVO — AGUARDANDO CONTATO".
 - **Filtros**: Refinar `useRows('leads')` para respeitar as permissões de vendedor (ver apenas seus leads ou institucionais atribuídos).
+- **Atribuição**: Garantir que a `lead_attribution` mantenha o `originator_id` imutável e o `current_responsible_id` atualizável apenas por autorizados (Admin), gerando log em `lead_activities`.
 
 ## 2. Refatoração da Conversão (Lead → Cliente)
 - **useConvertLead (src/lib/crm.ts)**:
-    - Remover dependência de criação de usuário Auth.
-    - Implementar verificação de duplicidade de cliente por e-mail/telefone normalizado.
-    - Criar `client` e `project` mantendo o `lead_id` para histórico.
-    - Transferir dados de `lead_attribution` para o novo cliente (preservando o Originador).
+    - Remover dependência de criação de usuário Auth. Acesso ao Portal fica "PENDENTE".
+    - Implementar verificação de duplicidade de cliente por e-mail/telefone normalizado. Não fundir automaticamente; preservar dados existentes.
+    - Criar `client` e `project` mantendo o `lead_id` para rastreabilidade total.
+    - Transferir dados de `lead_attribution` para o novo cliente (preservando Originador e Responsável Atual).
     - Registrar atividade de conversão.
+    - Garantir que falhas em e-mail/Resend/Auth não revertam a criação do Cliente/Projeto.
 
 ## 3. Gestão de Acesso (Pós-Conversão)
 - **Status Visual**: Em `admin.clientes.tsx` e `clientes.tsx`, exibir status "Acesso ao Portal" como Pendente (sem `user_id`) ou Ativo (com `user_id`).
