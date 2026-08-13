@@ -123,7 +123,7 @@ export function FunnelForm() {
       <div className="space-y-6 pt-4">
         {step === 'service' && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-            <h3 className="text-xl font-semibold text-white">Qual solução sua empresa precisa?</h3>
+            <h3 className="text-xl font-semibold text-white">Escolha a solução que sua empresa precisa:</h3>
             
             <div className="grid grid-cols-1 gap-3">
               {servicesLoading ? (
