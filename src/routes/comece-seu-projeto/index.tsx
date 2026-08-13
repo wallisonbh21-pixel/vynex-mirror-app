@@ -11,9 +11,7 @@ export const Route = createFileRoute('/comece-seu-projeto/')({
             Vamos entender o que você quer criar
           </h1>
           <p className="text-lg text-slate-400">
-            Conte para a ScaleNexus qual solução sua empresa precisa.
-            <br />
-            Escolha o serviço que mais combina com o seu objetivo e, nas próximas etapas, vamos montar seu projeto junto com você.
+            Conte para a ScaleNexus qual solução sua empresa precisa. Escolha o serviço que mais combina com o seu objetivo e, nas próximas etapas, vamos montar seu projeto junto com você.
           </p>
         </div>
         <FunnelForm />
