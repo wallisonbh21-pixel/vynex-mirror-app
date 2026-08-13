@@ -3,9 +3,9 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 
 export const runDiagnosticDirect = createServerFn({ method: "POST" })
-  .input(z.object({
+  .validator((data: { userId?: string }) => z.object({
     userId: z.string().uuid().optional()
-  }))
+  }).parse(data))
   .handler(async ({ data }) => {
     const { userId } = data;
 
