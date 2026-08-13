@@ -38,6 +38,7 @@ import {
   Clock,
   FolderOpen,
   Lock,
+  Share2,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
