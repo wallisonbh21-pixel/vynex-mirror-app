@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const leadFormSchema = z.object({
+export const leadFormSchema = z.object({
   name: z.string().min(2),
   company: z.string().optional(),
   email: z.string().email(),
