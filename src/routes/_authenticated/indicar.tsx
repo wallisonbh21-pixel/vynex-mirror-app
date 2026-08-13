@@ -89,7 +89,7 @@ function ReferralPage() {
 
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-  const referralUrl = tokenData ? `${baseUrl}/comece-seu-projeto/ref/${tokenData.token}` : "";
+  const referralUrl = tokenData?.token ? `${baseUrl}/comece-seu-projeto/ref/${tokenData.token}` : "";
 
   const copyLink = () => {
     if (!referralUrl) return;
@@ -185,11 +185,11 @@ function ReferralPage() {
                   Tentar novamente
                 </Button>
               </div>
-            ) : tokenData ? (
+            ) : tokenData?.exists ? (
               <span className="truncate text-foreground font-medium">{referralUrl}</span>
             ) : (
               <span className="text-muted-foreground italic">Seu link de indicação ainda não está disponível.</span>
-            )}
+            ) }
           </div>
         </section>
 
