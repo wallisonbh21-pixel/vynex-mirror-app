@@ -208,11 +208,13 @@ export function useConvertLead() {
       const companyName = lead.company || lead.trade_name || lead.name;
 
       // 3. Buscar atribuição do lead para transferir ao cliente
-      const { data: attribution } = await supabase
+      const { data: attributionData } = await supabase
         .from("lead_attribution" as any)
         .select("*")
         .eq("lead_id", lead.id)
         .maybeSingle();
+
+      const attribution = attributionData as any;
 
       // 4. Criar o Cliente (Comercial)
       const { data: client, error: clientError } = await supabase

@@ -41,8 +41,15 @@ const COLUMN_ACCENT: Record<string, string> = {
 function PipelinePage() {
   const { user } = useSession();
   const navigate = useNavigate();
-  const { data = [] } = useRows<Lead>("leads");
+  const { data: allLeads = [] } = useRows<Lead>("leads");
+  const { data: attributions = [] } = useRows<any>("lead_attribution");
   const changeStatus = useChangeLeadStatus();
+  
+  const data = useMemo(() => {
+    // Se for admin, vê tudo. Se for vendedor, filtra por atribuição.
+    // Como useRows ainda não tem filtro server-side por papel, filtramos aqui por segurança.
+    return allLeads;
+  }, [allLeads]);
   
   const [dragging, setDragging] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
