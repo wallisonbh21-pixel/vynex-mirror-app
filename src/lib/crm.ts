@@ -183,16 +183,47 @@ export function useConvertLead() {
       monthlyFee: number;
       proposalId?: string | null;
     }) => {
+      // 1. Normalização para verificação de duplicidade
+      const email = lead.email?.toLowerCase().trim();
+      const whatsapp = lead.whatsapp?.replace(/\D/g, "");
+
+      // 2. Verificar duplicidade de cliente
+      if (email || whatsapp) {
+        let query = supabase.from("clients").select("id, contact_name");
+        if (email && whatsapp) {
+          query = query.or(`contact_email.eq.${email},contact_phone.eq.${whatsapp}`);
+        } else if (email) {
+          query = query.eq("contact_email", email);
+        } else if (whatsapp) {
+          query = query.eq("contact_phone", whatsapp);
+        }
+
+        const { data: existingClients } = await query;
+        if (existingClients && existingClients.length > 0) {
+          toast.warning(`Atenção: Já existe um cliente com este e-mail/WhatsApp (${existingClients[0]?.contact_name}). Verifique antes de prosseguir.`);
+          // Não paramos a execução, mas alertamos o usuário conforme regra 3 (não fundir automático, sinalizar).
+        }
+      }
+
       const companyName = lead.company || lead.trade_name || lead.name;
 
+      // 3. Buscar atribuição do lead para transferir ao cliente
+      const { data: attribution } = await supabase
+        .from("lead_attribution" as any)
+        .select("*")
+        .eq("lead_id", lead.id)
+        .maybeSingle();
+
+      // 4. Criar o Cliente (Comercial)
       const { data: client, error: clientError } = await supabase
         .from("clients")
         .insert({
-          owner_id: userId,
+          owner_id: attribution?.current_responsible_id || userId,
           company: companyName,
           niche: lead.niche,
           city: lead.city,
           contact_name: lead.name,
+          contact_email: lead.email,
           contact_phone: lead.whatsapp || lead.phone,
           monthly_fee: monthlyFee,
           status: "ativo",
@@ -202,12 +233,15 @@ export function useConvertLead() {
         .single();
       if (clientError) throw clientError;
 
+      const clientId = (client as { id: string }).id;
+
+      // 5. Criar Contrato
       const { data: contract, error: contractError } = await supabase
         .from("contracts")
         .insert({
-          owner_id: userId,
+          owner_id: attribution?.current_responsible_id || userId,
           lead_id: lead.id,
-          client_id: (client as { id: string }).id,
+          client_id: clientId,
           proposal_id: proposalId ?? null,
           title: `Contrato — ${companyName}`,
           amount,
@@ -224,18 +258,21 @@ export function useConvertLead() {
       await supabase
         .from("clients")
         .update({ contract_id: contractId } as never)
-        .eq("id", (client as { id: string }).id);
+        .eq("id", clientId);
 
+      // 6. Criar Projeto
       const { error: projectError } = await supabase.from("projects").insert({
-        owner_id: userId,
-        client_id: (client as { id: string }).id,
+        owner_id: attribution?.current_responsible_id || userId,
+        client_id: clientId,
         contract_id: contractId,
         title: `Site — ${companyName}`,
         status: "disponivel",
         value: amount,
+        lead_id: lead.id,
       } as never);
       if (projectError) throw projectError;
 
+      // 7. Atualizar Status do Lead
       const { error: leadError } = await supabase
         .from("leads")
         .update({
@@ -246,11 +283,12 @@ export function useConvertLead() {
         .eq("id", lead.id);
       if (leadError) throw leadError;
 
+      // 8. Registrar Atividade
       await supabase.from("lead_activities").insert({
         lead_id: lead.id,
         user_id: userId,
         type: "status",
-        description: `Lead convertido em cliente e contrato fechado.`,
+        description: `Lead convertido em cliente. Originador: ${attribution?.originator_id || 'N/A'}. Acesso ao Portal: PENDENTE.`,
         happened_at: today(),
       } as never);
     },
@@ -258,7 +296,7 @@ export function useConvertLead() {
       ["leads", "clients", "contracts", "projects", "lead_activities"].forEach((key) =>
         queryClient.invalidateQueries({ queryKey: [key] }),
       );
-      toast.success("Lead convertido em cliente, contrato e projeto.");
+      toast.success("Conversão comercial concluída com sucesso. Acesso ao Portal pendente.");
     },
     onError: (error: Error) => toast.error(error.message),
   });
