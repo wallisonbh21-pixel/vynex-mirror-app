@@ -1,99 +1,75 @@
 # Planejamento do Novo Funil Comercial ScaleNexus
 
-Este documento detalha o diagnóstico da arquitetura atual e o plano de implementação para o **Novo Funil Comercial (Fase 6)**, focado em prospecção sem autenticação inicial, rastreamento de indicações e briefings estruturados.
+Este documento detalha o diagnóstico da arquitetura atual e o plano de implementação para o **Novo Funil Comercial (Fase 6)**, focado em prospecção sem autenticação inicial, rastreamento de indicações e briefings estruturados, incorporando as diretrizes de segurança e processos da ATA#006.
 
-## A. O QUE JÁ EXISTE (Reutilizável)
+## A. REGRAS DE NEGÓCIO E FLUXO OPERACIONAL
+
+### 1. Separação de Conversão e Acesso
+O fluxo comercial é independente da infraestrutura de login. A falha no envio de convite ou criação de Auth não bloqueia o processo comercial.
+- **Fluxo**: Lead → Negociação → Convertido → Criar/Atualizar Cliente → Criar Projeto.
+- **Portal**: A ativação do acesso (Auth + Convite) é um passo posterior e manual/opcional.
+- **Status de Acesso**: Clientes sem conta vinculada ficam com status "ACESSO PENDENTE".
+
+### 2. Atribuição e Rastreamento
+- **Originador vs Responsável**:
+  - **Originador**: Vendedor que gerou a indicação original (imutável após criação).
+  - **Responsável Atual**: Vendedor que atende o lead no momento (pode ser reatribuído).
+- **Referral Tokens**: Validados exclusivamente no backend via Server Function. Cookies/localStorage servem apenas para UX (continuidade), não para autoridade de dados.
+- **Indicação Institucional**: Links gerados pelo Admin sem vendedor vinculado (Originador = ScaleNexus/Admin).
+
+### 3. Duplicidade e Segurança
+- **Identificação Exata**: Comparação de E-mail e Telefone normalizados. Sem fusão automática por nome/empresa (apenas sinalização para revisão).
+- **Proteção da API**: O formulário público não tem acesso direto às tabelas. Tudo passa por uma Server Function segura com Rate Limiting e auditoria.
+- **Status Inicial**: Novos leads entram como "NOVO — AGUARDANDO CONTATO" com notificação automática para o responsável.
+
+---
+
+## B. O QUE JÁ EXISTE (Reutilizável)
+- **Tabela `leads`**: Base para armazenamento de prospectos.
+- **Tabela `lead_activities`**: Histórico de interações.
+- **Tabela `project_briefings`**: Armazenamento JSON (a ser mantido para compatibilidade).
+- **`src/lib/crm.ts`**: Hook `useConvertLead` (será refatorado para o novo fluxo).
+
+---
+
+## C. INFRAESTRUTURA A SER CRIADA
 
 ### 1. Banco de Dados
-- **Tabela `leads`**: Estrutura robusta para armazenamento de prospectos (nome, empresa, contato, nicho, origem, status).
-- **Tabela `lead_activities`**: Histórico completo de interações.
-- **Tabela `project_briefings`**: Estrutura JSON flexível que pode ser estendida para o novo formulário.
-- **Tabela `proposals` & `contracts`**: Base para a conversão financeira.
-- **Tabela `profiles`**: Contém `commission_rate` para vendedores e criadores.
-- **Tabela `user_roles`**: Suporte para papéis `admin`, `vendedor`, `criador` e `cliente`.
+- **Tabela `referral_tokens`**: Vincula códigos públicos a usuários ou ao "Admin/Institucional".
+- **Tabela `lead_attribution`**: Histórico auditável de atribuição (quem trouxe e quem atende).
+- **Tabela `services_catalog`**: Centralização de inteligência de produto.
+  - Campos: `base_price`, `recurring_fee`, `commission_rules` (vendedor/criador), `billing_cycle`, `conditional_questions` (JSON).
 
-### 2. Lógica e UI
-- **`src/lib/crm.ts`**: Hook `useConvertLead` que já realiza a ponte Lead -> Cliente -> Projeto.
-- **`src/lib/prospecting.ts`**: Motor de busca e validação de duplicidade básico.
-- **`src/lib/briefing.ts`**: Lógica de salvamento e recuperação de dados JSON.
-- **`RecordDialog.tsx`**: Componente de formulário dinâmico baseado em schemas.
-- **`SalesProgression.tsx`**: Visualizador de etapas do funil.
+### 2. Backend (Server Functions)
+- **`processPublicLead`**:
+  - Valida `referral_token`.
+  - Normaliza dados e verifica duplicidade.
+  - Registra lead e atribuição inicial.
+  - Dispara notificações.
 
 ---
 
-## B. O QUE PRECISA SER CRIADO
+## D. FASES DE IMPLEMENTAÇÃO RECOMENDADAS
 
-### 1. Infraestrutura de Rastreamento
-- **Nova Tabela `referral_tokens`**:
-  - `user_id`: UUID do Vendedor/Admin.
-  - `token`: Código público seguro (slug alfanumérico).
-  - `type`: 'vendedor' ou 'institucional'.
-- **Logs de Atribuição**: Tabela `lead_attribution` para histórico de mudanças de responsável.
+### FASE 1: Fundação e Catálogo (Infra)
+- Migrations para `referral_tokens`, `services_catalog` e `lead_attribution`.
+- Scripts de geração de tokens para vendedores existentes.
+- Cadastro inicial do catálogo de serviços (Landing Page, Institucional, Loja, etc).
 
-### 2. Catálogo de Serviços e Preços
-- **Nova Tabela `services_catalog`**:
-  - `id`, `name`, `type` (site, trafego, etc).
-  - `base_price`, `recurring_fee`.
-  - `config`: JSON com perguntas específicas do briefing para este serviço.
+### FASE 2: Captura Segura (API + Fluxo Público)
+- Implementação da Server Function `processPublicLead`.
+- Criação da rota pública `/comece-seu-projeto` com suporte a `ref/:token`.
+- Lógica de normalização e detecção de duplicidade (E-mail/Telefone).
 
----
+### FASE 3: Refatoração do Pipeline e Conversão
+- Atualização do Pipeline Comercial para refletir o status "NOVO".
+- Refatoração da `useConvertLead` para separar a criação do Cliente/Projeto da criação do Auth.
+- Implementação do botão "Ativar Acesso ao Portal" no perfil do Cliente.
 
-## C. ARQUITETURA DE INDICAÇÃO
-
-1. **Link Exclusivo**: Utilizaremos um `token` gerado aleatoriamente (ex: `nexus-7j2k`) vinculado ao perfil do vendedor.
-2. **URL Pública**: `/comece-seu-projeto/ref/:token`.
-3. **Persistência**: O token será armazenado em `localStorage/Cookie` no navegador do prospect para garantir a atribuição mesmo se ele fechar a aba e voltar depois.
-4. **Painel do Vendedor**: Nova rota `/_authenticated/vendedor/indicacoes` com contadores reais extraídos de `leads` filtrados por `owner_id` e `source` específico.
+### FASE 4: Painel do Vendedor e Briefing Dinâmico
+- Área de "Minhas Indicações" para vendedores.
+- Integração das perguntas dinâmicas do `services_catalog` no formulário de briefing, mantendo compatibilidade com `project_briefings`.
 
 ---
 
-## D. FORMULÁRIO "COMECE SEU PROJETO"
-
-1. **Público**: Rota `/comece-seu-projeto` (sem `requireAuth`).
-2. **Server Function Segura**: O formulário enviará os dados para uma `createServerFn` que:
-   - Valida o `referral_token`.
-   - Verifica duplicidade (Email/WhatsApp).
-   - Insere na tabela `leads` com `status: "novo"`.
-   - Notifica o Vendedor via `notifications`.
-3. **Perguntas Condicionais**: O formulário será montado dinamicamente a partir do `services_catalog`.
-
----
-
-## E. CRM E CONVERSÃO
-
-- **Fluxo**: Lead entra no Pipeline -> Vendedor negocia -> Move para "Fechado" -> Aciona Modal de Conversão.
-- **Mudança Crítica**: A criação do usuário Auth (Supabase) só ocorrerá no momento da execução da `useConvertLead`, disparando o e-mail de boas-vindas.
-
----
-
-## F. SEGURANÇA E DUPLICIDADE
-
-- **Spam**: Implementação de Rate Limiting na Server Function e possivelmente CAPTCHA.
-- **Duplicidade**: O sistema fará um "fuzzy match" (e-mail exato ou telefone exato). Se encontrar, em vez de criar novo, adiciona uma `lead_activity` no lead existente: "Nova tentativa de contato via formulário público".
-- **RLS**: As tabelas de Briefing continuarão protegidas, mas a Server Function usará `supabaseAdmin` para realizar o "ponteio" inicial seguro.
-
----
-
-## G. FASES DE IMPLEMENTAÇÃO
-
-### FASE 1: Fundação e Rastreamento (Infra)
-- Criar `referral_tokens`.
-- Criar catálogo de serviços básico.
-- Gerar links exclusivos para vendedores existentes.
-
-### FASE 2: Captura Pública (Frontend + API)
-- Rota pública `/comece-seu-projeto`.
-- Server Function de processamento de Leads.
-- Validação de duplicidade.
-
-### FASE 3: Painel Comercial 2.0
-- Nova área "Indicações" para Vendedores.
-- Relatórios de conversão por vendedor para o Admin.
-
-### FASE 4: Integração de Serviços (Briefing Dinâmico)
-- Migrar briefing atual para o novo formato baseado no catálogo.
-- Tela final de "Resumo do Projeto" (Pós-briefing).
-
----
-
-**ATA#006 — PLANEJAMENTO DO NOVO FUNIL COMERCIAL CONCLUÍDO — AGUARDANDO APROVAÇÃO PARA IMPLEMENTAÇÃO.**
+**ATA#006 — PLANEJAMENTO ATUALIZADO — AGUARDANDO APROVAÇÃO PARA INICIAR FASE 1.**
