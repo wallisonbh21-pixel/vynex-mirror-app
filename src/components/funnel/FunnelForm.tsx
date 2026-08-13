@@ -6,16 +6,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
-import { submitLeadForm } from '@/lib/funnel.functions'
+import { submitLeadForm, leadFormSchema } from '@/lib/funnel.functions'
+import { z } from 'zod'
 import { toast } from 'sonner'
 import { Loader2, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
 type Step = 'service' | 'contact' | 'details' | 'success'
 
+type FormData = z.infer<typeof leadFormSchema>
+
 export function FunnelForm() {
   const [step, setStep] = useState<Step>('service')
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     company: '',
     email: '',
