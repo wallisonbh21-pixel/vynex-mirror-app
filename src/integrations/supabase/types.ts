@@ -224,6 +224,51 @@ export type Database = {
           },
         ]
       }
+      lead_attribution: {
+        Row: {
+          attributed_at: string
+          current_responsible_id: string
+          id: string
+          lead_id: string
+          originator_id: string
+          referral_token_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          attributed_at?: string
+          current_responsible_id: string
+          id?: string
+          lead_id: string
+          originator_id: string
+          referral_token_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attributed_at?: string
+          current_responsible_id?: string
+          id?: string
+          lead_id?: string
+          originator_id?: string
+          referral_token_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_attribution_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: true
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_attribution_referral_token_id_fkey"
+            columns: ["referral_token_id"]
+            isOneToOne: false
+            referencedRelation: "referral_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           address: string | null
@@ -1239,6 +1284,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referral_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          is_institutional: boolean | null
+          seller_id: string | null
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_institutional?: boolean | null
+          seller_id?: string | null
+          token: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_institutional?: boolean | null
+          seller_id?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
+      services_catalog: {
+        Row: {
+          additional_config: Json | null
+          billing_cycle: string | null
+          briefing_questions: Json | null
+          category: string
+          created_at: string
+          creation_price: number | null
+          creator_remuneration: number | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          monthly_price: number | null
+          name: string
+          seller_commission_rate: number | null
+          setup_price: number | null
+          traffic_manager_remuneration: number | null
+          updated_at: string
+        }
+        Insert: {
+          additional_config?: Json | null
+          billing_cycle?: string | null
+          briefing_questions?: Json | null
+          category: string
+          created_at?: string
+          creation_price?: number | null
+          creator_remuneration?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          monthly_price?: number | null
+          name: string
+          seller_commission_rate?: number | null
+          setup_price?: number | null
+          traffic_manager_remuneration?: number | null
+          updated_at?: string
+        }
+        Update: {
+          additional_config?: Json | null
+          billing_cycle?: string | null
+          briefing_questions?: Json | null
+          category?: string
+          created_at?: string
+          creation_price?: number | null
+          creator_remuneration?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          monthly_price?: number | null
+          name?: string
+          seller_commission_rate?: number | null
+          setup_price?: number | null
+          traffic_manager_remuneration?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       studio_favorites: {
         Row: {
