@@ -24,6 +24,7 @@ import { Route as AuthenticatedDisponiveisRouteImport } from './routes/_authenti
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFollowupsRouteImport } from './routes/_authenticated/followups'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
+import { Route as AuthenticatedIndicarRouteImport } from './routes/_authenticated/indicar'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedMeusProjetosRouteImport } from './routes/_authenticated/meus-projetos'
 import { Route as AuthenticatedMeusSaquesRouteImport } from './routes/_authenticated/meus-saques'
@@ -138,6 +139,11 @@ const AuthenticatedFollowupsRoute = AuthenticatedFollowupsRouteImport.update({
 const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
   id: '/historico',
   path: '/historico',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIndicarRoute = AuthenticatedIndicarRouteImport.update({
+  id: '/indicar',
+  path: '/indicar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
@@ -376,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
+  '/indicar': typeof AuthenticatedIndicarRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/meus-saques': typeof AuthenticatedMeusSaquesRoute
@@ -430,6 +437,7 @@ export interface FileRoutesByTo {
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
+  '/indicar': typeof AuthenticatedIndicarRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/meus-saques': typeof AuthenticatedMeusSaquesRoute
@@ -487,6 +495,7 @@ export interface FileRoutesById {
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/followups': typeof AuthenticatedFollowupsRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
+  '/_authenticated/indicar': typeof AuthenticatedIndicarRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/_authenticated/meus-saques': typeof AuthenticatedMeusSaquesRoute
@@ -544,6 +553,7 @@ export interface FileRouteTypes {
     | '/financeiro'
     | '/followups'
     | '/historico'
+    | '/indicar'
     | '/metas'
     | '/meus-projetos'
     | '/meus-saques'
@@ -598,6 +608,7 @@ export interface FileRouteTypes {
     | '/financeiro'
     | '/followups'
     | '/historico'
+    | '/indicar'
     | '/metas'
     | '/meus-projetos'
     | '/meus-saques'
@@ -654,6 +665,7 @@ export interface FileRouteTypes {
     | '/_authenticated/financeiro'
     | '/_authenticated/followups'
     | '/_authenticated/historico'
+    | '/_authenticated/indicar'
     | '/_authenticated/metas'
     | '/_authenticated/meus-projetos'
     | '/_authenticated/meus-saques'
@@ -814,6 +826,13 @@ declare module '@tanstack/react-router' {
       path: '/historico'
       fullPath: '/historico'
       preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/indicar': {
+      id: '/_authenticated/indicar'
+      path: '/indicar'
+      fullPath: '/indicar'
+      preLoaderRoute: typeof AuthenticatedIndicarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/metas': {
@@ -1166,6 +1185,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFollowupsRoute: typeof AuthenticatedFollowupsRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
+  AuthenticatedIndicarRoute: typeof AuthenticatedIndicarRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedMeusProjetosRoute: typeof AuthenticatedMeusProjetosRoute
   AuthenticatedMeusSaquesRoute: typeof AuthenticatedMeusSaquesRoute
@@ -1198,6 +1218,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFollowupsRoute: AuthenticatedFollowupsRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
+  AuthenticatedIndicarRoute: AuthenticatedIndicarRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedMeusProjetosRoute: AuthenticatedMeusProjetosRoute,
   AuthenticatedMeusSaquesRoute: AuthenticatedMeusSaquesRoute,
