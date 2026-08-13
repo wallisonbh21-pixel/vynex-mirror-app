@@ -13,6 +13,7 @@ import {
 import { LEAD_STATUS, label, currency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Lead } from "@/lib/crm";
+import { useRows } from "@/lib/data";
 
 interface SalesFunnelProps {
   leads: Lead[];
@@ -26,6 +27,7 @@ interface FunnelConfig {
   bg: string;
   border: string;
   text: string;
+  label?: string;
 }
 
 export const FUNNEL_CONFIG: Record<string, FunnelConfig> = {
@@ -34,7 +36,8 @@ export const FUNNEL_CONFIG: Record<string, FunnelConfig> = {
     icon: Users, 
     bg: "bg-blue-500/10", 
     border: "border-blue-500/20",
-    text: "text-blue-500"
+    text: "text-blue-500",
+    label: "Novo — Aguardando Contato"
   },
   ['contatado']: { 
     color: "#8b5cf6", 
@@ -121,7 +124,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
                 </div>
                 <div className="text-left">
                   <span className="block text-sm font-bold text-foreground">
-                    {label(item.status)}
+                    {item.status === 'novo' ? 'Novo — Aguardando Contato' : label(item.status)}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {index > 0 ? `${conversionRate}% conversão` : 'Entrada'}
@@ -232,6 +235,9 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
 }
 
 export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => void }) {
+  const { data: attributions } = useRows<any>("lead_attribution");
+  const attribution = attributions?.find(a => a.lead_id === lead.id);
+
   const allSteps = LEAD_STATUS.filter(s => s !== 'perdido');
   const currentIndex = allSteps.indexOf(lead.status as any);
 
@@ -269,7 +275,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
 
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
-          <span className="text-primary">{label(lead.status)}</span>
+          <span className="text-primary">{lead.status === 'novo' ? 'Novo — Aguardando Contato' : label(lead.status)}</span>
           <span className="text-muted-foreground">{currentIndex + 1} de {allSteps.length}</span>
         </div>
         <div className="flex h-1 gap-1 overflow-hidden rounded-full bg-secondary/50">
@@ -287,14 +293,25 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
 
       <div className="grid grid-cols-2 gap-2 border-t border-border pt-3 text-[10px]">
         <div className="space-y-0.5">
-          <div className="text-muted-foreground uppercase">Vendedor</div>
-          <div className="font-medium truncate">ScaleNexus Team</div>
+          <div className="text-muted-foreground uppercase">Origem</div>
+          <div className="font-medium truncate">{lead.source || 'Direto'}</div>
         </div>
         <div className="space-y-0.5 text-right">
           <div className="text-muted-foreground uppercase">Próximo</div>
           <div className="font-medium">{lead.next_contact_at ? new Date(lead.next_contact_at).toLocaleDateString() : 'Não agendado'}</div>
         </div>
       </div>
+      
+      {attribution && (
+        <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border/50 pt-2 text-[9px] text-muted-foreground">
+          <div className="truncate">
+            <span className="opacity-70">Orig:</span> {attribution.originator_id.slice(0, 8)}
+          </div>
+          <div className="text-right truncate">
+            <span className="opacity-70">Resp:</span> {attribution.current_responsible_id.slice(0, 8)}
+          </div>
+        </div>
+      )}
       
       <button 
         onClick={onOpen}
