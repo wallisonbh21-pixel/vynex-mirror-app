@@ -1,10 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const getReferralToken = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
-    const { userId } = context;
+    const userId = (context as any).userId;
     if (!userId) throw new Error("Não autorizado");
 
     // Verificar papéis do usuário
@@ -41,7 +40,7 @@ export const getReferralToken = createServerFn({ method: "GET" })
 
 export const getReferralMetrics = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
-    const { userId } = context;
+    const userId = (context as any).userId;
     if (!userId) throw new Error("Não autorizado");
 
     const { data: roles } = await supabaseAdmin
@@ -58,19 +57,16 @@ export const getReferralMetrics = createServerFn({ method: "GET" })
     
     if (!isAdmin) {
       query = query.eq("originator_id", userId);
-    } else {
-      // Para admin, se quisermos a visão institucional, podemos filtrar por onde referral_token_id é institucional
-      // Mas o plano pede visão global + institucional. Vamos pegar tudo.
     }
 
     const { data: attributionData, error } = await query;
     if (error) throw error;
 
-    const leads = attributionData?.map(a => (a.leads as any)) || [];
+    const leads = (attributionData as any[])?.map(a => a.leads) || [];
     const total = leads.length;
-    const novos = leads.filter(l => l.status === "novo").length;
-    const emNegociacao = leads.filter(l => ["contatado", "interessado", "proposta", "negociacao"].includes(l.status)).length;
-    const convertidos = leads.filter(l => l.status === "fechado").length;
+    const novos = leads.filter(l => l && l.status === "novo").length;
+    const emNegociacao = leads.filter(l => l && ["contatado", "interessado", "proposta", "negociacao"].includes(l.status)).length;
+    const convertidos = leads.filter(l => l && l.status === "fechado").length;
     const taxaConversao = total > 0 ? Math.round((convertidos / total) * 100) : 0;
 
     return { total, novos, emNegociacao, convertidos, taxaConversao };
@@ -78,7 +74,7 @@ export const getReferralMetrics = createServerFn({ method: "GET" })
 
 export const getReferralLeads = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
-    const { userId } = context;
+    const userId = (context as any).userId;
     if (!userId) throw new Error("Não autorizado");
 
     const { data: roles } = await supabaseAdmin
@@ -89,23 +85,15 @@ export const getReferralLeads = createServerFn({ method: "GET" })
     const userRoles = roles?.map(r => r.role) || [];
     const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
+    // Mudando a estratégia de join para evitar o erro de relação
+    // Buscamos as atribuições primeiro
     let query = supabaseAdmin
       .from("lead_attribution")
       .select(`
         lead_id,
         originator_id,
-        leads (
-          id,
-          name,
-          company,
-          status,
-          created_at,
-          niche
-        ),
-        current_responsible:profiles!lead_attribution_current_responsible_id_fkey (
-          full_name,
-          nickname
-        )
+        current_responsible_id,
+        attributed_at
       `)
       .order("attributed_at", { ascending: false });
 
@@ -113,15 +101,39 @@ export const getReferralLeads = createServerFn({ method: "GET" })
       query = query.eq("originator_id", userId);
     }
 
-    const { data, error } = await query;
-    if (error) throw error;
+    const { data: attributions, error: attrError } = await query;
+    if (attrError) throw attrError;
+    if (!attributions || attributions.length === 0) return [];
 
-    return data;
+    const leadIds = attributions.map(a => a.lead_id);
+    const responsibleIds = Array.from(new Set(attributions.map(a => a.current_responsible_id).filter(Boolean)));
+
+    // Buscamos os leads e perfis separadamente para garantir compatibilidade
+    const { data: leads } = await supabaseAdmin
+      .from("leads")
+      .select("id, name, company, status, created_at, niche")
+      .in("id", leadIds);
+
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name, nickname")
+      .in("id", responsibleIds);
+
+    // Combinamos os dados
+    return attributions.map(attr => {
+      const lead = leads?.find(l => l.id === attr.lead_id);
+      const responsible = profiles?.find(p => p.id === attr.current_responsible_id);
+      return {
+        ...attr,
+        leads: lead,
+        current_responsible: responsible
+      };
+    });
   });
 
 export const getAdminReferralStats = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
-    const { userId } = context;
+    const userId = (context as any).userId;
     if (!userId) throw new Error("Não autorizado");
 
     const { data: leads } = await supabaseAdmin
@@ -129,23 +141,18 @@ export const getAdminReferralStats = createServerFn({ method: "GET" })
       .select("status");
     
     const total = leads?.length || 0;
-    const convertidos = leads?.filter(l => l.status === "fechado").length || 0;
     
-    const { data: sellersStats } = await supabaseAdmin
+    const { data: sellers } = await supabaseAdmin
       .from("profiles")
-      .select(`
-        id,
-        full_name,
-        nickname,
-        lead_attribution!lead_attribution_originator_id_fkey (
-          id,
-          leads(status)
-        )
-      `);
+      .select("id, full_name, nickname");
+    
+    const { data: allAttributions } = await supabaseAdmin
+      .from("lead_attribution")
+      .select("originator_id, lead_id, leads(status)");
 
-    const performance = sellersStats?.map(s => {
-      const attributions = (s.lead_attribution as any[]) || [];
-      const sLeads = attributions.map(a => a.leads);
+    const performance = sellers?.map(s => {
+      const sAttributions = (allAttributions as any[])?.filter(a => a.originator_id === s.id) || [];
+      const sLeads = sAttributions.map(a => a.leads).filter(Boolean);
       const sTotal = sLeads.length;
       const sConvertidos = sLeads.filter(l => l.status === "fechado").length;
       return {
