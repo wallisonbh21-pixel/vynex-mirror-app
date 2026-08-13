@@ -167,25 +167,25 @@ function ReferralPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard 
             label="Total de Indicações" 
-            value={metrics?.total || 0} 
+            value={String(metrics?.total || 0)} 
             icon={Target} 
             hint="Leads originados"
           />
           <StatCard 
             label="Novos" 
-            value={metrics?.novos || 0} 
+            value={String(metrics?.novos || 0)} 
             icon={Clock} 
             hint="Aguardando contato"
           />
           <StatCard 
             label="Em Negociação" 
-            value={metrics?.emNegociacao || 0} 
+            value={String(metrics?.emNegociacao || 0)} 
             icon={TrendingUp} 
             hint="Processo comercial"
           />
           <StatCard 
             label="Convertidos" 
-            value={metrics?.convertidos || 0} 
+            value={String(metrics?.convertidos || 0)} 
             icon={CheckCircle2} 
             hint="Leads fechados"
           />
@@ -233,26 +233,26 @@ function ReferralPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leads?.map((item: any) => (
+                {(leads as any[])?.map((item: any) => (
                   <TableRow key={item.lead_id}>
                     <TableCell>
-                      <div className="font-medium">{item.leads.company || item.leads.name}</div>
-                      <div className="text-xs text-muted-foreground">{item.leads.name}</div>
+                      <div className="font-medium">{item.leads?.company || item.leads?.name}</div>
+                      <div className="text-xs text-muted-foreground">{item.leads?.name}</div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">{item.leads.niche || "—"}</div>
+                      <div className="text-sm">{item.leads?.niche || "—"}</div>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {shortDate(item.leads.created_at)}
+                      {shortDate(item.leads?.created_at)}
                     </TableCell>
                     <TableCell>
                       <span className={cn(
                         "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                        item.leads.status === "fechado" ? "bg-green-500/10 text-green-500" :
-                        item.leads.status === "novo" ? "bg-blue-500/10 text-blue-500" :
+                        item.leads?.status === "fechado" ? "bg-green-500/10 text-green-500" :
+                        item.leads?.status === "novo" ? "bg-blue-500/10 text-blue-500" :
                         "bg-yellow-500/10 text-yellow-500"
                       )}>
-                        {getFriendlyStatus(item.leads.status)}
+                        {getFriendlyStatus(item.leads?.status)}
                       </span>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -267,7 +267,7 @@ function ReferralPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {(!leads || leads.length === 0) && (
+                {(!leads || (leads as any[]).length === 0) && (
                   <TableRow>
                     <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                       Nenhuma indicação encontrada.
@@ -280,26 +280,26 @@ function ReferralPage() {
 
           {/* Mobile Cards */}
           <div className="grid gap-4 lg:hidden">
-            {leads?.map((item: any) => (
+            {(leads as any[])?.map((item: any) => (
               <Card key={item.lead_id} className="p-4 space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-bold">{item.leads.company || item.leads.name}</div>
-                    <div className="text-xs text-muted-foreground">{shortDate(item.leads.created_at)}</div>
+                    <div className="font-bold">{item.leads?.company || item.leads?.name}</div>
+                    <div className="text-xs text-muted-foreground">{shortDate(item.leads?.created_at)}</div>
                   </div>
                   <span className={cn(
                     "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                    item.leads.status === "fechado" ? "bg-green-500/20 text-green-500" :
-                    item.leads.status === "novo" ? "bg-blue-500/20 text-blue-500" :
+                    item.leads?.status === "fechado" ? "bg-green-500/20 text-green-500" :
+                    item.leads?.status === "novo" ? "bg-blue-500/20 text-blue-500" :
                     "bg-yellow-500/20 text-yellow-500"
                   )}>
-                    {getFriendlyStatus(item.leads.status)}
+                    {getFriendlyStatus(item.leads?.status)}
                   </span>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="text-muted-foreground">Serviço:</div>
-                  <div className="font-medium text-right">{item.leads.niche || "—"}</div>
+                  <div className="font-medium text-right">{item.leads?.niche || "—"}</div>
                   <div className="text-muted-foreground">Responsável:</div>
                   <div className="font-medium text-right">{item.current_responsible?.nickname || "A definir"}</div>
                 </div>
