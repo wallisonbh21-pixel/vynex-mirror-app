@@ -236,11 +236,11 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
 
 export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => void }) {
   const { data: attributions } = useRows<any>("lead_attribution");
-  const { data: profiles } = useRows<any>("profiles");
+  const { data: profiles } = useRows<any>("profiles" as any);
   const attribution = attributions?.find(a => a.lead_id === lead.id);
 
   const getProfileName = (id: string) => {
-    const p = profiles?.find(p => p.id === id);
+    const p = profiles?.find((p: any) => p.id === id);
     return p?.full_name || p?.email || id.slice(0, 8);
   };
 
