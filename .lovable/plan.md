@@ -4,44 +4,41 @@ Implementação da área logada para Vendedores e Admin gerenciarem links de ind
 
 ## 1. Infraestrutura e Rotas
 - Criar a rota protegida `src/routes/_authenticated/indicar.tsx` (Central de Indicação).
-- Atualizar `src/components/AppShell.tsx` para incluir "INDICAÇÃO DE CLIENTES" nos menus `NAV_VENDEDOR` e `NAV_ADMIN` (a ser verificado).
+- Atualizar `src/components/AppShell.tsx` para incluir "INDICAÇÃO DE CLIENTES" nos menus `NAV_VENDEDOR` e `NAV_ADMIN`.
 - Restringir acesso via `requireVendedor` ou logicamente via roles dentro da página.
 
 ## 2. Lógica de Dados (Server Functions / Hooks)
 - Criar `src/lib/referral.functions.ts` para:
-  - `getMyReferralToken`: Busca o token do vendedor logado ou institucional (se admin).
-  - `getReferralMetrics`: Agrega contagens de leads por status (Novo, Em Negociação, Convertido) filtrado pelo `originator_id`.
-  - `getReferralLeads`: Lista leads originados pelo usuário com `current_responsible_id` e status.
-- Criar `src/lib/admin-referral.functions.ts` para visão global do Admin.
+  - `getReferralToken`: Busca o token do usuário. Para Admin, prioriza o token com `is_institutional = true`.
+  - `getReferralMetrics`: Agrega contagens de leads por status reais (`novo`, `negociacao`, `fechado`) filtrado pelo `originator_id`.
+  - `getReferralLeads`: Lista leads originados pelo usuário com `current_responsible_id` e status, omitindo dados privados do responsável.
 
 ## 3. Componentes da Interface
 - **Dashboard de Indicação**:
-  - Bloco de Link: Exibição do link `/comece-seu-projeto/ref/[TOKEN]`.
-  - Ações: Botão Copiar (com feedback), Compartilhar WhatsApp (mensagem template) e Modal QR Code.
+  - Bloco de Link: Exibição da URL completa: `https://[host]/comece-seu-projeto/ref/[TOKEN]` (via `window.location.origin`).
+  - Ações: Botão Copiar (com feedback), Compartilhar WhatsApp (mensagem template amigável) e Modal QR Code.
 - **Cards de Métricas**:
-  - Total, Novos, Em Negociação, Convertidos e % de Conversão.
+  - Total de Indicações, Novos (`novo`), Em Negociação (`negociacao`, `proposta`), Convertidos (`fechado`) e % de Conversão.
 - **Tabela/Cards de Leads**:
-  - Listagem com status amigáveis e link "Abrir no CRM" para detalhes.
+  - Listagem com `STATUS_LABEL` reais do CRM. Link "Abrir no CRM" para detalhes.
 - **Visão Admin**:
   - Seção "Visão Geral" e "Desempenho por Vendedor".
-  - Link Institucional fixo.
+  - Link Institucional destacado.
 
 ## 4. Segurança e Privacidade
-- Validar RLS nas tabelas `referral_tokens`, `lead_attribution` e `leads`.
-- Garantir que vendedor só veja o que originou (`originator_id = auth.uid()`).
-- Admin visualiza tudo.
+- Validar RLS: Vendedores acessam apenas leads onde `originator_id = auth.uid()`.
+- Privacidade: Responsável Atual exibe apenas `full_name` ou `nickname`, nunca UUID ou e-mail/telefone privado.
+- Admin visualiza todos os tokens e métricas globais.
 
-## Detalhes Técnicos
-- **QR Code**: Utilizar biblioteca `qrcode.react`.
-- **WhatsApp**: `https://wa.me/?text=...`.
-- **Status Mapping**:
+## 5. Auditoria de Status (Confirmado)
+- Reutilizar status de `src/lib/format.ts`: `novo`, `contatado`, `interessado`, `proposta`, `negociacao`, `fechado`, `perdido`.
+- **Mapeamento Amigável**:
   - `novo` -> "Novo"
-  - `contato` -> "Aguardando Contato"
-  - `em_contato` -> "Em Contato"
-  - `negociacao` -> "Em Negociação"
+  - `contatado` -> "Aguardando Contato"
+  - `negociacao`, `proposta`, `interessado` -> "Em Negociação"
   - `fechado` -> "Convertido"
   - `perdido` -> "Perdido"
 
 ## Validação
 - Build: `bun run build:dev`.
-- Testes manuais: Fluxo de cópia, geração de lead via link e persistência de Originador na reatribuição.
+- Testes: Cópia de link, geração de lead via link (Originador imutável) e visualização mobile.
