@@ -89,7 +89,13 @@ function ReferralPage() {
 
   const { data: diagnostic } = useQuery({
     queryKey: ["referral-diagnostic"],
-    queryFn: () => runDiagnosticDirect(),
+    queryFn: async () => {
+        // Pega o userId do localStorage para o diagnóstico manual
+        const sessionStr = typeof window !== 'undefined' ? window.localStorage.getItem(Object.keys(window.localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token')) || '') : null;
+        const session = sessionStr ? JSON.parse(sessionStr) : null;
+        const userId = session?.user?.id;
+        return runDiagnosticDirect({ data: { userId } });
+    },
   });
 
   if (diagnostic) {
