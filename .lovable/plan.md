@@ -4,8 +4,8 @@ Implementação da área logada para Vendedores e Admin gerenciarem links de ind
 
 ## 1. Infraestrutura e Rotas
 - Criar a rota protegida `src/routes/_authenticated/indicar.tsx` (Central de Indicação).
-- Atualizar `src/components/AppShell.tsx` para incluir "INDICAÇÃO DE CLIENTES" nos menus `NAV_VENDEDOR` e admin.
-- Restringir acesso via `requireRole(['vendedor', 'diretor', 'admin', 'rh'])`.
+- Atualizar `src/components/AppShell.tsx` para incluir "INDICAÇÃO DE CLIENTES" nos menus `NAV_VENDEDOR` e `NAV_ADMIN` (a ser verificado).
+- Restringir acesso via `requireVendedor` ou logicamente via roles dentro da página.
 
 ## 2. Lógica de Dados (Server Functions / Hooks)
 - Criar `src/lib/referral.functions.ts` para:
