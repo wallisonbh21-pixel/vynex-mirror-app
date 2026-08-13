@@ -44,6 +44,7 @@ import {
   today,
 } from "@/lib/format";
 import { sanitizeExternalUrl } from "@/lib/security";
+import { cn } from "@/lib/utils";
 import { leadFields } from "./leads.index";
 
 export const Route = createFileRoute("/_authenticated/leads/$leadId")({
@@ -360,7 +361,7 @@ function LeadDetail() {
                       })
                     }
                   >
-                    Gerar contrato
+                    Converter em Cliente
                   </Button>
                 ) : null}
                 <RecordDialog
