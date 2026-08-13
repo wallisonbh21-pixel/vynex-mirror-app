@@ -95,7 +95,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         status: "novo", // Correspondente a "NOVO — AGUARDANDO CONTATO" na UI
         source: data.referralToken ? "indicacao" : "site_publico",
         owner_id: originatorId || "00000000-0000-0000-0000-000000000000", // Fallback system ID
-        notes: `Interesse inicial: ${data.details?.objective || ''}\nServiço: ${data.serviceId}`,
+        notes: `Interesse inicial: ${data.details?.objective || data.details?.needs || ''}\nServiço: ${data.serviceId}`,
       } as any)
       .select("id")
       .single();

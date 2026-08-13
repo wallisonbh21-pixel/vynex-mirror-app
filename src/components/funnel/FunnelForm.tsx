@@ -122,7 +122,8 @@ export function FunnelForm() {
 
       <div className="space-y-6 pt-4">
         {step === 'service' && (
-          <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            <h3 className="text-xl font-semibold text-white">Qual solução sua empresa precisa?</h3>
             
             <div className="grid grid-cols-1 gap-3">
               {servicesLoading ? (
@@ -133,6 +134,7 @@ export function FunnelForm() {
                 services?.map((service) => (
                   <button
                     key={service.id}
+                    type="button"
                     onClick={() => setFormData(prev => ({ ...prev, serviceId: service.id }))}
                     className={`text-left p-4 rounded-xl border transition-all ${
                       formData.serviceId === service.id
@@ -141,10 +143,26 @@ export function FunnelForm() {
                     }`}
                   >
                     <div className="font-medium text-white">{service.name}</div>
-                    <div className="text-sm text-slate-400 mt-1">{service.description}</div>
+                    {service.description && (
+                      <div className="text-sm text-slate-400 mt-1">{service.description}</div>
+                    )}
                   </button>
                 ))
               )}
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="needs" className="text-white">Conte mais sobre o que você precisa</Label>
+              <Textarea 
+                id="needs" 
+                value={formData.details?.needs || ''} 
+                onChange={e => setFormData(prev => ({ 
+                  ...prev, 
+                  details: { ...(prev.details || {}), needs: e.target.value } 
+                }))}
+                placeholder="Ex: Tenho uma loja e quero vender pela internet, preciso divulgar meu serviço, quero atrair mais clientes..."
+                className="bg-white/5 border-white/10 min-h-[100px] text-white"
+              />
             </div>
           </div>
         )}
