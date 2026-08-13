@@ -40,6 +40,7 @@ import {
   getReferralLeads,
   getAdminReferralStats
 } from "@/lib/referral.functions";
+import { runDiagnostic } from "@/lib/referral-diagnostic.functions";
 import { useRoles } from "@/lib/auth";
 import { requireVendedor } from "@/lib/guard";
 import { STATUS_LABEL, shortDate } from "@/lib/format";
@@ -85,6 +86,15 @@ function ReferralPage() {
     queryFn: () => getAdminReferralStats(),
     enabled: isAdmin,
   });
+
+  const { data: diagnostic } = useQuery({
+    queryKey: ["referral-diagnostic"],
+    queryFn: () => runDiagnostic(),
+  });
+
+  if (diagnostic) {
+    console.log("REFERRAL_TOKEN_DIAGNOSTIC:", diagnostic);
+  }
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const referralUrl = tokenData ? `${baseUrl}/comece-seu-projeto/ref/${tokenData.token}` : "";
