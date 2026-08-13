@@ -7,9 +7,13 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
     userId: z.string().uuid().optional()
   }).parse(data))
   .handler(async ({ data }) => {
-    const { userId } = data;
+    let { userId } = data;
 
+    // Se não veio no data, tenta pegar do contexto (caso o middleware tenha funcionado no server)
+    // Mas aqui o foco é o diagnóstico manual
+    
     if (!userId) {
+        // Tenta pegar o primeiro vendedor para o relatório de auditoria não ser vazio
         const { data: firstVendedor } = await supabaseAdmin
             .from("user_roles")
             .select("user_id")
@@ -17,11 +21,10 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
             .limit(1)
             .maybeSingle();
         
-        return { 
-            error: "UserId não fornecido para diagnóstico.",
-            availableVendedor: firstVendedor?.user_id
-        };
+        userId = firstVendedor?.user_id;
     }
+
+    if (!userId) return { error: "Nenhum vendedor encontrado no banco para diagnosticar." };
 
     try {
       const { data: roles } = await supabaseAdmin
@@ -67,7 +70,7 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
       const validSellerIds = allTokens?.filter((t: any) => t.seller_id && !t.is_institutional).length || 0;
       const activeTokens = allTokens?.filter((t: any) => t.is_active).length || 0;
 
-      return {
+      const diagnostic = {
         userId,
         userRoles,
         isVendedor,
@@ -90,6 +93,10 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
             activeTokens
         }
       };
+
+      console.log("REFERRAL_TOKEN_DIAGNOSTIC_SERVER_LOG:", diagnostic);
+      
+      return diagnostic;
     } catch (e: any) {
       return { error: e.message };
     }
