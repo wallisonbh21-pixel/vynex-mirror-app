@@ -1,14 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { z } from "zod";
 
 export const runDiagnosticDirect = createServerFn({ method: "POST" })
-  .handler(async ({ context }) => {
-    // Busca administrativa de dados para diagnóstico sem depender de middleware de sessão
-    // Pega o userId passado no corpo da requisição (apenas para diagnóstico local)
-    const { userId } = (context as any).data || {};
+  .input(z.object({
+    userId: z.string().uuid().optional()
+  }))
+  .handler(async ({ data }) => {
+    const { userId } = data;
 
     if (!userId) {
-        // Tenta buscar o primeiro vendedor do banco para simular
         const { data: firstVendedor } = await supabaseAdmin
             .from("user_roles")
             .select("user_id")
@@ -23,7 +24,6 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
     }
 
     try {
-      // 1. Verificar roles
       const { data: roles } = await supabaseAdmin
         .from("user_roles")
         .select("role")
@@ -33,28 +33,24 @@ export const runDiagnosticDirect = createServerFn({ method: "POST" })
       const isVendedor = userRoles.includes("vendedor");
       const isAdmin = userRoles.includes("admin") || userRoles.includes("diretor");
 
-      // 2. Verificar Profile
       const { data: profile } = await supabaseAdmin
         .from("profiles")
         .select("id")
         .eq("id", userId)
         .maybeSingle();
 
-      // 3. Verificar Token do Vendedor
       const { data: sellerToken, error: sellerTokenError } = await supabaseAdmin
         .from("referral_tokens")
         .select("*")
         .eq("seller_id", userId)
         .maybeSingle();
 
-      // 4. Verificar Token Institucional
       const { data: instToken } = await supabaseAdmin
         .from("referral_tokens")
         .select("*")
         .eq("is_institutional", true)
         .maybeSingle();
 
-      // 5. Auditoria de Tokens
       const { count: totalTokens } = await supabaseAdmin
         .from("referral_tokens")
         .select("*", { count: "exact", head: true });
