@@ -31,18 +31,46 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
         }
       }
 
-      // 3. Extrair necessidades das notas legíveis
+      // 3. Mapeamento de labels amigáveis para campos conhecidos
+      const labelMap: Record<string, string> = {
+        objective: "Objetivo do projeto",
+        needs: "Necessidade do cliente",
+        observations: "Observações adicionais",
+        references: "Referências (sites/lojas)",
+        socialMedia: "Redes sociais",
+        currentWebsite: "Site atual",
+        name: "Nome",
+        company: "Empresa",
+        email: "E-mail",
+        whatsapp: "WhatsApp",
+        city: "Cidade",
+        state: "Estado",
+        segment: "Segmento",
+        serviceId: "Serviço"
+      };
+
+      // 4. Extrair necessidades das notas legíveis (retrocompatibilidade)
       const needsMatch = leadNotes?.match(/Interesse inicial:\s*([\s\S]*?)(?:\nServiço:|$)/i);
       let needs = dynamicData["needs"] || (needsMatch && needsMatch[1] ? needsMatch[1].trim() : (leadNotes?.split('\n')[0] || "—"));
 
-      // 4. Se o JSON existe mas não tem 'needs', e o needsMatch pegou algo, garantir que está no dynamicData para renderização unificada
-      if (!dynamicData["needs"] && needsMatch && needsMatch[1]) {
-        dynamicData["needs"] = needsMatch[1].trim();
-      }
+      // 5. Normalizar dynamicData para garantir que todos os campos tenham labels e valores limpos
+      const normalizedData: Record<string, { label: string, value: any }> = {};
       
-      // Se ainda assim não temos needs no dynamicData mas temos na variável needs, injetar
-      if (!dynamicData["needs"] && needs && needs !== "—") {
-        dynamicData["needs"] = needs;
+      // Primeiro, processar o dynamicData (JSON)
+      Object.entries(dynamicData).forEach(([key, value]) => {
+        if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) return;
+        normalizedData[key] = {
+          label: labelMap[key] || key,
+          value
+        };
+      });
+
+      // Garantir que 'needs' esteja presente se extraído das notas legíveis
+      if (!normalizedData["needs"] && needs && needs !== "—") {
+        normalizedData["needs"] = {
+          label: labelMap["needs"] || "Necessidade do cliente",
+          value: needs
+        };
       }
 
       return {
