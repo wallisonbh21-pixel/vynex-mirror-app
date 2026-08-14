@@ -121,9 +121,9 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           niche: data.segment,
           status: "novo",
           source: source,
-          owner_id: originatorId || "00000000-0000-0000-0000-000000000000", // Fallback técnico temporário se owner_id for NOT NULL no banco
-          notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
-        } as any)
+        owner_id: originatorId || "00000000-0000-0000-0000-000000000000", 
+        notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
+      } as any)
         .select("id")
         .single();
 
@@ -136,8 +136,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
       if (newLead) {
         const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
           lead_id: newLead.id,
-          originator_id: originatorId, // Pode ser NULL conforme regra 2 e 3
-          current_responsible_id: source === "indicacao" ? originatorId : null, // NULL conforme regra 2 e 3
+          originator_id: originatorId, 
+          current_responsible_id: source === "indicacao" ? originatorId : null,
           referral_token_id: referralTokenId,
         } as any);
 
