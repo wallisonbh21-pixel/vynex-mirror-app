@@ -8,9 +8,14 @@ Corrigir a falha de processamento no formulário público, garantindo que o envi
 ### Backend (Server Functions)
 - **Refatorar `submitLeadForm` em `src/lib/funnel.functions.ts`**:
     - Adicionar bloco `try/catch` global com retorno de erro estruturado.
-    - Implementar fallback garantido para `originatorId`: se nenhum admin for encontrado, usar um UUID de sistema fixo (`00000000-0000-0000-0000-000000000000`).
-    - Resolver o nome do serviço nominalmente antes de salvar nas `notes`, evitando perda de contexto se o UUID do serviço mudar ou for removido.
-    - Validar o `referralToken` com maior rigor, tratando tokens expirados ou inexistentes sem interromper o fluxo principal.
+    - **Remover completamente UUIDs de sistema fixos** (0000...).
+    - **Lógica de Atribuição**:
+        - **Token Vendedor**: `originator_id` e `current_responsible_id` definidos como o vendedor do token.
+        - **Token Institucional**: `originator_id` compatível com estrutura institucional, `current_responsible_id = NULL`.
+        - **Sem Token (Direto)**: Origem "ScaleNexus / Direto", `current_responsible_id = NULL`.
+        - **Token Inválido**: Retornar erro amigável, sem fallback silencioso para UUIDs fictícios.
+    - **Validação de Serviço**: Verificar se o `serviceId` existe e está ativo antes da criação do Lead. Salvar `service_id` e `service_name` no histórico/notes para preservação nominal.
+
 
 ### Frontend (Interface)
 - **Aprimorar `FunnelForm.tsx`**:
@@ -19,7 +24,11 @@ Corrigir a falha de processamento no formulário público, garantindo que o envi
     - Garantir que o estado de carregamento (`loading`) bloqueie múltiplos cliques.
 
 ## Validação
-- Teste de regressão com Playwright para:
-    - Envio sem indicação (atribuição ao sistema).
-    - Envio com indicação (atribuição ao vendedor).
-    - Simulação de erro de banco para verificar resposta amigável ao usuário.
+- Teste de regressão com Playwright para os cenários:
+    - **A) Link de vendedor válido**: Originador e Responsável = vendedor.
+    - **B) Link institucional**: Origem Institucional, Responsável vazio (NULL).
+    - **C) Acesso direto (sem token)**: Origem Direta, Responsável vazio (NULL).
+    - **D) Token inválido**: Mensagem amigável ao usuário, sem crash, sem UUID fictício.
+    - **E) Serviço inválido/desativado**: Mensagem amigável, impede criação de lead incorreto.
+    - **F) Serviço válido**: Persistência correta de `service_id` + `service_name`.
+
