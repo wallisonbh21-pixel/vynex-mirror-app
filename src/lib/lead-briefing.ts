@@ -23,7 +23,7 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
       // 2. Extrair necessidades
       // Formato esperado: Interesse inicial: Conteúdo \nServiço: ...
       const needsMatch = leadNotes?.match(/Interesse inicial:\s*([\s\S]*?)(?:\nServiço:|$)/i);
-      const needs = needsMatch ? needsMatch[1].trim() : leadNotes || "—";
+      const needs = needsMatch && needsMatch[1] ? needsMatch[1].trim() : leadNotes || "—";
 
       return {
         serviceName,
