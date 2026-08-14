@@ -57,6 +57,7 @@ import {
 } from "@/lib/format";
 import { sanitizeExternalUrl } from "@/lib/security";
 import { cn } from "@/lib/utils";
+import { useLeadBriefing } from "@/lib/lead-briefing";
 import { leadFields } from "./leads.index";
 
 export const Route = createFileRoute("/_authenticated/leads/$leadId")({
@@ -107,6 +108,7 @@ function LeadDetail() {
   const logActivity = useLogActivity();
   const changeStatus = useChangeLeadStatus();
   const convert = useConvertLead();
+  const { data: briefing } = useLeadBriefing(leadId, lead?.notes || null);
 
   const handleConvert = (data: any) => {
     setConversionData(data);
@@ -269,6 +271,37 @@ function LeadDetail() {
                   Ver Cliente no Painel
                 </Link>
               </Button>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
+          <h2 className="text-sm font-semibold flex items-center gap-2 mb-4">
+            <span role="img" aria-label="briefing">📋</span> Briefing Inicial
+          </h2>
+          
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">1. Serviço de interesse</span>
+              <div className="text-sm font-medium bg-secondary/30 p-2 rounded-lg border border-border/50">
+                {briefing?.serviceName || "—"}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">2. Necessidade do cliente</span>
+              <div className="text-sm text-foreground bg-secondary/30 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed">
+                {briefing?.needs || "—"}
+              </div>
+            </div>
+
+            {briefing?.objective && (
+              <div className="space-y-1">
+                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">3. Objetivo do projeto</span>
+                <div className="text-sm text-foreground bg-secondary/30 p-3 rounded-lg border border-border/50 whitespace-pre-wrap italic">
+                  {briefing?.objective}
+                </div>
+              </div>
             )}
           </div>
         </section>
