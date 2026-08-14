@@ -32,20 +32,17 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
       }
 
       // 3. Extrair necessidades das notas legíveis
-      // Prioridade 1: O campo 'needs' dentro do JSON dinâmico
-      // Prioridade 2: O formato "Interesse inicial: ..."
-      // Prioridade 3: A primeira linha das notas
       const needsMatch = leadNotes?.match(/Interesse inicial:\s*([\s\S]*?)(?:\nServiço:|$)/i);
-      let needs = dynamicData.needs || (needsMatch && needsMatch[1] ? needsMatch[1].trim() : (leadNotes?.split('\n')[0] || "—"));
+      let needs = dynamicData["needs"] || (needsMatch && needsMatch[1] ? needsMatch[1].trim() : (leadNotes?.split('\n')[0] || "—"));
 
       // 4. Se o JSON existe mas não tem 'needs', e o needsMatch pegou algo, garantir que está no dynamicData para renderização unificada
-      if (!dynamicData.needs && needsMatch && needsMatch[1]) {
-        dynamicData.needs = needsMatch[1].trim();
+      if (!dynamicData["needs"] && needsMatch && needsMatch[1]) {
+        dynamicData["needs"] = needsMatch[1].trim();
       }
       
       // Se ainda assim não temos needs no dynamicData mas temos na variável needs, injetar
-      if (!dynamicData.needs && needs && needs !== "—") {
-        dynamicData.needs = needs;
+      if (!dynamicData["needs"] && needs && needs !== "—") {
+        dynamicData["needs"] = needs;
       }
 
       return {
