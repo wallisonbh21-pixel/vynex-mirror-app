@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft,
   CalendarClock,
@@ -109,6 +111,23 @@ function LeadDetail() {
   const changeStatus = useChangeLeadStatus();
   const convert = useConvertLead();
   const { data: briefing } = useLeadBriefing(leadId, lead?.notes || null);
+  const { data: attribution } = useQuery({
+    queryKey: ["lead-attribution", leadId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lead_attribution" as any)
+        .select(`
+          *,
+          originator:profiles!lead_attribution_originator_id_fkey(full_name, nickname),
+          responsible:profiles!lead_attribution_current_responsible_id_fkey(full_name, nickname)
+        `)
+        .eq("lead_id", leadId)
+        .maybeSingle();
+      if (error) throw error;
+      return data as any;
+    },
+    enabled: !!leadId,
+  });
 
   const handleConvert = (data: any) => {
     setConversionData(data);
@@ -202,7 +221,7 @@ function LeadDetail() {
               <dd className="text-right">
                 <div className="flex flex-col items-end">
                   {lead.whatsapp && (
-                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" className="text-brand-500 font-medium hover:underline">
+                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-brand-500 font-medium hover:underline">
                       {lead.whatsapp}
                     </a>
                   )}
@@ -229,18 +248,40 @@ function LeadDetail() {
           </dl>
 
           <div className="mt-6 pt-6 border-t border-border space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Origem do Lead</span>
-                <div className="text-sm font-medium">{lead.source || "Direto / Site"}</div>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Origem do Lead</span>
+                  <div className="text-sm font-medium">
+                    {lead.source === "indicacao" ? "Indicação" : lead.source === "site_publico" ? "ScaleNexus / Institucional" : lead.source || "Direto / Site"}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Acesso ao Portal</span>
+                  <div className="flex items-center gap-2">
+                    <div className={cn("size-2 rounded-full", lead.status === 'fechado' ? "bg-amber-500" : "bg-muted")} />
+                    <span className="text-sm font-medium">
+                      {lead.status === 'fechado' ? "PENDENTE" : "Indisponível"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Acesso ao Portal</span>
-                <div className="flex items-center gap-2">
-                  <div className={cn("size-2 rounded-full", lead.status === 'fechado' ? "bg-amber-500" : "bg-muted")} />
-                  <span className="text-sm font-medium">
-                    {lead.status === 'fechado' ? "PENDENTE" : "Indisponível"}
-                  </span>
+
+              <div className="pt-4 border-t border-border/50">
+                <h3 className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-3">Atribuição Comercial</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground uppercase font-medium">Indicado por</span>
+                    <div className="text-sm font-semibold text-brand-500">
+                      {attribution?.originator ? (attribution.originator.full_name || attribution.originator.nickname) : attribution?.originator_id ? "Usuário Externo" : "ScaleNexus"}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground uppercase font-medium">Responsável Atual</span>
+                    <div className="text-sm font-semibold">
+                      {attribution?.responsible ? (attribution.responsible.full_name || attribution.responsible.nickname) : "Aguardando atribuição"}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -301,15 +342,15 @@ function LeadDetail() {
                 return (
                   <div key={key} className="space-y-1 group">
                     <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{label}</span>
-                    <div className="text-sm text-foreground bg-secondary/20 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed transition-colors group-hover:bg-secondary/30">
+                    <div className="text-sm text-foreground bg-secondary/20 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed transition-colors group-hover:bg-secondary/40">
                       {isUrl ? (
                         <div className="flex flex-col gap-2">
-                          <span className="break-all font-mono text-xs opacity-70">{String(value)}</span>
+                          <span className="break-all font-mono text-xs opacity-70 mb-1">{String(value)}</span>
                           <Button 
                             asChild 
-                            variant="outline" 
+                            variant="secondary" 
                             size="sm" 
-                            className="w-fit h-7 text-[10px] gap-1.5 border-brand-500/30 text-brand-500 hover:text-brand-500 hover:bg-brand-500/5"
+                            className="w-fit h-7 text-[10px] gap-1.5 border border-brand-500/20 text-brand-600 hover:text-white hover:bg-brand-500 transition-all shadow-sm"
                           >
                             <a href={sanitizeExternalUrl(String(value).startsWith('http') ? String(value) : `https://${value}`)} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="size-3" /> Abrir referência
