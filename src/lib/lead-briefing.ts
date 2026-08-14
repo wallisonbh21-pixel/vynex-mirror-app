@@ -20,7 +20,6 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
       }
 
       // 2. Extrair dados estruturados das notas
-      // Formato esperado: Interesse inicial: ... \nServiço: ... \nDados do Briefing: JSON
       const briefingJsonMatch = leadNotes?.match(/Dados do Briefing:\s*(\{.*\})/i);
       let dynamicData: Record<string, any> = {};
 
@@ -32,9 +31,19 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
         }
       }
 
-      // 3. Extrair necessidades e objetivo das notas legíveis (fallback ou para manter compatibilidade)
+      // 3. Extrair necessidades das notas legíveis
       const needsMatch = leadNotes?.match(/Interesse inicial:\s*([\s\S]*?)(?:\nServiço:|$)/i);
-      const needs = needsMatch && needsMatch[1] ? needsMatch[1].trim() : (leadNotes?.split('\n')[0] || "—");
+      let needs = dynamicData["needs"] || (needsMatch && needsMatch[1] ? needsMatch[1].trim() : (leadNotes?.split('\n')[0] || "—"));
+
+      // 4. Se o JSON existe mas não tem 'needs', e o needsMatch pegou algo, garantir que está no dynamicData para renderização unificada
+      if (!dynamicData["needs"] && needsMatch && needsMatch[1]) {
+        dynamicData["needs"] = needsMatch[1].trim();
+      }
+      
+      // Se ainda assim não temos needs no dynamicData mas temos na variável needs, injetar
+      if (!dynamicData["needs"] && needs && needs !== "—") {
+        dynamicData["needs"] = needs;
+      }
 
       return {
         serviceName,

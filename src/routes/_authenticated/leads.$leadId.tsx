@@ -288,54 +288,60 @@ function LeadDetail() {
               </div>
             </div>
 
-            {briefing?.dynamicData && Object.entries(briefing.dynamicData).map(([key, value]) => {
-              if (!value || (typeof value === 'string' && value.trim() === '')) return null;
+            {briefing?.dynamicData && Object.entries(briefing.dynamicData).length > 0 ? (
+              Object.entries(briefing.dynamicData).map(([key, value]) => {
+                if (!value || (typeof value === 'string' && value.trim() === '')) return null;
 
-              const labelMap: Record<string, string> = {
-                objective: "Objetivo do projeto",
-                needs: "Necessidade do cliente",
-                observations: "Observações adicionais",
-                references: "Referências (sites/lojas)",
-                socialMedia: "Redes sociais",
-                currentWebsite: "Site atual"
-              };
+                const labelMap: Record<string, string> = {
+                  objective: "Objetivo do projeto",
+                  needs: "Necessidade do cliente",
+                  observations: "Observações adicionais",
+                  references: "Referências (sites/lojas)",
+                  socialMedia: "Redes sociais",
+                  currentWebsite: "Site atual"
+                };
 
-              const label = labelMap[key] || key;
-              const isUrl = typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://') || value.includes('.com'));
+                const label = labelMap[key] || key;
+                const isUrl = typeof value === 'string' && (
+                  value.startsWith('http://') || 
+                  value.startsWith('https://') || 
+                  (value.includes('.') && !value.includes(' ') && value.length > 4)
+                );
 
-              return (
-                <div key={key} className="space-y-1 group">
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{label}</span>
-                  <div className="text-sm text-foreground bg-secondary/20 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed transition-colors group-hover:bg-secondary/30">
-                    {isUrl ? (
-                      <div className="flex flex-col gap-2">
-                        <span className="break-all font-mono text-xs opacity-70">{String(value)}</span>
-                        <Button 
-                          asChild 
-                          variant="outline" 
-                          size="sm" 
-                          className="w-fit h-7 text-[10px] gap-1.5 border-brand-500/30 text-brand-500 hover:text-brand-500 hover:bg-brand-500/5"
-                        >
-                          <a href={sanitizeExternalUrl(String(value).startsWith('http') ? String(value) : `https://${value}`)} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="size-3" /> Abrir referência
-                          </a>
-                        </Button>
-                      </div>
-                    ) : (
-                      String(value)
-                    )}
+                return (
+                  <div key={key} className="space-y-1 group">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{label}</span>
+                    <div className="text-sm text-foreground bg-secondary/20 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed transition-colors group-hover:bg-secondary/30">
+                      {isUrl ? (
+                        <div className="flex flex-col gap-2">
+                          <span className="break-all font-mono text-xs opacity-70">{String(value)}</span>
+                          <Button 
+                            asChild 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-fit h-7 text-[10px] gap-1.5 border-brand-500/30 text-brand-500 hover:text-brand-500 hover:bg-brand-500/5"
+                          >
+                            <a href={sanitizeExternalUrl(String(value).startsWith('http') ? String(value) : `https://${value}`)} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="size-3" /> Abrir referência
+                            </a>
+                          </Button>
+                        </div>
+                      ) : (
+                        String(value)
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              briefing?.needs && briefing.needs !== "—" && (
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Necessidade do cliente</span>
+                  <div className="text-sm text-foreground bg-secondary/30 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed">
+                    {briefing.needs}
                   </div>
                 </div>
-              );
-            })}
-
-            {!briefing?.dynamicData && briefing?.needs && (
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Necessidade do cliente</span>
-                <div className="text-sm text-foreground bg-secondary/30 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed">
-                  {briefing.needs}
-                </div>
-              </div>
+              )
             )}
           </div>
         </section>
