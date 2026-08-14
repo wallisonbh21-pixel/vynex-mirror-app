@@ -36,17 +36,17 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
         objective: "Objetivo do projeto",
         needs: "Necessidade do cliente",
         observations: "Observações adicionais",
-        references: "Referências (sites/lojas)",
+        references: "Referência / Site de referência",
         socialMedia: "Redes sociais",
         currentWebsite: "Site atual",
-        name: "Nome",
+        name: "Nome do cliente",
         company: "Empresa",
         email: "E-mail",
         whatsapp: "WhatsApp",
         city: "Cidade",
         state: "Estado",
-        segment: "Segmento",
-        serviceId: "Serviço"
+        segment: "Nicho/Segmento",
+        serviceId: "Serviço de interesse"
       };
 
       // 4. Extrair necessidades das notas legíveis (retrocompatibilidade)
