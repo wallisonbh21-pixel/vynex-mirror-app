@@ -11,14 +11,7 @@ export const leadFormSchema = z.object({
   segment: z.string(),
   serviceId: z.string().uuid(),
   referralToken: z.string().optional(),
-  details: z.object({
-    objective: z.string().optional(),
-    needs: z.string().optional(),
-    observations: z.string().optional(),
-    references: z.string().optional(),
-    socialMedia: z.string().optional(),
-    currentWebsite: z.string().optional(),
-  }).optional(),
+  details: z.record(z.string(), z.any()).optional(),
 });
 
 export const submitLeadForm = createServerFn({ method: "POST" })
@@ -43,7 +36,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         lead_id: existingLead.id,
         user_id: "00000000-0000-0000-0000-000000000000", // System/Public User placeholder if needed, or identify as system
         type: "status",
-        description: `Novo interesse recebido pelo formulário público para o serviço: ${data.serviceId}. Detalhes: ${data.details?.objective || 'N/A'}`,
+        description: `Novo interesse recebido pelo formulário público para o serviço: ${data.serviceId}. Detalhes: ${data.details?.['objective'] || 'N/A'}`,
         happened_at: new Date().toISOString(),
       } as any);
 
@@ -95,7 +88,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         status: "novo", // Correspondente a "NOVO — AGUARDANDO CONTATO" na UI
         source: data.referralToken ? "indicacao" : "site_publico",
         owner_id: originatorId || "00000000-0000-0000-0000-000000000000", // Fallback system ID
-        notes: `Interesse inicial: ${data.details?.objective || data.details?.needs || ''}\nServiço: ${data.serviceId}\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
+        notes: `Interesse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço: ${data.serviceId}\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
       } as any)
       .select("id")
       .single();
