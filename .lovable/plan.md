@@ -1,28 +1,25 @@
-# Plano de Ajuste: Etapa de Seleção de Serviço do Funil
+# Plano de Correção: Robusteza do Funil Comercial
 
-O objetivo é corrigir a renderização da etapa de seleção de serviços no funil público da ScaleNexus, garantindo que as opções do catálogo sejam exibidas corretamente, que o título esteja alinhado com o solicitado, e que um novo campo de texto para briefing detalhado seja incluído e persistido.
+## Objetivo
+Corrigir a falha de processamento no formulário público, garantindo que o envio de leads seja resiliente a falhas de atribuição, tokens inválidos e instabilidades de rede.
 
-## Ações a realizar
+## Alterações Técnicas
 
-1. **Catálogo de Serviços**:
-   - Garantir que a query de `services_catalog` traga as opções solicitadas.
-   - Nota: Como não posso alterar o banco de dados diretamente via SQL neste momento sem permissão explícita para migração de dados, assumo que os dados corretos devem estar lá ou serão injetados. Vou focar na interface que consome esses dados.
+### Backend (Server Functions)
+- **Refatorar `submitLeadForm` em `src/lib/funnel.functions.ts`**:
+    - Adicionar bloco `try/catch` global com retorno de erro estruturado.
+    - Implementar fallback garantido para `originatorId`: se nenhum admin for encontrado, usar um UUID de sistema fixo (`00000000-0000-0000-0000-000000000000`).
+    - Resolver o nome do serviço nominalmente antes de salvar nas `notes`, evitando perda de contexto se o UUID do serviço mudar ou for removido.
+    - Validar o `referralToken` com maior rigor, tratando tokens expirados ou inexistentes sem interromper o fluxo principal.
 
-2. **Frontend (`src/components/funnel/FunnelForm.tsx`)**:
-   - Atualizar o título da primeira etapa para "Qual solução sua empresa precisa?".
-   - Implementar a renderização visual das opções de serviço como botões de seleção (cards).
-   - Adicionar o campo de texto "Conte mais sobre o que você precisa" com o placeholder solicitado.
-   - Garantir que o campo de texto seja mapeado para `formData.details.needs` (que já existe no schema do lead).
-   - Impedir o avanço para a próxima etapa se nenhum serviço for selecionado.
+### Frontend (Interface)
+- **Aprimorar `FunnelForm.tsx`**:
+    - Adicionar validação preventiva do `serviceId` e campos obrigatórios antes do envio final.
+    - Melhorar o tratamento de erros no `handleSubmit` para exibir mensagens específicas retornadas pelo servidor.
+    - Garantir que o estado de carregamento (`loading`) bloqueie múltiplos cliques.
 
-3. **Validação e Persistência (`src/lib/funnel.functions.ts`)**:
-   - Garantir que o campo `needs` dentro do objeto `details` seja corretamente recebido e processado na criação do Lead/Atividade.
-
-## Detalhes Técnicos
-
-- **Componente**: `FunnelForm.tsx`
-- **Função de Servidor**: `submitLeadForm` em `funnel.functions.ts`
-- **Estado**: O campo de texto será vinculado a `formData.details.needs`.
-- **UI**: Uso de Tailwind CSS para manter o padrão Dark premium da ScaleNexus.
-
-Não serão alterados: CRM, lógica de indicação (referral), banco de dados (schema) ou integrações externas.
+## Validação
+- Teste de regressão com Playwright para:
+    - Envio sem indicação (atribuição ao sistema).
+    - Envio com indicação (atribuição ao vendedor).
+    - Simulação de erro de banco para verificar resposta amigável ao usuário.
