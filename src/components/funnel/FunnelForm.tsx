@@ -83,9 +83,11 @@ export function FunnelForm() {
       if (result.success) {
         setStep('success')
         localStorage.removeItem('sn_referral_token')
+      } else {
+        toast.error(result.message)
       }
     } catch (error: any) {
-      toast.error('Erro ao enviar formulário: ' + error.message)
+      toast.error('Erro de conexão: Não foi possível enviar o formulário. Tente novamente.')
     } finally {
       setLoading(false)
     }
