@@ -53,7 +53,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
       if (existingLead) {
         await supabaseAdmin.from("lead_activities").insert({
           lead_id: existingLead.id,
-          user_id: "00000000-0000-0000-0000-000000000000", // System marker
+          user_id: "00000000-0000-0000-0000-000000000000", // System marker fixo para atividade automática
           type: "status",
           description: `Novo interesse recebido via Funil. Serviço: ${service.name}. Objetivo: ${data.details?.['objective'] || 'N/A'}`,
           happened_at: new Date().toISOString(),
@@ -121,9 +121,9 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           niche: data.segment,
           status: "novo",
           source: source,
-        owner_id: originatorId || "00000000-0000-0000-0000-000000000000", 
-        notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
-      } as any)
+          owner_id: originatorId, 
+          notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
+        } as any)
         .select("id")
         .single();
 
@@ -149,7 +149,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         // 6. Atividade Inicial
         await supabaseAdmin.from("lead_activities").insert({
           lead_id: newLead.id,
-          user_id: originatorId || "00000000-0000-0000-0000-000000000000",
+          user_id: originatorId || "00000000-0000-0000-0000-000000000000", // Fallback técnico para user_id na atividade se necessário, mas idealmente seria o ID do admin que visualiza
           type: "status",
           description: `Lead criado via formulário público. Origem: ${displaySource}.`,
           happened_at: new Date().toISOString(),
