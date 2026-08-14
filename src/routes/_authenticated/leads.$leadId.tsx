@@ -221,7 +221,7 @@ function LeadDetail() {
               <dd className="text-right">
                 <div className="flex flex-col items-end">
                   {lead.whatsapp && (
-                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" className="text-brand-500 font-medium hover:underline">
+                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-brand-500 font-medium hover:underline">
                       {lead.whatsapp}
                     </a>
                   )}
