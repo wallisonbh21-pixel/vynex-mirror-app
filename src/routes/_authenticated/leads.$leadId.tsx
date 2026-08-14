@@ -289,19 +289,9 @@ function LeadDetail() {
             </div>
 
             {briefing?.dynamicData && Object.entries(briefing.dynamicData).length > 0 ? (
-              Object.entries(briefing.dynamicData).map(([key, value]) => {
+              Object.entries(briefing.dynamicData).map(([key, item]: [string, any]) => {
+                const { label, value } = item;
                 if (!value || (typeof value === 'string' && value.trim() === '')) return null;
-
-                const labelMap: Record<string, string> = {
-                  objective: "Objetivo do projeto",
-                  needs: "Necessidade do cliente",
-                  observations: "Observações adicionais",
-                  references: "Referências (sites/lojas)",
-                  socialMedia: "Redes sociais",
-                  currentWebsite: "Site atual"
-                };
-
-                const label = labelMap[key] || key;
                 const isUrl = typeof value === 'string' && (
                   value.startsWith('http://') || 
                   value.startsWith('https://') || 

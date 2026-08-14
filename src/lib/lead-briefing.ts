@@ -48,7 +48,7 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
       return {
         serviceName,
         needs,
-        dynamicData,
+        dynamicData: normalizedData,
       };
     },
     enabled: !!leadId,

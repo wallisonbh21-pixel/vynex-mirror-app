@@ -11,14 +11,7 @@ export const leadFormSchema = z.object({
   segment: z.string(),
   serviceId: z.string().uuid(),
   referralToken: z.string().optional(),
-  details: z.object({
-    objective: z.string().optional(),
-    needs: z.string().optional(),
-    observations: z.string().optional(),
-    references: z.string().optional(),
-    socialMedia: z.string().optional(),
-    currentWebsite: z.string().optional(),
-  }).optional(),
+  details: z.record(z.string(), z.any()).optional(),
 });
 
 export const submitLeadForm = createServerFn({ method: "POST" })
