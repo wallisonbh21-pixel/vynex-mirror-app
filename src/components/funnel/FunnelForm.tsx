@@ -155,10 +155,12 @@ export function FunnelForm() {
               <Label htmlFor="needs" className="text-white">Conte mais sobre o que você precisa</Label>
               <Textarea 
                 id="needs" 
-                value={formData.details?.needs || ''} 
+                value={formData.details?.['needs'] || ''} 
+
                 onChange={e => setFormData(prev => ({ 
                   ...prev, 
                   details: { ...(prev.details || {}), needs: e.target.value } 
+
                 }))}
                 placeholder="Ex: Tenho uma loja e quero vender pela internet, preciso divulgar meu serviço, quero atrair mais clientes..."
                 className="bg-white/5 border-white/10 min-h-[100px] text-white"
@@ -254,8 +256,9 @@ export function FunnelForm() {
                 <Label htmlFor="objective">Qual o objetivo principal?</Label>
                 <Textarea 
                   id="objective" 
-                  value={formData.details?.objective || ''} 
+                  value={formData.details?.['objective'] || ''} 
                   onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, objective: e.target.value } }))}
+
                   placeholder="O que você espera alcançar com este projeto?"
                   className="bg-white/5 border-white/10 min-h-[100px]"
                 />
@@ -264,8 +267,9 @@ export function FunnelForm() {
                 <Label htmlFor="needs">Principais necessidades ou problemas</Label>
                 <Textarea 
                   id="needs" 
-                  value={formData.details?.needs || ''} 
+                  value={formData.details?.['needs'] || ''} 
                   onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, needs: e.target.value } }))}
+
                   placeholder="Descreva o que não está funcionando hoje ou o que precisa ser construído."
                   className="bg-white/5 border-white/10"
                 />
@@ -274,8 +278,9 @@ export function FunnelForm() {
                 <Label htmlFor="references">Referências visuais ou sites que gosta</Label>
                 <Input 
                   id="references" 
-                  value={formData.details?.references || ''} 
+                  value={formData.details?.['references'] || ''} 
                   onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, references: e.target.value } }))}
+
                   placeholder="Links de sites que você admira"
                   className="bg-white/5 border-white/10"
                 />
@@ -285,8 +290,9 @@ export function FunnelForm() {
                   <Label htmlFor="social">Redes Sociais (Instagram/LinkedIn)</Label>
                   <Input 
                     id="social" 
-                    value={formData.details?.socialMedia || ''} 
+                    value={formData.details?.['socialMedia'] || ''} 
                     onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, socialMedia: e.target.value } }))}
+
                     placeholder="@suaempresa"
                     className="bg-white/5 border-white/10"
                   />
@@ -295,8 +301,9 @@ export function FunnelForm() {
                   <Label htmlFor="current">Site Atual (se houver)</Label>
                   <Input 
                     id="current" 
-                    value={formData.details?.currentWebsite || ''} 
+                    value={formData.details?.['currentWebsite'] || ''} 
                     onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, currentWebsite: e.target.value } }))}
+
                     placeholder="www.suaempresa.com.br"
                     className="bg-white/5 border-white/10"
                   />
