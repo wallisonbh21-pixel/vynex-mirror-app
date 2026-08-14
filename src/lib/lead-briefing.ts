@@ -24,7 +24,7 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
       const briefingJsonMatch = leadNotes?.match(/Dados do Briefing:\s*(\{.*\})/i);
       let dynamicData: Record<string, any> = {};
 
-      if (briefingJsonMatch) {
+      if (briefingJsonMatch && briefingJsonMatch[1]) {
         try {
           dynamicData = JSON.parse(briefingJsonMatch[1]);
         } catch (e) {
