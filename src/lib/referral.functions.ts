@@ -120,7 +120,7 @@ export const getReferralLeads = createServerFn({ method: "GET" })
     if (!attributions || attributions.length === 0) return [];
 
     const leadIds = attributions.map(a => a.lead_id);
-    const responsibleIds = Array.from(new Set(attributions.map(a => a.current_responsible_id).filter(Boolean)));
+    const responsibleIds = Array.from(new Set(attributions.map(a => a.current_responsible_id).filter((id): id is string => !!id)));
 
     const { data: leads } = await supabaseAdmin
       .from("leads")
