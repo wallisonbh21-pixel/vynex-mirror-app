@@ -17,6 +17,8 @@ export const leadFormSchema = z.object({
 export const submitLeadForm = createServerFn({ method: "POST" })
   .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
+    const traceId = `FUNNEL_SUBMIT_${Date.now()}`;
+    console.log(`[TRACE][${traceId}] START`, { serviceId: data.serviceId, email: data.email });
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -29,6 +31,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .select("id, name, is_active")
         .eq("id", data.serviceId)
         .maybeSingle();
+      
+      console.log(`[TRACE][${traceId}] SERVICE_VALIDATED`, { serviceFound: !!service });
 
       if (serviceFetchError) {
         console.error("Erro ao buscar serviço:", serviceFetchError);
@@ -103,6 +107,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           throw new Error("O link de indicação utilizado é inválido.");
         }
       }
+      
+      console.log(`[TRACE][${traceId}] REFERRAL_VALIDATED`, { source, originatorId });
 
       // 4. Criar Lead
       // Sem vendedor artificial. owner_id será o originador ou NULL (se o banco permitir NULL)
@@ -126,6 +132,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         } as any)
         .select("id")
         .single();
+      
+      console.log(`[TRACE][${traceId}] LEAD_INSERTED`, { leadId: newLead?.id, error: leadError });
 
       if (leadError) {
         console.error("Erro ao criar lead:", leadError);
@@ -145,6 +153,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           console.error("Erro ao criar atribuição:", attrError);
           // Não lançamos erro aqui para não perder o lead já criado, mas logamos
         }
+        
+        console.log(`[TRACE][${traceId}] ATTRIBUTION_INSERTED`);
 
         // 6. Atividade Inicial
         await supabaseAdmin.from("lead_activities").insert({
@@ -154,9 +164,13 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           description: `Lead criado via formulário público. Origem: ${displaySource}.`,
           happened_at: new Date().toISOString(),
         } as any);
+        }
+        console.log(`[TRACE][${traceId}] ACTIVITY_INSERTED`);
       }
-
-      return { success: true, message: "Lead criado com sucesso.", isNew: true };
+      
+      const response = { success: true, message: "Lead criado com sucesso.", isNew: true };
+      console.log(`[TRACE][${traceId}] RESPONSE_CREATED`, response);
+      return response;
 
     } catch (error: any) {
       console.error("Erro no processamento do Funil:", error);
