@@ -14,6 +14,8 @@ export const leadFormSchema = z.object({
   details: z.record(z.string(), z.any()).optional(),
 });
 
+const DEFAULT_ADMIN_ID = "ce4c32ee-583a-456c-8f0b-a516188d196b";
+
 export const submitLeadForm = createServerFn({ method: "POST" })
   .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
@@ -29,6 +31,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .select("id, name, is_active")
         .eq("id", data.serviceId)
         .maybeSingle();
+      
+      
 
       if (serviceFetchError) {
         console.error("Erro ao buscar serviço:", serviceFetchError);
@@ -53,13 +57,15 @@ export const submitLeadForm = createServerFn({ method: "POST" })
       if (existingLead) {
         await supabaseAdmin.from("lead_activities").insert({
           lead_id: existingLead.id,
-          user_id: "00000000-0000-0000-0000-000000000000", // System marker fixo para atividade automática
+          user_id: "00000000-0000-0000-0000-000000000000",
           type: "status",
           description: `Novo interesse recebido via Funil. Serviço: ${service.name}. Objetivo: ${data.details?.['objective'] || 'N/A'}`,
           happened_at: new Date().toISOString(),
         } as any);
 
-        return { success: true, message: "Interesse registrado com sucesso.", isNew: false };
+        const dupResponse = { success: true, message: "Interesse registrado com sucesso.", isNew: false };
+        
+        return dupResponse;
       }
 
       // 3. Processar Referral Token
@@ -90,8 +96,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           if (tokenData.is_institutional) {
             source = "indicacao_institucional";
             displaySource = "ScaleNexus / Institucional";
-            // Originador institucional = admin ou nulo dependendo da config, 
-            // mas usaremos o owner_id do token se existir, ou NULL conforme regra
             originatorId = tokenData.seller_id; 
           } else {
             source = "indicacao";
@@ -99,21 +103,21 @@ export const submitLeadForm = createServerFn({ method: "POST" })
             originatorId = tokenData.seller_id;
           }
         } else {
-          // Token informado mas não encontrado
           throw new Error("O link de indicação utilizado é inválido.");
         }
       }
+      
+      
 
       // 4. Criar Lead
-      // Sem vendedor artificial. owner_id será o originador ou NULL (se o banco permitir NULL)
-      // Se owner_id for obrigatório, precisamos de um fallback real, mas a regra pede NULL se institucional/direto.
-      // Vou verificar se owner_id aceita NULL. No types.ts diz owner_id: string. 
-      // Se for obrigatório, usarei um admin real ou deixarei estourar para ajustarmos o schema.
       const { data: newLead, error: leadError } = await supabaseAdmin
         .from("leads")
         .insert({
           name: data.name,
           company: data.company || null,
+          estimated_value: 0,
+          closed_value: 0,
+
           email: email,
           whatsapp: whatsapp,
           city: data.city,
@@ -121,11 +125,13 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           niche: data.segment,
           status: "novo",
           source: source,
-          owner_id: originatorId, 
+          owner_id: originatorId || DEFAULT_ADMIN_ID, 
           notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
         } as any)
         .select("id")
         .single();
+      
+      
 
       if (leadError) {
         console.error("Erro ao criar lead:", leadError);
@@ -137,26 +143,31 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
           lead_id: newLead.id,
           originator_id: originatorId, 
-          current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : null,
+          current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : DEFAULT_ADMIN_ID,
           referral_token_id: referralTokenId,
         } as any);
 
         if (attrError) {
           console.error("Erro ao criar atribuição:", attrError);
-          // Não lançamos erro aqui para não perder o lead já criado, mas logamos
         }
+        
+        
 
         // 6. Atividade Inicial
         await supabaseAdmin.from("lead_activities").insert({
           lead_id: newLead.id,
-          user_id: originatorId || "00000000-0000-0000-0000-000000000000", // Fallback técnico para user_id na atividade se necessário, mas idealmente seria o ID do admin que visualiza
+          user_id: originatorId || DEFAULT_ADMIN_ID,
           type: "status",
           description: `Lead criado via formulário público. Origem: ${displaySource}.`,
           happened_at: new Date().toISOString(),
         } as any);
+        
+        
       }
-
-      return { success: true, message: "Lead criado com sucesso.", isNew: true };
+      
+      const response = { success: true, message: "Lead criado com sucesso.", isNew: true };
+      
+      return response;
 
     } catch (error: any) {
       console.error("Erro no processamento do Funil:", error);
