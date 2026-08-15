@@ -227,28 +227,28 @@ export type Database = {
       lead_attribution: {
         Row: {
           attributed_at: string
-          current_responsible_id: string
+          current_responsible_id: string | null
           id: string
           lead_id: string
-          originator_id: string
+          originator_id: string | null
           referral_token_id: string | null
           updated_at: string
         }
         Insert: {
           attributed_at?: string
-          current_responsible_id: string
+          current_responsible_id?: string | null
           id?: string
           lead_id: string
-          originator_id: string
+          originator_id?: string | null
           referral_token_id?: string | null
           updated_at?: string
         }
         Update: {
           attributed_at?: string
-          current_responsible_id?: string
+          current_responsible_id?: string | null
           id?: string
           lead_id?: string
-          originator_id?: string
+          originator_id?: string | null
           referral_token_id?: string | null
           updated_at?: string
         }
