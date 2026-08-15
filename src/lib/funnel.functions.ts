@@ -137,7 +137,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
           lead_id: newLead.id,
           originator_id: originatorId, 
-          current_responsible_id: source === "indicacao" ? originatorId : null,
+          current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : null,
           referral_token_id: referralTokenId,
         } as any);
 
