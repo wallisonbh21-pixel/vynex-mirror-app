@@ -274,27 +274,27 @@ export type Database = {
           address: string | null
           city: string | null
           closed_at: string | null
-          closed_value: number
+          closed_value: number | null
           company: string | null
-          created_at: string
+          created_at: string | null
           email: string | null
-          estimated_value: number
+          estimated_value: number | null
           google_maps_url: string | null
           id: string
           instagram: string | null
           lat: number | null
           lon: number | null
-          name: string
+          name: string | null
           next_contact_at: string | null
           niche: string | null
           notes: string | null
-          owner_id: string
+          owner_id: string | null
           phone: string | null
           source: string | null
           state: string | null
-          status: string
+          status: string | null
           trade_name: string | null
-          updated_at: string
+          updated_at: string | null
           website: string | null
           whatsapp: string | null
         }
@@ -302,27 +302,27 @@ export type Database = {
           address?: string | null
           city?: string | null
           closed_at?: string | null
-          closed_value?: number
+          closed_value?: number | null
           company?: string | null
-          created_at?: string
+          created_at?: string | null
           email?: string | null
-          estimated_value?: number
+          estimated_value?: number | null
           google_maps_url?: string | null
           id?: string
           instagram?: string | null
           lat?: number | null
           lon?: number | null
-          name: string
+          name?: string | null
           next_contact_at?: string | null
           niche?: string | null
           notes?: string | null
-          owner_id: string
+          owner_id?: string | null
           phone?: string | null
           source?: string | null
           state?: string | null
-          status?: string
+          status?: string | null
           trade_name?: string | null
-          updated_at?: string
+          updated_at?: string | null
           website?: string | null
           whatsapp?: string | null
         }
@@ -330,27 +330,27 @@ export type Database = {
           address?: string | null
           city?: string | null
           closed_at?: string | null
-          closed_value?: number
+          closed_value?: number | null
           company?: string | null
-          created_at?: string
+          created_at?: string | null
           email?: string | null
-          estimated_value?: number
+          estimated_value?: number | null
           google_maps_url?: string | null
           id?: string
           instagram?: string | null
           lat?: number | null
           lon?: number | null
-          name?: string
+          name?: string | null
           next_contact_at?: string | null
           niche?: string | null
           notes?: string | null
-          owner_id?: string
+          owner_id?: string | null
           phone?: string | null
           source?: string | null
           state?: string | null
-          status?: string
+          status?: string | null
           trade_name?: string | null
-          updated_at?: string
+          updated_at?: string | null
           website?: string | null
           whatsapp?: string | null
         }
