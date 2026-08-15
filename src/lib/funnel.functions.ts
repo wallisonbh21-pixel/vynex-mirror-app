@@ -19,8 +19,6 @@ const DEFAULT_ADMIN_ID = "ce4c32ee-583a-456c-8f0b-a516188d196b";
 export const submitLeadForm = createServerFn({ method: "POST" })
   .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
-    const traceId = `FUNNEL_SUBMIT_${Date.now()}`;
-    console.log(`[TRACE][${traceId}] START`, { serviceId: data.serviceId, email: data.email });
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -34,7 +32,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .eq("id", data.serviceId)
         .maybeSingle();
       
-      console.log(`[TRACE][${traceId}] SERVICE_VALIDATED`, { serviceFound: !!service });
+      
 
       if (serviceFetchError) {
         console.error("Erro ao buscar serviço:", serviceFetchError);
@@ -66,7 +64,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         } as any);
 
         const dupResponse = { success: true, message: "Interesse registrado com sucesso.", isNew: false };
-        console.log(`[TRACE][${traceId}] RESPONSE_CREATED_EXISTING`, dupResponse);
+        
         return dupResponse;
       }
 
@@ -109,7 +107,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         }
       }
       
-      console.log(`[TRACE][${traceId}] REFERRAL_VALIDATED`, { source, originatorId });
+      
 
       // 4. Criar Lead
       const { data: newLead, error: leadError } = await supabaseAdmin
@@ -133,7 +131,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .select("id")
         .single();
       
-      console.log(`[TRACE][${traceId}] LEAD_INSERTED`, { leadId: newLead?.id, error: leadError });
+      
 
       if (leadError) {
         console.error("Erro ao criar lead:", leadError);
@@ -153,7 +151,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           console.error("Erro ao criar atribuição:", attrError);
         }
         
-        console.log(`[TRACE][${traceId}] ATTRIBUTION_INSERTED`);
+        
 
         // 6. Atividade Inicial
         await supabaseAdmin.from("lead_activities").insert({
@@ -164,11 +162,11 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           happened_at: new Date().toISOString(),
         } as any);
         
-        console.log(`[TRACE][${traceId}] ACTIVITY_INSERTED`);
+        
       }
       
       const response = { success: true, message: "Lead criado com sucesso.", isNew: true };
-      console.log(`[TRACE][${traceId}] RESPONSE_CREATED`, response);
+      
       return response;
 
     } catch (error: any) {
