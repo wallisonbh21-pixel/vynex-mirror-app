@@ -83,6 +83,7 @@ export function FunnelForm() {
       if (result.success) {
         setStep('success')
         localStorage.removeItem('sn_referral_token')
+        localStorage.removeItem('sn_referral_active_session')
       } else {
         toast.error(result.message)
       }

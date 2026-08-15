@@ -8,8 +8,9 @@ export const Route = createFileRoute('/comece-seu-projeto/ref/$token')({
 
     useEffect(() => {
       if (token) {
-        // Armazena o token de indicação para uso posterior no formulário
+        // Marca que esta é uma jornada iniciada por indicação
         localStorage.setItem('sn_referral_token', token)
+        localStorage.setItem('sn_referral_active_session', 'true')
       }
       // Redireciona para o formulário principal
       navigate({ to: '/comece-seu-projeto' })
