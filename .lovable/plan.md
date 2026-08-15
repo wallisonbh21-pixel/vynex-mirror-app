@@ -5,13 +5,16 @@ O diagnóstico confirmou que o `referralToken` está sendo perdido durante a nav
 ## O que vamos mudar
 
 ### 1. Backend (Segurança e Atribuição)
-- Refatorar `submitLeadForm` em `src/lib/funnel.functions.ts` para garantir que o `originatorId` seja extraído corretamente do token.
-- Garantir que `owner_id` e `current_responsible_id` sejam definidos como o vendedor dono do token, sem fallbacks artificiais.
+- Refatorar `submitLeadForm` em `src/lib/funnel.functions.ts` para garantir que o `originatorId` seja extraído e validado novamente no servidor.
+- Garantir que `owner_id` e `current_responsible_id` sejam definidos como o vendedor dono do token.
+- **Validação Estrita:** Se o token for institucional, `current_responsible_id` deve ser `NULL` e a origem deve ser "Institucional". Se não houver token, origem deve ser "Direto".
 
-### 2. Frontend (Persistência e UX)
-- **Captura e Validação:** A rota `/comece-seu-projeto/ref/$token` validará o token antes de armazená-lo.
-- **Persistência Híbrida:** Utilizaremos `localStorage` para persistência entre sessões/refresh, mas o estado do componente `FunnelForm` será a fonte primária durante o preenchimento.
-- **Proteção contra Overwrite:** Implementar lógica para evitar que um acesso direto limpe um token válido já armazenado, mas permitir a substituição se um novo link de indicação for acessado.
+### 2. Frontend (Persistência da Jornada Atual)
+- **Captura e Validação:** A rota `/comece-seu-projeto/ref/$token` validará o token e iniciará uma "Sessão de Indicação".
+- **Isolamento de Jornada:** O token será armazenado com um marcador de tempo ou flag de "jornada ativa".
+- **Acesso Direto Limpa Token Antigo:** Se o usuário entrar diretamente em `/comece-seu-projeto` (sem vir de um redirect `/ref/$token`), qualquer token de indicação antigo no `localStorage` será **limpo** imediatamente para garantir a origem "Direto".
+- **Persistência Temporária:** O token persistirá apenas para permitir refresh e navegação entre etapas da jornada atual.
+- **Limpeza Pós-Sucesso:** O token será removido do `localStorage` assim que o formulário for enviado com sucesso.
 
 ### 3. Fluxo de Navegação
 - Garantir que o token seja injetado no payload final do `submitLeadForm` independentemente de refresh ou troca de etapas.
@@ -28,14 +31,11 @@ O diagnóstico confirmou que o `referralToken` está sendo perdido durante a nav
     - Se `referralToken` presente e válido -> Origem "Indicação", Responsável = Vendedor.
     - Se `referralToken` ausente -> Origem "Direto" ou "Institucional", Responsável = NULL.
 
-## Validação
+## Validação e Casos de Teste
 
-1.  Simulação de acesso via link `/ref/c43f90bc8934`.
-2.  Navegação completa pelas 3 etapas com refresh na etapa de contato.
-3.  Submissão do formulário.
-4.  Verificação no banco de dados:
-    - `leads.owner_id` deve ser o UUID do vendedor.
-    - `lead_attribution.originator_id` deve ser o UUID do vendedor.
-    - `lead_attribution.referral_token_id` deve estar preenchido.
+1.  **TESTE A (Fluxo Feliz):** Acesso via `/ref/c43f90bc8934` -> Refresh -> Envio -> Originador/Responsável = Vendedor A.
+2.  **TESTE B (Proteção de Acesso Direto):** Acesso via `/ref/A` -> Fecha aba -> Acesso direto `/comece-seu-projeto` -> Envio -> Origem = "Direto", Responsável = NULL.
+3.  **TESTE C (Substituição de Token):** Acesso via `/ref/A` -> Sem fechar, acesso via `/ref/B` -> Envio -> Lead atribuído a B.
+4.  **TESTE D (Institucional):** Acesso via link institucional -> Origem = "Institucional", Responsável = NULL, `referral_token_id` preservado.
 
-ATA#006 — PLANO DE CORREÇÃO DO REFERRAL TOKEN — AGUARDANDO APROVAÇÃO.
+ATA#006 — PLANO DE CORREÇÃO DO REFERRAL TOKEN AJUSTADO — AGUARDANDO APROVAÇÃO.
