@@ -117,6 +117,9 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .insert({
           name: data.name,
           company: data.company || null,
+          estimated_value: 0,
+          closed_value: 0,
+
           email: email,
           whatsapp: whatsapp,
           city: data.city,
