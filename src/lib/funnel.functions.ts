@@ -14,6 +14,8 @@ export const leadFormSchema = z.object({
   details: z.record(z.string(), z.any()).optional(),
 });
 
+const DEFAULT_ADMIN_ID = "ce4c32ee-583a-456c-8f0b-a516188d196b";
+
 export const submitLeadForm = createServerFn({ method: "POST" })
   .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
@@ -122,7 +124,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           niche: data.segment,
           status: "novo",
           source: source,
-          owner_id: originatorId, 
+          owner_id: originatorId || DEFAULT_ADMIN_ID, 
           notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
         } as any)
         .select("id")
@@ -140,7 +142,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
           lead_id: newLead.id,
           originator_id: originatorId, 
-          current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : null,
+          current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : DEFAULT_ADMIN_ID,
           referral_token_id: referralTokenId,
         } as any);
 
@@ -153,7 +155,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         // 6. Atividade Inicial
         await supabaseAdmin.from("lead_activities").insert({
           lead_id: newLead.id,
-          user_id: originatorId || "00000000-0000-0000-0000-000000000000",
+          user_id: originatorId || DEFAULT_ADMIN_ID,
           type: "status",
           description: `Lead criado via formulário público. Origem: ${displaySource}.`,
           happened_at: new Date().toISOString(),
