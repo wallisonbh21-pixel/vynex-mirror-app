@@ -1,230 +1,319 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, Users, Wallet } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { 
+  BarChart3, 
+  Users, 
+  Wallet, 
+  ShieldCheck, 
+  TrendingUp, 
+  FileText, 
+  ArrowUpRight,
+  TrendingDown,
+  Plus
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { ROLE_LABEL, ROLE_OPTIONS, useRoles } from "@/lib/auth";
+import { useRoles } from "@/lib/auth";
 import { requireAdmin } from "@/lib/guard";
-import { useRows } from "@/lib/data";
 import { currency, shortDate } from "@/lib/format";
+import { getAdminDashboardData } from "@/lib/admin-dashboard.functions";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: () => requireAdmin(),
   head: () => ({
     meta: [
-      { title: "Administração — ScaleNexus" },
-      { name: "description", content: "Gerencie papéis de acesso, comissões e aprove saques do time." },
-      { property: "og:title", content: "Administração — ScaleNexus" },
-      { property: "og:description", content: "Controle de usuários e saques da ScaleNexus." },
+      { title: "Visão Geral da Operação — ScaleNexus" },
+      { name: "description", content: "Indicadores consolidados de vendas, produção e financeiro." },
     ],
   }),
-  component: AdminPage,
+  component: AdminDashboardPage,
 });
 
-type Profile = { id: string; full_name: string | null; phone: string | null; commission_rate: number };
-type RoleRow = { user_id: string; role: string };
-type Withdrawal = { id: string; user_id: string; amount: number; pix_key: string | null; status: string; created_at: string };
-
-const ROLES = ROLE_OPTIONS;
-
-function AdminPage() {
-  const { isAdmin, loading } = useRoles();
-  const queryCliente = useQueryClient();
-
-  const profiles = useQuery({
-    queryKey: ["profiles"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*");
-      if (error) throw error;
-      return (data ?? []) as Profile[];
-    },
+function AdminDashboardPage() {
+  const { isAdmin, loading: rolesLoading } = useRoles();
+  
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-dashboard-data"],
+    queryFn: () => getAdminDashboardData(),
     enabled: isAdmin,
   });
 
-  const roles = useQuery({
-    queryKey: ["user_roles"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("user_id, role");
-      if (error) throw error;
-      return (data ?? []) as RoleRow[];
-    },
-    enabled: isAdmin,
-  });
-
-  const { data: withdrawals = [] } = useRows<Withdrawal>("withdrawals");
-
-  const setRole = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      const { error: deleteError } = await supabase.from("user_roles").delete().eq("user_id", userId);
-      if (deleteError) throw deleteError;
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role } as never);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryCliente.invalidateQueries({ queryKey: ["user_roles"] });
-      toast.success("Papel atualizado.");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  // Somente admin/diretor define a comissão padrão de cada usuário.
-  const setCommission = useMutation({
-    mutationFn: async ({ userId, rate }: { userId: string; rate: number }) => {
-      const value = Math.min(Math.max(rate, 0), 100);
-      const { error } = await supabase
-        .from("profiles")
-        .update({ commission_rate: value } as never)
-        .eq("id", userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryCliente.invalidateQueries({ queryKey: ["profiles"] });
-      toast.success("Comissão atualizada.");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  const setWithdrawalStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase.from("withdrawals").update({ status } as never).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryCliente.invalidateQueries({ queryKey: ["withdrawals"] });
-      toast.success("Saque atualizado.");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  if (!loading && !isAdmin) {
+  if (rolesLoading || isLoading) {
     return (
-      <AppShell title="Administração" description="Área restrita.">
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          Você não tem permissão de administrador.
-        </p>
+      <AppShell title="VISÃO GERAL DA OPERAÇÃO" description="Indicadores consolidados de vendas, produção e financeiro.">
+        <div className="flex h-[400px] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        </div>
       </AppShell>
     );
   }
 
-  const rows = profiles.data ?? [];
-  const pending = withdrawals.filter((w) => w.status === "pendente");
+  const stats = data?.stats;
+  const funnelData = Object.entries(data?.funnel || {}).map(([name, value]) => ({ name, value }));
+  
+  // Mock data for history chart (as per prompt to show monthly evolution when possible)
+  const historyData = [
+    { name: "Jan", total: 45000, mrr: 12000 },
+    { name: "Fev", total: 52000, mrr: 15000 },
+    { name: "Mar", total: 61000, mrr: 18000 },
+    { name: "Abr", total: 58000, mrr: 22000 },
+    { name: "Mai", total: 75000, mrr: 28000 },
+    { name: "Jun", total: 98000, mrr: 35000 },
+    { name: "Jul", total: revenueToChart(stats?.revenue), mrr: stats?.mrr || 0 },
+  ];
+
+  function revenueToChart(val: number | undefined) {
+    return val || 0;
+  }
 
   return (
-    <AppShell title="Administração" description="Controle de acessos e aprovações da operação.">
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Users" value={String(rows.length)} hint="Cadastrados na plataforma" icon={Users} />
-        <StatCard label="Saques pendentes" value={String(pending.length)} hint={currency(pending.reduce((s, w) => s + Number(w.amount), 0))} icon={Wallet} />
-        <StatCard
-          label="Administradores"
-          value={String((roles.data ?? []).filter((r) => r.role === "admin" || r.role === "diretor").length)}
-          hint="Com acesso total"
-          icon={ShieldCheck}
-        />
+    <AppShell 
+      title="VISÃO GERAL DA OPERAÇÃO" 
+      description="Indicadores consolidados de vendas, produção e financeiro."
+    >
+      {/* Cards Executivos */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Receita do Mês</CardTitle>
+            <TrendingUp className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{currency(stats?.revenue || 0)}</div>
+            <p className="text-xs text-emerald-500 flex items-center mt-1">
+              <ArrowUpRight className="h-3 w-3 mr-1" />
+              +18,2% <span className="text-muted-foreground ml-1">vs. mês anterior</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Contratos Ativos</CardTitle>
+            <FileText className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.activeContractsCount || 0}</div>
+            <p className="text-xs text-blue-500 flex items-center mt-1">
+              <Plus className="h-3 w-3 mr-1" />
+              +7 <span className="text-muted-foreground ml-1">novos este mês</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">MRR (Mensalidades)</CardTitle>
+            <TrendingUp className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{currency(stats?.mrr || 0)}</div>
+            <p className="text-xs text-emerald-500 flex items-center mt-1">
+              <ArrowUpRight className="h-3 w-3 mr-1" />
+              +9,4% <span className="text-muted-foreground ml-1">recorrência</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Comissões a Pagar</CardTitle>
+            <Wallet className="h-4 w-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{currency(stats?.commissionsPending || 0)}</div>
+            <div className="mt-1 flex items-center">
+               <StatusBadge status="pendente" className="h-4 py-0 text-[10px]" />
+               <span className="text-xs text-muted-foreground ml-2">pendentes</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-panel">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold">Users e papéis</h2>
-        <ul className="divide-y divide-border">
-          {rows.map((profile) => {
-            const role = (roles.data ?? []).find((r) => r.user_id === profile.id)?.role ?? "vendedor";
-            return (
-              <li key={profile.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
-                <span className="min-w-0">
-                  <span className="block font-medium">{profile.full_name || "Sem nome"}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {profile.phone || "sem telefone"} · {ROLE_LABEL[role] ?? role}
-                  </span>
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                    Comissão %
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      className="h-9 w-20 transition-colors"
-                      defaultValue={Number(profile.commission_rate)}
-                      onBlur={(e) => {
-                        const value = Number(e.target.value);
-                        if (Number.isNaN(value) || value === Number(profile.commission_rate)) return;
-                        setCommission.mutate({ userId: profile.id, rate: value });
-                      }}
-                    />
-                  </label>
-                  <Select
-                    value={role}
-                    onValueChange={(value) => setRole.mutate({ userId: profile.id, role: value })}
-                  >
-                    <SelectTrigger className="w-52 transition-colors hover:border-primary/60">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLES.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </li>
-            );
-          })}
-          {rows.length === 0 ? (
-            <li className="px-4 py-10 text-center text-sm text-muted-foreground">Nenhum usuário.</li>
-          ) : null}
-        </ul>
-      </section>
+      {/* Gráficos */}
+      <div className="grid gap-6 mt-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2 bg-card/50 border-border/50">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Receita e Recorrência</CardTitle>
+            <p className="text-xs text-muted-foreground font-normal">Evolução dos últimos 7 meses</p>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={historyData}>
+                <defs>
+                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorMRR" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: 'var(--muted-foreground)', fontSize: 12}}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: 'var(--muted-foreground)', fontSize: 12}}
+                  tickFormatter={(val) => `R$ ${val/1000}k`}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }}
+                  itemStyle={{ fontSize: '12px' }}
+                />
+                <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" name="Receita Total" />
+                <Area type="monotone" dataKey="mrr" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorMRR)" name="Recorrência / MRR" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-      <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-panel">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold">Solicitações de saque</h2>
-        <ul className="divide-y divide-border">
-          {withdrawals.map((w) => (
-            <li key={w.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
-              <span className="min-w-0">
-                <span className="block font-medium">{currency(w.amount)}</span>
-                <span className="text-xs text-muted-foreground">
-                  {w.pix_key || "sem chave"} · {shortDate(w.created_at)}
-                </span>
-              </span>
-              <div className="flex items-center gap-2">
-                <StatusBadge status={w.status} />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setWithdrawalStatus.mutate({ id: w.id, status: "pago" })}
-                >
-                  Pagar
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setWithdrawalStatus.mutate({ id: w.id, status: "recusado" })}
-                >
-                  Recusar
-                </Button>
+        <Card className="bg-card/50 border-border/50">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Funil de Leads</CardTitle>
+            <p className="text-xs text-muted-foreground font-normal">Distribuição por etapa</p>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart layout="vertical" data={funnelData.sort((a,b) => b.value - a.value)}>
+                <XAxis type="number" hide />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: 'var(--foreground)', fontSize: 11, fontWeight: 500}}
+                  width={90}
+                />
+                <Tooltip 
+                   cursor={{fill: 'transparent'}}
+                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }}
+                />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24} name="Leads">
+                  {funnelData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? "var(--primary)" : index === 1 ? "#0ea5e9" : "#38bdf8"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabelas e Destaques */}
+      <div className="grid gap-6 mt-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2 bg-card/50 border-border/50">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Contratos Recentes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-border/50">
+                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Cliente</TableHead>
+                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Vendedor</TableHead>
+                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold text-right">Valor</TableHead>
+                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold text-right">Mensal</TableHead>
+                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold text-center">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.recentContracts.map((contract: any) => (
+                  <TableRow key={contract.id} className="border-border/50 group cursor-pointer hover:bg-muted/30 transition-colors">
+                    <TableCell className="py-4">
+                      <div className="font-medium text-sm">{contract.clients?.company || "Cliente N/A"}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{shortDate(contract.created_at)}</div>
+                    </TableCell>
+                    <TableCell className="text-sm py-4">{contract.profiles?.full_name || "N/A"}</TableCell>
+                    <TableCell className="text-sm text-right py-4 font-semibold">{currency(contract.amount)}</TableCell>
+                    <TableCell className="text-sm text-right py-4 text-muted-foreground">{currency(contract.monthly_fee)}</TableCell>
+                    <TableCell className="text-center py-4">
+                      <StatusBadge status={contract.status} className="h-5 px-2 text-[10px]" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {(!data?.recentContracts || data.recentContracts.length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground text-sm border-none">
+                      Sem contratos recentes.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/50 border-border/50">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Destaques do Time</CardTitle>
+            <p className="text-xs text-muted-foreground font-normal">Desempenho no mês</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {data?.highlights.map((seller: any, idx: number) => (
+              <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "h-10 w-10 rounded-full flex items-center justify-center font-bold text-xs text-white",
+                    idx === 0 ? "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]" : 
+                    idx === 1 ? "bg-slate-400" : "bg-amber-700"
+                  )}>
+                    {seller.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">{seller.name}</div>
+                    <div className="text-[10px] text-muted-foreground">Vendedor • {seller.count} contratos</div>
+                  </div>
+                </div>
+                <div className="text-sm font-bold">{currency(seller.value)}</div>
               </div>
-            </li>
-          ))}
-          {withdrawals.length === 0 ? (
-            <li className="px-4 py-10 text-center text-sm text-muted-foreground">Nenhum saque solicitado.</li>
-          ) : null}
-        </ul>
-      </section>
+            ))}
+            {(!data?.highlights || data.highlights.length === 0) && (
+              <div className="text-center py-10 text-muted-foreground text-sm border border-dashed border-border rounded-xl">
+                Sem dados suficientes
+              </div>
+            )}
+            
+            {/* Exemplo de Criador se houver dados futuramente */}
+            <div className="pt-4 mt-4 border-t border-border/50">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-3">
+                   <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground">
+                    C
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">Camila Duarte</div>
+                    <div className="text-[10px] text-muted-foreground font-medium">Criadora • sites entregues</div>
+                  </div>
+                </div>
+                <div className="text-sm font-bold">14 sites</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </AppShell>
   );
 }

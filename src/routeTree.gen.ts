@@ -41,6 +41,9 @@ import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recu
 import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes'
+import { Route as AuthenticatedAdminSaquesRouteImport } from './routes/_authenticated/admin/saques'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
 import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
@@ -230,6 +233,24 @@ const AuthenticatedAdminClientesLoginRoute =
     path: '/clientes-login',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminConfiguracoesRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSaquesRoute =
+  AuthenticatedAdminSaquesRouteImport.update({
+    id: '/saques',
+    path: '/saques',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedBriefingProjectIdRoute =
   AuthenticatedBriefingProjectIdRouteImport.update({
     id: '/briefing/$projectId',
@@ -399,6 +420,9 @@ export interface FileRoutesByFullPath {
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/saques': typeof AuthenticatedAdminSaquesRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -454,6 +478,9 @@ export interface FileRoutesByTo {
   '/comece-seu-projeto': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/saques': typeof AuthenticatedAdminSaquesRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -512,6 +539,9 @@ export interface FileRoutesById {
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
+  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/saques': typeof AuthenticatedAdminSaquesRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
   '/_authenticated/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
@@ -570,6 +600,9 @@ export interface FileRouteTypes {
     | '/comece-seu-projeto/'
     | '/admin/clientes'
     | '/admin/clientes-login'
+    | '/admin/configuracoes'
+    | '/admin/saques'
+    | '/admin/usuarios'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
@@ -625,6 +658,9 @@ export interface FileRouteTypes {
     | '/comece-seu-projeto'
     | '/admin/clientes'
     | '/admin/clientes-login'
+    | '/admin/configuracoes'
+    | '/admin/saques'
+    | '/admin/usuarios'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
     | '/cliente/documentos'
@@ -682,6 +718,9 @@ export interface FileRouteTypes {
     | '/comece-seu-projeto/'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/clientes-login'
+    | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/saques'
+    | '/_authenticated/admin/usuarios'
     | '/_authenticated/briefing/$projectId'
     | '/_authenticated/cliente/aprovacoes'
     | '/_authenticated/cliente/documentos'
@@ -947,6 +986,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesLoginRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/saques': {
+      id: '/_authenticated/admin/saques'
+      path: '/saques'
+      fullPath: '/admin/saques'
+      preLoaderRoute: typeof AuthenticatedAdminSaquesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/briefing/$projectId': {
       id: '/_authenticated/briefing/$projectId'
       path: '/briefing/$projectId'
@@ -1150,11 +1210,17 @@ const AuthenticatedClienteRouteRouteWithChildren =
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminClientesLoginRoute: typeof AuthenticatedAdminClientesLoginRoute
+  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminSaquesRoute: typeof AuthenticatedAdminSaquesRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminClientesLoginRoute: AuthenticatedAdminClientesLoginRoute,
+  AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminSaquesRoute: AuthenticatedAdminSaquesRoute,
+  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
