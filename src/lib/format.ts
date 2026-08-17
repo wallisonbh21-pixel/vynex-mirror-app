@@ -32,7 +32,7 @@ export const PROJECT_STATUS = [
 ] as const;
 export type ProjectStatus = (typeof PROJECT_STATUS)[number];
 
-export const getProjetoProgress = (status: string): number => {
+export const getProjectProgress = (status: string): number => {
   const progressMap: Record<string, number> = {
     disponivel: 10,
     briefing: 20,
@@ -47,7 +47,7 @@ export const getProjetoProgress = (status: string): number => {
   return progressMap[status] ?? 0;
 };
 
-export const getProjetoNextStep = (status: string): string => {
+export const getProjectNextStep = (status: string): string => {
   const nextStepMap: Record<string, string> = {
     disponivel: "Iniciando a fase de briefing.",
     briefing: "Coletando informações para o seu site.",
