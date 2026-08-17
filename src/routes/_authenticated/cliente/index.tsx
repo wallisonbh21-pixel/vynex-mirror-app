@@ -26,7 +26,7 @@ import {
   Activity
 } from "lucide-react";
 import { ProjectProgression } from "@/components/ProjectProgression";
-import { PROJECT_STATUS, getProjetoProgress, getProjetoNextStep, label } from "@/lib/format";
+import { PROJECT_STATUS, getProjectProgress, getProjectNextStep, label } from "@/lib/format";
 import { useNotifications } from "@/lib/notifications";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -169,19 +169,19 @@ function ClienteDashboard() {
                   </div>
                   <div className="p-4 rounded-xl bg-background/40 border border-border/50">
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">PRÓXIMA ETAPA</p>
-                    <p className="font-medium text-primary">{getProjetoNextStep(activeProjeto.status)}</p>
+                    <p className="font-medium text-primary">{getProjectNextStep(activeProjeto.status)}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">PROGRESSO</p>
-                    <p className="text-2xl font-black text-primary">{getProjetoProgress(activeProjeto.status)}%</p>
+                    <p className="text-2xl font-black text-primary">{getProjectProgress(activeProjeto.status)}%</p>
                   </div>
                   <div className="h-4 w-full bg-secondary/50 rounded-full overflow-hidden border border-border/20">
                     <div 
                       className="h-full bg-gradient-to-r from-primary/80 to-primary shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out"
-                      style={{ width: `${getProjetoProgress(activeProjeto.status)}%` }}
+                      style={{ width: `${getProjectProgress(activeProjeto.status)}%` }}
                     />
                   </div>
                 </div>
@@ -292,7 +292,7 @@ function ClienteDashboard() {
         {/* RESUMO EM CARDS COMPACTOS */}
         {activeProjeto && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard label="PROGRESSO" value={`${getProjetoProgress(activeProjeto.status)}%`} icon={<Activity size={14} />} />
+            <StatCard label="PROGRESSO" value={`${getProjectProgress(activeProjeto.status)}%`} icon={<Activity size={14} />} />
             <StatCard 
               label="MENSAGENS" 
               value={unreadMessages > 0 ? `${unreadMessages} novas` : "Nenhuma nova"} 

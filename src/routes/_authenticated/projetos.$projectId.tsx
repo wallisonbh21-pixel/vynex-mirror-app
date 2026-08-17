@@ -37,7 +37,7 @@ import { useMyCreatorProjetos, useProjetoChecklist, useProjetoNotes, useUpdateCr
 import { useApprovalEvents } from "@/lib/approval";
 import { getBriefing } from "@/lib/briefing";
 import { useQuery } from "@tanstack/react-query";
-import { buildProjetoContext, generateIntelligence } from "@/lib/ai-core";
+import { buildProjectContext, generateIntelligence } from "@/lib/ai-core";
 import { AICorePanel } from "@/components/AICorePanel";
 import { getSitePlan } from "@/lib/planner";
 import { useStudioData } from "@/lib/studio/hooks";
@@ -78,7 +78,7 @@ function DetalhesProjetoPage() {
   const { data: studioData } = useStudioData(projectId);
 
   const intelligence = useMemo(() => {
-    const context = buildProjetoContext(projectId, savedBriefing || null, sitePlan || null, studioData || null);
+    const context = buildProjectContext(projectId, savedBriefing || null, sitePlan || null, studioData || null);
     return generateIntelligence(context, studioData || null);
   }, [projectId, savedBriefing, sitePlan, studioData]);
 
