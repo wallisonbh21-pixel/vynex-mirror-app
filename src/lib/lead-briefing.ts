@@ -66,7 +66,7 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
       
       // Se não achou nada estruturado, pode ser o formato ultra-legado onde a primeira linha é a necessidade
       if (!legacyNeeds && leadNotes && !leadNotes.includes("Dados do Briefing:")) {
-        legacyNeeds = leadNotes.split('\n')[0]?.trim();
+        legacyNeeds = leadNotes.split('\n')[0]?.trim() || null;
       }
 
       // 7. Normalizar dynamicData

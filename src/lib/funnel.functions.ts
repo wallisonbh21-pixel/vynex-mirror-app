@@ -128,7 +128,10 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         throw new Error(leadError ? `Falha ao salvar o lead no banco: [${leadError.code}] ${leadError.message}` : "Erro de persistência: O lead não foi gerado.");
       }
 
-      const newLeadId = leadData[0].id;
+      const newLeadId = leadData[0]?.id;
+      if (!newLeadId) {
+        throw new Error("Erro de persistência: O ID do lead não foi retornado.");
+      }
       console.log(`[ATA006] Lead criado com ID: ${newLeadId}`);
 
       // 5. Criar Atribuição Comercial
