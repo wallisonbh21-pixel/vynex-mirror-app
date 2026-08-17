@@ -75,10 +75,10 @@ function ResetPasswordPage() {
     
     // Identify role to redirect
     const { data: { user } } = await supabase.auth.getUser();
-    const isCliente = user?.user_metadata?.['role'] === 'cliente';
+    const isClientee = user?.user_metadata?.['role'] === 'cliente';
     
     // Auto redirect to /cliente after password creation
-    navigate({ to: isCliente ? "/cliente" : "/painel", replace: true });
+    navigate({ to: isClientee ? "/cliente" : "/painel", replace: true });
   }
 
   return (
@@ -101,7 +101,7 @@ function ResetPasswordPage() {
           <h1 className="text-lg font-semibold">Crie sua senha</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {ready
-              ? "Defina uma senha segura para acessar seu Portal do Cliente."
+              ? "Defina uma senha segura para acessar seu Portal do Clientee."
               : "Aguardando validação da sessão..."}
           </p>
 

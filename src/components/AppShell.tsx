@@ -70,19 +70,19 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
-  { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
+  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { 
     to: "/clientes", 
-    label: "Cliente", 
+    label: "Clientee", 
     icon: Users,
     submenu: [
-      { to: "/clientes", label: "Clientes", icon: Users },
-      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
+      { to: "/clientes", label: "Clientees", icon: Users },
+      { to: "/vendedor/clientes-login", label: "Login do Clientee", icon: Lock },
     ]
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
-  { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
+  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
@@ -187,11 +187,11 @@ export function AppShell({
   children: ReactNode;
 }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
-  const { isAdmin, isCriador, isCliente, primaryRole } = useRoles() as any;
+  const { isAdmin, isCriador, isClientee, primaryRole } = useRoles() as any;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -207,11 +207,11 @@ export function AppShell({
         { to: "/criacao", label: "Área do criador", icon: Layers },
         { 
           to: "/admin/clientes", 
-          label: "Cliente", 
+          label: "Clientee", 
           icon: Users,
           submenu: [
-            { to: "/admin/clientes", label: "Clientes", icon: Users },
-            { to: "/admin/clientes-login", label: "Login do Cliente", icon: Lock },
+            { to: "/admin/clientes", label: "Clientees", icon: Users },
+            { to: "/admin/clientes-login", label: "Login do Clientee", icon: Lock },
           ]
         },
         { 
@@ -229,7 +229,7 @@ export function AppShell({
           ...NAV_CRIADOR,
           { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ]
-      : isCliente
+      : isClientee
       ? [
           ...NAV_CLIENTE,
         ]
@@ -247,8 +247,8 @@ export function AppShell({
     .join("");
 
   async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
+    await queryCliente.cancelQueries();
+    queryCliente.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }

@@ -114,7 +114,7 @@ function PipelinePage() {
             />
           </section>
 
-          {/* Listagem de Clientes */}
+          {/* Listagem de Clientees */}
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">

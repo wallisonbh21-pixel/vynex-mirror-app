@@ -102,7 +102,7 @@ export function useActivities(leadId?: string) {
 }
 
 export function useLogActivity() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (values: {
       lead_id: string;
@@ -125,8 +125,8 @@ export function useLogActivity() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lead_activities"] });
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryCliente.invalidateQueries({ queryKey: ["lead_activities"] });
+      queryCliente.invalidateQueries({ queryKey: ["leads"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -134,7 +134,7 @@ export function useLogActivity() {
 
 /** Muda o status do lead e registra a mudança na linha do tempo. */
 export function useChangeLeadStatus() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       lead,
@@ -159,8 +159,8 @@ export function useChangeLeadStatus() {
       } as never);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
-      queryClient.invalidateQueries({ queryKey: ["lead_activities"] });
+      queryCliente.invalidateQueries({ queryKey: ["leads"] });
+      queryCliente.invalidateQueries({ queryKey: ["lead_activities"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -168,7 +168,7 @@ export function useChangeLeadStatus() {
 
 /** Converte um lead fechado em cliente + contrato + projeto inicial. */
 export function useConvertLead() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       lead,
@@ -199,11 +199,11 @@ export function useConvertLead() {
         
         if (filters.length > 0) {
           query = query.or(filters.join(","));
-          const { data: existingClients } = await query;
-          if (existingClients && existingClients.length > 0) {
+          const { data: existingClientes } = await query;
+          if (existingClientes && existingClientes.length > 0) {
             // Lançar erro customizado para ser capturado pela UI
             const error = new Error("DUPLICATE_CLIENT");
-            (error as any).clients = existingClients;
+            (error as any).clients = existingClientes;
             throw error;
           }
         }
@@ -221,10 +221,10 @@ export function useConvertLead() {
       const attribution = attributionData as any;
       const ownerId = attribution?.current_responsible_id || userId;
 
-      let finalClientId = clientId;
+      let finalClienteId = clientId;
 
-      // 4. Criar o Cliente (Comercial) - SOMENTE se não houver um existente
-      if (!finalClientId) {
+      // 4. Criar o Clientee (Comercial) - SOMENTE se não houver um existente
+      if (!finalClienteId) {
         const { data: client, error: clientError } = await supabase
           .from("clients")
           .insert({
@@ -242,13 +242,13 @@ export function useConvertLead() {
           .select("id")
           .single();
         if (clientError) throw clientError;
-        finalClientId = (client as { id: string }).id;
+        finalClienteId = (client as { id: string }).id;
       } else {
         // Se usar cliente existente, vincular o lead se ainda não estiver vinculado
         await supabase
           .from("clients")
           .update({ lead_id: lead.id } as never)
-          .eq("id", finalClientId)
+          .eq("id", finalClienteId)
           .is("lead_id", null);
       }
 
@@ -258,7 +258,7 @@ export function useConvertLead() {
         .insert({
           owner_id: ownerId,
           lead_id: lead.id,
-          client_id: finalClientId,
+          client_id: finalClienteId,
           proposal_id: proposalId ?? null,
           title: `Contrato — ${companyName}`,
           amount,
@@ -275,7 +275,7 @@ export function useConvertLead() {
       // 6. Criar Projeto
       const { error: projectError } = await supabase.from("projects").insert({
         owner_id: ownerId,
-        client_id: finalClientId,
+        client_id: finalClienteId,
         contract_id: contractId,
         title: `Site — ${companyName}`,
         status: "disponivel",
@@ -308,7 +308,7 @@ export function useConvertLead() {
     },
     onSuccess: () => {
       ["leads", "clients", "contracts", "projects", "lead_activities"].forEach((key) =>
-        queryClient.invalidateQueries({ queryKey: [key] }),
+        queryCliente.invalidateQueries({ queryKey: [key] }),
       );
       toast.success("Conversão comercial concluída com sucesso. Acesso ao Portal pendente.");
     },

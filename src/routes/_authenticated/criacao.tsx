@@ -42,7 +42,7 @@ import { useRows } from "@/lib/data";
 import {
   creatorEarnings,
   monthlySeries,
-  useMyCreatorProjects,
+  useMyCreatorProjetos,
 } from "@/lib/creator";
 import { currency, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -71,7 +71,7 @@ type Withdrawal = { id: string; amount: number; status: string; created_at: stri
 function PainelCriador() {
   const navigate = useNavigate();
   const { data: profile } = useProfile();
-  const { data: mine = [] } = useMyCreatorProjects();
+  const { data: mine = [] } = useMyCreatorProjetos();
   const { data: withdrawals = [] } = useRows<Withdrawal>("withdrawals");
 
   const earnings = creatorEarnings(mine, withdrawals);

@@ -40,7 +40,7 @@ const credentials = z.object({
   password: z.string().min(6, "A senha precisa ter ao menos 6 caracteres").max(72),
 });
 
-type RpcClient = {
+type RpcCliente = {
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
 };
 
@@ -62,7 +62,7 @@ function AuthPage() {
 
   // Cadastro público de administrador só existe enquanto não houver nenhum.
   useEffect(() => {
-    (supabase as unknown as RpcClient).rpc("admin_exists").then(({ data, error }) => {
+    (supabase as unknown as RpcCliente).rpc("admin_exists").then(({ data, error }) => {
       if (!error) setAdminExists(data !== false);
     });
   }, []);

@@ -38,7 +38,7 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
         observations: "Observações adicionais",
         references: "Referência / Site de referência",
         socialMedia: "Redes sociais",
-        currentWebsite: "Site atual",
+        currentSite: "Site atual",
         name: "Nome do cliente",
         company: "Empresa",
         email: "E-mail",

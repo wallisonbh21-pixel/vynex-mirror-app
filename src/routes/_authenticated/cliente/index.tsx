@@ -1,7 +1,7 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useClientPortalData } from "@/lib/client";
+import { useClientePortalData } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,11 +33,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/cliente/")({
-  component: ClientDashboard,
+  component: ClienteDashboard,
 });
 
-function ClientDashboard() {
-  const { data: client, isLoading, isError, refetch } = useClientPortalData();
+function ClienteDashboard() {
+  const { data: client, isLoading, isError, refetch } = useClientePortalData();
   const { data: notifications = [] } = useNotifications();
   
   const { data: meetings = [] } = useQuery({
@@ -104,15 +104,15 @@ function ClientDashboard() {
   }
 
   const projects = client.projects || [];
-  const activeProject = projects[0];
+  const activeProjeto = projects[0];
   const nextMeeting = meetings[0];
   const unreadMessages = notifications.filter(n => n.category === 'chat' && !n.read_at).length;
   const newDocuments = notifications.filter(n => n.category === 'document' && !n.read_at).length;
-  const pendingApprovals = activeProject?.status === 'aguardando_cliente' ? 1 : 0;
+  const pendingApprovals = activeProjeto?.status === 'aguardando_cliente' ? 1 : 0;
 
   // Determinar Ação Necessária
   let actionRequired = null;
-  if (activeProject?.status === 'aguardando_cliente') {
+  if (activeProjeto?.status === 'aguardando_cliente') {
     actionRequired = {
       title: "Seu projeto está aguardando aprovação.",
       buttonText: "REVISAR PROJETO",
@@ -136,58 +136,58 @@ function ClientDashboard() {
   }
 
   return (
-    <AppShell title="Portal do Cliente">
+    <AppShell title="Portal do Clientee">
       <div className="space-y-8 pb-10">
         {/* TOPO */}
         <div className="flex flex-col gap-2">
           <h2 className="text-3xl font-bold tracking-tight">
-            Olá, {client.contact_name || "Cliente"}! 👋
+            Olá, {client.contact_name || "Clientee"}! 👋
           </h2>
           <p className="text-muted-foreground">
             Acompanhe tudo que a ScaleNexus está desenvolvendo para <span className="font-semibold text-foreground">{client.company || "sua empresa"}</span>.
           </p>
         </div>
 
-        {activeProject ? (
+        {activeProjeto ? (
           <div className="grid gap-6 lg:grid-cols-12">
             {/* CARD PRINCIPAL - PROJETO ATUAL */}
             <Card className="lg:col-span-8 border-sidebar-border/50 bg-sidebar/30 backdrop-blur-sm shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/10">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-primary">PROJETO ATUAL</p>
-                  <CardTitle className="text-2xl font-bold">{activeProject.title}</CardTitle>
+                  <CardTitle className="text-2xl font-bold">{activeProjeto.title}</CardTitle>
                 </div>
                 <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                  {label(activeProject.status)}
+                  {label(activeProjeto.status)}
                 </Badge>
               </CardHeader>
               <CardContent className="pt-6 space-y-8">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-background/40 border border-border/50">
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">TIPO</p>
-                    <p className="font-medium">{activeProject.site_type || "Desenvolvimento Web"}</p>
+                    <p className="font-medium">{activeProjeto.site_type || "Desenvolvimento Web"}</p>
                   </div>
                   <div className="p-4 rounded-xl bg-background/40 border border-border/50">
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">PRÓXIMA ETAPA</p>
-                    <p className="font-medium text-primary">{getProjectNextStep(activeProject.status)}</p>
+                    <p className="font-medium text-primary">{getProjectNextStep(activeProjeto.status)}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">PROGRESSO</p>
-                    <p className="text-2xl font-black text-primary">{getProjectProgress(activeProject.status)}%</p>
+                    <p className="text-2xl font-black text-primary">{getProjectProgress(activeProjeto.status)}%</p>
                   </div>
                   <div className="h-4 w-full bg-secondary/50 rounded-full overflow-hidden border border-border/20">
                     <div 
                       className="h-full bg-gradient-to-r from-primary/80 to-primary shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out"
-                      style={{ width: `${getProjectProgress(activeProject.status)}%` }}
+                      style={{ width: `${getProjectProgress(activeProjeto.status)}%` }}
                     />
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-border/10">
-                  <ProjectProgression steps={[...PROJECT_STATUS].filter(s => s !== 'cancelado')} currentStatus={activeProject.status} />
+                  <ProjectProgression steps={[...PROJECT_STATUS].filter(s => s !== 'cancelado')} currentStatus={activeProjeto.status} />
                 </div>
               </CardContent>
             </Card>
@@ -290,9 +290,9 @@ function ClientDashboard() {
         )}
 
         {/* RESUMO EM CARDS COMPACTOS */}
-        {activeProject && (
+        {activeProjeto && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard label="PROGRESSO" value={`${getProjectProgress(activeProject.status)}%`} icon={<Activity size={14} />} />
+            <StatCard label="PROGRESSO" value={`${getProjectProgress(activeProjeto.status)}%`} icon={<Activity size={14} />} />
             <StatCard 
               label="MENSAGENS" 
               value={unreadMessages > 0 ? `${unreadMessages} novas` : "Nenhuma nova"} 

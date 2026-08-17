@@ -114,7 +114,7 @@ export function useOpportunities(showRemoved = false) {
 
 /** Cadastro manual de oportunidade (a busca externa chega na FASE 5.2). */
 export function useSaveOpportunity() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
       const { id, ...rest } = values;
@@ -130,7 +130,7 @@ export function useSaveOpportunity() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
+      queryCliente.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
       toast.success("Oportunidade salva.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -209,7 +209,7 @@ async function logStatus(
 }
 
 export function useChangeOpportunityStatus() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       opportunity,
@@ -229,8 +229,8 @@ export function useChangeOpportunityStatus() {
       await logStatus(opportunity.id, userId, opportunity.status, status);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
-      queryClient.invalidateQueries({ queryKey: ["prospecting_status_events"] });
+      queryCliente.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
+      queryCliente.invalidateQueries({ queryKey: ["prospecting_status_events"] });
       toast.success("Status atualizado.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -239,7 +239,7 @@ export function useChangeOpportunityStatus() {
 
 /** Converte a oportunidade em lead do CRM, sem duplicar empresas já cadastradas. */
 export function useAddOpportunityToLeads() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       opportunity,
@@ -327,8 +327,8 @@ export function useAddOpportunityToLeads() {
       return lead.id as string;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryCliente.invalidateQueries({ queryKey: ["prospecting_opportunities"] });
+      queryCliente.invalidateQueries({ queryKey: ["leads"] });
       toast.success("Empresa adicionada aos seus leads com sucesso.");
     },
     onError: (error: Error) => toast.error(error.message),

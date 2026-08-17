@@ -34,7 +34,7 @@ export function MeetingRoomLayout({
   onComplete, 
   isCompleting 
 }: MeetingRoomLayoutProps) {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   const [message, setMessage] = useState('');
   const [note, setNote] = useState('');
 
@@ -53,14 +53,14 @@ export function MeetingRoomLayout({
     const channel = supabase
       .channel(`meeting-data-${meeting.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'meeting_messages', filter: `meeting_id=eq.${meeting.id}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['meeting-messages', meeting.id] });
+        queryCliente.invalidateQueries({ queryKey: ['meeting-messages', meeting.id] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'meeting_notes', filter: `meeting_id=eq.${meeting.id}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['meeting-notes', meeting.id] });
+        queryCliente.invalidateQueries({ queryKey: ['meeting-notes', meeting.id] });
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [meeting.id, queryClient]);
+  }, [meeting.id, queryCliente]);
 
   const sendMessageMutation = useMutation({
     mutationFn: (text: string) => meetingMutations.sendMessage({ meeting_id: meeting.id, sender_id: user.id, message: text }),
@@ -285,7 +285,7 @@ export function MeetingRoomLayout({
                         <span className="text-xs font-medium">{meeting.project?.title || 'Não vinculado'}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-slate-800">
-                        <span className="text-xs text-slate-500">Cliente</span>
+                        <span className="text-xs text-slate-500">Clientee</span>
                         <span className="text-xs font-medium">{meeting.client?.name || 'Não vinculado'}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-slate-800">

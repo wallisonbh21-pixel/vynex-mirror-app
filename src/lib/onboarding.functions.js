@@ -53,7 +53,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         .eq("id", data.clientId)
         .single();
     if (clientErr || !client)
-        throw new Error("Cliente não encontrado.");
+        throw new Error("Clientee não encontrado.");
     if (!isAdmin && client.owner_id !== actorId)
         throw new Error("Sem permissão.");
     if (!client.contact_email)
@@ -61,7 +61,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     // 4. Check Username uniqueness
     const { data: existingProfile } = await supabaseAdmin.from("profiles").select("id").eq("nickname", data.username).maybeSingle();
     if (existingProfile)
-        throw new Error("Usuário já em uso.");
+        throw new Error("User já em uso.");
     // 5. Auth User logic
     let targetUser = null;
     const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
@@ -97,9 +97,9 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
         <h2 style="color: #0F172A;">Olá, ${client.contact_name || data.username}! 👋</h2>
-        <p>Seu acesso ao Portal do Cliente ScaleNexus está pronto.</p>
+        <p>Seu acesso ao Portal do Clientee ScaleNexus está pronto.</p>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <strong>Usuário:</strong> ${data.username}
+          <strong>User:</strong> ${data.username}
         </div>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${siteUrl}/cliente/login" style="background: #3B82F6; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold;">
@@ -113,7 +113,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     try {
         const result = await sendResendEmail({
             to: client.contact_email,
-            subject: "Seu acesso ao Portal do Cliente ScaleNexus foi criado",
+            subject: "Seu acesso ao Portal do Clientee ScaleNexus foi criado",
             html: emailHtml,
             fromName: "Equipe ScaleNexus"
         });

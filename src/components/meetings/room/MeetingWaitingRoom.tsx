@@ -109,7 +109,7 @@ export function MeetingWaitingRoom({
                   <AvatarImage src={p.profiles?.avatar_url || ''} />
                   <AvatarFallback>{p.profiles?.full_name?.charAt(0) || '?'}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-slate-300">{p.profiles?.full_name || 'Usuário'}</span>
+                <span className="text-sm text-slate-300">{p.profiles?.full_name || 'User'}</span>
               </div>
             ))}
           </div>

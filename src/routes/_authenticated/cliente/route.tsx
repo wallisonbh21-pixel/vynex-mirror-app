@@ -4,10 +4,10 @@ import { getCurrentRoles } from "@/lib/guard";
 export const Route = createFileRoute("/_authenticated/cliente")({
   beforeLoad: async ({ location }) => {
     const roles = await getCurrentRoles();
-    const isCliente = roles.includes("cliente");
+    const isClientee = roles.includes("cliente");
     const isAdmin = roles.includes("admin");
 
-    if (!isCliente && !isAdmin) {
+    if (!isClientee && !isAdmin) {
       throw redirect({ 
         to: "/cliente/login", 
         search: { redirect: location.href },

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useClientData } from "@/lib/client";
+import { useClienteData } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/cliente/perfil")({
 });
 
 function MyProfile() {
-  const { data: client, isLoading } = useClientData();
+  const { data: client, isLoading } = useClienteData();
 
   if (isLoading) {
     return (
@@ -36,11 +36,11 @@ function MyProfile() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 text-center md:text-left space-y-1">
-            <h2 className="text-2xl font-bold">{client?.contact_name || "Cliente ScaleNexus"}</h2>
+            <h2 className="text-2xl font-bold">{client?.contact_name || "Clientee ScaleNexus"}</h2>
             <p className="text-muted-foreground">{client?.company || "Empresa Individual"}</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
               <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/10">ID: {client?.id.slice(0, 8)}</Badge>
-              <Badge variant="secondary" className="bg-blue-500/5 text-blue-500 border-blue-500/10">Role: Cliente</Badge>
+              <Badge variant="secondary" className="bg-blue-500/5 text-blue-500 border-blue-500/10">Role: Clientee</Badge>
             </div>
           </div>
           <Button variant="outline" className="border-sidebar-border/50">Alterar Foto</Button>

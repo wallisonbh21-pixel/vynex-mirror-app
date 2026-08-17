@@ -84,7 +84,7 @@ const INITIAL_DATA: BriefingData = {
 function BriefingPage() {
   const { projectId } = useParams({ from: "/_authenticated/briefing/$projectId" });
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<BriefingData>(INITIAL_DATA);
 
@@ -118,7 +118,7 @@ function BriefingPage() {
   const save = useMutation({
     mutationFn: (data: BriefingData) => saveBriefing(projectId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["briefing", projectId] });
+      queryCliente.invalidateQueries({ queryKey: ["briefing", projectId] });
       toast.success("Progresso salvo automaticamente");
     },
   });

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList, useClientOnboarding } from "@/lib/client";
+import { useClientesList, useClienteOnboarding } from "@/lib/client";
 import { createFileRoute } from '@tanstack/react-router';
 import { requireVendedor } from '@/lib/guard';
 import { 
@@ -50,7 +50,7 @@ export const Route = createFileRoute('/_authenticated/vendedor/clientes-login')(
 
 function VendedorLoginCentral() {
   const { user } = useSession();
-  const { data: allClients, isLoading, isError, error, refetch } = useClientsList(user?.id);
+  const { data: allClientes, isLoading, isError, error, refetch } = useClientesList(user?.id);
   
   // DIAGNÓSTICO OBRIGATÓRIO (REQUISITO 1 E 10)
   if (isError) {
@@ -63,20 +63,20 @@ function VendedorLoginCentral() {
     });
   }
 
-  const activeClients = useMemo(() => {
-    return allClients?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
-  }, [allClients]);
+  const activeClientes = useMemo(() => {
+    return allClientes?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
+  }, [allClientes]);
   
-  const clients = allClients;
-  const onboarding = useClientOnboarding();
+  const clients = allClientes;
+  const onboarding = useClienteOnboarding();
   const resendInviteFn = useServerFn(resendInvite);
   const sendNotificationFn = useServerFn(sendNotification);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [selectedClienteId, setSelectedClienteId] = useState<string>("");
   const [username, setUsername] = useState("");
 
-  const filteredClients = useMemo(() => {
+  const filteredClientes = useMemo(() => {
     return clients?.filter((c) => {
       const searchLower = searchTerm.toLowerCase();
       return (
@@ -87,13 +87,13 @@ function VendedorLoginCentral() {
     }) || [];
   }, [clients, searchTerm]);
 
-  const selectedClient = useMemo(() => clients?.find(c => c.id === selectedClientId), [clients, selectedClientId]);
+  const selectedCliente = useMemo(() => clients?.find(c => c.id === selectedClienteId), [clients, selectedClienteId]);
 
-  const clientsWithLogin = useMemo(() => filteredClients.filter(c => !!c.user_id), [filteredClients]);
-  const clientsWithoutLogin = useMemo(() => filteredClients.filter(c => !c.user_id), [filteredClients]);
+  const clientsWithLogin = useMemo(() => filteredClientes.filter(c => !!c.user_id), [filteredClientes]);
+  const clientsWithoutLogin = useMemo(() => filteredClientes.filter(c => !c.user_id), [filteredClientes]);
 
   const handleCreateAccess = async () => {
-    if (!selectedClient) {
+    if (!selectedCliente) {
       toast.error("Selecione um cliente.");
       return;
     }
@@ -101,20 +101,20 @@ function VendedorLoginCentral() {
       toast.error("Informe um nome de usuário.");
       return;
     }
-    if (!selectedClient.contact_email) {
+    if (!selectedCliente.contact_email) {
       toast.error("Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.");
       return;
     }
 
     try {
       await onboarding.mutateAsync({
-        clientId: selectedClient.id,
+        clientId: selectedCliente.id,
         username,
-        email: selectedClient.contact_email,
-        fullName: selectedClient.contact_name || username
+        email: selectedCliente.contact_email,
+        fullName: selectedCliente.contact_name || username
       });
       setIsModalOpen(false);
-      setSelectedClientId("");
+      setSelectedClienteId("");
       setUsername("");
       refetch();
     } catch (e: any) {
@@ -144,11 +144,11 @@ function VendedorLoginCentral() {
 
   const handleOpenModal = (clientId?: string) => {
     if (clientId) {
-      setSelectedClientId(clientId);
+      setSelectedClienteId(clientId);
       const client = clients?.find(c => c.id === clientId);
       setUsername(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
     } else {
-      setSelectedClientId("");
+      setSelectedClienteId("");
       setUsername("");
     }
     setIsModalOpen(true);
@@ -156,7 +156,7 @@ function VendedorLoginCentral() {
 
   return (
     <AppShell 
-      title="Login do Cliente" 
+      title="Login do Clientee" 
       description="Gerencie os acessos, comunique-se e acompanhe seus clientes."
       actions={
         <Button className="gap-2 font-bold shadow-lg shadow-primary/20 h-10 px-6 rounded-xl" onClick={() => handleOpenModal()}>
@@ -181,10 +181,10 @@ function VendedorLoginCentral() {
         <Tabs defaultValue="with-access" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md bg-muted/30 p-1 rounded-2xl mb-6">
             <TabsTrigger value="with-access" className="rounded-xl">
-              Clientes com Login ({clientsWithLogin.length})
+              Clientees com Login ({clientsWithLogin.length})
             </TabsTrigger>
             <TabsTrigger value="no-access" className="rounded-xl">
-              Clientes sem acesso ({clientsWithoutLogin.length})
+              Clientees sem acesso ({clientsWithoutLogin.length})
             </TabsTrigger>
           </TabsList>
 
@@ -221,7 +221,7 @@ function VendedorLoginCentral() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 pt-1">
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <User className="size-3.5 text-primary/60" />
-                                <span className="font-medium text-foreground/80">Usuário:</span> {usernameDisplay}
+                                <span className="font-medium text-foreground/80">User:</span> {usernameDisplay}
                              </div>
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Mail className="size-3.5 text-primary/60" />
@@ -304,9 +304,9 @@ function VendedorLoginCentral() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="client-select">CLIENTE</Label>
-              <Select value={selectedClientId} onValueChange={(val) => {
-                setSelectedClientId(val);
-                const c = activeClients?.find(x => x.id === val);
+              <Select value={selectedClienteId} onValueChange={(val) => {
+                setSelectedClienteId(val);
+                const c = activeClientes?.find(x => x.id === val);
                 if (c) setUsername(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
               }}>
                 <SelectTrigger id="client-select" className="h-11 rounded-xl">
@@ -319,10 +319,10 @@ function VendedorLoginCentral() {
                     <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg m-2">
                       <p className="font-bold">Erro ao carregar clientes.</p>
                     </div>
-                  ) : activeClients.length === 0 ? (
+                  ) : activeClientes.length === 0 ? (
                     <div className="p-2 text-sm text-muted-foreground text-center font-medium">Nenhum cliente ativo disponível.</div>
                   ) : (
-                    activeClients.map(c => (
+                    activeClientes.map(c => (
                       <SelectItem key={c.id} value={c.id} className="cursor-pointer">
                         {c.contact_name || 'Sem nome'}
                       </SelectItem>
@@ -333,19 +333,19 @@ function VendedorLoginCentral() {
 
             </div>
 
-            {selectedClient && (
+            {selectedCliente && (
               <div className="space-y-4 p-4 rounded-2xl bg-muted/30 border border-border/50">
                 <div className="space-y-1">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Cliente:</Label>
-                  <p className="font-semibold">{selectedClient.contact_name}</p>
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Clientee:</Label>
+                  <p className="font-semibold">{selectedCliente.contact_name}</p>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">E-mail:</Label>
-                  <p className="font-semibold">{selectedClient.contact_email || <span className="text-destructive font-normal italic">Não cadastrado!</span>}</p>
+                  <p className="font-semibold">{selectedCliente.contact_email || <span className="text-destructive font-normal italic">Não cadastrado!</span>}</p>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Empresa:</Label>
-                  <p className="font-semibold">{selectedClient.company || "—"}</p>
+                  <p className="font-semibold">{selectedCliente.company || "—"}</p>
                 </div>
               </div>
             )}
@@ -361,14 +361,14 @@ function VendedorLoginCentral() {
               />
             </div>
 
-            {selectedClient && selectedClient.user_id && (
+            {selectedCliente && selectedCliente.user_id && (
               <p className="text-xs text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-200 flex items-center gap-2">
                 <CheckCircle className="size-4" />
-                Este cliente já possui acesso ao Portal do Cliente.
+                Este cliente já possui acesso ao Portal do Clientee.
               </p>
             )}
 
-            {selectedClient && !selectedClient.contact_email && (
+            {selectedCliente && !selectedCliente.contact_email && (
               <p className="text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20">
                 Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.
               </p>
@@ -378,9 +378,9 @@ function VendedorLoginCentral() {
             <Button 
               className="w-full h-11 rounded-xl font-bold gap-2"
               onClick={handleCreateAccess} 
-              disabled={onboarding.isPending || !selectedClient || !username || !selectedClient.contact_email}
+              disabled={onboarding.isPending || !selectedCliente || !username || !selectedCliente.contact_email}
             >
-              {onboarding.isPending ? 'PROCESSANDO...' : selectedClient?.user_id ? 'GERENCIAR ACESSO' : 'CRIAR PAINEL DO CLIENTE'}
+              {onboarding.isPending ? 'PROCESSANDO...' : selectedCliente?.user_id ? 'GERENCIAR ACESSO' : 'CRIAR PAINEL DO CLIENTE'}
             </Button>
           </DialogFooter>
         </DialogContent>

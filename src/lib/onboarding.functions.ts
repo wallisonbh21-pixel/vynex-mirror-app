@@ -59,7 +59,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       .eq("id", data.clientId)
       .single();
     
-    if (clientErr || !client) throw new Error("Cliente não encontrado.");
+    if (clientErr || !client) throw new Error("Clientee não encontrado.");
     if (!isAdmin && client.owner_id !== actorId) throw new Error("Sem permissão.");
     if (!client.contact_email) throw new Error("E-mail não informado.");
 
@@ -112,9 +112,9 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
         <h2 style="color: #0F172A;">Olá, ${client.contact_name || data.username}! 👋</h2>
-        <p>Seu acesso ao Portal do Cliente ScaleNexus está pronto.</p>
+        <p>Seu acesso ao Portal do Clientee ScaleNexus está pronto.</p>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <strong>Usuário:</strong> ${data.username}
+          <strong>User:</strong> ${data.username}
         </div>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${siteUrl}/cliente/login" style="background: #3B82F6; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold;">
@@ -134,7 +134,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       try {
         const result = await sendResendEmail({
           to: client.contact_email,
-          subject: "Seu acesso ao Portal do Cliente ScaleNexus foi criado",
+          subject: "Seu acesso ao Portal do Clientee ScaleNexus foi criado",
           html: emailHtml,
           fromName: "Equipe ScaleNexus"
         });
@@ -144,7 +144,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
       } catch (resendError: any) {
         console.warn("[DEBUG] Resend failed, falling back to Supabase Auth Invite/Recovery", resendError.message);
         
-        // 7.2 Fallback to Supabase Auth (Temporary/Test method)
+        // 7.2 Fallback to Supabase Auth (Temporary/Teste method)
         if (existingAuthUser) {
           // If user already exists, send a real password reset email
           const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(client.contact_email, {
@@ -213,7 +213,7 @@ export const resendInvite = createServerFn({ method: "POST" })
     const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
     const targetUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
 
-    if (!targetUser) throw new Error("Usuário não encontrado no sistema de autenticação.");
+    if (!targetUser) throw new Error("User não encontrado no sistema de autenticação.");
 
     // Fetch client to get contact name
     const { data: client } = await userSupabase
@@ -223,7 +223,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
-    const contactName = client?.contact_name || (targetUser.user_metadata as any)?.full_name || "Cliente";
+    const contactName = client?.contact_name || (targetUser.user_metadata as any)?.full_name || "Clientee";
 
     // Scenario: Reuse Auth + Redefinition email
     try {
@@ -234,7 +234,7 @@ export const resendInvite = createServerFn({ method: "POST" })
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
             <h2 style="color: #0F172A;">Olá, ${contactName}! 👋</h2>
-            <p>Você solicitou um novo acesso ao Portal do Cliente ScaleNexus.</p>
+            <p>Você solicitou um novo acesso ao Portal do Clientee ScaleNexus.</p>
             <p>Para sua segurança, pedimos que redefina sua senha clicando no botão abaixo:</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${siteUrl}/cliente/login" style="background: #3B82F6; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold;">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList, useRegisterClient, useClientOnboarding, useDeleteClient } from "@/lib/client";
+import { useClientesList, useRegisterCliente, useClienteOnboarding, useDeleteCliente } from "@/lib/client";
 import { createFileRoute } from '@tanstack/react-router';
 import { requireVendedor } from '@/lib/guard';
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -34,21 +34,21 @@ import { sendNotification } from "@/lib/client-login.functions";
 
 export const Route = createFileRoute('/_authenticated/vendedor/clientes')({
   beforeLoad: () => requireVendedor(),
-  component: VendedorClientes,
+  component: VendedorClientees,
 });
 
-function VendedorClientes() {
+function VendedorClientees() {
   const { user } = useSession();
-  const { data: clients, isLoading, refetch } = useClientsList(user?.id);
-  const registerClient = useRegisterClient();
-  const onboarding = useClientOnboarding();
-  const deleteClient = useDeleteClient();
+  const { data: clients, isLoading, refetch } = useClientesList(user?.id);
+  const registerCliente = useRegisterCliente();
+  const onboarding = useClienteOnboarding();
+  const deleteCliente = useDeleteCliente();
 
   const resendInviteFn = useServerFn(resendInvite);
   const sendNotificationFn = useServerFn(sendNotification);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [selectedClienteId, setSelectedClienteId] = useState<string>("");
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   const clientRegistrationFields: Field[] = [
@@ -59,18 +59,18 @@ function VendedorClientes() {
     { name: "notes", label: "Observações", type: "textarea", placeholder: "Opcional" },
   ];
 
-  const handleRegisterClient = async (values: Record<string, unknown>) => {
+  const handleRegisterCliente = async (values: Record<string, unknown>) => {
     try {
       const submissionData = {
         ...values,
         notes: (values as any).notes || "",
       };
-      const result = await registerClient.mutateAsync(submissionData);
+      const result = await registerCliente.mutateAsync(submissionData);
       // No automatic redirection
     } catch (error) {}
   };
 
-  const selectedClient = clients?.find(c => c.id === selectedClientId);
+  const selectedCliente = clients?.find(c => c.id === selectedClienteId);
   
   const loginFields: Field[] = [
     { 
@@ -82,12 +82,12 @@ function VendedorClientes() {
   ];
 
   const handleCreateLogin = async (values: Record<string, unknown>) => {
-    if (!selectedClient) return;
+    if (!selectedCliente) return;
     try {
       const payload = {
-        clientId: selectedClientId,
-        email: selectedClient.contact_email,
-        fullName: selectedClient.contact_name || "Cliente",
+        clientId: selectedClienteId,
+        email: selectedCliente.contact_email,
+        fullName: selectedCliente.contact_name || "Clientee",
         username: values["username"] as string,
       };
       
@@ -95,7 +95,7 @@ function VendedorClientes() {
       if (result && (result as any).success) {
         toast.success((result as any).message);
         setIsLoginDialogOpen(false);
-        setSelectedClientId("");
+        setSelectedClienteId("");
         refetch();
       }
     } catch (error: any) {
@@ -128,18 +128,18 @@ function VendedorClientes() {
     let confirmMsg = `Tem certeza que deseja excluir o cliente "${client.contact_name}"?\nEsta ação removerá o cadastro comercial do cliente.`;
     
     if (hasAuth) {
-      confirmMsg = `⚠️ ESTE CLIENTE POSSUI UM LOGIN VINCULADO!\n\n${confirmMsg}\n\nA exclusão poderá afetar o acesso ao Portal do Cliente. Deseja continuar?`;
+      confirmMsg = `⚠️ ESTE CLIENTE POSSUI UM LOGIN VINCULADO!\n\n${confirmMsg}\n\nA exclusão poderá afetar o acesso ao Portal do Clientee. Deseja continuar?`;
     }
 
     if (window.confirm(confirmMsg)) {
       try {
-        await deleteClient.mutateAsync(client.id);
+        await deleteCliente.mutateAsync(client.id);
         refetch();
       } catch (e) {}
     }
   };
 
-  const filteredClients = clients?.filter((c) => {
+  const filteredClientes = clients?.filter((c) => {
 
     return c.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.contact_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
@@ -148,17 +148,17 @@ function VendedorClientes() {
 
   return (
     <AppShell 
-      title="Meus Clientes" 
+      title="Meus Clientees" 
       description="Gerencie sua carteira de clientes."
       actions={
         <RecordDialog
-          title="Cadastrar Cliente"
+          title="Cadastrar Clientee"
           fields={clientRegistrationFields}
-          onSubmit={handleRegisterClient}
+          onSubmit={handleRegisterCliente}
           trigger={
             <Button className="gap-2">
               <Plus className="size-4" />
-              Cadastrar Cliente
+              Cadastrar Clientee
             </Button>
           }
         />
@@ -180,12 +180,12 @@ function VendedorClientes() {
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="h-32 rounded-xl border bg-card animate-pulse" />
             ))
-          ) : filteredClients?.length === 0 ? (
+          ) : filteredClientes?.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground border rounded-xl bg-card">
               Nenhum cliente encontrado em sua carteira.
             </div>
           ) : (
-            filteredClients?.map((client) => {
+            filteredClientes?.map((client) => {
               const hasLogin = !!client.user_id;
               const profile = (client as any).profiles;
               const username = Array.isArray(profile) ? profile[0]?.nickname : profile?.nickname;
@@ -222,7 +222,7 @@ function VendedorClientes() {
                         </div>
                         {username && (
                            <div className="flex items-center gap-1.5">
-                            <span className="font-medium text-foreground">Usuário:</span> {username}
+                            <span className="font-medium text-foreground">User:</span> {username}
                           </div>
                         )}
                       </div>
@@ -231,13 +231,13 @@ function VendedorClientes() {
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <RecordDialog
-                      title="Cadastrar Login do Cliente"
+                      title="Cadastrar Login do Clientee"
                       fields={loginFields}
                       onSubmit={handleCreateLogin}
-                      open={isLoginDialogOpen && selectedClientId === client.id}
+                      open={isLoginDialogOpen && selectedClienteId === client.id}
                       onOpenChange={(open) => {
                         setIsLoginDialogOpen(open);
-                        if (open) setSelectedClientId(client.id);
+                        if (open) setSelectedClienteId(client.id);
                       }}
                     />
                     {!hasLogin ? (
@@ -246,12 +246,12 @@ function VendedorClientes() {
                         size="sm" 
                         className="gap-2 font-bold bg-primary hover:bg-primary/90"
                         onClick={() => {
-                          setSelectedClientId(client.id);
+                          setSelectedClienteId(client.id);
                           setIsLoginDialogOpen(true);
                         }}
                       >
                         <Lock className="size-3.5" />
-                        Cadastrar Login do Cliente
+                        Cadastrar Login do Clientee
                       </Button>
                     ) : (
                       <>
@@ -260,12 +260,12 @@ function VendedorClientes() {
                           size="sm" 
                           className="h-8 px-3 rounded-lg gap-2 font-bold"
                           onClick={() => {
-                            setSelectedClientId(client.id);
+                            setSelectedClienteId(client.id);
                             setIsLoginDialogOpen(true);
                           }}
                         >
                           <UserPlus className="size-3.5" /> 
-                          Fazer Cadastro do Painel do Cliente
+                          Fazer Cadastro do Painel do Clientee
                         </Button>
                         <Button 
                           variant="secondary" 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useClientPortalData } from "@/lib/client";
+import { useClientePortalData } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +15,10 @@ export const Route = createFileRoute("/_authenticated/cliente/documentos")({
 });
 
 function MyDocuments() {
-  const { data: clientData, isLoading: loadingClient } = useClientPortalData();
+  const { data: clientData, isLoading: loadingCliente } = useClientePortalData();
   
-  const activeProject = clientData?.projects?.[0];
-  const projectId = activeProject?.id;
+  const activeProjeto = clientData?.projects?.[0];
+  const projectId = activeProjeto?.id;
 
   const { data: documents, isLoading: loadingDocs, isError } = useQuery({
     queryKey: ["project-documents", projectId],
@@ -34,7 +34,7 @@ function MyDocuments() {
     },
   });
 
-  if (loadingClient || loadingDocs) {
+  if (loadingCliente || loadingDocs) {
     return (
       <AppShell title="Documentos">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -44,7 +44,7 @@ function MyDocuments() {
     );
   }
 
-  if (!activeProject) {
+  if (!activeProjeto) {
     return (
       <AppShell title="Documentos">
         <Card className="p-12 text-center border-dashed">
@@ -60,7 +60,7 @@ function MyDocuments() {
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-bold">Central de Documentos</h2>
-          <p className="text-muted-foreground">Acesse contratos, manuais e arquivos do seu projeto: {activeProject.title}.</p>
+          <p className="text-muted-foreground">Acesse contratos, manuais e arquivos do seu projeto: {activeProjeto.title}.</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

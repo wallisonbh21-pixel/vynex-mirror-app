@@ -8,10 +8,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute('/_authenticated/cliente/reset-password')({
-  component: ClientResetPassword,
+  component: ClienteResetPassword,
 });
 
-function ClientResetPassword() {
+function ClienteResetPassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

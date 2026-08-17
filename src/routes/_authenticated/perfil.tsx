@@ -32,7 +32,7 @@ const schema = z.object({
 });
 
 function PerfilPage() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
@@ -99,7 +99,7 @@ function PerfilPage() {
       toast.error(error.message);
       return;
     }
-    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    queryCliente.invalidateQueries({ queryKey: ["profile"] });
     toast.success("Perfil atualizado.");
   }
 
@@ -133,8 +133,8 @@ function PerfilPage() {
       toast.error(profileError.message);
       return;
     }
-    queryClient.invalidateQueries({ queryKey: ["profile"] });
-    queryClient.invalidateQueries({ queryKey: ["avatar"] });
+    queryCliente.invalidateQueries({ queryKey: ["profile"] });
+    queryCliente.invalidateQueries({ queryKey: ["avatar"] });
     toast.success("Foto de perfil atualizada.");
   }
 

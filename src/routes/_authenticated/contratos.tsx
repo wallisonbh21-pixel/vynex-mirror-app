@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/contratos")({
   component: ContratosPage,
 });
 
-type Client = { id: string; company: string };
+type Cliente = { id: string; company: string };
 
 const fields: Field[] = [
   { name: "title", label: "Título do contrato", required: true },
@@ -39,7 +39,7 @@ const fields: Field[] = [
 
 function ContratosPage() {
   const { data = [] } = useRows<Contract>("contracts", { column: "signed_at" });
-  const { data: clients = [] } = useRows<Client>("clients");
+  const { data: clients = [] } = useRows<Cliente>("clients");
   const save = useSaveRow("contracts");
 
   const active = data.filter((contract) => contract.status === "ativo");
@@ -59,7 +59,7 @@ function ContratosPage() {
           <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Contrato</th>
-              <th className="px-4 py-3">Cliente</th>
+              <th className="px-4 py-3">Clientee</th>
               <th className="px-4 py-3 text-right">Valor</th>
               <th className="px-4 py-3 text-right">Mensalidade</th>
               <th className="px-4 py-3">Assinatura</th>

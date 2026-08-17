@@ -32,7 +32,7 @@ export const sendNotification = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-export const getClientAccessLogs = createServerFn({ method: "GET" })
+export const getClienteAccessLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ userId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {

@@ -33,7 +33,7 @@ export function FunnelForm() {
       observations: '',
       references: '',
       socialMedia: '',
-      currentWebsite: '',
+      currentSite: '',
     }
   })
 
@@ -304,8 +304,8 @@ export function FunnelForm() {
                   <Label htmlFor="current">Site Atual (se houver)</Label>
                   <Input 
                     id="current" 
-                    value={formData.details?.['currentWebsite'] || ''} 
-                    onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, currentWebsite: e.target.value } }))}
+                    value={formData.details?.['currentSite'] || ''} 
+                    onChange={e => setFormData(prev => ({ ...prev, details: { ...prev.details, currentSite: e.target.value } }))}
 
                     placeholder="www.suaempresa.com.br"
                     className="bg-white/5 border-white/10"

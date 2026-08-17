@@ -5,10 +5,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const getApprovalView = createServerFn({ method: "GET" })
   .inputValidator((data: { token: string }) => ({ token: String(data.token ?? "") }))
   .handler(async ({ data }) => {
-    const { loadProjectByToken, loadClient } = await import("@/lib/approval.server");
-    const project = await loadProjectByToken(data.token);
+    const { loadProjetoByToken, loadCliente } = await import("@/lib/approval.server");
+    const project = await loadProjetoByToken(data.token);
     if (!project) return { valid: false as const };
-    const client = await loadClient(project.client_id);
+    const client = await loadCliente(project.client_id);
     return {
       valid: true as const,
       project: {
@@ -27,13 +27,13 @@ export const getApprovalView = createServerFn({ method: "GET" })
     };
   });
 
-/** Cliente aprova o site pelo link seguro. */
+/** Clientee aprova o site pelo link seguro. */
 export const clientApproveSite = createServerFn({ method: "POST" })
   .inputValidator((data: { token: string }) => ({ token: String(data.token ?? "") }))
   .handler(async ({ data }) => {
     const {
-      loadProjectByToken,
-      loadClient,
+      loadProjetoByToken,
+      loadCliente,
       adminUserIds,
       notify,
       logApprovalEvent,
@@ -41,7 +41,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
     } = await import("@/lib/approval.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const project = await loadProjectByToken(data.token);
+    const project = await loadProjetoByToken(data.token);
     if (!project) return { ok: false as const, error: "Este link não é mais válido." };
     if (project.client_approved_at || project.status === APPROVAL_FLOW.aprovado) {
       return { ok: false as const, error: "Este site já foi aprovado anteriormente." };
@@ -50,7 +50,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Este projeto não está aguardando aprovação do cliente." };
     }
 
-    const client = await loadClient(project.client_id);
+    const client = await loadCliente(project.client_id);
     const now = new Date().toISOString();
     const { error } = await supabaseAdmin
       .from("projects")
@@ -60,7 +60,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
 
     await logApprovalEvent({
       project_id: project.id,
-      actor_label: client?.contact_name || client?.company || "Cliente",
+      actor_label: client?.contact_name || client?.company || "Clientee",
       event_type: "aprovado_cliente",
       previous_status: project.status,
       new_status: APPROVAL_FLOW.aprovado,
@@ -70,8 +70,8 @@ export const clientApproveSite = createServerFn({ method: "POST" })
     await notify([
       ...admins.map((id) => ({
         user_id: id,
-        title: "Cliente aprovou o site.",
-        body: `${client?.company ?? "Cliente"} aprovou o projeto ${project.title}.`,
+        title: "Clientee aprovou o site.",
+        body: `${client?.company ?? "Clientee"} aprovou o projeto ${project.title}.`,
         project_id: project.id,
         link: "/aprovacoes",
       })),
@@ -89,7 +89,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
       {
         user_id: project.owner_id,
         title: "Seu cliente teve o site aprovado.",
-        body: `${client?.company ?? "Cliente"} — ${project.title}`,
+        body: `${client?.company ?? "Clientee"} — ${project.title}`,
         project_id: project.id,
         link: "/projetos",
       },
@@ -98,7 +98,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-/** Cliente solicita alterações pelo link seguro. */
+/** Clientee solicita alterações pelo link seguro. */
 export const clientRequestChanges = createServerFn({ method: "POST" })
   .inputValidator((data: { token: string; message: string }) => ({
     token: String(data.token ?? ""),
@@ -109,8 +109,8 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Descreva as alterações desejadas." };
     }
     const {
-      loadProjectByToken,
-      loadClient,
+      loadProjetoByToken,
+      loadCliente,
       adminUserIds,
       notify,
       logApprovalEvent,
@@ -118,34 +118,34 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
     } = await import("@/lib/approval.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const project = await loadProjectByToken(data.token);
+    const project = await loadProjetoByToken(data.token);
     if (!project) return { ok: false as const, error: "Este link não é mais válido." };
     if (project.status !== APPROVAL_FLOW.liberado) {
       return { ok: false as const, error: "Este projeto não está aguardando aprovação do cliente." };
     }
 
-    const client = await loadClient(project.client_id);
+    const client = await loadCliente(project.client_id);
     const { error } = await supabaseAdmin
       .from("projects")
-      .update({ status: APPROVAL_FLOW.ajustesCliente } as never)
+      .update({ status: APPROVAL_FLOW.ajustesClientee } as never)
       .eq("id", project.id);
     if (error) return { ok: false as const, error: "Não foi possível registrar a solicitação." };
 
     await logApprovalEvent({
       project_id: project.id,
-      actor_label: client?.contact_name || client?.company || "Cliente",
+      actor_label: client?.contact_name || client?.company || "Clientee",
       event_type: "ajustes_cliente",
       message: data.message,
       previous_status: project.status,
-      new_status: APPROVAL_FLOW.ajustesCliente,
+      new_status: APPROVAL_FLOW.ajustesClientee,
     });
 
     const admins = await adminUserIds();
     await notify([
       ...admins.map((id) => ({
         user_id: id,
-        title: "Cliente solicitou alterações.",
-        body: `${client?.company ?? "Cliente"} — ${project.title}: ${data.message}`,
+        title: "Clientee solicitou alterações.",
+        body: `${client?.company ?? "Clientee"} — ${project.title}: ${data.message}`,
         project_id: project.id,
         link: "/aprovacoes",
       })),
@@ -153,7 +153,7 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
         ? [
             {
               user_id: project.creator_id,
-              title: "Cliente solicitou alterações no projeto.",
+              title: "Clientee solicitou alterações no projeto.",
               body: `${project.title}: ${data.message}`,
               project_id: project.id,
               link: "/meus-projetos",
@@ -162,8 +162,8 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
         : []),
       {
         user_id: project.owner_id,
-        title: "Cliente solicitou alterações no projeto.",
-        body: `${client?.company ?? "Cliente"} — ${project.title}`,
+        title: "Clientee solicitou alterações no projeto.",
+        body: `${client?.company ?? "Clientee"} — ${project.title}`,
         project_id: project.id,
         link: "/projetos",
       },
@@ -173,7 +173,7 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
   });
 
 /** ADMIN/DIRETOR libera o envio ao cliente e gera o link seguro. */
-export const releaseToClient = createServerFn({ method: "POST" })
+export const releaseToCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { projectId: string; origin: string }) => ({
     projectId: String(data.projectId ?? ""),
@@ -187,8 +187,8 @@ export const releaseToClient = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Apenas administradores podem liberar o envio ao cliente.");
 
     const {
-      generateClientToken,
-      loadClient,
+      generateClienteToken,
+      loadCliente,
       notify,
       logApprovalEvent,
       queueWhatsappMessage,
@@ -215,7 +215,7 @@ export const releaseToClient = createServerFn({ method: "POST" })
       throw new Error("Somente projetos aguardando aprovação interna podem ser liberados.");
     }
 
-    const token = generateClientToken();
+    const token = generateClienteToken();
     const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await supabaseAdmin
       .from("projects")
@@ -229,7 +229,7 @@ export const releaseToClient = createServerFn({ method: "POST" })
       .eq("id", project.id);
     if (error) throw new Error("Não foi possível liberar o envio ao cliente.");
 
-    const client = await loadClient(project.client_id);
+    const client = await loadCliente(project.client_id);
     const origin = data.origin.replace(/\/$/, "");
     const link = `${origin}/aprovacao/${token}`;
 
@@ -274,7 +274,7 @@ export const releaseToClient = createServerFn({ method: "POST" })
       {
         user_id: project.owner_id,
         title: "Site enviado para aprovação do cliente.",
-        body: `${client?.company ?? "Cliente"} — ${project.title}`,
+        body: `${client?.company ?? "Clientee"} — ${project.title}`,
         project_id: project.id,
         link: "/projetos",
       },

@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/reunioes/")({
 });
 
 function MeetingsPage() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   const [view, setView] = useState<"grid" | "list">("grid");
   
   const { data: meetings, isLoading } = useQuery({
@@ -36,7 +36,7 @@ function MeetingsPage() {
   const cancelMutation = useMutation({
     mutationFn: (id: string) => meetingMutations.cancel(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["meetings"] });
+      queryCliente.invalidateQueries({ queryKey: ["meetings"] });
       toast.success("Reunião cancelada com sucesso");
     },
     onError: () => toast.error("Erro ao cancelar reunião"),

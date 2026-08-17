@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/projetos")({
   component: ProjetosPage,
 });
 
-type Project = {
+type Projeto = {
   id: string;
   title: string;
   client_id: string | null;
@@ -32,20 +32,20 @@ type Project = {
   description: string | null;
 };
 
-type Client = { id: string; company: string };
+type Cliente = { id: string; company: string };
 
 function ProjetosPage() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
 
-  const { data = [] } = useRows<Project>("projects");
-  const { data: clients = [] } = useRows<Client>("clients");
+  const { data = [] } = useRows<Projeto>("projects");
+  const { data: clients = [] } = useRows<Cliente>("clients");
   const save = useSaveRow("projects");
   const remove = useDeleteRow("projects");
 
   const clientName = useMemo(() => {
     const map = new Map(clients.map((client) => [client.id, client.company]));
-    return (id: string | null) => (id ? map.get(id) ?? "Cliente removido" : "Sem cliente");
+    return (id: string | null) => (id ? map.get(id) ?? "Clientee removido" : "Sem cliente");
   }, [clients]);
 
   // Somente administradores/diretores definem comissão.
@@ -61,7 +61,7 @@ function ProjetosPage() {
     { name: "site_type", label: "Tipo de site", placeholder: "Landing page, institucional, e-commerce..." },
     {
       name: "client_id",
-      label: "Cliente",
+      label: "Clientee",
       type: "select",
       options: clients.map((client) => ({ value: client.id, label: client.company })),
     },

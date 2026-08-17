@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { SalesProgression } from "@/components/SalesProgression";
 
 import { requireCriador } from "@/lib/guard";
-import { useMyCreatorProjects, creatorEarnings } from "@/lib/creator";
+import { useMyCreatorProjetos, creatorEarnings } from "@/lib/creator";
 import { useRows } from "@/lib/data";
 import { currency, shortDate, label } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/meus-projetos")({
 });
 
 function MeusProjetosPage() {
-  const { data: projects = [], isLoading } = useMyCreatorProjects();
+  const { data: projects = [], isLoading } = useMyCreatorProjetos();
   const { data: withdrawals = [] } = useRows<any>("withdrawals");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string>("all");

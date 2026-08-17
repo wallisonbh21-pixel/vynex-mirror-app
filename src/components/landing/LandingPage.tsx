@@ -169,7 +169,7 @@ export function LandingPage() {
             {[
               { role: "Vendedor", desc: "Encontre oportunidades, gerencie leads e feche negócios.", icon: Target },
               { role: "Criador", desc: "Produza sites profissionais dentro da ScaleNexus.", icon: Palette },
-              { role: "Cliente", desc: "Acompanhe, revise e aprove seu projeto.", icon: ShieldCheck },
+              { role: "Clientee", desc: "Acompanhe, revise e aprove seu projeto.", icon: ShieldCheck },
             ].map(item => (
               <div key={item.role} className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 text-center">
                 <item.icon className="size-10 text-primary mx-auto mb-6" />

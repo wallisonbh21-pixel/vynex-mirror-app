@@ -79,7 +79,7 @@ export interface ScaleNexusProjectMemory {
  */
 export function generateForgeDecisions(context: ScaleNexusProjectContext): ForgeDecision[] {
   const decisions: ForgeDecision[] = [];
-  const niche = context.niche?.toLowerCase() || 'general';
+  const niche = context.niche?.toLowerCase() || 'geral';
   const goal = (context.objectives?.[0] || 'whatsapp').toUpperCase();
 
   // 1. Goal-based Decisions
@@ -131,7 +131,7 @@ export function createBuildPlan(context: ScaleNexusProjectContext): ForgeBuildPl
   const decisions = generateForgeDecisions(context);
   const sections: ForgeSectionPlan[] = [];
   const goal = (context.objectives?.[0] || 'whatsapp').toUpperCase();
-  const niche = context.niche?.toLowerCase() || 'general';
+  const niche = context.niche?.toLowerCase() || 'geral';
 
   // Strategy & Objective definition
   let strategy = 'Conversão Direta';

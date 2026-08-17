@@ -9,7 +9,7 @@ import { Send, MessageSquare, Plus, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
-import { useClientPortalData } from "@/lib/client";
+import { useClientePortalData } from "@/lib/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -20,13 +20,13 @@ export const Route = createFileRoute("/_authenticated/cliente/mensagens")({
 
 function MyMessages() {
   const { user } = useSession();
-  const { data: clientData, isLoading: loadingClient } = useClientPortalData();
+  const { data: clientData, isLoading: loadingCliente } = useClientePortalData();
   const [messageText, setMessageText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
 
-  const activeProject = clientData?.projects?.[0];
-  const projectId = activeProject?.id;
+  const activeProjeto = clientData?.projects?.[0];
+  const projectId = activeProjeto?.id;
 
   const { data: messages, isLoading: loadingMessages } = useQuery({
     queryKey: ["project-messages", projectId],
@@ -56,7 +56,7 @@ function MyMessages() {
     },
     onSuccess: () => {
       setMessageText("");
-      queryClient.invalidateQueries({ queryKey: ["project-messages", projectId] });
+      queryCliente.invalidateQueries({ queryKey: ["project-messages", projectId] });
     },
     onError: (error: any) => {
       toast.error("Erro ao enviar mensagem: " + error.message);
@@ -82,7 +82,7 @@ function MyMessages() {
           filter: `project_id=eq.${projectId}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["project-messages", projectId] });
+          queryCliente.invalidateQueries({ queryKey: ["project-messages", projectId] });
         }
       )
       .subscribe();
@@ -90,7 +90,7 @@ function MyMessages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [projectId, queryClient]);
+  }, [projectId, queryCliente]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +98,7 @@ function MyMessages() {
     sendMessageMutation.mutate(messageText);
   };
 
-  if (loadingClient || loadingMessages) {
+  if (loadingCliente || loadingMessages) {
     return (
       <AppShell title="Mensagens">
         <div className="flex items-center justify-center h-64">
@@ -108,7 +108,7 @@ function MyMessages() {
     );
   }
 
-  if (!activeProject) {
+  if (!activeProjeto) {
     return (
       <AppShell title="Mensagens">
         <Card className="p-12 text-center border-dashed">
@@ -129,7 +129,7 @@ function MyMessages() {
                 <MessageSquare className="size-5" />
               </div>
               <div>
-                <h3 className="font-bold">Suporte: {activeProject.title}</h3>
+                <h3 className="font-bold">Suporte: {activeProjeto.title}</h3>
                 <p className="text-xs text-muted-foreground">Canal direto com a equipe ScaleNexus</p>
               </div>
             </div>

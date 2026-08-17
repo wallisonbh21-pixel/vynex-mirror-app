@@ -19,7 +19,7 @@ function MeetingRoomPage() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   const [hasJoined, setHasJoined] = useState(false);
 
   const { data: meeting, isLoading, error } = useQuery({
@@ -54,7 +54,7 @@ function MeetingRoomPage() {
           filter: `id=eq.${meetingId}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['meeting', meetingId] });
+          queryCliente.invalidateQueries({ queryKey: ['meeting', meetingId] });
         }
       )
       .on(
@@ -66,7 +66,7 @@ function MeetingRoomPage() {
           filter: `meeting_id=eq.${meetingId}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['meeting', meetingId] });
+          queryCliente.invalidateQueries({ queryKey: ['meeting', meetingId] });
         }
       )
       .subscribe();
@@ -74,7 +74,7 @@ function MeetingRoomPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [meetingId, queryClient]);
+  }, [meetingId, queryCliente]);
 
   const joinMutation = useMutation({
     mutationFn: () => meetingMutations.updateParticipantPresence(meetingId, user!.id, 'join'),

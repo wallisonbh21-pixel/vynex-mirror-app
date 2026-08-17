@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const registerClientSchema = z.object({
+const registerClienteSchema = z.object({
   contact_email: z.string().email("E-mail inválido"),
   contact_name: z.string().optional().nullable().transform(val => val ?? ""),
   contact_phone: z.string().optional().nullable().transform(val => val ?? ""),
@@ -10,9 +10,9 @@ const registerClientSchema = z.object({
   notes: z.string().optional().nullable().transform(val => val ?? ""),
 });
 
-export const registerNewClient = createServerFn({ method: "POST" })
+export const registerNewCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => registerClientSchema.parse(data))
+  .validator((data: unknown) => registerClienteSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId: actorId, supabase: userSupabase } = context;
@@ -29,7 +29,7 @@ export const registerNewClient = createServerFn({ method: "POST" })
     }
 
     // Create the commercial client record
-    const { data: newClient, error: clientError } = await supabaseAdmin
+    const { data: newCliente, error: clientError } = await supabaseAdmin
       .from("clients")
       .insert({
         contact_name: data.contact_name,
@@ -43,16 +43,16 @@ export const registerNewClient = createServerFn({ method: "POST" })
       .select()
       .single();
 
-    if (clientError || !newClient) {
+    if (clientError || !newCliente) {
       console.error("[DEBUG] client_creation_failed", clientError);
       throw new Error(`Erro ao salvar o registro do cliente: ${clientError?.message || "Registro não criado"}`);
     }
 
-    console.log("[DEBUG] client_created", { clientId: newClient.id, email: data.contact_email });
+    console.log("[DEBUG] client_created", { clientId: newCliente.id, email: data.contact_email });
 
     return { 
       success: true, 
-      client: newClient,
-      message: "Cliente cadastrado com sucesso." 
+      client: newCliente,
+      message: "Clientee cadastrado com sucesso." 
     };
   });

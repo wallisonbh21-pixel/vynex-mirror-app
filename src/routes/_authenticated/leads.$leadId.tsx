@@ -99,7 +99,7 @@ const proposalFields: Field[] = [
 function LeadDetail() {
   const { leadId } = Route.useParams();
   const { user } = useSession();
-  const [duplicateClient, setDuplicateClient] = useState<any>(null);
+  const [duplicateCliente, setDuplicateCliente] = useState<any>(null);
   const [conversionData, setConversionData] = useState<any>(null);
   const { data: lead, isLoading } = useLead(leadId);
   const { data: activities = [] } = useActivities(leadId);
@@ -134,7 +134,7 @@ function LeadDetail() {
     convert.mutate(data, {
       onError: (error: any) => {
         if (error.message === "DUPLICATE_CLIENT") {
-          setDuplicateClient(error.clients[0]);
+          setDuplicateCliente(error.clients[0]);
         }
       }
     });
@@ -273,7 +273,7 @@ function LeadDetail() {
                   <div className="space-y-1">
                     <span className="text-[10px] text-muted-foreground uppercase font-medium">Indicado por</span>
                     <div className="text-sm font-semibold text-brand-500">
-                      {attribution?.originator ? (attribution.originator.full_name || attribution.originator.nickname) : attribution?.originator_id ? "Usuário Externo" : "ScaleNexus"}
+                      {attribution?.originator ? (attribution.originator.full_name || attribution.originator.nickname) : attribution?.originator_id ? "User Externo" : "ScaleNexus"}
                     </div>
                   </div>
                   <div className="space-y-1">
@@ -300,7 +300,7 @@ function LeadDetail() {
                   })
                 }
               >
-                Converter em Cliente & Projeto
+                Converter em Clientee & Projeto
               </Button>
             ) : (
               <Button
@@ -309,7 +309,7 @@ function LeadDetail() {
                 asChild
               >
                 <Link to="/admin/clientes">
-                  Ver Cliente no Painel
+                  Ver Clientee no Painel
                 </Link>
               </Button>
             )}
@@ -490,7 +490,7 @@ function LeadDetail() {
                       })
                     }
                   >
-                    Converter em Cliente
+                    Converter em Clientee
                   </Button>
                 ) : null}
                 <RecordDialog
@@ -518,7 +518,7 @@ function LeadDetail() {
         </ul>
       </section>
 
-      <AlertDialog open={!!duplicateClient} onOpenChange={(open) => !open && setDuplicateClient(null)}>
+      <AlertDialog open={!!duplicateCliente} onOpenChange={(open) => !open && setDuplicateCliente(null)}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-warning">
@@ -527,8 +527,8 @@ function LeadDetail() {
             <AlertDialogDescription className="space-y-3">
               <p>Encontramos um cliente com o mesmo e-mail ou WhatsApp.</p>
               <div className="rounded-xl border border-border bg-muted/30 p-3 text-sm">
-                <div className="font-bold text-foreground">{duplicateClient?.company}</div>
-                <div className="text-muted-foreground">{duplicateClient?.contact_name}</div>
+                <div className="font-bold text-foreground">{duplicateCliente?.company}</div>
+                <div className="text-muted-foreground">{duplicateCliente?.contact_name}</div>
               </div>
               <p className="text-xs text-muted-foreground">O que deseja fazer? Você pode utilizar este cliente existente para vincular o novo projeto.</p>
             </AlertDialogDescription>
@@ -543,7 +543,7 @@ function LeadDetail() {
               asChild
             >
               <Link to="/admin/clientes">
-                Ver Cliente Existente
+                Ver Clientee Existente
               </Link>
             </Button>
             <AlertDialogAction asChild>
@@ -552,12 +552,12 @@ function LeadDetail() {
                 onClick={() => {
                   convert.mutate({
                     ...conversionData,
-                    clientId: duplicateClient.id
+                    clientId: duplicateCliente.id
                   });
-                  setDuplicateClient(null);
+                  setDuplicateCliente(null);
                 }}
               >
-                Usar Cliente Existente
+                Usar Clientee Existente
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>

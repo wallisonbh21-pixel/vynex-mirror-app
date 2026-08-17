@@ -79,7 +79,7 @@ export function useStudioData(projectId: string, clientToken?: string) {
 }
 
 export function useSaveStudioData() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   
   return useMutation({
     mutationFn: async ({ projectId, data }: { projectId: string; data: StudioData }) => {
@@ -96,7 +96,7 @@ export function useSaveStudioData() {
       return data;
     },
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(['studio-data', variables.projectId], data);
+      queryCliente.setQueryData(['studio-data', variables.projectId], data);
     }
   });
 }
@@ -117,7 +117,7 @@ export function useStudioFavorites() {
 }
 
 export function useToggleFavorite() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   
   return useMutation({
     mutationFn: async ({ itemId, itemType, isFavorite }: { itemId: string; itemType: string; isFavorite: boolean }) => {
@@ -140,7 +140,7 @@ export function useToggleFavorite() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studio-favorites'] });
+      queryCliente.invalidateQueries({ queryKey: ['studio-favorites'] });
     }
   });
 }
@@ -162,7 +162,7 @@ export function useUserTemplates() {
 }
 
 export function useSaveUserTemplate() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   
   return useMutation({
     mutationFn: async (template: Omit<LibraryItem, 'id' | 'type'>) => {
@@ -186,7 +186,7 @@ export function useSaveUserTemplate() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studio-user-templates'] });
+      queryCliente.invalidateQueries({ queryKey: ['studio-user-templates'] });
     }
   });
 }

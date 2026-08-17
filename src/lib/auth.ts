@@ -12,7 +12,7 @@ export const ROLE_LABEL: Record<string, string> = {
   rh: "Administrativo (RH)",
   vendedor: "Vendedor",
   criador: "Criador",
-  cliente: "Cliente",
+  cliente: "Clientee",
 };
 
 export const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
@@ -109,7 +109,7 @@ export function useRoles() {
     isRh: roles.includes("rh"),
     isCriador: roles.includes("criador"),
     isVendedor: roles.includes("vendedor"),
-    isCliente: roles.includes("cliente"),
+    isClientee: roles.includes("cliente"),
     primaryRole: (roles[0] ?? "vendedor") as AppRole,
     loading: query.isLoading,
   };

@@ -32,7 +32,7 @@ export function useRows<T = Record<string, unknown>>(
 }
 
 export function useSaveRow(table: Table, invalidate: Table[] = []) {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
       const { id, ...rest } = values;
@@ -43,10 +43,10 @@ export function useSaveRow(table: Table, invalidate: Table[] = []) {
       if (error) throw error;
     },
     onSuccess: () => {
-      [table, ...invalidate].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
+      [table, ...invalidate].forEach((key) => queryCliente.invalidateQueries({ queryKey: [key] }));
       // Se salvamos um cliente, também invalidamos a lista de clientes para login
       if (table === "clients") {
-        queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+        queryCliente.invalidateQueries({ queryKey: ["clients-list"] });
       }
       toast.success("Registro salvo.");
     },
@@ -55,14 +55,14 @@ export function useSaveRow(table: Table, invalidate: Table[] = []) {
 }
 
 export function useDeleteRow(table: Table, invalidate: Table[] = []) {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from(table).delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      [table, ...invalidate].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
+      [table, ...invalidate].forEach((key) => queryCliente.invalidateQueries({ queryKey: [key] }));
       toast.success("Registro removido.");
     },
     onError: (error: Error) => toast.error(error.message),
