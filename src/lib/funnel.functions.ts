@@ -101,7 +101,8 @@ export const submitLeadForm = createServerFn({ method: "POST" })
       }
 
       // 4. Criar Lead
-      const { data: newLead, error: leadError } = await supabaseAdmin
+      console.log(`[ATA006] Tentando criar lead. Owner: ${originatorId || DEFAULT_ADMIN_ID}`);
+      const leadInsertResult = await supabaseAdmin
         .from("leads")
         .insert({
           name: data.name,
@@ -118,38 +119,52 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           owner_id: originatorId || DEFAULT_ADMIN_ID, 
           notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
         } as any)
-        .select("id")
-        .single();
+        .select("id");
+      
+      const { data: leadData, error: leadError } = leadInsertResult;
       
       if (leadError) {
-        console.error("Erro ao criar lead:", leadError);
-        throw new Error(`Falha ao salvar o lead: ${leadError.message}`);
+        console.error("[ATA006] Erro ao criar lead:", leadError);
+        throw new Error(`Falha ao salvar o lead no banco: [${leadError.code}] ${leadError.message}`);
       }
+
+      if (!leadData || leadData.length === 0) {
+        console.error("[ATA006] Lead não foi criado e nenhum erro retornado.");
+        throw new Error("Erro de persistência: O lead não foi gerado.");
+      }
+
+      const newLead = leadData[0];
+      console.log(`[ATA006] Lead criado com ID: ${newLead.id}`);
 
       // 5. Criar Atribuição Comercial
-      if (newLead) {
-        const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
-          lead_id: newLead.id,
-          originator_id: originatorId, 
-          current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : DEFAULT_ADMIN_ID,
-          referral_token_id: referralTokenId,
-        } as any);
+      console.log(`[ATA006] Tentando criar atribuição para lead ${newLead.id}`);
+      const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
+        lead_id: newLead.id,
+        originator_id: originatorId, 
+        current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : DEFAULT_ADMIN_ID,
+        referral_token_id: referralTokenId,
+      } as any);
 
-        if (attrError) {
-          console.error("Erro ao criar atribuição:", attrError);
-        }
+      if (attrError) {
+        console.error("[ATA006] Erro ao criar atribuição:", attrError);
+        // Interromper conforme ATA#006
+        throw new Error(`Falha ao salvar atribuição: [${attrError.code}] ${attrError.message}`);
+      }
 
-        // 6. Atividade Inicial
-        await supabaseAdmin.from("lead_activities").insert({
-          lead_id: newLead.id,
-          user_id: originatorId || DEFAULT_ADMIN_ID,
-          type: "status",
-          description: `Lead criado via formulário público. Origem: ${displaySource}.`,
-          happened_at: new Date().toISOString(),
-        } as any);
+      // 6. Atividade Inicial
+      const { error: activityError } = await supabaseAdmin.from("lead_activities").insert({
+        lead_id: newLead.id,
+        user_id: originatorId || DEFAULT_ADMIN_ID,
+        type: "status",
+        description: `Lead criado via formulário público. Origem: ${displaySource}.`,
+        happened_at: new Date().toISOString(),
+      } as any);
+      
+      if (activityError) {
+        console.warn("[ATA006] Erro ao criar atividade (não crítico):", activityError);
       }
       
-      return { success: true, message: "Lead criado com sucesso.", isNew: true };
+      return { success: true, message: "Lead criado com sucesso.", isNew: true, leadId: newLead.id };
 
     } catch (error: any) {
       console.error("Erro no processamento do Funil:", error);
