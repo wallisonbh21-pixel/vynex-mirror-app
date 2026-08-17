@@ -33,50 +33,75 @@ export function useLeadBriefing(leadId: string, leadNotes: string | null) {
 
       // 3. Mapeamento de labels amigáveis para campos conhecidos
       const labelMap: Record<string, string> = {
-        objective: "Objetivo do projeto",
-        needs: "Necessidade do cliente",
-        observations: "Observações adicionais",
-        references: "Referência / Site de referência",
-        socialMedia: "Redes sociais",
-        currentSite: "Site atual",
-        name: "Nome do cliente",
-        company: "Empresa",
-        email: "E-mail",
-        whatsapp: "WhatsApp",
-        city: "Cidade",
-        state: "Estado",
-        segment: "Nicho/Segmento",
-        serviceId: "Serviço de interesse"
+        serviceId: "SERVIÇO DE INTERESSE",
+        objective: "OBJETIVO DO PROJETO",
+        needs: "NECESSIDADE DO CLIENTE",
+        references: "REFERÊNCIA",
+        currentWebsite: "SITE ATUAL",
+        socialMedia: "REDES SOCIAIS",
+        observations: "OBSERVAÇÕES ADICIONAIS",
       };
 
-      // 4. Extrair necessidades das notas legíveis (retrocompatibilidade)
+      // 4. Mapeamento de botões para campos de link
+      const linkButtonMap: Record<string, string> = {
+        references: "Abrir referência",
+        currentWebsite: "Abrir site",
+        socialMedia: "Abrir rede social",
+      };
+
+      // 5. Ordem de exibição desejada
+      const displayOrder = [
+        "serviceId",
+        "objective",
+        "needs",
+        "references",
+        "currentWebsite",
+        "socialMedia",
+        "observations",
+      ];
+
+      // 6. Extrair necessidades das notas legíveis (retrocompatibilidade)
       const needsMatch = leadNotes?.match(/Interesse inicial:\s*([\s\S]*?)(?:\nServiço:|$)/i);
-      let needs = dynamicData["needs"] || (needsMatch && needsMatch[1] ? needsMatch[1].trim() : (leadNotes?.split('\n')[0] || "—"));
-
-      // 5. Normalizar dynamicData para garantir que todos os campos tenham labels e valores limpos
-      const normalizedData: Record<string, { label: string, value: any }> = {};
+      let legacyNeeds = needsMatch && needsMatch[1] ? needsMatch[1].trim() : null;
       
-      // Primeiro, processar o dynamicData (JSON)
-      Object.entries(dynamicData).forEach(([key, value]) => {
-        if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) return;
-        normalizedData[key] = {
-          label: labelMap[key] || key,
-          value
-        };
-      });
-
-      // Garantir que 'needs' esteja presente se extraído das notas legíveis
-      if (!normalizedData["needs"] && needs && needs !== "—") {
-        normalizedData["needs"] = {
-          label: labelMap["needs"] || "Necessidade do cliente",
-          value: needs
-        };
+      // Se não achou nada estruturado, pode ser o formato ultra-legado onde a primeira linha é a necessidade
+      if (!legacyNeeds && leadNotes && !leadNotes.includes("Dados do Briefing:")) {
+        legacyNeeds = leadNotes.split('\n')[0]?.trim();
       }
 
+      // 7. Normalizar dynamicData
+      const normalizedData: any[] = [];
+      
+      displayOrder.forEach((key) => {
+        let value = dynamicData[key];
+
+        // Regra de não duplicação: se objective e needs forem iguais, limpa needs
+        if (key === "needs" && value && value === dynamicData["objective"]) {
+          value = null;
+        }
+
+        // Retrocompatibilidade para needs
+        if (key === "needs" && !value && legacyNeeds && legacyNeeds !== "—") {
+          value = legacyNeeds;
+        }
+
+        // Resolver serviceName para serviceId
+        if (key === "serviceId") {
+          value = serviceName !== "—" ? serviceName : null;
+        }
+
+        if (value && typeof value === 'string' && value.trim() !== '' && value !== "—") {
+          normalizedData.push({
+            key,
+            label: labelMap[key] || key,
+            value: value.trim(),
+            buttonLabel: linkButtonMap[key],
+          });
+        }
+      });
+
       return {
-        serviceName,
-        needs,
-        dynamicData: normalizedData,
+        briefingItems: normalizedData,
       };
     },
     enabled: !!leadId,
