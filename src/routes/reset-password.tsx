@@ -61,7 +61,7 @@ function ResetPasswordPage() {
     setLoading(true);
     
     // Update password AND remove the must_change_password flag
-    const { error } = await supabase.auth.updateUsuário({ 
+    const { error } = await supabase.auth.updateUser({ 
       password: parsed.data.password,
       data: { must_change_password: false }
     });
@@ -74,7 +74,7 @@ function ResetPasswordPage() {
     toast.success("Sua senha foi definida com sucesso!");
     
     // Identify role to redirect
-    const { data: { user } } = await supabase.auth.getUsuário();
+    const { data: { user } } = await supabase.auth.getUser();
     const isClientee = user?.user_metadata?.['role'] === 'cliente';
     
     // Auto redirect to /cliente after password creation

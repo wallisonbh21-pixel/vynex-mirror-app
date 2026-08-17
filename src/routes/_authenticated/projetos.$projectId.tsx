@@ -6,7 +6,7 @@ import {
   Clock, 
   CircleDollarSign, 
   Globe, 
-  Usuário,
+  User,
   ExternalLink,
   MessageSquare,
   FileText,
@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
-import { ProjetoProgression } from "@/components/ProjetoProgression";
+import { ProjectProgression } from "@/components/ProjectProgression";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -120,7 +120,7 @@ function DetalhesProjetoPage() {
           </div>
         </div>
         <div className="mt-6 border-t pt-6">
-          <ProjetoProgression steps={progressionSteps as any} currentStatus={project.status} />
+          <ProjectProgression steps={progressionSteps as any} currentStatus={project.status} />
         </div>
       </div>
 

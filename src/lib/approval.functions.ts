@@ -34,7 +34,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
     const {
       loadProjetoByToken,
       loadCliente,
-      adminUsuárioIds,
+      adminUserIds,
       notify,
       logApprovalEvent,
       APPROVAL_FLOW,
@@ -66,7 +66,7 @@ export const clientApproveSite = createServerFn({ method: "POST" })
       new_status: APPROVAL_FLOW.aprovado,
     });
 
-    const admins = await adminUsuárioIds();
+    const admins = await adminUserIds();
     await notify([
       ...admins.map((id) => ({
         user_id: id,
@@ -111,7 +111,7 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
     const {
       loadProjetoByToken,
       loadCliente,
-      adminUsuárioIds,
+      adminUserIds,
       notify,
       logApprovalEvent,
       APPROVAL_FLOW,
@@ -140,7 +140,7 @@ export const clientRequestChanges = createServerFn({ method: "POST" })
       new_status: APPROVAL_FLOW.ajustesClientee,
     });
 
-    const admins = await adminUsuárioIds();
+    const admins = await adminUserIds();
     await notify([
       ...admins.map((id) => ({
         user_id: id,

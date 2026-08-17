@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -32,7 +32,7 @@ export function useRows<T = Record<string, unknown>>(
 }
 
 export function useSaveRow(table: Table, invalidate: Table[] = []) {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
       const { id, ...rest } = values;
@@ -55,7 +55,7 @@ export function useSaveRow(table: Table, invalidate: Table[] = []) {
 }
 
 export function useDeleteRow(table: Table, invalidate: Table[] = []) {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from(table).delete().eq("id", id);

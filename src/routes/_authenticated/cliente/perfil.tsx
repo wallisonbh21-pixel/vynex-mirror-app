@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Usuário, Mail, Phone, Building, Shield } from "lucide-react";
+import { User, Mail, Phone, Building, Shield } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cliente/perfil")({
   component: MyProfile,
@@ -50,7 +50,7 @@ function MyProfile() {
           <Card className="border-sidebar-border/50 bg-sidebar/30 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Usuário className="size-4 text-primary" />
+                <User className="size-4 text-primary" />
                 Dados Pessoais
               </CardTitle>
             </CardHeader>

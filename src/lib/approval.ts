@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
@@ -99,7 +99,7 @@ async function adminIds() {
 }
 
 function useInvalidate() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return () => {
     queryCliente.invalidateQueries({ queryKey: ["projects"] });
     queryCliente.invalidateQueries({ queryKey: ["project_approval_events"] });

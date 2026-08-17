@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { today } from "@/lib/format";
@@ -102,7 +102,7 @@ export function useActivities(leadId?: string) {
 }
 
 export function useLogActivity() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (values: {
       lead_id: string;
@@ -134,7 +134,7 @@ export function useLogActivity() {
 
 /** Muda o status do lead e registra a mudança na linha do tempo. */
 export function useChangeLeadStatus() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       lead,
@@ -168,7 +168,7 @@ export function useChangeLeadStatus() {
 
 /** Converte um lead fechado em cliente + contrato + projeto inicial. */
 export function useConvertLead() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       lead,

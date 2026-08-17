@@ -4,7 +4,7 @@ import type { AppRole } from "@/lib/auth";
 
 /** Lê os papéis do usuário autenticado (admin sempre tem acesso total). */
 export async function getCurrentRoles(): Promise<AppRole[]> {
-  const { data: userData, error: userError } = await supabase.auth.getUsuário();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
   const user = userData?.user;
   if (userError || !user) {
     if (typeof window === "undefined") {

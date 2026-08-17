@@ -21,10 +21,10 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { ForgeBuildPlan, ForgeSectionPlan } from '@/lib/forge';
-import { ScaleNexusProjetoContext } from '@/lib/ai-core';
+import { ScaleNexusProjectContext } from '@/lib/ai-core';
 
 interface ForgePanelProps {
-  context: ScaleNexusProjetoContext;
+  context: ScaleNexusProjectContext;
   plan: ForgeBuildPlan;
   onUpdatePlan: (updatedPlan: ForgeBuildPlan) => void;
   onStartBuild: (plan: ForgeBuildPlan) => void;

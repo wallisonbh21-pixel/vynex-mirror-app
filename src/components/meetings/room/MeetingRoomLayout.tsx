@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { MeetingWithParticipants, MeetingMessage, MeetingNote } from '@/lib/meetings/types';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Usuários, MessageSquare, StickyNote, Info, LogOut, XCircle, Send, CheckCircle2 } from 'lucide-react';
-import { useQuery, useMutation, useQueryCliente } from '@tanstack/react-query';
+import { Users, MessageSquare, StickyNote, Info, LogOut, XCircle, Send, CheckCircle2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { meetingQueries } from '@/lib/meetings/queries';
 import { meetingMutations } from '@/lib/meetings/mutations';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -34,7 +34,7 @@ export function MeetingRoomLayout({
   onComplete, 
   isCompleting 
 }: MeetingRoomLayoutProps) {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const [message, setMessage] = useState('');
   const [note, setNote] = useState('');
 
@@ -163,7 +163,7 @@ export function MeetingRoomLayout({
         <aside className="w-full max-w-[400px] border-l border-slate-800 bg-slate-900/30 flex flex-col hidden lg:flex">
           <Tabs defaultValue="participants" className="flex-1 flex flex-col">
             <TabsList className="w-full h-12 bg-slate-900/50 border-b border-slate-800 rounded-none px-2 gap-2">
-              <TabsTrigger value="participants" className="flex-1 data-[state=active]:bg-slate-800"><Usuários className="w-4 h-4 mr-2" /> Participantes</TabsTrigger>
+              <TabsTrigger value="participants" className="flex-1 data-[state=active]:bg-slate-800"><Users className="w-4 h-4 mr-2" /> Participantes</TabsTrigger>
               <TabsTrigger value="chat" className="flex-1 data-[state=active]:bg-slate-800"><MessageSquare className="w-4 h-4 mr-2" /> Chat</TabsTrigger>
               <TabsTrigger value="notes" className="flex-1 data-[state=active]:bg-slate-800"><StickyNote className="w-4 h-4 mr-2" /> Notas</TabsTrigger>
               <TabsTrigger value="info" className="flex-1 data-[state=active]:bg-slate-800"><Info className="w-4 h-4 mr-2" /> Info</TabsTrigger>
@@ -317,7 +317,7 @@ export function MeetingRoomLayout({
 
       {/* Mobile Footer Menu (Placeholder for tabs) */}
       <footer className="lg:hidden h-14 border-t border-slate-800 bg-slate-900 flex items-center justify-around px-2">
-        <Button variant="ghost" size="icon" className="text-slate-400"><Usuários className="w-5 h-5" /></Button>
+        <Button variant="ghost" size="icon" className="text-slate-400"><Users className="w-5 h-5" /></Button>
         <Button variant="ghost" size="icon" className="text-slate-400"><MessageSquare className="w-5 h-5" /></Button>
         <Button variant="ghost" size="icon" className="text-slate-400"><StickyNote className="w-5 h-5" /></Button>
         <Button variant="ghost" size="icon" className="text-slate-400"><Info className="w-5 h-5" /></Button>

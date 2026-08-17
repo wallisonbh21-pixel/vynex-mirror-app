@@ -223,9 +223,9 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           const token = authHeader.split(" ")[1];
-          const { data: { user: authUsuário }, error: authError } = await supabase.auth.getUsuário(token);
+          const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
           
-          if (authError || !authUsuário) {
+          if (authError || !authUser) {
             return new Response(JSON.stringify({ error: "Unauthorized", message: "Sessão inválida" }), { 
               status: 401,
               headers: { "Content-Type": "application/json" }
@@ -233,7 +233,7 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // 2. ALWAYS VALIDATE ROLES
-          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", authUsuário.id);
+          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", authUser.id);
           const userRoles = roles?.map(r => r.role) || [];
 
           if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {

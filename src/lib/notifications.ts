@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
@@ -36,7 +36,7 @@ export function useNotifications() {
 }
 
 export function useMarkNotificationRead() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const { user } = useSession();
   return useMutation({
     mutationFn: async (id: string) => {
@@ -52,7 +52,7 @@ export function useMarkNotificationRead() {
 }
 
 export function useMarkAllNotificationsRead() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const { user } = useSession();
   return useMutation({
     mutationFn: async () => {

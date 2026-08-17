@@ -1,7 +1,7 @@
 
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Sparkles, ArrowRight, Lock, Usuário } from "lucide-react";
+import { Sparkles, ArrowRight, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +41,7 @@ function ClienteLoginPage() {
     const roles = rolesData?.map(r => r.role) || [];
     
     if (roles.includes("cliente")) {
-      const { data: userData } = await supabase.auth.getUsuário();
+      const { data: userData } = await supabase.auth.getUser();
       if (userData?.user?.user_metadata?.['must_change_password']) {
         navigate({ to: "/cliente/primeiro-acesso", replace: true });
       } else {
@@ -85,9 +85,9 @@ function ClienteLoginPage() {
           <h2 className="text-2xl font-bold mb-6">Entre no seu painel</h2>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Usuário / E-mail</Label>
+              <Label htmlFor="email">User / E-mail</Label>
               <div className="relative">
-                <Usuário className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-white/40" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-white/40" />
                 <Input
                   id="email"
                   value={email}

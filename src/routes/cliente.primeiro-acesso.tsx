@@ -53,7 +53,7 @@ function PrimeiroAcessoPage() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.updateUsuário({
+    const { error } = await supabase.auth.updateUser({
       password: password,
       data: { must_change_password: false }
     });

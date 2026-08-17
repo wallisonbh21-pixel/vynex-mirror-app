@@ -30,7 +30,7 @@ function ClienteResetPassword() {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUsuário({ password });
+      const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       
       toast.success("Senha definida com sucesso!");

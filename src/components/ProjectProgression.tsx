@@ -4,16 +4,16 @@ import {
   Target,
   Circle
 } from "lucide-react";
-import { label, ProjetoStatus } from "@/lib/format";
+import { label, ProjectStatus } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-interface ProjetoProgressionProps {
-  steps: ProjetoStatus[];
+interface ProjectProgressionProps {
+  steps: ProjectStatus[];
   currentStatus: string;
 }
 
-export function ProjetoProgression({ steps, currentStatus }: ProjetoProgressionProps) {
-  const currentIndex = steps.indexOf(currentStatus as ProjetoStatus);
+export function ProjectProgression({ steps, currentStatus }: ProjectProgressionProps) {
+  const currentIndex = steps.indexOf(currentStatus as ProjectStatus);
 
   return (
     <div className="relative py-12 px-2 overflow-x-auto no-scrollbar">

@@ -55,6 +55,6 @@ export const deleteCliente = createServerFn({ method: "POST" })
     return {
         success: true,
         message: "Clientee excluído com sucesso.",
-        hadAuthUsuário: hasAuth
+        hadAuthUser: hasAuth
     };
 });

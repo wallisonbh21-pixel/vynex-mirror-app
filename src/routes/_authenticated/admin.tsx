@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
-import { ShieldCheck, Usuários, Wallet } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ShieldCheck, Users, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
@@ -41,7 +41,7 @@ const ROLES = ROLE_OPTIONS;
 
 function AdminPage() {
   const { isAdmin, loading } = useRoles();
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
 
   const profiles = useQuery({
     queryKey: ["profiles"],
@@ -126,7 +126,7 @@ function AdminPage() {
   return (
     <AppShell title="Administração" description="Controle de acessos e aprovações da operação.">
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Usuários" value={String(rows.length)} hint="Cadastrados na plataforma" icon={Usuários} />
+        <StatCard label="Users" value={String(rows.length)} hint="Cadastrados na plataforma" icon={Users} />
         <StatCard label="Saques pendentes" value={String(pending.length)} hint={currency(pending.reduce((s, w) => s + Number(w.amount), 0))} icon={Wallet} />
         <StatCard
           label="Administradores"
@@ -137,7 +137,7 @@ function AdminPage() {
       </div>
 
       <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-panel">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold">Usuários e papéis</h2>
+        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold">Users e papéis</h2>
         <ul className="divide-y divide-border">
           {rows.map((profile) => {
             const role = (roles.data ?? []).find((r) => r.user_id === profile.id)?.role ?? "vendedor";

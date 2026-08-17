@@ -1,9 +1,9 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { createClientePortalAccount } from "./onboarding.functions";
+import { createClientPortalAccount } from "./onboarding.functions";
 import { registerNewCliente } from "./client-registration.functions";
 import { deleteCliente } from "./client-deletion.functions";
 
@@ -122,8 +122,8 @@ export function useClientesList(ownerId?: string, statusFilter?: string) {
  * Hook para gerenciar o onboarding de clientes (criação de conta e vínculo).
  */
 export function useClienteOnboarding() {
-  const queryCliente = useQueryCliente();
-  const onboardFn = useServerFn(createClientePortalAccount);
+  const queryCliente = useQueryClient();
+  const onboardFn = useServerFn(createClientPortalAccount);
 
   return useMutation({
     mutationFn: async (params: { email: string; fullName: string; clientId: string; username: string }) => {
@@ -147,7 +147,7 @@ export function useClienteOnboarding() {
  * Hook para cadastrar um novo cliente.
  */
 export function useRegisterCliente() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const registerFn = useServerFn(registerNewCliente);
 
   return useMutation({
@@ -172,7 +172,7 @@ export function useRegisterCliente() {
  * Hook para excluir um cliente.
  */
 export function useDeleteCliente() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const deleteFn = useServerFn(deleteCliente);
 
   return useMutation({

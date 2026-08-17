@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQueryCliente } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { UsuárioRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
@@ -32,7 +32,7 @@ const schema = z.object({
 });
 
 function PerfilPage() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
@@ -85,7 +85,7 @@ function PerfilPage() {
       .eq("id", user!.id);
 
     if (!error && parsed.data.email !== user?.email) {
-      const { error: emailError } = await supabase.auth.updateUsuário({ email: parsed.data.email });
+      const { error: emailError } = await supabase.auth.updateUser({ email: parsed.data.email });
       if (emailError) {
         setSaving(false);
         toast.error("Não foi possível alterar o e-mail: " + emailError.message);
@@ -158,7 +158,7 @@ function PerfilPage() {
             />
           ) : (
             <span className="mx-auto flex size-24 items-center justify-center rounded-full bg-gradient-brand text-2xl font-semibold text-primary-foreground">
-              {initials || <UsuárioRound className="size-8" />}
+              {initials || <UserRound className="size-8" />}
             </span>
           )}
           <p className="mt-4 text-base font-semibold">{displayName}</p>

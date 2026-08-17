@@ -30,7 +30,7 @@ export const PROJECT_STATUS = [
   "entregue",
   "cancelado",
 ] as const;
-export type ProjetoStatus = (typeof PROJECT_STATUS)[number];
+export type ProjectStatus = (typeof PROJECT_STATUS)[number];
 
 export const getProjetoProgress = (status: string): number => {
   const progressMap: Record<string, number> = {

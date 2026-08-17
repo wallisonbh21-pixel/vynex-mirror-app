@@ -10,7 +10,7 @@ import {
   Search, 
   ShieldCheck,
   Circle,
-  UsuárioPlus,
+  UserPlus,
   Mail,
   MoreVertical,
   CheckCircle2,
@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useQueryCliente } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { resendInvite } from "@/lib/onboarding.functions";
 import { sendNotification } from "@/lib/client-login.functions";
@@ -39,7 +39,7 @@ export const Route = createFileRoute('/_authenticated/admin/clientes')({
 });
 
 function AdminClientees() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const { data: clients, isLoading, refetch } = useClientesList();
   const registerCliente = useRegisterCliente();
   const onboarding = useClienteOnboarding();
@@ -223,7 +223,7 @@ function AdminClientees() {
                         </div>
                         {username && (
                            <div className="flex items-center gap-1.5">
-                            <span className="font-medium text-foreground">Usuário:</span> {username}
+                            <span className="font-medium text-foreground">User:</span> {username}
                           </div>
                         )}
                       </div>
@@ -259,7 +259,7 @@ function AdminClientees() {
                             setIsLoginDialogOpen(true);
                           }}
                         >
-                          <UsuárioPlus className="size-3.5" /> 
+                          <UserPlus className="size-3.5" /> 
                           Fazer Cadastro do Painel do Clientee
                         </Button>
                         <Button 

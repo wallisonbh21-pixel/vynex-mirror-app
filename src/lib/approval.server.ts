@@ -70,7 +70,7 @@ export async function loadCliente(clientId: string | null) {
   } | null;
 }
 
-export async function adminUsuárioIds() {
+export async function adminUserIds() {
   const { data } = await supabaseAdmin
     .from("user_roles")
     .select("user_id, role")

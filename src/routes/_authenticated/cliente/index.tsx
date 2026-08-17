@@ -25,7 +25,7 @@ import {
   Wallet,
   Activity
 } from "lucide-react";
-import { ProjetoProgression } from "@/components/ProjetoProgression";
+import { ProjectProgression } from "@/components/ProjectProgression";
 import { PROJECT_STATUS, getProjetoProgress, getProjetoNextStep, label } from "@/lib/format";
 import { useNotifications } from "@/lib/notifications";
 import { useQuery } from "@tanstack/react-query";
@@ -187,7 +187,7 @@ function ClienteDashboard() {
                 </div>
 
                 <div className="pt-4 border-t border-border/10">
-                  <ProjetoProgression steps={[...PROJECT_STATUS].filter(s => s !== 'cancelado')} currentStatus={activeProjeto.status} />
+                  <ProjectProgression steps={[...PROJECT_STATUS].filter(s => s !== 'cancelado')} currentStatus={activeProjeto.status} />
                 </div>
               </CardContent>
             </Card>

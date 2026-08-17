@@ -37,7 +37,7 @@ export const getClienteAccessLogs = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({ userId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: { user }, error } = await supabaseAdmin.auth.admin.getUsuárioById(data.userId);
+    const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(data.userId);
     if (error) throw error;
     
     return {

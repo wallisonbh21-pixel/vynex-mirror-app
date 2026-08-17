@@ -10,7 +10,7 @@ import {
   Search, 
   ShieldCheck,
   Circle,
-  UsuárioPlus,
+  UserPlus,
   Lock,
   ExternalLink,
   Mail,
@@ -222,7 +222,7 @@ function VendedorClientees() {
                         </div>
                         {username && (
                            <div className="flex items-center gap-1.5">
-                            <span className="font-medium text-foreground">Usuário:</span> {username}
+                            <span className="font-medium text-foreground">User:</span> {username}
                           </div>
                         )}
                       </div>
@@ -264,7 +264,7 @@ function VendedorClientees() {
                             setIsLoginDialogOpen(true);
                           }}
                         >
-                          <UsuárioPlus className="size-3.5" /> 
+                          <UserPlus className="size-3.5" /> 
                           Fazer Cadastro do Painel do Clientee
                         </Button>
                         <Button 

@@ -3,17 +3,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const createClienteAccountSchema = z.object({
+const createClientAccountSchema = z.object({
   clientId: z.string().uuid(),
   username: z.string().min(3),
 });
 
-export const createClientePortalAccount = createServerFn({ method: "POST" })
+export const createClientPortalAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => createClienteAccountSchema.parse(data))
+  .validator((data: unknown) => createClientAccountSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { createAuthUsuário } = await import("./auth-utils.server");
+    const { createAuthUser } = await import("./auth-utils.server");
     const { sendResendEmail } = await import("./resend.server");
     const { supabase: userSupabase, userId: actorId } = context;
 
@@ -63,7 +63,7 @@ export const createClientePortalAccount = createServerFn({ method: "POST" })
     if (!isAdmin && client.owner_id !== actorId) throw new Error("Sem permissão.");
     if (!client.contact_email) throw new Error("E-mail não informado.");
 
-    // 4. Check Usuárioname uniqueness (Scenario 2)
+    // 4. Check Username uniqueness (Scenario 2)
     const { data: existingProfile } = await supabaseAdmin.from("profiles").select("id").eq("nickname", data.username).maybeSingle();
     
     // If username exists but belongs to ANOTHER user
@@ -71,38 +71,38 @@ export const createClientePortalAccount = createServerFn({ method: "POST" })
       throw new Error("Este nome de usuário já está sendo utilizado por outro cliente. Escolha outro nome.");
     }
 
-    // 5. Auth Usuário logic
-    let targetUsuário: any = null;
-    const { data: { users } } = await supabaseAdmin.auth.admin.listUsuários();
+    // 5. Auth User logic
+    let targetUser: any = null;
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
     
     // Find by email (Scenario 1 & 3)
-    const existingAuthUsuário = users.find((u) => u.email?.toLowerCase() === client.contact_email!.toLowerCase());
+    const existingAuthUser = users.find((u) => u.email?.toLowerCase() === client.contact_email!.toLowerCase());
 
-    if (existingAuthUsuário) {
-      targetUsuário = existingAuthUsuário;
+    if (existingAuthUser) {
+      targetUser = existingAuthUser;
       // Link if needed (e.g. if the commercial record is not yet linked to the Auth account)
-      if (client.user_id !== targetUsuário.id) {
-        await supabaseAdmin.from("clients").update({ user_id: targetUsuário.id } as any).eq("id", client.id);
+      if (client.user_id !== targetUser.id) {
+        await supabaseAdmin.from("clients").update({ user_id: targetUser.id } as any).eq("id", client.id);
       }
     } else {
       // Create new Auth
-      const { user: newUsuário } = await createAuthUsuário(supabaseAdmin, {
+      const { user: newUser } = await createAuthUser(supabaseAdmin, {
         email: client.contact_email,
         username: data.username,
         fullName: client.contact_name || data.username,
         role: "cliente",
         clientId: client.id
       });
-      targetUsuário = newUsuário;
+      targetUser = newUser;
       auditData.auth_created = true;
-      await supabaseAdmin.from("clients").update({ user_id: targetUsuário.id } as any).eq("id", client.id);
+      await supabaseAdmin.from("clients").update({ user_id: targetUser.id } as any).eq("id", client.id);
     }
 
     // 6. Ensure Profile & Role
-    await supabaseAdmin.from("profiles").upsert({ id: targetUsuário.id, nickname: data.username, full_name: client.contact_name || data.username } as any);
+    await supabaseAdmin.from("profiles").upsert({ id: targetUser.id, nickname: data.username, full_name: client.contact_name || data.username } as any);
     auditData.profile_linked = true;
     
-    await supabaseAdmin.from("user_roles").upsert({ user_id: targetUsuário.id, role: "cliente" as any }, { onConflict: "user_id,role" });
+    await supabaseAdmin.from("user_roles").upsert({ user_id: targetUser.id, role: "cliente" as any }, { onConflict: "user_id,role" });
     auditData.role_created = true;
 
     // 7. Email Dispatch
@@ -114,7 +114,7 @@ export const createClientePortalAccount = createServerFn({ method: "POST" })
         <h2 style="color: #0F172A;">Olá, ${client.contact_name || data.username}! 👋</h2>
         <p>Seu acesso ao Portal do Clientee ScaleNexus está pronto.</p>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <strong>Usuário:</strong> ${data.username}
+          <strong>User:</strong> ${data.username}
         </div>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${siteUrl}/cliente/login" style="background: #3B82F6; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold;">
@@ -145,7 +145,7 @@ export const createClientePortalAccount = createServerFn({ method: "POST" })
         console.warn("[DEBUG] Resend failed, falling back to Supabase Auth Invite/Recovery", resendError.message);
         
         // 7.2 Fallback to Supabase Auth (Temporary/Teste method)
-        if (existingAuthUsuário) {
+        if (existingAuthUser) {
           // If user already exists, send a real password reset email
           const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(client.contact_email, {
             redirectTo: `${siteUrl}/cliente/login`
@@ -154,7 +154,7 @@ export const createClientePortalAccount = createServerFn({ method: "POST" })
           console.log("[DEBUG] Password reset email sent via Supabase Auth as fallback");
         } else {
           // If user is new, send a standard invite (which also sends an email)
-          const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUsuárioByEmail(client.contact_email, {
+          const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.contact_email, {
             data: { 
               full_name: client.contact_name || data.username,
               username: data.username,
@@ -173,7 +173,7 @@ export const createClientePortalAccount = createServerFn({ method: "POST" })
         auditData.resend_message_id = resendMessageId;
         await logAudit("client_access_created_success", auditData);
         
-        const isExisting = !!existingAuthUsuário;
+        const isExisting = !!existingAuthUser;
         return { 
           success: true, 
           message: isExisting ? "Este cliente já possui login. E-mail de redefinição enviado." : "Login criado e e-mail de acesso enviado.",
@@ -210,20 +210,20 @@ export const resendInvite = createServerFn({ method: "POST" })
     }
 
     // Find the user in Auth
-    const { data: { users } } = await supabaseAdmin.auth.admin.listUsuários();
-    const targetUsuário = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
+    const targetUser = users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
 
-    if (!targetUsuário) throw new Error("Usuário não encontrado no sistema de autenticação.");
+    if (!targetUser) throw new Error("User não encontrado no sistema de autenticação.");
 
     // Fetch client to get contact name
     const { data: client } = await userSupabase
       .from("clients")
       .select("contact_name, contact_email")
-      .eq("user_id", targetUsuário.id)
+      .eq("user_id", targetUser.id)
       .maybeSingle();
 
     const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
-    const contactName = client?.contact_name || (targetUsuário.user_metadata as any)?.full_name || "Clientee";
+    const contactName = client?.contact_name || (targetUser.user_metadata as any)?.full_name || "Clientee";
 
     // Scenario: Reuse Auth + Redefinition email
     try {

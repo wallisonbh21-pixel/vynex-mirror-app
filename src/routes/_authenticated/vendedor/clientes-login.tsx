@@ -7,7 +7,7 @@ import {
   Search, 
   Plus, 
   Mail,
-  Usuário,
+  User,
   Calendar,
   Lock,
   Bell,
@@ -74,7 +74,7 @@ function VendedorLoginCentral() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClienteId, setSelectedClienteId] = useState<string>("");
-  const [username, setUsuárioname] = useState("");
+  const [username, setUsername] = useState("");
 
   const filteredClientes = useMemo(() => {
     return clients?.filter((c) => {
@@ -115,7 +115,7 @@ function VendedorLoginCentral() {
       });
       setIsModalOpen(false);
       setSelectedClienteId("");
-      setUsuárioname("");
+      setUsername("");
       refetch();
     } catch (e: any) {
       // toast is handled by mutation
@@ -146,10 +146,10 @@ function VendedorLoginCentral() {
     if (clientId) {
       setSelectedClienteId(clientId);
       const client = clients?.find(c => c.id === clientId);
-      setUsuárioname(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
+      setUsername(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
     } else {
       setSelectedClienteId("");
-      setUsuárioname("");
+      setUsername("");
     }
     setIsModalOpen(true);
   };
@@ -195,7 +195,7 @@ function VendedorLoginCentral() {
               </div>
             ) : clientsWithLogin.length === 0 ? (
               <div className="py-20 text-center text-muted-foreground border-2 border-dashed rounded-3xl bg-card/30">
-                <Usuário className="size-12 opacity-20 mx-auto mb-4" />
+                <User className="size-12 opacity-20 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground">Nenhum cliente com login</h3>
                 <p>Ative o acesso de seus clientes para que eles utilizem o portal.</p>
               </div>
@@ -209,7 +209,7 @@ function VendedorLoginCentral() {
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                       <div className="flex items-start gap-5">
                         <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-500/20">
-                          <Usuário className="size-7" />
+                          <User className="size-7" />
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
@@ -220,8 +220,8 @@ function VendedorLoginCentral() {
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 pt-1">
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Usuário className="size-3.5 text-primary/60" />
-                                <span className="font-medium text-foreground/80">Usuário:</span> {usernameDisplay}
+                                <User className="size-3.5 text-primary/60" />
+                                <span className="font-medium text-foreground/80">User:</span> {usernameDisplay}
                              </div>
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Mail className="size-3.5 text-primary/60" />
@@ -274,7 +274,7 @@ function VendedorLoginCentral() {
                 <div key={client.id} className="p-6 rounded-3xl border border-border/50 bg-card/50 hover:bg-card transition-all flex flex-col sm:flex-row items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                     <div className="size-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border/50">
-                      <Usuário className="size-6" />
+                      <User className="size-6" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">{client.contact_name}</h3>
@@ -307,7 +307,7 @@ function VendedorLoginCentral() {
               <Select value={selectedClienteId} onValueChange={(val) => {
                 setSelectedClienteId(val);
                 const c = activeClientes?.find(x => x.id === val);
-                if (c) setUsuárioname(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
+                if (c) setUsername(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
               }}>
                 <SelectTrigger id="client-select" className="h-11 rounded-xl">
                   <SelectValue placeholder="Selecione o cliente ▼" />
@@ -355,7 +355,7 @@ function VendedorLoginCentral() {
               <Input 
                 id="username"
                 value={username} 
-                onChange={e => setUsuárioname(e.target.value)}
+                onChange={e => setUsername(e.target.value)}
                 placeholder="Ex: joao123"
                 className="h-11 rounded-xl"
               />

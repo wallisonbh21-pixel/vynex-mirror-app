@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useQuery, useMutation, useQueryCliente } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { meetingQueries } from '@/lib/meetings/queries';
 import { meetingMutations } from '@/lib/meetings/mutations';
 import { useSession, useRoles } from '@/lib/auth';
@@ -19,7 +19,7 @@ function MeetingRoomPage() {
   const { user } = useSession();
   const { isAdmin } = useRoles();
   const navigate = useNavigate();
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const [hasJoined, setHasJoined] = useState(false);
 
   const { data: meeting, isLoading, error } = useQuery({

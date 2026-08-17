@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryCliente } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { StudioData, StudioSection, StudioDesignSystem } from '@/types/studio';
 import { LibraryItem } from '@/types/studio-v2';
@@ -79,7 +79,7 @@ export function useStudioData(projectId: string, clientToken?: string) {
 }
 
 export function useSaveStudioData() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   
   return useMutation({
     mutationFn: async ({ projectId, data }: { projectId: string; data: StudioData }) => {
@@ -117,11 +117,11 @@ export function useStudioFavorites() {
 }
 
 export function useToggleFavorite() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   
   return useMutation({
     mutationFn: async ({ itemId, itemType, isFavorite }: { itemId: string; itemType: string; isFavorite: boolean }) => {
-      const { data: { user } } = await supabase.auth.getUsuário();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Unauthorized');
 
       if (isFavorite) {
@@ -145,8 +145,8 @@ export function useToggleFavorite() {
   });
 }
 
-// Usuário Templates Hooks
-export function useUsuárioTemplates() {
+// User Templates Hooks
+export function useUserTemplates() {
   return useQuery({
     queryKey: ['studio-user-templates'],
     queryFn: async () => {
@@ -161,12 +161,12 @@ export function useUsuárioTemplates() {
   });
 }
 
-export function useSaveUsuárioTemplate() {
-  const queryCliente = useQueryCliente();
+export function useSaveUserTemplate() {
+  const queryCliente = useQueryClient();
   
   return useMutation({
     mutationFn: async (template: Omit<LibraryItem, 'id' | 'type'>) => {
-      const { data: { user } } = await supabase.auth.getUsuário();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Unauthorized');
 
       const { error } = await supabase

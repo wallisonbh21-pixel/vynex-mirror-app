@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
@@ -68,7 +68,7 @@ type RpcCliente = {
 
 /** Assume o projeto de forma atômica — só o primeiro criador consegue. */
 export function useClaimProjeto() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (projectId: string) => {
       const { error } = await (supabase as unknown as RpcCliente).rpc("claim_project", {
@@ -86,7 +86,7 @@ export function useClaimProjeto() {
 
 /** Atualiza etapa/entrega de um projeto do criador. */
 export function useUpdateCreatorProjeto() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...values }: { id: string } & Record<string, unknown>) => {
       // Security: ensure user only updates their own project
@@ -94,7 +94,7 @@ export function useUpdateCreatorProjeto() {
       const { data: project } = await supabase.from("projects").select("creator_id, status").eq("id", id).single();
       if (!project) throw new Error("Projeto não encontrado.");
       
-      const { data: { user } } = await supabase.auth.getUsuário();
+      const { data: { user } } = await supabase.auth.getUser();
       if (project.creator_id !== user?.id) throw new Error("Acesso negado.");
 
       // Critical financial fields protection (re-enforcing what might be in triggers)
@@ -130,7 +130,7 @@ export function useUpdateCreatorProjeto() {
 
 /** Checklist do projeto */
 export function useProjetoChecklist(projectId: string) {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   
   const query = useQuery({
     queryKey: ["projects", projectId, "checklist"],
@@ -148,7 +148,7 @@ export function useProjetoChecklist(projectId: string) {
 
   const toggle = useMutation({
     mutationFn: async ({ itemId, completed }: { itemId: string, completed: boolean }) => {
-      const { data: { user } } = await supabase.auth.getUsuário();
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from("project_checklist_items")
         .update({ 
@@ -167,7 +167,7 @@ export function useProjetoChecklist(projectId: string) {
 
 /** Notas do projeto */
 export function useProjetoNotes(projectId: string) {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   
   const query = useQuery({
     queryKey: ["projects", projectId, "notes"],
@@ -185,7 +185,7 @@ export function useProjetoNotes(projectId: string) {
 
   const addNote = useMutation({
     mutationFn: async (content: string) => {
-      const { data: { user } } = await supabase.auth.getUsuário();
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from("project_notes")
         .insert({ 

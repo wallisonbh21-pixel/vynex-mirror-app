@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Clock, Usuário, Calendar, CheckCircle2, Package } from "lucide-react";
+import { Clock, User, Calendar, CheckCircle2, Package } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cliente/projeto")({
   component: MyProjeto,
@@ -98,7 +98,7 @@ function MyProjeto() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Usuário className="size-4" />
+                    <User className="size-4" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Responsável</p>

@@ -9,7 +9,7 @@ import {
   Sparkles,
   Star,
   Target,
-  UsuárioRound,
+  UserRound,
   Loader2,
   ExternalLink,
   X,
@@ -659,7 +659,7 @@ function ProspeccaoPage() {
                 byVendor().map(([id, stats]) => (
                   <li key={id} className="flex items-center justify-between gap-3">
                     <span className="flex items-center gap-2">
-                      <UsuárioRound className="size-4 text-muted-foreground" />
+                      <UserRound className="size-4 text-muted-foreground" />
                       {nameOf(id)}
                     </span>
                     <span className="text-muted-foreground">

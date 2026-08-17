@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryCliente } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3,
   Building2,
@@ -18,8 +18,8 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
-  UsuárioRound,
-  Usuários,
+  UserRound,
+  Users,
   Wallet,
   Rocket,
   Plus,
@@ -75,9 +75,9 @@ const NAV_VENDEDOR: NavItem[] = [
   { 
     to: "/clientes", 
     label: "Clientee", 
-    icon: Usuários,
+    icon: Users,
     submenu: [
-      { to: "/clientes", label: "Clientees", icon: Usuários },
+      { to: "/clientes", label: "Clientees", icon: Users },
       { to: "/vendedor/clientes-login", label: "Login do Clientee", icon: Lock },
     ]
   },
@@ -172,7 +172,7 @@ const NAV_CLIENTE: NavItem[] = [
   { to: "/cliente/pagamentos", label: "Pagamentos", icon: Wallet },
   { to: "/cliente/aprovacoes", label: "Aprovações", icon: ShieldCheck },
   { to: "/cliente/notificacoes", label: "Notificações", icon: BellRing },
-  { to: "/cliente/perfil", label: "Meu Perfil", icon: UsuárioRound },
+  { to: "/cliente/perfil", label: "Meu Perfil", icon: UserRound },
 ];
 
 export function AppShell({
@@ -187,7 +187,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const navigate = useNavigate();
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
@@ -208,9 +208,9 @@ export function AppShell({
         { 
           to: "/admin/clientes", 
           label: "Clientee", 
-          icon: Usuários,
+          icon: Users,
           submenu: [
-            { to: "/admin/clientes", label: "Clientees", icon: Usuários },
+            { to: "/admin/clientes", label: "Clientees", icon: Users },
             { to: "/admin/clientes-login", label: "Login do Clientee", icon: Lock },
           ]
         },
@@ -222,12 +222,12 @@ export function AppShell({
             { to: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
           ]
         },
-        { to: "/perfil", label: "Meu perfil", icon: UsuárioRound },
+        { to: "/perfil", label: "Meu perfil", icon: UserRound },
       ]
     : isCriador
       ? [
           ...NAV_CRIADOR,
-          { to: "/perfil", label: "Meu perfil", icon: UsuárioRound },
+          { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ]
       : isClientee
       ? [
@@ -235,7 +235,7 @@ export function AppShell({
         ]
       : [
           ...NAV_VENDEDOR,
-          { to: "/perfil", label: "Meu perfil", icon: UsuárioRound },
+          { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ];
 
   const displayName = profile?.nickname || profile?.full_name || "Sem nome";
@@ -445,4 +445,4 @@ function Avatar({ url, initials }: { url: string | null; initials: string }) {
   );
 }
 
-export { Usuários };
+export { Users };

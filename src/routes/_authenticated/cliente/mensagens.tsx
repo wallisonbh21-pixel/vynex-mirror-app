@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 import { useClientePortalData } from "@/lib/client";
-import { useQuery, useMutation, useQueryCliente } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,7 @@ function MyMessages() {
   const { data: clientData, isLoading: loadingCliente } = useClientePortalData();
   const [messageText, setMessageText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
 
   const activeProjeto = clientData?.projects?.[0];
   const projectId = activeProjeto?.id;

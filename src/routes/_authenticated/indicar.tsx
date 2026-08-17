@@ -7,7 +7,7 @@ import {
   ExternalLink, 
   Target, 
   TrendingUp, 
-  Usuários, 
+  Users, 
   CheckCircle2, 
   Clock,
   Search,

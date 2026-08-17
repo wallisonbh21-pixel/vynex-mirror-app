@@ -273,7 +273,7 @@ function LeadDetail() {
                   <div className="space-y-1">
                     <span className="text-[10px] text-muted-foreground uppercase font-medium">Indicado por</span>
                     <div className="text-sm font-semibold text-brand-500">
-                      {attribution?.originator ? (attribution.originator.full_name || attribution.originator.nickname) : attribution?.originator_id ? "Usuário Externo" : "ScaleNexus"}
+                      {attribution?.originator ? (attribution.originator.full_name || attribution.originator.nickname) : attribution?.originator_id ? "User Externo" : "ScaleNexus"}
                     </div>
                   </div>
                   <div className="space-y-1">

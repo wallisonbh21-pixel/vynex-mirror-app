@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -114,7 +114,7 @@ export function useOpportunities(showRemoved = false) {
 
 /** Cadastro manual de oportunidade (a busca externa chega na FASE 5.2). */
 export function useSaveOpportunity() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
       const { id, ...rest } = values;
@@ -209,7 +209,7 @@ async function logStatus(
 }
 
 export function useChangeOpportunityStatus() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       opportunity,
@@ -239,7 +239,7 @@ export function useChangeOpportunityStatus() {
 
 /** Converte a oportunidade em lead do CRM, sem duplicar empresas já cadastradas. */
 export function useAddOpportunityToLeads() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   return useMutation({
     mutationFn: async ({
       opportunity,

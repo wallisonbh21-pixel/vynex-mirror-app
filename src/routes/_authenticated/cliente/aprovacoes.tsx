@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle2, AlertCircle, Eye, MessageSquare, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryCliente } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { 
   Dialog, 
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/cliente/aprovacoes")({
 });
 
 function MyApprovals() {
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const { data: projects, isLoading: loadingProjetos } = useClienteProjetos();
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");

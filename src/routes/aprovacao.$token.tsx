@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useQuery, useMutation, useQueryCliente } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useStudioData } from '@/lib/studio/hooks';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, AlertCircle, Globe, ExternalLink, MessageSquare, Send, ArrowRight, Clock } from 'lucide-react';
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/aprovacao/$token')({
 
 function ClienteApprovalPage() {
   const { token } = Route.useParams();
-  const queryCliente = useQueryCliente();
+  const queryCliente = useQueryClient();
   const [adjustNote, setAdjustNote] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [showAdjustForm, setShowAdjustForm] = useState(false);
