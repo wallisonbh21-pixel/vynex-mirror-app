@@ -216,11 +216,23 @@ export function AppShell({
         },
         { 
           to: "/admin", 
-          label: "Administração", 
+          label: "Visão Geral", 
+          icon: LayoutDashboard,
+        },
+        { 
+          to: "/admin/usuarios", 
+          label: "Usuários", 
+          icon: Users,
+        },
+        { 
+          to: "/admin/saques", 
+          label: "Financeiro / Saques", 
+          icon: Wallet,
+        },
+        { 
+          to: "/admin/configuracoes", 
+          label: "Configurações", 
           icon: ShieldCheck,
-          submenu: [
-            { to: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
-          ]
         },
         { to: "/perfil", label: "Meu perfil", icon: UserRound },
       ]
