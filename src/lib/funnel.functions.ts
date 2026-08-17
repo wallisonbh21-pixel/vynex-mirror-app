@@ -32,8 +32,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .eq("id", data.serviceId)
         .maybeSingle();
       
-      
-
       if (serviceFetchError) {
         console.error("Erro ao buscar serviço:", serviceFetchError);
         throw new Error("Erro de comunicação ao validar o serviço escolhido.");
@@ -59,13 +57,11 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           lead_id: existingLead.id,
           user_id: "00000000-0000-0000-0000-000000000000",
           type: "status",
-          description: `Novo interesse recebido via Funil. Serviço: ${service.name}. Objetivo: ${data.details?.['objective'] || 'N/A'}`,
+          description: `Novo interesse recebido via Funil. Serviço: ${service.name}.`,
           happened_at: new Date().toISOString(),
         } as any);
 
-        const dupResponse = { success: true, message: "Interesse registrado com sucesso.", isNew: false };
-        
-        return dupResponse;
+        return { success: true, message: "Interesse registrado com sucesso.", isNew: false };
       }
 
       // 3. Processar Referral Token
@@ -88,26 +84,21 @@ export const submitLeadForm = createServerFn({ method: "POST" })
 
         if (tokenData) {
           if (!tokenData.is_active) {
-            throw new Error("Este link de indicação não está mais ativo. Por favor, utilize o link oficial da ScaleNexus.");
+            throw new Error("Este link de indicação não está mais ativo.");
           }
 
           referralTokenId = tokenData.id;
+          originatorId = tokenData.seller_id;
           
           if (tokenData.is_institutional) {
             source = "indicacao_institucional";
             displaySource = "ScaleNexus / Institucional";
-            originatorId = tokenData.seller_id; 
           } else {
             source = "indicacao";
             displaySource = "Indicação de Vendedor";
-            originatorId = tokenData.seller_id;
           }
-        } else {
-          throw new Error("O link de indicação utilizado é inválido.");
         }
       }
-      
-      
 
       // 4. Criar Lead
       const { data: newLead, error: leadError } = await supabaseAdmin
@@ -117,7 +108,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           company: data.company || null,
           estimated_value: 0,
           closed_value: 0,
-
           email: email,
           whatsapp: whatsapp,
           city: data.city,
@@ -131,11 +121,9 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .select("id")
         .single();
       
-      
-
       if (leadError) {
         console.error("Erro ao criar lead:", leadError);
-        throw new Error("Falha ao salvar os dados do lead no banco.");
+        throw new Error(`Falha ao salvar o lead: ${leadError.message}`);
       }
 
       // 5. Criar Atribuição Comercial
@@ -150,8 +138,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         if (attrError) {
           console.error("Erro ao criar atribuição:", attrError);
         }
-        
-        
 
         // 6. Atividade Inicial
         await supabaseAdmin.from("lead_activities").insert({
@@ -161,19 +147,15 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           description: `Lead criado via formulário público. Origem: ${displaySource}.`,
           happened_at: new Date().toISOString(),
         } as any);
-        
-        
       }
       
-      const response = { success: true, message: "Lead criado com sucesso.", isNew: true };
-      
-      return response;
+      return { success: true, message: "Lead criado com sucesso.", isNew: true };
 
     } catch (error: any) {
       console.error("Erro no processamento do Funil:", error);
       return { 
         success: false, 
-        message: error.message || "Ocorreu um erro inesperado ao processar sua solicitação. Por favor, tente novamente mais tarde." 
+        message: error.message || "Ocorreu um erro inesperado ao processar sua solicitação." 
       };
     }
   });
