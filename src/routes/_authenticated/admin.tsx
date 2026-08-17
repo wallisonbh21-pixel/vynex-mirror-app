@@ -8,7 +8,8 @@ import {
   TrendingUp, 
   FileText, 
   ArrowUpRight,
-  TrendingDown
+  TrendingDown,
+  Plus
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
