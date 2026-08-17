@@ -19,9 +19,6 @@ const DEFAULT_ADMIN_ID = "ce4c32ee-583a-456c-8f0b-a516188d196b";
 export const submitLeadForm = createServerFn({ method: "POST" })
   .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
-    const traceId = `FUNNEL_SUBMIT_${Date.now()}`;
-    console.log(`[SUBMIT_START][${traceId}]`, { serviceId: data.serviceId, email: data.email });
-    
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -36,7 +33,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .maybeSingle();
       
       if (serviceFetchError) {
-        console.error(`[${traceId}] Erro ao buscar serviço:`, serviceFetchError);
+        console.error("Erro ao buscar serviço:", serviceFetchError);
         throw new Error("Erro de comunicação ao validar o serviço escolhido.");
       }
 
@@ -48,8 +45,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         throw new Error(`O serviço "${service.name}" não está disponível no momento.`);
       }
 
-      console.log(`[SERVICE_OK][${traceId}]`, { serviceName: service.name });
-
       // 2. Verificar Duplicidade
       const { data: existingLead } = await supabaseAdmin
         .from("leads")
@@ -58,7 +53,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         .maybeSingle();
 
       if (existingLead) {
-        console.log(`[DUPLICATE_DETECTED][${traceId}]`, { leadId: existingLead.id });
         await supabaseAdmin.from("lead_activities").insert({
           lead_id: existingLead.id,
           user_id: "00000000-0000-0000-0000-000000000000",
@@ -69,8 +63,6 @@ export const submitLeadForm = createServerFn({ method: "POST" })
 
         return { success: true, message: "Interesse registrado com sucesso.", isNew: false };
       }
-
-      console.log(`[VALIDATION_OK][${traceId}]`);
 
       // 3. Processar Referral Token
       let originatorId = null;
@@ -86,7 +78,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
           .maybeSingle();
 
         if (tokenError) {
-          console.error(`[${traceId}] Erro ao validar token:`, tokenError);
+          console.error("Erro ao validar token:", tokenError);
           throw new Error("Erro técnico ao processar sua indicação.");
         }
 
@@ -105,40 +97,34 @@ export const submitLeadForm = createServerFn({ method: "POST" })
             source = "indicacao";
             displaySource = "Indicação de Vendedor";
           }
-        } else {
-          console.warn(`[${traceId}] Token inválido: ${data.referralToken}`);
         }
       }
 
       // 4. Criar Lead
-      const leadData = {
-        name: data.name,
-        company: data.company || null,
-        estimated_value: 0,
-        closed_value: 0,
-        email: email,
-        whatsapp: whatsapp,
-        city: data.city,
-        state: data.state,
-        niche: data.segment,
-        status: "novo",
-        source: source,
-        owner_id: originatorId || DEFAULT_ADMIN_ID, 
-        notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
-      };
-
       const { data: newLead, error: leadError } = await supabaseAdmin
         .from("leads")
-        .insert(leadData as any)
+        .insert({
+          name: data.name,
+          company: data.company || null,
+          estimated_value: 0,
+          closed_value: 0,
+          email: email,
+          whatsapp: whatsapp,
+          city: data.city,
+          state: data.state,
+          niche: data.segment,
+          status: "novo",
+          source: source,
+          owner_id: originatorId || DEFAULT_ADMIN_ID, 
+          notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
+        } as any)
         .select("id")
         .single();
       
       if (leadError) {
-        console.error(`[${traceId}] Erro ao criar lead:`, leadError);
+        console.error("Erro ao criar lead:", leadError);
         throw new Error(`Falha ao salvar o lead: ${leadError.message}`);
       }
-
-      console.log(`[LEAD_CREATED][${traceId}]`, { leadId: newLead?.id });
 
       // 5. Criar Atribuição Comercial
       if (newLead) {
@@ -150,32 +136,23 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         } as any);
 
         if (attrError) {
-          console.error(`[${traceId}] Erro ao criar atribuição:`, attrError);
-        } else {
-          console.log(`[ATTRIBUTION_CREATED][${traceId}]`);
+          console.error("Erro ao criar atribuição:", attrError);
         }
 
         // 6. Atividade Inicial
-        const { error: activityError } = await supabaseAdmin.from("lead_activities").insert({
+        await supabaseAdmin.from("lead_activities").insert({
           lead_id: newLead.id,
           user_id: originatorId || DEFAULT_ADMIN_ID,
           type: "status",
           description: `Lead criado via formulário público. Origem: ${displaySource}.`,
           happened_at: new Date().toISOString(),
         } as any);
-        
-        if (activityError) {
-          console.error(`[${traceId}] Erro ao criar atividade:`, activityError);
-        } else {
-          console.log(`[ACTIVITY_CREATED][${traceId}]`);
-        }
       }
       
-      console.log(`[RETURN_SUCCESS][${traceId}]`);
       return { success: true, message: "Lead criado com sucesso.", isNew: true };
 
     } catch (error: any) {
-      console.error(`[${traceId}] Erro no processamento do Funil:`, error);
+      console.error("Erro no processamento do Funil:", error);
       return { 
         success: false, 
         message: error.message || "Ocorreu um erro inesperado ao processar sua solicitação." 
