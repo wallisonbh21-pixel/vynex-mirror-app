@@ -322,17 +322,9 @@ function LeadDetail() {
           </h2>
           
           <div className="space-y-6">
-            <div className="space-y-1">
-              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Serviço de interesse</span>
-              <div className="text-sm font-bold bg-brand-500/10 text-brand-500 p-3 rounded-lg border border-brand-500/20">
-                {briefing?.serviceName || "—"}
-              </div>
-            </div>
-
-            {briefing?.dynamicData && Object.entries(briefing.dynamicData).length > 0 ? (
-              Object.entries(briefing.dynamicData).map(([key, item]: [string, any]) => {
-                const { label, value } = item;
-                if (!value || (typeof value === 'string' && value.trim() === '')) return null;
+            {briefing?.briefingItems && briefing.briefingItems.length > 0 ? (
+              briefing.briefingItems.map((item: any) => {
+                const { label, value, buttonLabel } = item;
                 const isUrl = typeof value === 'string' && (
                   value.startsWith('http://') || 
                   value.startsWith('https://') || 
@@ -340,9 +332,14 @@ function LeadDetail() {
                 );
 
                 return (
-                  <div key={key} className="space-y-1 group">
+                  <div key={item.key} className="space-y-1 group">
                     <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{label}</span>
-                    <div className="text-sm text-foreground bg-secondary/20 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed transition-colors group-hover:bg-secondary/40">
+                    <div className={cn(
+                      "text-sm p-3 rounded-lg border leading-relaxed transition-colors",
+                      item.key === 'serviceId' 
+                        ? "font-bold bg-brand-500/10 text-brand-500 border-brand-500/20" 
+                        : "text-foreground bg-secondary/20 border-border/50 whitespace-pre-wrap group-hover:bg-secondary/40"
+                    )}>
                       {isUrl ? (
                         <div className="flex flex-col gap-2">
                           <span className="break-all font-mono text-xs opacity-70 mb-1">{String(value)}</span>
@@ -353,7 +350,7 @@ function LeadDetail() {
                             className="w-fit h-7 text-[10px] gap-1.5 border border-brand-500/20 text-brand-600 hover:text-white hover:bg-brand-500 transition-all shadow-sm"
                           >
                             <a href={sanitizeExternalUrl(String(value).startsWith('http') ? String(value) : `https://${value}`)} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="size-3" /> Abrir referência
+                              <ExternalLink className="size-3" /> {buttonLabel || "Abrir referência"}
                             </a>
                           </Button>
                         </div>
@@ -365,14 +362,9 @@ function LeadDetail() {
                 );
               })
             ) : (
-              briefing?.needs && briefing.needs !== "—" && (
-                <div className="space-y-1">
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Necessidade do cliente</span>
-                  <div className="text-sm text-foreground bg-secondary/30 p-3 rounded-lg border border-border/50 whitespace-pre-wrap leading-relaxed">
-                    {briefing.needs}
-                  </div>
-                </div>
-              )
+              <div className="text-sm text-muted-foreground p-3 rounded-lg border border-dashed border-border bg-secondary/10">
+                Nenhuma informação detalhada disponível.
+              </div>
             )}
           </div>
         </section>

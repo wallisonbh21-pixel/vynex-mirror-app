@@ -123,23 +123,21 @@ export const submitLeadForm = createServerFn({ method: "POST" })
       
       const { data: leadData, error: leadError } = leadInsertResult;
       
-      if (leadError) {
+      if (leadError || !leadData || leadData.length === 0) {
         console.error("[ATA006] Erro ao criar lead:", leadError);
-        throw new Error(`Falha ao salvar o lead no banco: [${leadError.code}] ${leadError.message}`);
+        throw new Error(leadError ? `Falha ao salvar o lead no banco: [${leadError.code}] ${leadError.message}` : "Erro de persistência: O lead não foi gerado.");
       }
 
-      if (!leadData || leadData.length === 0) {
-        console.error("[ATA006] Lead não foi criado e nenhum erro retornado.");
-        throw new Error("Erro de persistência: O lead não foi gerado.");
+      const newLeadId = leadData[0]?.id;
+      if (!newLeadId) {
+        throw new Error("Erro de persistência: O ID do lead não foi retornado.");
       }
-
-      const newLead = leadData[0];
-      console.log(`[ATA006] Lead criado com ID: ${newLead.id}`);
+      console.log(`[ATA006] Lead criado com ID: ${newLeadId}`);
 
       // 5. Criar Atribuição Comercial
-      console.log(`[ATA006] Tentando criar atribuição para lead ${newLead.id}`);
+      console.log(`[ATA006] Tentando criar atribuição para lead ${newLeadId}`);
       const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
-        lead_id: newLead.id,
+        lead_id: newLeadId,
         originator_id: originatorId, 
         current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : DEFAULT_ADMIN_ID,
         referral_token_id: referralTokenId,
@@ -153,7 +151,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
 
       // 6. Atividade Inicial
       const { error: activityError } = await supabaseAdmin.from("lead_activities").insert({
-        lead_id: newLead.id,
+        lead_id: newLeadId,
         user_id: originatorId || DEFAULT_ADMIN_ID,
         type: "status",
         description: `Lead criado via formulário público. Origem: ${displaySource}.`,
@@ -164,7 +162,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
         console.warn("[ATA006] Erro ao criar atividade (não crítico):", activityError);
       }
       
-      return { success: true, message: "Lead criado com sucesso.", isNew: true, leadId: newLead.id };
+      return { success: true, message: "Lead criado com sucesso.", isNew: true, leadId: newLeadId };
 
     } catch (error: any) {
       console.error("Erro no processamento do Funil:", error);
