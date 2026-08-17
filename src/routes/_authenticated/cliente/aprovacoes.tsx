@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientProjects } from "@/lib/client";
+import { useClienteProjetos } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle2, AlertCircle, Eye, MessageSquare, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryCliente } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { 
   Dialog, 
@@ -25,8 +25,8 @@ export const Route = createFileRoute("/_authenticated/cliente/aprovacoes")({
 });
 
 function MyApprovals() {
-  const queryClient = useQueryClient();
-  const { data: projects, isLoading: loadingProjects } = useClientProjects();
+  const queryCliente = useQueryCliente();
+  const { data: projects, isLoading: loadingProjetos } = useClienteProjetos();
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
@@ -47,7 +47,7 @@ function MyApprovals() {
     },
   });
 
-  if (loadingProjects || loadingEvents) {
+  if (loadingProjetos || loadingEvents) {
     return (
       <AppShell title="Aprovações">
         <Skeleton className="h-96 w-full" />
@@ -104,7 +104,7 @@ function MyApprovals() {
                       .insert({
                         project_id: project.id,
                         event_type: "APPROVAL",
-                        actor_label: "Cliente",
+                        actor_label: "Clientee",
                         message: "Projeto aprovado pelo cliente via Portal.",
                         new_status: "aprovado"
                       });
@@ -119,8 +119,8 @@ function MyApprovals() {
                         .eq("id", project.id);
                       
                       toast.success("Projeto aprovado com sucesso!");
-                      queryClient.invalidateQueries({ queryKey: ["client-projects"] });
-                      queryClient.invalidateQueries({ queryKey: ["client-approval-events", project.id] });
+                      queryCliente.invalidateQueries({ queryKey: ["client-projects"] });
+                      queryCliente.invalidateQueries({ queryKey: ["client-approval-events", project.id] });
                     } else {
                       toast.error("Erro ao aprovar projeto.");
                     }
@@ -162,7 +162,7 @@ function MyApprovals() {
                       .insert({
                         project_id: project!.id,
                         event_type: "FEEDBACK",
-                        actor_label: "Cliente",
+                        actor_label: "Clientee",
                         message: feedbackText,
                         new_status: "em_revisao"
                       });
@@ -177,8 +177,8 @@ function MyApprovals() {
                     toast.success("Feedback enviado com sucesso!");
                     setFeedbackModalOpen(false);
                     setFeedbackText("");
-                    queryClient.invalidateQueries({ queryKey: ["client-projects"] });
-                    queryClient.invalidateQueries({ queryKey: ["client-approval-events", project!.id] });
+                    queryCliente.invalidateQueries({ queryKey: ["client-projects"] });
+                    queryCliente.invalidateQueries({ queryKey: ["client-approval-events", project!.id] });
                   } catch (err: any) {
                     toast.error("Erro ao enviar feedback: " + err.message);
                   } finally {

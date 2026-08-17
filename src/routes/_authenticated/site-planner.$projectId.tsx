@@ -28,7 +28,7 @@ import { AppShell } from "@/components/AppShell";
 import { cn } from "@/lib/utils";
 import { getBriefing } from "@/lib/briefing";
 import { getSitePlan, saveSitePlan, generateRecommendedPlan, SitePlanSection, SitePlanData } from "@/lib/planner";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryCliente } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/site-planner/$projectId")(
 function SitePlannerPage() {
   const { projectId } = useParams({ from: "/_authenticated/site-planner/$projectId" });
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   const [plan, setPlan] = useState<Partial<SitePlanData> | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
@@ -77,7 +77,7 @@ function SitePlannerPage() {
   const saveMutation = useMutation({
     mutationFn: (data: Partial<SitePlanData>) => saveSitePlan(projectId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["site-plan", projectId] });
+      queryCliente.invalidateQueries({ queryKey: ["site-plan", projectId] });
       toast.success("Plano salvo com sucesso");
     },
   });

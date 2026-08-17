@@ -1,15 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { createClientPortalAccount } from "./onboarding.functions";
-import { registerNewClient } from "./client-registration.functions";
-import { deleteClient } from "./client-deletion.functions";
+import { createClientePortalAccount } from "./onboarding.functions";
+import { registerNewCliente } from "./client-registration.functions";
+import { deleteCliente } from "./client-deletion.functions";
 /**
- * Hook legado mantido para compatibilidade com o Portal do Cliente existente.
+ * Hook legado mantido para compatibilidade com o Portal do Clientee existente.
  */
-export function useClientData() {
+export function useClienteData() {
     const { user } = useSession();
     return useQuery({
         queryKey: ["client-profile", user?.id],
@@ -27,9 +27,9 @@ export function useClientData() {
     });
 }
 /**
- * Hook legado mantido para compatibilidade com o Portal do Cliente existente.
+ * Hook legado mantido para compatibilidade com o Portal do Clientee existente.
  */
-export function useClientProjects() {
+export function useClienteProjetos() {
     const { user } = useSession();
     return useQuery({
         queryKey: ["client-projects", user?.id],
@@ -52,7 +52,7 @@ export function useClientProjects() {
 /**
  * Busca dados detalhados do cliente para o portal.
  */
-export function useClientPortalData() {
+export function useClientePortalData() {
     const { user } = useSession();
     return useQuery({
         queryKey: ["client-portal-data", user?.id],
@@ -81,7 +81,7 @@ export function useClientPortalData() {
  * Busca a listagem de clientes para Admin/Vendedor.
  * @param ownerId Se fornecido, filtra pelos clientes do vendedor.
  */
-export function useClientsList(ownerId, statusFilter) {
+export function useClientesList(ownerId, statusFilter) {
     return useQuery({
         queryKey: ["clients-list", ownerId, statusFilter],
         queryFn: async () => {
@@ -111,15 +111,15 @@ export function useClientsList(ownerId, statusFilter) {
 /**
  * Hook para gerenciar o onboarding de clientes (criação de conta e vínculo).
  */
-export function useClientOnboarding() {
-    const queryClient = useQueryClient();
-    const onboardFn = useServerFn(createClientPortalAccount);
+export function useClienteOnboarding() {
+    const queryCliente = useQueryCliente();
+    const onboardFn = useServerFn(createClientePortalAccount);
     return useMutation({
         mutationFn: async (params) => {
             return onboardFn({ data: params });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+            queryCliente.invalidateQueries({ queryKey: ["clients-list"] });
             if (data.success) {
                 toast.success(data.message || "Acesso ao portal ativado!", { duration: 6000 });
             }
@@ -135,17 +135,17 @@ export function useClientOnboarding() {
 /**
  * Hook para cadastrar um novo cliente.
  */
-export function useRegisterClient() {
-    const queryClient = useQueryClient();
-    const registerFn = useServerFn(registerNewClient);
+export function useRegisterCliente() {
+    const queryCliente = useQueryCliente();
+    const registerFn = useServerFn(registerNewCliente);
     return useMutation({
         mutationFn: async (values) => {
             return registerFn({ data: values });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+            queryCliente.invalidateQueries({ queryKey: ["clients-list"] });
             if (data.success) {
-                toast.success(data.message || "Cliente cadastrado com sucesso!");
+                toast.success(data.message || "Clientee cadastrado com sucesso!");
             }
             else {
                 toast.error(data.message || "Erro no cadastro.");
@@ -159,18 +159,18 @@ export function useRegisterClient() {
 /**
  * Hook para excluir um cliente.
  */
-export function useDeleteClient() {
-    const queryClient = useQueryClient();
-    const deleteFn = useServerFn(deleteClient);
+export function useDeleteCliente() {
+    const queryCliente = useQueryCliente();
+    const deleteFn = useServerFn(deleteCliente);
     return useMutation({
         mutationFn: async (clientId) => {
             return deleteFn({ data: { clientId } });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["clients"] });
-            queryClient.invalidateQueries({ queryKey: ["clients-list"] });
+            queryCliente.invalidateQueries({ queryKey: ["clients"] });
+            queryCliente.invalidateQueries({ queryKey: ["clients-list"] });
             if (data.success) {
-                toast.success(data.message || "Cliente excluído.");
+                toast.success(data.message || "Clientee excluído.");
             }
         },
         onError: (error) => {

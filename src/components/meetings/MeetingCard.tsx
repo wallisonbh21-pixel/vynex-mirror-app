@@ -4,7 +4,7 @@ import {
   Calendar, 
   Clock, 
   Video, 
-  Users as UsersIcon, 
+  Usuários as UsuáriosIcon, 
   CheckCircle2, 
   XCircle, 
   Clock3,

@@ -6,7 +6,7 @@ import {
   Clock, 
   CircleDollarSign, 
   Globe, 
-  User,
+  Usuário,
   ExternalLink,
   MessageSquare,
   FileText,
@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { sanitizeExternalUrl } from "@/lib/security";
 import { AppShell } from "@/components/AppShell";
-import { ProjectProgression } from "@/components/ProjectProgression";
+import { ProjetoProgression } from "@/components/ProjetoProgression";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,11 +33,11 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
-import { useMyCreatorProjects, useProjectChecklist, useProjectNotes, useUpdateCreatorProject } from "@/lib/creator";
+import { useMyCreatorProjetos, useProjetoChecklist, useProjetoNotes, useUpdateCreatorProjeto } from "@/lib/creator";
 import { useApprovalEvents } from "@/lib/approval";
 import { getBriefing } from "@/lib/briefing";
 import { useQuery } from "@tanstack/react-query";
-import { buildProjectContext, generateIntelligence } from "@/lib/ai-core";
+import { buildProjetoContext, generateIntelligence } from "@/lib/ai-core";
 import { AICorePanel } from "@/components/AICorePanel";
 import { getSitePlan } from "@/lib/planner";
 import { useStudioData } from "@/lib/studio/hooks";
@@ -56,12 +56,12 @@ export const Route = createFileRoute("/_authenticated/projetos/$projectId")({
 
 function DetalhesProjetoPage() {
   const { projectId } = useParams({ from: "/_authenticated/projetos/$projectId" });
-  const { data: projects = [] } = useMyCreatorProjects();
+  const { data: projects = [] } = useMyCreatorProjetos();
   const { data: clients = [] } = useRows<any>("clients");
   const { data: events = [] } = useApprovalEvents(projectId);
-  const { data: checklist = [], toggle } = useProjectChecklist(projectId);
-  const { data: notes = [], addNote } = useProjectNotes(projectId);
-  const updateProject = useUpdateCreatorProject();
+  const { data: checklist = [], toggle } = useProjetoChecklist(projectId);
+  const { data: notes = [], addNote } = useProjetoNotes(projectId);
+  const updateProjeto = useUpdateCreatorProjeto();
   const [newNote, setNewNote] = useState("");
 
   const { data: savedBriefing } = useQuery({
@@ -78,7 +78,7 @@ function DetalhesProjetoPage() {
   const { data: studioData } = useStudioData(projectId);
 
   const intelligence = useMemo(() => {
-    const context = buildProjectContext(projectId, savedBriefing || null, sitePlan || null, studioData || null);
+    const context = buildProjetoContext(projectId, savedBriefing || null, sitePlan || null, studioData || null);
     return generateIntelligence(context, studioData || null);
   }, [projectId, savedBriefing, sitePlan, studioData]);
 
@@ -102,7 +102,7 @@ function DetalhesProjetoPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">{project.title}</h1>
-            <p className="text-muted-foreground">{client?.company || "Cliente"}</p>
+            <p className="text-muted-foreground">{client?.company || "Clientee"}</p>
           </div>
           <div className="flex gap-4">
             <div className="text-right">
@@ -120,7 +120,7 @@ function DetalhesProjetoPage() {
           </div>
         </div>
         <div className="mt-6 border-t pt-6">
-          <ProjectProgression steps={progressionSteps as any} currentStatus={project.status} />
+          <ProjetoProgression steps={progressionSteps as any} currentStatus={project.status} />
         </div>
       </div>
 
@@ -433,7 +433,7 @@ function DetalhesProjetoPage() {
                   
                   const confirmed = window.confirm("Tem certeza que deseja enviar este projeto para aprovação?");
                   if (confirmed) {
-                    updateProject.mutate({ id: project.id, status: "aguardando_aprovacao" });
+                    updateProjeto.mutate({ id: project.id, status: "aguardando_aprovacao" });
                   }
                 }}
               >
@@ -442,7 +442,7 @@ function DetalhesProjetoPage() {
             ) : project.status === "ajustes" ? (
               <Button 
                 className="w-full gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold h-12"
-                onClick={() => updateProject.mutate({ id: project.id, status: "em_producao" })}
+                onClick={() => updateProjeto.mutate({ id: project.id, status: "em_producao" })}
               >
                 Retomar Produção
               </Button>

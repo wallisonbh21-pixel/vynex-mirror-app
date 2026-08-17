@@ -22,7 +22,7 @@ export const LEAD_STATUS_STEPS = [
 
 export const APPROVAL_STATUS_STEPS = [
   { id: "interna", label: "Revisão Interna" },
-  { id: "liberado", label: "Com Cliente" },
+  { id: "liberado", label: "Com Clientee" },
   { id: "ajustes_cliente", label: "Ajustes" },
   { id: "aprovado", label: "Aprovado" },
 ];
@@ -84,7 +84,7 @@ export function SalesProgression({ status }: SalesProgressionProps) {
       </div>
       <div className="mt-12 text-center">
         <p className="text-xs text-muted-foreground">
-          Cliente está atualmente em: <span className="font-bold text-primary uppercase tracking-wider">{steps[currentIndex]?.label}</span>
+          Clientee está atualmente em: <span className="font-bold text-primary uppercase tracking-wider">{steps[currentIndex]?.label}</span>
         </p>
       </div>
     </div>

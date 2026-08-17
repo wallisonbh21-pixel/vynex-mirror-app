@@ -16,7 +16,7 @@ import {
   Star,
   Plus
 } from 'lucide-react';
-import { ProjectIntelligence, AIAction } from '@/lib/ai-core';
+import { ProjetoIntelligence, AIAction } from '@/lib/ai-core';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -24,7 +24,7 @@ import { StudioData, StudioSection } from '@/types/studio';
 import { Sparkles, X, Undo2, AlertCircle } from 'lucide-react';
 
 interface AICorePanelProps {
-  intelligence: ProjectIntelligence;
+  intelligence: ProjetoIntelligence;
   onAccept?: (action: AIAction) => void;
   onIgnore?: (issueId: string) => void;
   onUndoLast?: () => void;

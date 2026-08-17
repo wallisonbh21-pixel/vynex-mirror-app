@@ -9,7 +9,7 @@ import {
   LayoutDashboard,
   Building2,
   Target,
-  Users,
+  Usuários,
   Sparkles,
   Palette,
   Eye,
@@ -26,7 +26,7 @@ import { Progress } from "@/components/ui/progress";
 import { AppShell } from "@/components/AppShell";
 import { cn } from "@/lib/utils";
 import { getBriefing, saveBriefing, BriefingData } from "@/lib/briefing";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryCliente } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/briefing/$projectId")({
 const STEPS = [
   { id: 1, title: "Negócio", icon: Building2 },
   { id: 2, title: "Objetivo", icon: Target },
-  { id: 3, title: "Público", icon: Users },
+  { id: 3, title: "Público", icon: Usuários },
   { id: 4, title: "Diferenciais", icon: Sparkles },
   { id: 5, title: "Conteúdo", icon: FileText },
   { id: 6, title: "Visual", icon: Palette },
@@ -84,7 +84,7 @@ const INITIAL_DATA: BriefingData = {
 function BriefingPage() {
   const { projectId } = useParams({ from: "/_authenticated/briefing/$projectId" });
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<BriefingData>(INITIAL_DATA);
 
@@ -118,7 +118,7 @@ function BriefingPage() {
   const save = useMutation({
     mutationFn: (data: BriefingData) => saveBriefing(projectId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["briefing", projectId] });
+      queryCliente.invalidateQueries({ queryKey: ["briefing", projectId] });
       toast.success("Progresso salvo automaticamente");
     },
   });

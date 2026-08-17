@@ -31,7 +31,7 @@ import { AICorePanel } from '@/components/AICorePanel';
 import { ForgePanel } from '@/components/ForgePanel';
 import { generateId } from '@/lib/studio/utils';
 import { SECTION_TEMPLATES } from '@/lib/studio/templates';
-import { buildProjectContext, generateIntelligence, AIAction } from '@/lib/ai-core';
+import { buildProjetoContext, generateIntelligence, AIAction } from '@/lib/ai-core';
 import { createBuildPlan, ForgeBuildPlan } from '@/lib/forge';
 import { getBriefing } from '@/lib/briefing';
 import { getSitePlan } from '@/lib/planner';
@@ -78,7 +78,7 @@ function ScaleNexusStudioPage() {
   });
 
   const intelligence = useMemo(() => {
-    const context = buildProjectContext(projectId, briefing || null, sitePlan || null, data);
+    const context = buildProjetoContext(projectId, briefing || null, sitePlan || null, data);
     const result = generateIntelligence(context, data);
     return {
       ...result,
@@ -89,7 +89,7 @@ function ScaleNexusStudioPage() {
   // Initial Forge Plan Generation
   useEffect(() => {
     if (briefing && sitePlan && !forgePlan) {
-      const context = buildProjectContext(projectId, briefing, sitePlan, data);
+      const context = buildProjetoContext(projectId, briefing, sitePlan, data);
       const plan = createBuildPlan(context);
       setForgePlan(plan);
     }
@@ -472,7 +472,7 @@ function ScaleNexusStudioPage() {
                 <TabsContent value="forge" className="m-0 max-h-[600px] overflow-y-auto custom-scrollbar">
                   {forgePlan && (
                     <ForgePanel 
-                      context={buildProjectContext(projectId, briefing || null, sitePlan || null, data)}
+                      context={buildProjetoContext(projectId, briefing || null, sitePlan || null, data)}
                       plan={forgePlan}
                       onUpdatePlan={setForgePlan}
                       onStartBuild={runForgeBuild}

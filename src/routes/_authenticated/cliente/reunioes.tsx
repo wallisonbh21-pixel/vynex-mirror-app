@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock, Video, Users, ChevronRight } from "lucide-react";
+import { Calendar, Clock, Video, Usuários, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cliente/reunioes")({
   component: MyMeetings,
@@ -91,7 +91,7 @@ function MyMeetings() {
 
         <div className="space-y-4">
           <h2 className="text-xl font-bold flex items-center gap-2 opacity-70">
-            <Users className="size-5" />
+            <Usuários className="size-5" />
             Reuniões Anteriores
           </h2>
           <Card className="border-sidebar-border/50 bg-sidebar/30 backdrop-blur-sm overflow-hidden">

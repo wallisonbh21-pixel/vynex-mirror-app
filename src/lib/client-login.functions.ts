@@ -32,12 +32,12 @@ export const sendNotification = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-export const getClientAccessLogs = createServerFn({ method: "GET" })
+export const getClienteAccessLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ userId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    const { data: { user }, error } = await supabaseAdmin.auth.admin.getUsuárioById(data.userId);
     if (error) throw error;
     
     return {

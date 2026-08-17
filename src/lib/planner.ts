@@ -101,7 +101,7 @@ export function generateRecommendedPlan(briefing: BriefingData): Partial<SitePla
     number: (index + 1).toString().padStart(2, '0'),
     icon: getIconForSection(name),
     name,
-    objective: getObjectiveForSection(name, objectives),
+    objective: getObjetivoForSection(name, objectives),
     recommendation: getRecommendationForSection(name, briefing),
     essential: ['hero', 'cta', 'contato'].some(e => name.toLowerCase().includes(e)),
     recommended: ['depoimentos', 'galeria', 'diferenciais'].some(r => name.toLowerCase().includes(r)),
@@ -141,7 +141,7 @@ function getIconForSection(name: string): string {
   return '📦';
 }
 
-function getObjectiveForSection(name: string, objectives: string[]): string {
+function getObjetivoForSection(name: string, objectives: string[]): string {
   const n = name.toLowerCase();
   if (n.includes('hero')) return 'Apresentar a empresa e direcionar para a ação principal.';
   if (n.includes('produto')) return 'Mostrar os principais itens oferecidos.';

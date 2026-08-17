@@ -1,16 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-const createClientAccountSchema = z.object({
+const createClienteAccountSchema = z.object({
     clientId: z.string().uuid(),
     username: z.string().min(3),
 });
-export const createClientPortalAccount = createServerFn({ method: "POST" })
+export const createClientePortalAccount = createServerFn({ method: "POST" })
     .middleware([requireSupabaseAuth])
-    .validator((data) => createClientAccountSchema.parse(data))
+    .validator((data) => createClienteAccountSchema.parse(data))
     .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { createAuthUser } = await import("./auth-utils.server");
+    const { createAuthUsuário } = await import("./auth-utils.server");
     const { sendResendEmail } = await import("./resend.server");
     const { supabase: userSupabase, userId: actorId } = context;
     if (!actorId)
@@ -53,43 +53,43 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
         .eq("id", data.clientId)
         .single();
     if (clientErr || !client)
-        throw new Error("Cliente não encontrado.");
+        throw new Error("Clientee não encontrado.");
     if (!isAdmin && client.owner_id !== actorId)
         throw new Error("Sem permissão.");
     if (!client.contact_email)
         throw new Error("E-mail não informado.");
-    // 4. Check Username uniqueness
+    // 4. Check Usuárioname uniqueness
     const { data: existingProfile } = await supabaseAdmin.from("profiles").select("id").eq("nickname", data.username).maybeSingle();
     if (existingProfile)
         throw new Error("Usuário já em uso.");
-    // 5. Auth User logic
-    let targetUser = null;
-    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
-    const existingAuthUser = users.find((u) => u.email?.toLowerCase() === client.contact_email.toLowerCase());
-    if (existingAuthUser) {
-        targetUser = existingAuthUser;
+    // 5. Auth Usuário logic
+    let targetUsuário = null;
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsuários();
+    const existingAuthUsuário = users.find((u) => u.email?.toLowerCase() === client.contact_email.toLowerCase());
+    if (existingAuthUsuário) {
+        targetUsuário = existingAuthUsuário;
         // Link if needed
-        if (client.user_id !== targetUser.id) {
-            await supabaseAdmin.from("clients").update({ user_id: targetUser.id }).eq("id", client.id);
+        if (client.user_id !== targetUsuário.id) {
+            await supabaseAdmin.from("clients").update({ user_id: targetUsuário.id }).eq("id", client.id);
         }
     }
     else {
         // Create new Auth
-        const { user: newUser } = await createAuthUser(supabaseAdmin, {
+        const { user: newUsuário } = await createAuthUsuário(supabaseAdmin, {
             email: client.contact_email,
             username: data.username,
             fullName: client.contact_name || data.username,
             role: "cliente",
             clientId: client.id
         });
-        targetUser = newUser;
+        targetUsuário = newUsuário;
         auditData.auth_created = true;
-        await supabaseAdmin.from("clients").update({ user_id: targetUser.id }).eq("id", client.id);
+        await supabaseAdmin.from("clients").update({ user_id: targetUsuário.id }).eq("id", client.id);
     }
     // 6. Ensure Profile & Role
-    await supabaseAdmin.from("profiles").upsert({ id: targetUser.id, nickname: data.username, full_name: client.contact_name || data.username });
+    await supabaseAdmin.from("profiles").upsert({ id: targetUsuário.id, nickname: data.username, full_name: client.contact_name || data.username });
     auditData.profile_linked = true;
-    await supabaseAdmin.from("user_roles").upsert({ user_id: targetUser.id, role: "cliente" }, { onConflict: "user_id,role" });
+    await supabaseAdmin.from("user_roles").upsert({ user_id: targetUsuário.id, role: "cliente" }, { onConflict: "user_id,role" });
     auditData.role_created = true;
     // 7. Email Dispatch
     auditData.email_send_attempt = true;
@@ -97,7 +97,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
         <h2 style="color: #0F172A;">Olá, ${client.contact_name || data.username}! 👋</h2>
-        <p>Seu acesso ao Portal do Cliente ScaleNexus está pronto.</p>
+        <p>Seu acesso ao Portal do Clientee ScaleNexus está pronto.</p>
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <strong>Usuário:</strong> ${data.username}
         </div>
@@ -113,7 +113,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     try {
         const result = await sendResendEmail({
             to: client.contact_email,
-            subject: "Seu acesso ao Portal do Cliente ScaleNexus foi criado",
+            subject: "Seu acesso ao Portal do Clientee ScaleNexus foi criado",
             html: emailHtml,
             fromName: "Equipe ScaleNexus"
         });

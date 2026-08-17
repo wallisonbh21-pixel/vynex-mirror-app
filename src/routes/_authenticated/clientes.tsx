@@ -14,19 +14,19 @@ export const Route = createFileRoute("/_authenticated/clientes")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Clientes — ScaleNexus" },
+      { title: "Clientees — ScaleNexus" },
       {
         name: "description",
         content: "Carteira do vendedor: empresa, responsável, contrato, mensalidade, projetos e data de entrada.",
       },
-      { property: "og:title", content: "Clientes — ScaleNexus" },
+      { property: "og:title", content: "Clientees — ScaleNexus" },
       { property: "og:description", content: "Carteira de clientes da ScaleNexus." },
     ],
   }),
-  component: ClientesPage,
+  component: ClienteesPage,
 });
 
-type Client = {
+type Cliente = {
   id: string;
   company: string;
   niche: string | null;
@@ -42,7 +42,7 @@ type Client = {
   created_at: string;
 };
 
-type Project = { id: string; title: string; status: string; client_id: string | null };
+type Projeto = { id: string; title: string; status: string; client_id: string | null };
 
 const fields: Field[] = [
   { name: "company", label: "Empresa", required: true },
@@ -56,11 +56,11 @@ const fields: Field[] = [
   { name: "notes", label: "Observações", type: "textarea" },
 ];
 
-function ClientesPage() {
+function ClienteesPage() {
   const { user } = useSession();
-  const { data = [], isLoading } = useRows<Client>("clients");
+  const { data = [], isLoading } = useRows<Cliente>("clients");
   const { data: contracts = [] } = useRows<Contract>("contracts", { column: "signed_at" });
-  const { data: projects = [] } = useRows<Project>("projects");
+  const { data: projects = [] } = useRows<Projeto>("projects");
   const save = useSaveRow("clients");
   const remove = useDeleteRow("clients");
 
@@ -70,7 +70,7 @@ function ClientesPage() {
 
   return (
     <AppShell
-      title="Clientes"
+      title="Clientees"
       description={`Recorrência ativa de ${currency(recurring)} por mês.`}
       actions={
         <RecordDialog
@@ -89,7 +89,7 @@ function ClientesPage() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {data.map((client) => {
           const contract = contracts.find((item) => item.id === client.contract_id);
-          const clientProjects = projects.filter((project) => project.client_id === client.id);
+          const clientProjetos = projects.filter((project) => project.client_id === client.id);
           return (
             <article key={client.id} className="rounded-2xl border border-border bg-card p-5 shadow-panel">
               <div className="flex items-start justify-between gap-3">
@@ -121,7 +121,7 @@ function ClientesPage() {
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">Projetos</dt>
                   <dd className="text-right">
-                    {clientProjects.length ? clientProjects.map((p) => p.title).join(", ") : "—"}
+                    {clientProjetos.length ? clientProjetos.map((p) => p.title).join(", ") : "—"}
                   </dd>
                 </div>
                 {client.notes ? (

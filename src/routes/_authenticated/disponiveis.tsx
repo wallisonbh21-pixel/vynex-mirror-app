@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
-import { useAvailableProjects, useClaimProject, type CreatorProject } from "@/lib/creator";
+import { useAvailableProjetos, useClaimProjeto, type CreatorProjeto } from "@/lib/creator";
 import { currency, shortDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/disponiveis")({
@@ -26,12 +26,12 @@ export const Route = createFileRoute("/_authenticated/disponiveis")({
   component: DisponiveisPage,
 });
 
-type Client = { id: string; company: string; contact_name: string | null };
+type Cliente = { id: string; company: string; contact_name: string | null };
 
 function DisponiveisPage() {
-  const { data: projects = [], isLoading } = useAvailableProjects();
-  const { data: clients = [] } = useRows<Client>("clients");
-  const claim = useClaimProject();
+  const { data: projects = [], isLoading } = useAvailableProjetos();
+  const { data: clients = [] } = useRows<Cliente>("clients");
+  const claim = useClaimProjeto();
   const [search, setSearch] = useState("");
 
   const clientOf = useMemo(() => {
@@ -48,7 +48,7 @@ function DisponiveisPage() {
       .some((value) => String(value).toLowerCase().includes(term));
   });
 
-  const commissionOf = (p: CreatorProject) =>
+  const commissionOf = (p: CreatorProjeto) =>
     Number(p.commission) > 0 ? Number(p.commission) : (Number(p.value) * Number(p.commission_rate)) / 100;
 
   return (
@@ -96,7 +96,7 @@ function DisponiveisPage() {
                 <div className="min-w-0">
                   <h2 className="truncate text-base font-semibold">{project.title}</h2>
                   <p className="text-xs text-muted-foreground">
-                    {client?.company ?? "Cliente interno"}
+                    {client?.company ?? "Clientee interno"}
                     {client?.contact_name ? ` · ${client.contact_name}` : ""}
                   </p>
                 </div>

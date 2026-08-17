@@ -4,7 +4,7 @@ import type { AppRole } from "@/lib/auth";
 
 /** Lê os papéis do usuário autenticado (admin sempre tem acesso total). */
 export async function getCurrentRoles(): Promise<AppRole[]> {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
+  const { data: userData, error: userError } = await supabase.auth.getUsuário();
   const user = userData?.user;
   if (userError || !user) {
     if (typeof window === "undefined") {
@@ -47,4 +47,4 @@ export const requireCriadorOuAdmin = () => requireRole(["criador", "admin"]);
 export const requireAdmin = () => requireRole(["admin"]);
 
 /** Rotas exclusivas do cliente. */
-export const requireCliente = () => requireRole(["cliente"]);
+export const requireClientee = () => requireRole(["cliente"]);

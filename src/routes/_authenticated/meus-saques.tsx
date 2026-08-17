@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { requireCriador } from "@/lib/guard";
 import { useProfile, useSession } from "@/lib/auth";
 import { useRows, useSaveRow } from "@/lib/data";
-import { creatorEarnings, useMyCreatorProjects } from "@/lib/creator";
+import { creatorEarnings, useMyCreatorProjetos } from "@/lib/creator";
 import { currency, shortDate } from "@/lib/format";
 import { toast } from "sonner";
 
@@ -40,7 +40,7 @@ type Withdrawal = {
 function MeusSaquesPage() {
   const { user } = useSession();
   const { data: profile } = useProfile();
-  const { data: projects = [] } = useMyCreatorProjects();
+  const { data: projects = [] } = useMyCreatorProjetos();
   const { data: withdrawals = [] } = useRows<Withdrawal>("withdrawals");
   const save = useSaveRow("withdrawals");
 

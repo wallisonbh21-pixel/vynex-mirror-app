@@ -6,11 +6,11 @@ export const APPROVAL_FLOW = {
   interna: "aguardando_aprovacao",
   liberado: "aguardando_cliente",
   ajustesInternos: "ajustes",
-  ajustesCliente: "ajustes_solicitados",
+  ajustesClientee: "ajustes_solicitados",
   aprovado: "aprovado",
 } as const;
 
-export type ApprovalProject = {
+export type ApprovalProjeto = {
   id: string;
   title: string;
   status: string;
@@ -27,14 +27,14 @@ export type ApprovalProject = {
   client_token_expires_at: string | null;
 };
 
-export function generateClientToken() {
+export function generateClienteToken() {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /** Busca o projeto pelo token público, validando validade e etapa. */
-export async function loadProjectByToken(token: string) {
+export async function loadProjetoByToken(token: string) {
   if (!token || token.length < 16) return null;
   const { data, error } = await supabaseAdmin
     .from("projects")
@@ -44,7 +44,7 @@ export async function loadProjectByToken(token: string) {
     .eq("client_token", token)
     .maybeSingle();
   if (error || !data) return null;
-  const project = data as unknown as ApprovalProject;
+  const project = data as unknown as ApprovalProjeto;
   if (
     project.client_token_expires_at &&
     new Date(project.client_token_expires_at).getTime() < Date.now()
@@ -54,7 +54,7 @@ export async function loadProjectByToken(token: string) {
   return project;
 }
 
-export async function loadClient(clientId: string | null) {
+export async function loadCliente(clientId: string | null) {
   if (!clientId) return null;
   const { data } = await supabaseAdmin
     .from("clients")
@@ -70,7 +70,7 @@ export async function loadClient(clientId: string | null) {
   } | null;
 }
 
-export async function adminUserIds() {
+export async function adminUsuárioIds() {
   const { data } = await supabaseAdmin
     .from("user_roles")
     .select("user_id, role")

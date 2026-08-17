@@ -5,9 +5,9 @@ export function generateInitialPassword() {
     // though crypto is supported in nodejs_compat.
     return crypto.randomBytes(12).toString('hex').slice(0, 12);
 }
-export async function createAuthUser(supabaseAdmin, { email, username, fullName, role, clientId }) {
+export async function createAuthUsuário(supabaseAdmin, { email, username, fullName, role, clientId }) {
     const initialPassword = generateInitialPassword();
-    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+    const { data: newUsuário, error: createError } = await supabaseAdmin.auth.admin.createUsuário({
         email,
         password: initialPassword,
         email_confirm: true,
@@ -21,5 +21,5 @@ export async function createAuthUser(supabaseAdmin, { email, username, fullName,
     });
     if (createError)
         throw createError;
-    return { user: newUser.user, initialPassword };
+    return { user: newUsuário.user, initialPassword };
 }

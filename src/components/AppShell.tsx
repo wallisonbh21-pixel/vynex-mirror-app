@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryCliente } from "@tanstack/react-query";
 import {
   BarChart3,
   Building2,
@@ -18,8 +18,8 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
-  UserRound,
-  Users,
+  UsuárioRound,
+  Usuários,
   Wallet,
   Rocket,
   Plus,
@@ -70,19 +70,19 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
-  { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
+  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { 
     to: "/clientes", 
-    label: "Cliente", 
-    icon: Users,
+    label: "Clientee", 
+    icon: Usuários,
     submenu: [
-      { to: "/clientes", label: "Clientes", icon: Users },
-      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
+      { to: "/clientes", label: "Clientees", icon: Usuários },
+      { to: "/vendedor/clientes-login", label: "Login do Clientee", icon: Lock },
     ]
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
-  { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
+  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
@@ -172,7 +172,7 @@ const NAV_CLIENTE: NavItem[] = [
   { to: "/cliente/pagamentos", label: "Pagamentos", icon: Wallet },
   { to: "/cliente/aprovacoes", label: "Aprovações", icon: ShieldCheck },
   { to: "/cliente/notificacoes", label: "Notificações", icon: BellRing },
-  { to: "/cliente/perfil", label: "Meu Perfil", icon: UserRound },
+  { to: "/cliente/perfil", label: "Meu Perfil", icon: UsuárioRound },
 ];
 
 export function AppShell({
@@ -187,11 +187,11 @@ export function AppShell({
   children: ReactNode;
 }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
-  const { isAdmin, isCriador, isCliente, primaryRole } = useRoles() as any;
+  const { isAdmin, isCriador, isClientee, primaryRole } = useRoles() as any;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -207,11 +207,11 @@ export function AppShell({
         { to: "/criacao", label: "Área do criador", icon: Layers },
         { 
           to: "/admin/clientes", 
-          label: "Cliente", 
-          icon: Users,
+          label: "Clientee", 
+          icon: Usuários,
           submenu: [
-            { to: "/admin/clientes", label: "Clientes", icon: Users },
-            { to: "/admin/clientes-login", label: "Login do Cliente", icon: Lock },
+            { to: "/admin/clientes", label: "Clientees", icon: Usuários },
+            { to: "/admin/clientes-login", label: "Login do Clientee", icon: Lock },
           ]
         },
         { 
@@ -222,20 +222,20 @@ export function AppShell({
             { to: "/admin", label: "Dashboard Admin", icon: LayoutDashboard },
           ]
         },
-        { to: "/perfil", label: "Meu perfil", icon: UserRound },
+        { to: "/perfil", label: "Meu perfil", icon: UsuárioRound },
       ]
     : isCriador
       ? [
           ...NAV_CRIADOR,
-          { to: "/perfil", label: "Meu perfil", icon: UserRound },
+          { to: "/perfil", label: "Meu perfil", icon: UsuárioRound },
         ]
-      : isCliente
+      : isClientee
       ? [
           ...NAV_CLIENTE,
         ]
       : [
           ...NAV_VENDEDOR,
-          { to: "/perfil", label: "Meu perfil", icon: UserRound },
+          { to: "/perfil", label: "Meu perfil", icon: UsuárioRound },
         ];
 
   const displayName = profile?.nickname || profile?.full_name || "Sem nome";
@@ -247,8 +247,8 @@ export function AppShell({
     .join("");
 
   async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
+    await queryCliente.cancelQueries();
+    queryCliente.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
@@ -445,4 +445,4 @@ function Avatar({ url, initials }: { url: string | null; initials: string }) {
   );
 }
 
-export { Users };
+export { Usuários };

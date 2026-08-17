@@ -10,7 +10,7 @@ import { useDeleteRow, useRows, useSaveRow } from "@/lib/data";
 import { useSession, useRoles } from "@/lib/auth";
 import type { Contract } from "@/lib/crm";
 import { currency, shortDate } from "@/lib/format";
-import { useMyCreatorProjects } from "@/lib/creator";
+import { useMyCreatorProjetos } from "@/lib/creator";
 
 
 export const Route = createFileRoute("/_authenticated/metas")({
@@ -48,7 +48,7 @@ function MetasPage() {
   const { isCriador } = useRoles();
   const { data: goals = [] } = useRows<Goal>("goals", { column: "month" });
   const { data: contracts = [] } = useRows<Contract>("contracts", { column: "signed_at" });
-  const { data: projects = [] } = useMyCreatorProjects();
+  const { data: projects = [] } = useMyCreatorProjetos();
   const save = useSaveRow("goals");
   const remove = useDeleteRow("goals");
 
@@ -119,9 +119,9 @@ function MetasPage() {
             <div className="grid gap-4 md:grid-cols-2">
               {goals.map((goal) => {
                 const monthKey = goal.month.slice(0, 7);
-                const monthProjects = projects.filter((p) => (p.delivered_at || p.created_at).slice(0, 7) === monthKey && p.status === 'entregue');
+                const monthProjetos = projects.filter((p) => (p.delivered_at || p.created_at).slice(0, 7) === monthKey && p.status === 'entregue');
                 const progressPercent = Number(goal.sales_target)
-                  ? Math.min(100, Math.round((monthProjects.length / Number(goal.sales_target)) * 100))
+                  ? Math.min(100, Math.round((monthProjetos.length / Number(goal.sales_target)) * 100))
                   : 0;
 
                 return (
@@ -150,7 +150,7 @@ function MetasPage() {
                       <div className="flex justify-between text-xs font-bold uppercase tracking-wider mb-2">
                         <span>Entregas Realizadas</span>
                         <span className="text-muted-foreground">
-                          {monthProjects.length} / {goal.sales_target}
+                          {monthProjetos.length} / {goal.sales_target}
                         </span>
                       </div>
                       <Progress value={progressPercent} className="h-2" />

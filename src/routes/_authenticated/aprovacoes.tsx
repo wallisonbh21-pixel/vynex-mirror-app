@@ -18,9 +18,9 @@ import {
   APPROVAL_STATUS,
   useApprovalEvents,
   useApprovalQueue,
-  useReleaseToClient,
+  useReleaseToCliente,
   useRequestInternalAdjust,
-  type ApprovalProjectRow,
+  type ApprovalProjetoRow,
 } from "@/lib/approval";
 import { label, shortDate } from "@/lib/format";
 
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/aprovacoes")({
   component: AprovacoesPage,
 });
 
-type Client = { id: string; company: string; contact_name: string | null; contact_email: string | null };
+type Cliente = { id: string; company: string; contact_name: string | null; contact_email: string | null };
 
 const adjustFields: Field[] = [
   {
@@ -56,18 +56,18 @@ const adjustFields: Field[] = [
 function AprovacoesPage() {
   const { data: profile } = useProfile();
   const { isAdmin } = useRoles();
-  const { data: allProjects = [] } = useApprovalQueue();
-  const { data: clients = [] } = useRows<Client>("clients");
+  const { data: allProjetos = [] } = useApprovalQueue();
+  const { data: clients = [] } = useRows<Cliente>("clients");
   const { data: profiles = [] } = useProfiles();
   const { data: events = [] } = useApprovalEvents();
-  const release = useReleaseToClient();
+  const release = useReleaseToCliente();
   const adjust = useRequestInternalAdjust();
   const [links, setLinks] = useState<Record<string, string>>({});
 
   const projects = useMemo(() => {
-    if (isAdmin) return allProjects;
-    return allProjects.filter(p => p.creator_id === profile?.id);
-  }, [allProjects, isAdmin, profile]);
+    if (isAdmin) return allProjetos;
+    return allProjetos.filter(p => p.creator_id === profile?.id);
+  }, [allProjetos, isAdmin, profile]);
 
   const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients]);
   const creatorName = useMemo(() => {
@@ -76,8 +76,8 @@ function AprovacoesPage() {
   }, [profiles]);
 
   const pendentes = projects.filter((p) => p.status === APPROVAL_STATUS.interna);
-  const comCliente = projects.filter((p) => p.status === APPROVAL_STATUS.liberado);
-  const ajustes = projects.filter((p) => p.status === APPROVAL_STATUS.ajustesCliente);
+  const comClientee = projects.filter((p) => p.status === APPROVAL_STATUS.liberado);
+  const ajustes = projects.filter((p) => p.status === APPROVAL_STATUS.ajustesClientee);
   const aprovados = projects.filter((p) => p.status === APPROVAL_STATUS.aprovado);
 
   async function copyLink(link: string) {
@@ -85,7 +85,7 @@ function AprovacoesPage() {
     toast.success("Link copiado.");
   }
 
-  function renderCard(project: ApprovalProjectRow) {
+  function renderCard(project: ApprovalProjetoRow) {
     const client = project.client_id ? clientById.get(project.client_id) : undefined;
     const link = links[project.id];
     return (
@@ -97,7 +97,7 @@ function AprovacoesPage() {
           <div>
             <h3 className="font-semibold">{project.title}</h3>
             <p className="text-xs text-muted-foreground">
-              {client?.company ?? "Cliente interno"} · {client?.contact_name ?? "Sem contato"}
+              {client?.company ?? "Clientee interno"} · {client?.contact_name ?? "Sem contato"}
             </p>
           </div>
           <StatusBadge status={project.status} />
@@ -140,7 +140,7 @@ function AprovacoesPage() {
                     onSuccess: (result) => {
                       setLinks((prev) => ({ ...prev, [project.id]: result.link }));
                       if (!result.clientEmail) {
-                        toast.info("Cliente sem e-mail cadastrado — envie o link manualmente.");
+                        toast.info("Clientee sem e-mail cadastrado — envie o link manualmente.");
                       }
                     },
                   })
@@ -186,13 +186,13 @@ function AprovacoesPage() {
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Aguardando revisão" value={String(pendentes.length)} icon={ShieldCheck} />
-        <StatCard label="Com o cliente" value={String(comCliente.length)} icon={ExternalLink} />
+        <StatCard label="Com o cliente" value={String(comClientee.length)} icon={ExternalLink} />
         <StatCard label="Alterações pedidas" value={String(ajustes.length)} icon={Wrench} />
         <StatCard label="Aprovados" value={String(aprovados.length)} icon={History} />
       </div>
 
       <Section title="Aguardando sua revisão" items={pendentes} render={renderCard} />
-      <Section title="Aguardando aprovação do cliente" items={comCliente} render={renderCard} />
+      <Section title="Aguardando aprovação do cliente" items={comClientee} render={renderCard} />
       <Section title="Alterações solicitadas pelo cliente" items={ajustes} render={renderCard} />
       <Section title="Aprovados pelo cliente" items={aprovados} render={renderCard} />
 
@@ -252,8 +252,8 @@ function Section({
   render,
 }: {
   title: string;
-  items: ApprovalProjectRow[];
-  render: (project: ApprovalProjectRow) => React.ReactNode;
+  items: ApprovalProjetoRow[];
+  render: (project: ApprovalProjetoRow) => React.ReactNode;
 }) {
   return (
     <section className="mt-8">

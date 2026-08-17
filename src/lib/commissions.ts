@@ -83,7 +83,7 @@ export function useSellerCommissions() {
       const rows: CommissionRow[] = ((contracts ?? []) as unknown as ContractRow[]).map((contract) => ({
         id: contract.id,
         date: contract.signed_at ?? contract.created_at,
-        client: contract.clients?.company ?? "Cliente não informado",
+        client: contract.clients?.company ?? "Clientee não informado",
         reference: contract.title,
         type: "Bônus de venda",
         rate,
@@ -101,7 +101,7 @@ export function useSellerCommissions() {
   });
 }
 
-type ProjectRow = {
+type ProjetoRow = {
   id: string;
   title: string;
   status: string;
@@ -131,11 +131,11 @@ export function useCreatorCommissions() {
         .order("created_at", { ascending: false });
       if (error) throw error;
 
-      const projects = (data ?? []) as unknown as ProjectRow[];
+      const projects = (data ?? []) as unknown as ProjetoRow[];
       const rows: CommissionRow[] = projects.map((project) => ({
         id: project.id,
         date: project.delivered_at ?? project.assigned_at ?? project.created_at,
-        client: project.clients?.company ?? "Cliente não informado",
+        client: project.clients?.company ?? "Clientee não informado",
         reference: project.title,
         type: "Comissão de criação",
         rate: Number(project.commission_rate),

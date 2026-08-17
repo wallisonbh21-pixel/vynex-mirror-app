@@ -8,10 +8,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute('/_authenticated/cliente/reset-password')({
-  component: ClientResetPassword,
+  component: ClienteResetPassword,
 });
 
-function ClientResetPassword() {
+function ClienteResetPassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,7 +30,7 @@ function ClientResetPassword() {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUsuário({ password });
       if (error) throw error;
       
       toast.success("Senha definida com sucesso!");

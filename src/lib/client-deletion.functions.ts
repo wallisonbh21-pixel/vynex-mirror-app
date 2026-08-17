@@ -2,13 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const deleteClientSchema = z.object({
+const deleteClienteSchema = z.object({
   clientId: z.string().uuid(),
 });
 
-export const deleteClient = createServerFn({ method: "POST" })
+export const deleteCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => deleteClientSchema.parse(data))
+  .validator((data: unknown) => deleteClienteSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId: actorId, supabase: userSupabase } = context;
@@ -32,7 +32,7 @@ export const deleteClient = createServerFn({ method: "POST" })
       .single();
 
     if (fetchError || !client) {
-      throw new Error("Cliente não encontrado.");
+      throw new Error("Clientee não encontrado.");
     }
 
     if (!isAdmin && client.owner_id !== actorId) {
@@ -67,7 +67,7 @@ export const deleteClient = createServerFn({ method: "POST" })
 
     return { 
       success: true, 
-      message: "Cliente excluído com sucesso.",
-      hadAuthUser: hasAuth
+      message: "Clientee excluído com sucesso.",
+      hadAuthUsuário: hasAuth
     };
   });

@@ -218,7 +218,7 @@ function ComissoesPage() {
             <thead className="bg-secondary/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium">Data</th>
-                <th className="px-4 py-3 font-medium">Cliente</th>
+                <th className="px-4 py-3 font-medium">Clientee</th>
                 <th className="px-4 py-3 font-medium">{creatorView ? "Projeto" : "Contrato"}</th>
                 <th className="px-4 py-3 font-medium">{creatorView ? "Valor do projeto" : "Tipo"}</th>
                 <th className="px-4 py-3 font-medium">{creatorView ? "% do criador" : "Percentual"}</th>

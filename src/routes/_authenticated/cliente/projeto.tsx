@@ -1,19 +1,19 @@
 import { cn } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useClientProjects } from "@/lib/client";
+import { useClienteProjetos } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Clock, User, Calendar, CheckCircle2, Package } from "lucide-react";
+import { Clock, Usuário, Calendar, CheckCircle2, Package } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cliente/projeto")({
-  component: MyProject,
+  component: MyProjeto,
 });
 
-function MyProject() {
-  const { data: projects, isLoading } = useClientProjects();
+function MyProjeto() {
+  const { data: projects, isLoading } = useClienteProjetos();
 
   if (isLoading) {
     return (
@@ -98,7 +98,7 @@ function MyProject() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <User className="size-4" />
+                    <Usuário className="size-4" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Responsável</p>

@@ -1,10 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 import { PROJECT_STATUS } from "@/lib/format";
 
-export type CreatorProject = {
+export type CreatorProjeto = {
   id: string;
   owner_id: string;
   creator_id: string | null;
@@ -28,7 +28,7 @@ export type CreatorProject = {
 const PROJECTS_KEY = ["projects"];
 
 /** Vitrine: projetos ainda não assumidos por nenhum criador. */
-export function useAvailableProjects() {
+export function useAvailableProjetos() {
   return useQuery({
     queryKey: ["projects", "disponiveis"],
     queryFn: async () => {
@@ -39,13 +39,13 @@ export function useAvailableProjects() {
         .is("creator_id", null)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as CreatorProject[];
+      return (data ?? []) as unknown as CreatorProjeto[];
     },
   });
 }
 
 /** Projetos que pertencem ao criador logado. */
-export function useMyCreatorProjects() {
+export function useMyCreatorProjetos() {
   const { user } = useSession();
   return useQuery({
     queryKey: ["projects", "meus", user?.id],
@@ -57,27 +57,27 @@ export function useMyCreatorProjects() {
         .eq("creator_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as CreatorProject[];
+      return (data ?? []) as unknown as CreatorProjeto[];
     },
   });
 }
 
-type RpcClient = {
+type RpcCliente = {
   rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
 };
 
 /** Assume o projeto de forma atômica — só o primeiro criador consegue. */
-export function useClaimProject() {
-  const queryClient = useQueryClient();
+export function useClaimProjeto() {
+  const queryCliente = useQueryCliente();
   return useMutation({
     mutationFn: async (projectId: string) => {
-      const { error } = await (supabase as unknown as RpcClient).rpc("claim_project", {
+      const { error } = await (supabase as unknown as RpcCliente).rpc("claim_project", {
         _project_id: projectId,
       });
       if (error) throw new Error(error.message);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PROJECTS_KEY });
+      queryCliente.invalidateQueries({ queryKey: PROJECTS_KEY });
       toast.success("Projeto assumido! Ele já está em produção na sua fila.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -85,8 +85,8 @@ export function useClaimProject() {
 }
 
 /** Atualiza etapa/entrega de um projeto do criador. */
-export function useUpdateCreatorProject() {
-  const queryClient = useQueryClient();
+export function useUpdateCreatorProjeto() {
+  const queryCliente = useQueryCliente();
   return useMutation({
     mutationFn: async ({ id, ...values }: { id: string } & Record<string, unknown>) => {
       // Security: ensure user only updates their own project
@@ -94,7 +94,7 @@ export function useUpdateCreatorProject() {
       const { data: project } = await supabase.from("projects").select("creator_id, status").eq("id", id).single();
       if (!project) throw new Error("Projeto não encontrado.");
       
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUsuário();
       if (project.creator_id !== user?.id) throw new Error("Acesso negado.");
 
       // Critical financial fields protection (re-enforcing what might be in triggers)
@@ -121,7 +121,7 @@ export function useUpdateCreatorProject() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PROJECTS_KEY });
+      queryCliente.invalidateQueries({ queryKey: PROJECTS_KEY });
       toast.success("Projeto atualizado.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -129,8 +129,8 @@ export function useUpdateCreatorProject() {
 }
 
 /** Checklist do projeto */
-export function useProjectChecklist(projectId: string) {
-  const queryClient = useQueryClient();
+export function useProjetoChecklist(projectId: string) {
+  const queryCliente = useQueryCliente();
   
   const query = useQuery({
     queryKey: ["projects", projectId, "checklist"],
@@ -148,7 +148,7 @@ export function useProjectChecklist(projectId: string) {
 
   const toggle = useMutation({
     mutationFn: async ({ itemId, completed }: { itemId: string, completed: boolean }) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUsuário();
       const { error } = await supabase
         .from("project_checklist_items")
         .update({ 
@@ -159,15 +159,15 @@ export function useProjectChecklist(projectId: string) {
         .eq("id", itemId);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["projects", projectId, "checklist"] })
+    onSuccess: () => queryCliente.invalidateQueries({ queryKey: ["projects", projectId, "checklist"] })
   });
 
   return { ...query, toggle };
 }
 
 /** Notas do projeto */
-export function useProjectNotes(projectId: string) {
-  const queryClient = useQueryClient();
+export function useProjetoNotes(projectId: string) {
+  const queryCliente = useQueryCliente();
   
   const query = useQuery({
     queryKey: ["projects", projectId, "notes"],
@@ -185,7 +185,7 @@ export function useProjectNotes(projectId: string) {
 
   const addNote = useMutation({
     mutationFn: async (content: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUsuário();
       const { error } = await supabase
         .from("project_notes")
         .insert({ 
@@ -195,15 +195,15 @@ export function useProjectNotes(projectId: string) {
         } as never);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["projects", projectId, "notes"] })
+    onSuccess: () => queryCliente.invalidateQueries({ queryKey: ["projects", projectId, "notes"] })
   });
 
   return { ...query, addNote };
 }
 
 /** Resumo financeiro do criador a partir das comissões e saques. */
-export function creatorEarnings(projects: CreatorProject[], withdrawals: { amount: number; status: string }[]) {
-  const commissionOf = (p: CreatorProject) =>
+export function creatorEarnings(projects: CreatorProjeto[], withdrawals: { amount: number; status: string }[]) {
+  const commissionOf = (p: CreatorProjeto) =>
     Number(p.commission) > 0 ? Number(p.commission) : (Number(p.value) * Number(p.commission_rate)) / 100;
 
   const pending = projects
@@ -235,7 +235,7 @@ export function creatorEarnings(projects: CreatorProject[], withdrawals: { amoun
 }
 
 /** Agrupa projetos e ganhos por mês (últimos 6 meses). */
-export function monthlySeries(projects: CreatorProject[], commissionOf: (p: CreatorProject) => number) {
+export function monthlySeries(projects: CreatorProjeto[], commissionOf: (p: CreatorProjeto) => number) {
   const months: { key: string; label: string; projetos: number; ganhos: number }[] = [];
   const now = new Date();
   for (let i = 5; i >= 0; i -= 1) {

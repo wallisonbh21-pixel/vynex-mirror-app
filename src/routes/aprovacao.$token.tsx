@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryCliente } from '@tanstack/react-query';
 import { useStudioData } from '@/lib/studio/hooks';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, AlertCircle, Globe, ExternalLink, MessageSquare, Send, ArrowRight, Clock } from 'lucide-react';
@@ -12,15 +12,15 @@ import { shortDate } from '@/lib/format';
 import { sanitizeExternalUrl } from '@/lib/security';
 
 export const Route = createFileRoute('/aprovacao/$token')({
-  component: ClientApprovalPage,
+  component: ClienteApprovalPage,
   head: () => ({
     meta: [{ title: 'Aprovação de Projeto — ScaleNexus' }],
   }),
 });
 
-function ClientApprovalPage() {
+function ClienteApprovalPage() {
   const { token } = Route.useParams();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   const [adjustNote, setAdjustNote] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [showAdjustForm, setShowAdjustForm] = useState(false);
@@ -71,8 +71,8 @@ function ClientApprovalPage() {
         event_type: status === 'aprovado' ? 'client_approval' : 'client_adjustment',
         previous_status: project?.status || null,
         new_status: status,
-        actor_label: 'Cliente',
-        message: message || (status === 'aprovado' ? 'Projeto aprovado pelo cliente.' : 'Cliente solicitou ajustes.')
+        actor_label: 'Clientee',
+        message: message || (status === 'aprovado' ? 'Projeto aprovado pelo cliente.' : 'Clientee solicitou ajustes.')
       } as any);
 
       // Notification logic (internal system)
@@ -90,7 +90,7 @@ function ClientApprovalPage() {
       return data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['public-project', token], (old: any) => ({ ...old, status: data.status }));
+      queryCliente.setQueryData(['public-project', token], (old: any) => ({ ...old, status: data.status }));
       toast.success(data.status === 'aprovado' ? 'Site aprovado com sucesso!' : 'Solicitação enviada.');
       setShowConfirm(false);
       setShowAdjustForm(false);

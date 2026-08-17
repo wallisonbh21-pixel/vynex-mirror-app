@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MeetingWithParticipants } from '@/lib/meetings/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Calendar, Users, Clock, PlayCircle, ArrowLeft } from 'lucide-react';
+import { Calendar, Usuários, Clock, PlayCircle, ArrowLeft } from 'lucide-react';
 import { format, isBefore, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from '@tanstack/react-router';
@@ -80,7 +80,7 @@ export function MeetingWaitingRoom({
               <span>{format(scheduledTime, "HH:mm")} ({meeting.duration_minutes} min)</span>
             </div>
             <div className="flex items-center gap-3 text-slate-300">
-              <Users className="w-5 h-5 text-blue-500" />
+              <Usuários className="w-5 h-5 text-blue-500" />
               <span>{meeting.participants.length} Participantes</span>
             </div>
           </div>

@@ -1,20 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 import { createNotifications } from "@/lib/notifications";
-import { releaseToClient } from "@/lib/approval.functions";
+import { releaseToCliente } from "@/lib/approval.functions";
 
 export const APPROVAL_STATUS = {
   producao: "em_producao",
   interna: "aguardando_aprovacao",
   liberado: "aguardando_cliente",
   ajustesInternos: "ajustes",
-  ajustesCliente: "ajustes_solicitados",
+  ajustesClientee: "ajustes_solicitados",
   aprovado: "aprovado",
 } as const;
 
-export type ApprovalProjectRow = {
+export type ApprovalProjetoRow = {
   id: string;
   title: string;
   status: string;
@@ -49,8 +49,8 @@ export const APPROVAL_EVENT_LABEL: Record<string, string> = {
   enviado_aprovacao: "Criador enviou para aprovação",
   liberado_cliente: "Administração liberou o envio ao cliente",
   ajustes_internos: "Administração solicitou ajustes",
-  aprovado_cliente: "Cliente aprovou o site",
-  ajustes_cliente: "Cliente solicitou alterações",
+  aprovado_cliente: "Clientee aprovou o site",
+  ajustes_cliente: "Clientee solicitou alterações",
   retomada_producao: "Projeto retomou a produção",
 };
 
@@ -65,12 +65,12 @@ export function useApprovalQueue() {
         .in("status", [
           APPROVAL_STATUS.interna,
           APPROVAL_STATUS.liberado,
-          APPROVAL_STATUS.ajustesCliente,
+          APPROVAL_STATUS.ajustesClientee,
           APPROVAL_STATUS.aprovado,
         ])
         .order("submitted_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as ApprovalProjectRow[];
+      return (data ?? []) as unknown as ApprovalProjetoRow[];
     },
   });
 }
@@ -99,11 +99,11 @@ async function adminIds() {
 }
 
 function useInvalidate() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   return () => {
-    queryClient.invalidateQueries({ queryKey: ["projects"] });
-    queryClient.invalidateQueries({ queryKey: ["project_approval_events"] });
-    queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    queryCliente.invalidateQueries({ queryKey: ["projects"] });
+    queryCliente.invalidateQueries({ queryKey: ["project_approval_events"] });
+    queryCliente.invalidateQueries({ queryKey: ["notifications"] });
   };
 }
 
@@ -113,7 +113,7 @@ export function useSubmitForApproval() {
   const { user } = useSession();
   return useMutation({
     mutationFn: async (input: {
-      project: ApprovalProjectRow;
+      project: ApprovalProjetoRow;
       delivery_link: string;
       delivery_notes?: string | null;
     }) => {
@@ -170,11 +170,11 @@ export function useSubmitForApproval() {
 }
 
 /** ADMIN/DIRETOR libera o envio ao cliente e gera o link seguro. */
-export function useReleaseToClient() {
+export function useReleaseToCliente() {
   const invalidate = useInvalidate();
   return useMutation({
     mutationFn: async (projectId: string) =>
-      releaseToClient({ data: { projectId, origin: window.location.origin } }),
+      releaseToCliente({ data: { projectId, origin: window.location.origin } }),
     onSuccess: () => {
       invalidate();
       toast.success("Envio liberado. Link seguro gerado para o cliente.");
@@ -188,7 +188,7 @@ export function useRequestInternalAdjust() {
   const invalidate = useInvalidate();
   const { user } = useSession();
   return useMutation({
-    mutationFn: async (input: { project: ApprovalProjectRow; message: string }) => {
+    mutationFn: async (input: { project: ApprovalProjetoRow; message: string }) => {
       const { error } = await supabase
         .from("projects")
         .update({ status: APPROVAL_STATUS.ajustesInternos } as never)
@@ -230,7 +230,7 @@ export function useResumeProduction() {
   const invalidate = useInvalidate();
   const { user } = useSession();
   return useMutation({
-    mutationFn: async (project: ApprovalProjectRow) => {
+    mutationFn: async (project: ApprovalProjetoRow) => {
       const { error } = await supabase
         .from("projects")
         .update({ status: APPROVAL_STATUS.producao } as never)

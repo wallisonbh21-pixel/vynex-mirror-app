@@ -7,7 +7,7 @@ import {
   ExternalLink, 
   Target, 
   TrendingUp, 
-  Users, 
+  Usuários, 
   CheckCircle2, 
   Clock,
   Search,
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/indicar")({
   beforeLoad: () => requireVendedor(),
   head: () => ({
     meta: [
-      { title: "Indicação de Clientes — ScaleNexus" },
+      { title: "Indicação de Clientees — ScaleNexus" },
     ],
   }),
   component: ReferralPage,
@@ -117,7 +117,7 @@ function ReferralPage() {
 
   return (
     <AppShell 
-      title="Indicação de Clientes" 
+      title="Indicação de Clientees" 
       description={isAdmin ? "Visão administrativa e link institucional." : "Indique novos clientes e acompanhe seus resultados."}
     >
       <div className="space-y-8">
@@ -254,7 +254,7 @@ function ReferralPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Cliente/Empresa</TableHead>
+                  <TableHead>Clientee/Empresa</TableHead>
                   <TableHead>Serviço/Nicho</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Status</TableHead>

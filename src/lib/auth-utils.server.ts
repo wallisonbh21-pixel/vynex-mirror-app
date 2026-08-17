@@ -1,4 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseCliente } from "@supabase/supabase-js";
 import crypto from "node:crypto";
 
 export function generateInitialPassword(): string {
@@ -8,8 +8,8 @@ export function generateInitialPassword(): string {
   return crypto.randomBytes(12).toString('hex').slice(0, 12);
 }
 
-export async function createAuthUser(
-  supabaseAdmin: SupabaseClient,
+export async function createAuthUsuário(
+  supabaseAdmin: SupabaseCliente,
   { email, username, fullName, role, clientId }: { 
     email: string; 
     username: string; 
@@ -20,7 +20,7 @@ export async function createAuthUser(
 ) {
   const initialPassword = generateInitialPassword();
 
-  const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+  const { data: newUsuário, error: createError } = await supabaseAdmin.auth.admin.createUsuário({
     email,
     password: initialPassword,
     email_confirm: true,
@@ -35,5 +35,5 @@ export async function createAuthUser(
 
   if (createError) throw createError;
 
-  return { user: newUser.user, initialPassword };
+  return { user: newUsuário.user, initialPassword };
 }

@@ -166,8 +166,8 @@ export function generateIntelligence(
 ): ProjectIntelligence {
   const snapshot = buildStudioSnapshot(studioData);
   const objectives = context.objectives || [];
-  const primaryGoal = objectives.length > 0 ? (objectives[0] as string) : 'institutional';
-  const niche = context.niche || 'general';
+  const primaryGoal = objectives.length > 0 ? (objectives[0] as string) : 'institucional';
+  const niche = context.niche || 'geral';
   
   const recommendedCTA = objectives.includes('whatsapp') ? 'Fale no WhatsApp' : 
                          objectives.includes('agendamento') ? 'Agendar agora' : 'Saiba mais';
@@ -316,7 +316,7 @@ export function generateIntelligence(
     ],
     sectionPriorities: [],
     toneOfVoice: context.niche === 'hamburgueria' ? 'direto, jovem, apetitoso' : 'profissional e claro',
-    visualDirection: context.visualStyle?.join(', ') || 'modern',
+    visualDirection: context.visualStyle?.join(', ') || 'moderno',
     contentPriorities: context.services || [],
   };
 }

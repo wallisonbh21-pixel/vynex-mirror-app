@@ -17,7 +17,7 @@ import {
   Calendar,
   ChevronRight
 } from "lucide-react";
-import { useClientPortalData } from "@/lib/client";
+import { useClientePortalData } from "@/lib/client";
 import { currency, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/cliente/pagamentos")({
 });
 
 function MyPayments() {
-  const { data: client, isLoading: isLoadingClient } = useClientPortalData();
+  const { data: client, isLoading: isLoadingCliente } = useClientePortalData();
 
   const { data: transactions, isLoading: isLoadingTransactions } = useQuery({
     queryKey: ["client-transactions", client?.id],
@@ -49,7 +49,7 @@ function MyPayments() {
     },
   });
 
-  if (isLoadingClient || isLoadingTransactions) {
+  if (isLoadingCliente || isLoadingTransactions) {
     return (
       <AppShell title="Pagamentos">
         <div className="space-y-6">
@@ -60,8 +60,8 @@ function MyPayments() {
     );
   }
 
-  const activeProject = client?.projects?.[0];
-  const totalContracted = activeProject?.value || 0;
+  const activeProjeto = client?.projects?.[0];
+  const totalContracted = activeProjeto?.value || 0;
   
   // Calcular totais reais das transações
   const totalPaid = transactions?.reduce((acc, tx) => acc + (tx.amount || 0), 0) || 0;
@@ -88,7 +88,7 @@ function MyPayments() {
             <CardContent>
               <div className="text-2xl font-black">{currency(totalContracted)}</div>
               <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold tracking-tight">
-                {activeProject?.title || "Nenhum projeto ativo"}
+                {activeProjeto?.title || "Nenhum projeto ativo"}
               </p>
             </CardContent>
           </Card>

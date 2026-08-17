@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useClientProjects } from "@/lib/client";
+import { useClienteProjetos } from "@/lib/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/cliente/site")({
 });
 
 function MySite() {
-  const { data: projects, isLoading } = useClientProjects();
+  const { data: projects, isLoading } = useClienteProjetos();
 
   if (isLoading) {
     return (

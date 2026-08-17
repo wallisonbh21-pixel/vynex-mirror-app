@@ -11,7 +11,7 @@ import {
   Send,
   AlertCircle,
 } from "lucide-react";
-import { useProjectChecklist, useProjectNotes, useUpdateCreatorProject } from "@/lib/creator";
+import { useProjetoChecklist, useProjetoNotes, useUpdateCreatorProjeto } from "@/lib/creator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,10 +20,10 @@ import { toast } from "sonner";
 import { currency } from "@/lib/format";
 
 export function CriadorWorkspace({ project }: { project: any }) {
-  const { data: checklist = [], toggle } = useProjectChecklist(project.id);
-  const { data: notes = [], addNote } = useProjectNotes(project.id);
+  const { data: checklist = [], toggle } = useProjetoChecklist(project.id);
+  const { data: notes = [], addNote } = useProjetoNotes(project.id);
   const [newNote, setNewNote] = useState("");
-  const updateProject = useUpdateCreatorProject();
+  const updateProjeto = useUpdateCreatorProjeto();
 
   const progress = useMemo(() => {
     if (checklist.length === 0) return 0;
@@ -40,7 +40,7 @@ export function CriadorWorkspace({ project }: { project: any }) {
       toast.error("O link de pré-visualização é obrigatório.");
       return;
     }
-    updateProject.mutate({
+    updateProjeto.mutate({
       id: project.id,
       status: "aguardando_aprovacao",
       submitted_at: new Date().toISOString()

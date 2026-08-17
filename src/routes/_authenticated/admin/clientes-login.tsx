@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useClientsList, useClientOnboarding } from "@/lib/client";
+import { useClientesList, useClienteOnboarding } from "@/lib/client";
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin } from '@/lib/guard';
 import { 
   Search, 
   Plus, 
   Mail,
-  User,
+  Usuário,
   Calendar,
   Lock,
   Bell,
@@ -48,7 +48,7 @@ export const Route = createFileRoute('/_authenticated/admin/clientes-login')({
 });
 
 function AdminLoginCentral() {
-  const { data: allClients, isLoading, isError, error, refetch } = useClientsList();
+  const { data: allClientes, isLoading, isError, error, refetch } = useClientesList();
   
   // DIAGNÓSTICO OBRIGATÓRIO (REQUISITO 1 E 10)
   if (isError) {
@@ -61,20 +61,20 @@ function AdminLoginCentral() {
     });
   }
 
-  const activeClients = useMemo(() => {
-    return allClients?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
-  }, [allClients]);
+  const activeClientes = useMemo(() => {
+    return allClientes?.filter(c => String(c.status).trim().toLowerCase() === "ativo") || [];
+  }, [allClientes]);
   
-  const clients = allClients;
-  const onboarding = useClientOnboarding();
+  const clients = allClientes;
+  const onboarding = useClienteOnboarding();
   const resendInviteFn = useServerFn(resendInvite);
   const sendNotificationFn = useServerFn(sendNotification);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
-  const [username, setUsername] = useState("");
+  const [selectedClienteId, setSelectedClienteId] = useState<string>("");
+  const [username, setUsuárioname] = useState("");
 
-  const filteredClients = useMemo(() => {
+  const filteredClientes = useMemo(() => {
     return clients?.filter((c) => {
       const searchLower = searchTerm.toLowerCase();
       return (
@@ -85,13 +85,13 @@ function AdminLoginCentral() {
     }) || [];
   }, [clients, searchTerm]);
 
-  const selectedClient = useMemo(() => clients?.find(c => c.id === selectedClientId), [clients, selectedClientId]);
+  const selectedCliente = useMemo(() => clients?.find(c => c.id === selectedClienteId), [clients, selectedClienteId]);
 
-  const clientsWithLogin = useMemo(() => filteredClients.filter(c => !!c.user_id), [filteredClients]);
-  const clientsWithoutLogin = useMemo(() => filteredClients.filter(c => !c.user_id), [filteredClients]);
+  const clientsWithLogin = useMemo(() => filteredClientes.filter(c => !!c.user_id), [filteredClientes]);
+  const clientsWithoutLogin = useMemo(() => filteredClientes.filter(c => !c.user_id), [filteredClientes]);
 
   const handleCreateAccess = async () => {
-    if (!selectedClient) {
+    if (!selectedCliente) {
       toast.error("Selecione um cliente.");
       return;
     }
@@ -99,21 +99,21 @@ function AdminLoginCentral() {
       toast.error("Informe um nome de usuário.");
       return;
     }
-    if (!selectedClient.contact_email) {
+    if (!selectedCliente.contact_email) {
       toast.error("Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.");
       return;
     }
 
     try {
       await onboarding.mutateAsync({
-        clientId: selectedClient.id,
+        clientId: selectedCliente.id,
         username,
-        email: selectedClient.contact_email,
-        fullName: selectedClient.contact_name || username
+        email: selectedCliente.contact_email,
+        fullName: selectedCliente.contact_name || username
       });
       setIsModalOpen(false);
-      setSelectedClientId("");
-      setUsername("");
+      setSelectedClienteId("");
+      setUsuárioname("");
       refetch();
     } catch (e: any) {
       // toast is handled by mutation
@@ -142,19 +142,19 @@ function AdminLoginCentral() {
 
   const handleOpenModal = (clientId?: string) => {
     if (clientId) {
-      setSelectedClientId(clientId);
+      setSelectedClienteId(clientId);
       const client = clients?.find(c => c.id === clientId);
-      setUsername(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
+      setUsuárioname(client?.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
     } else {
-      setSelectedClientId("");
-      setUsername("");
+      setSelectedClienteId("");
+      setUsuárioname("");
     }
     setIsModalOpen(true);
   };
 
   return (
     <AppShell 
-      title="Login do Cliente" 
+      title="Login do Clientee" 
       description="Gerencie os acessos, comunique-se e acompanhe seus clientes."
       actions={
         <Button className="gap-2 font-bold shadow-lg shadow-primary/20 h-10 px-6 rounded-xl" onClick={() => handleOpenModal()}>
@@ -179,10 +179,10 @@ function AdminLoginCentral() {
         <Tabs defaultValue="with-access" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md bg-muted/30 p-1 rounded-2xl mb-6">
             <TabsTrigger value="with-access" className="rounded-xl">
-              Clientes com Login ({clientsWithLogin.length})
+              Clientees com Login ({clientsWithLogin.length})
             </TabsTrigger>
             <TabsTrigger value="no-access" className="rounded-xl">
-              Clientes sem acesso ({clientsWithoutLogin.length})
+              Clientees sem acesso ({clientsWithoutLogin.length})
             </TabsTrigger>
           </TabsList>
 
@@ -193,7 +193,7 @@ function AdminLoginCentral() {
               </div>
             ) : clientsWithLogin.length === 0 ? (
               <div className="py-20 text-center text-muted-foreground border-2 border-dashed rounded-3xl bg-card/30">
-                <User className="size-12 opacity-20 mx-auto mb-4" />
+                <Usuário className="size-12 opacity-20 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground">Nenhum cliente com login</h3>
                 <p>Tente ativar o acesso de um cliente comercial.</p>
               </div>
@@ -207,7 +207,7 @@ function AdminLoginCentral() {
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                       <div className="flex items-start gap-5">
                         <div className="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-500/20">
-                          <User className="size-7" />
+                          <Usuário className="size-7" />
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
@@ -218,7 +218,7 @@ function AdminLoginCentral() {
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 pt-1">
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <User className="size-3.5 text-primary/60" />
+                                <Usuário className="size-3.5 text-primary/60" />
                                 <span className="font-medium text-foreground/80">Usuário:</span> {usernameDisplay}
                              </div>
                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -297,7 +297,7 @@ function AdminLoginCentral() {
                 <div key={client.id} className="p-6 rounded-3xl border border-border/50 bg-card/50 hover:bg-card transition-all flex flex-col sm:flex-row items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                     <div className="size-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border/50">
-                      <User className="size-6" />
+                      <Usuário className="size-6" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">{client.contact_name}</h3>
@@ -327,10 +327,10 @@ function AdminLoginCentral() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="client-select">CLIENTE</Label>
-              <Select value={selectedClientId} onValueChange={(val) => {
-                setSelectedClientId(val);
-                const c = activeClients?.find(x => x.id === val);
-                if (c) setUsername(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
+              <Select value={selectedClienteId} onValueChange={(val) => {
+                setSelectedClienteId(val);
+                const c = activeClientes?.find(x => x.id === val);
+                if (c) setUsuárioname(c.contact_name?.toLowerCase().replace(/\s+/g, '') || "");
               }}>
                 <SelectTrigger id="client-select" className="h-11 rounded-xl">
                   <SelectValue placeholder="Selecione o cliente ▼" />
@@ -342,10 +342,10 @@ function AdminLoginCentral() {
                     <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg m-2">
                       <p className="font-bold">Erro ao carregar clientes.</p>
                     </div>
-                  ) : activeClients.length === 0 ? (
+                  ) : activeClientes.length === 0 ? (
                     <div className="p-2 text-sm text-muted-foreground text-center font-medium">Nenhum cliente ativo disponível.</div>
                   ) : (
-                    activeClients.map(c => (
+                    activeClientes.map(c => (
                       <SelectItem key={c.id} value={c.id} className="cursor-pointer">
                         {c.contact_name || 'Sem nome'}
                       </SelectItem>
@@ -356,19 +356,19 @@ function AdminLoginCentral() {
 
             </div>
 
-            {selectedClient && (
+            {selectedCliente && (
               <div className="space-y-4 p-4 rounded-2xl bg-muted/30 border border-border/50">
                 <div className="space-y-1">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Cliente:</Label>
-                  <p className="font-semibold">{selectedClient.contact_name}</p>
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Clientee:</Label>
+                  <p className="font-semibold">{selectedCliente.contact_name}</p>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">E-mail:</Label>
-                  <p className="font-semibold">{selectedClient.contact_email || <span className="text-destructive font-normal italic">Não cadastrado!</span>}</p>
+                  <p className="font-semibold">{selectedCliente.contact_email || <span className="text-destructive font-normal italic">Não cadastrado!</span>}</p>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Empresa:</Label>
-                  <p className="font-semibold">{selectedClient.company || "—"}</p>
+                  <p className="font-semibold">{selectedCliente.company || "—"}</p>
                 </div>
               </div>
             )}
@@ -378,20 +378,20 @@ function AdminLoginCentral() {
               <Input 
                 id="username"
                 value={username} 
-                onChange={e => setUsername(e.target.value)}
+                onChange={e => setUsuárioname(e.target.value)}
                 placeholder="Ex: joao123"
                 className="h-11 rounded-xl"
               />
             </div>
 
-            {selectedClient && selectedClient.user_id && (
+            {selectedCliente && selectedCliente.user_id && (
               <p className="text-xs text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-200 flex items-center gap-2">
                 <CheckCircle className="size-4" />
-                Este cliente já possui acesso ao Portal do Cliente.
+                Este cliente já possui acesso ao Portal do Clientee.
               </p>
             )}
 
-            {selectedClient && !selectedClient.contact_email && (
+            {selectedCliente && !selectedCliente.contact_email && (
               <p className="text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20">
                 Este cliente não possui e-mail cadastrado. Cadastre um e-mail no cadastro do cliente antes de criar o acesso.
               </p>
@@ -401,9 +401,9 @@ function AdminLoginCentral() {
             <Button 
               className="w-full h-11 rounded-xl font-bold gap-2"
               onClick={handleCreateAccess} 
-              disabled={onboarding.isPending || !selectedClient || !username || !selectedClient.contact_email}
+              disabled={onboarding.isPending || !selectedCliente || !username || !selectedCliente.contact_email}
             >
-              {onboarding.isPending ? 'PROCESSANDO...' : selectedClient?.user_id ? 'GERENCIAR ACESSO' : 'CRIAR PAINEL DO CLIENTE'}
+              {onboarding.isPending ? 'PROCESSANDO...' : selectedCliente?.user_id ? 'GERENCIAR ACESSO' : 'CRIAR PAINEL DO CLIENTE'}
             </Button>
           </DialogFooter>
         </DialogContent>

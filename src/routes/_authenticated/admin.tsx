@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, Users, Wallet } from "lucide-react";
+import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
+import { ShieldCheck, Usuários, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
@@ -41,7 +41,7 @@ const ROLES = ROLE_OPTIONS;
 
 function AdminPage() {
   const { isAdmin, loading } = useRoles();
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
 
   const profiles = useQuery({
     queryKey: ["profiles"],
@@ -75,7 +75,7 @@ function AdminPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user_roles"] });
+      queryCliente.invalidateQueries({ queryKey: ["user_roles"] });
       toast.success("Papel atualizado.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -92,7 +92,7 @@ function AdminPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      queryCliente.invalidateQueries({ queryKey: ["profiles"] });
       toast.success("Comissão atualizada.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -104,7 +104,7 @@ function AdminPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["withdrawals"] });
+      queryCliente.invalidateQueries({ queryKey: ["withdrawals"] });
       toast.success("Saque atualizado.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -126,7 +126,7 @@ function AdminPage() {
   return (
     <AppShell title="Administração" description="Controle de acessos e aprovações da operação.">
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Usuários" value={String(rows.length)} hint="Cadastrados na plataforma" icon={Users} />
+        <StatCard label="Usuários" value={String(rows.length)} hint="Cadastrados na plataforma" icon={Usuários} />
         <StatCard label="Saques pendentes" value={String(pending.length)} hint={currency(pending.reduce((s, w) => s + Number(w.amount), 0))} icon={Wallet} />
         <StatCard
           label="Administradores"

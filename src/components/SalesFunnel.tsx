@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { 
-  Users, 
+  Usuários, 
   MessageSquare, 
   CheckCircle2, 
   Handshake, 
@@ -33,7 +33,7 @@ interface FunnelConfig {
 export const FUNNEL_CONFIG: Record<string, FunnelConfig> = {
   ['novo']: { 
     color: "#3b82f6", 
-    icon: Users, 
+    icon: Usuários, 
     bg: "bg-blue-500/10", 
     border: "border-blue-500/20",
     text: "text-blue-500",
@@ -265,7 +265,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
             {lead.company || lead.name}
           </button>
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-            <Users size={12} />
+            <Usuários size={12} />
             <span className="truncate">{lead.name}</span>
           </div>
         </div>

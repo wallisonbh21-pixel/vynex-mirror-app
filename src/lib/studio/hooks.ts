@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryCliente } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { StudioData, StudioSection, StudioDesignSystem } from '@/types/studio';
 import { LibraryItem } from '@/types/studio-v2';
@@ -79,7 +79,7 @@ export function useStudioData(projectId: string, clientToken?: string) {
 }
 
 export function useSaveStudioData() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   
   return useMutation({
     mutationFn: async ({ projectId, data }: { projectId: string; data: StudioData }) => {
@@ -96,7 +96,7 @@ export function useSaveStudioData() {
       return data;
     },
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(['studio-data', variables.projectId], data);
+      queryCliente.setQueryData(['studio-data', variables.projectId], data);
     }
   });
 }
@@ -117,11 +117,11 @@ export function useStudioFavorites() {
 }
 
 export function useToggleFavorite() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   
   return useMutation({
     mutationFn: async ({ itemId, itemType, isFavorite }: { itemId: string; itemType: string; isFavorite: boolean }) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUsuário();
       if (!user) throw new Error('Unauthorized');
 
       if (isFavorite) {
@@ -140,13 +140,13 @@ export function useToggleFavorite() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studio-favorites'] });
+      queryCliente.invalidateQueries({ queryKey: ['studio-favorites'] });
     }
   });
 }
 
-// User Templates Hooks
-export function useUserTemplates() {
+// Usuário Templates Hooks
+export function useUsuárioTemplates() {
   return useQuery({
     queryKey: ['studio-user-templates'],
     queryFn: async () => {
@@ -161,12 +161,12 @@ export function useUserTemplates() {
   });
 }
 
-export function useSaveUserTemplate() {
-  const queryClient = useQueryClient();
+export function useSaveUsuárioTemplate() {
+  const queryCliente = useQueryCliente();
   
   return useMutation({
     mutationFn: async (template: Omit<LibraryItem, 'id' | 'type'>) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUsuário();
       if (!user) throw new Error('Unauthorized');
 
       const { error } = await supabase
@@ -186,7 +186,7 @@ export function useSaveUserTemplate() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studio-user-templates'] });
+      queryCliente.invalidateQueries({ queryKey: ['studio-user-templates'] });
     }
   });
 }

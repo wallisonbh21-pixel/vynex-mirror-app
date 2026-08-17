@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryCliente } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
@@ -36,7 +36,7 @@ export function useNotifications() {
 }
 
 export function useMarkNotificationRead() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   const { user } = useSession();
   return useMutation({
     mutationFn: async (id: string) => {
@@ -46,13 +46,13 @@ export function useMarkNotificationRead() {
         .eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] }),
+    onSuccess: () => queryCliente.invalidateQueries({ queryKey: ["notifications", user?.id] }),
     onError: (error: Error) => toast.error(error.message),
   });
 }
 
 export function useMarkAllNotificationsRead() {
-  const queryClient = useQueryClient();
+  const queryCliente = useQueryCliente();
   const { user } = useSession();
   return useMutation({
     mutationFn: async () => {
@@ -64,7 +64,7 @@ export function useMarkAllNotificationsRead() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryCliente.invalidateQueries({ queryKey: ["notifications", user?.id] });
       toast.success("Notificações marcadas como lidas.");
     },
     onError: (error: Error) => toast.error(error.message),

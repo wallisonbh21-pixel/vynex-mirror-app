@@ -15,8 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
-import { Route as AuthenticatedClienteRouteRouteImport } from './routes/_authenticated/cliente/route'
-import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
+import { Route as AuthenticatedClienteeRouteRouteImport } from './routes/_authenticated/cliente/route'
+import { Route as AuthenticatedClienteesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedComissoesRouteImport } from './routes/_authenticated/comissoes'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
 import { Route as AuthenticatedCriacaoRouteImport } from './routes/_authenticated/criacao'
@@ -35,33 +35,33 @@ import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated/prospeccao'
 import { Route as AprovacaoTokenRouteImport } from './routes/aprovacao.$token'
-import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
-import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.primeiro-acesso'
-import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
+import { Route as ClienteeLoginRouteImport } from './routes/cliente.login'
+import { Route as ClienteePrimeiroAcessoRouteImport } from './routes/cliente.primeiro-acesso'
+import { Route as ClienteeRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
 import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
-import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
-import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
-import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
-import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
-import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
-import { Route as AuthenticatedClienteDocumentosRouteImport } from './routes/_authenticated/cliente/documentos'
-import { Route as AuthenticatedClienteMensagensRouteImport } from './routes/_authenticated/cliente/mensagens'
-import { Route as AuthenticatedClienteNotificacoesRouteImport } from './routes/_authenticated/cliente/notificacoes'
-import { Route as AuthenticatedClientePagamentosRouteImport } from './routes/_authenticated/cliente/pagamentos'
-import { Route as AuthenticatedClientePerfilRouteImport } from './routes/_authenticated/cliente/perfil'
-import { Route as AuthenticatedClienteProjetoRouteImport } from './routes/_authenticated/cliente/projeto'
-import { Route as AuthenticatedClienteResetPasswordRouteImport } from './routes/_authenticated/cliente.reset-password'
-import { Route as AuthenticatedClienteReunioesRouteImport } from './routes/_authenticated/cliente/reunioes'
-import { Route as AuthenticatedClienteSiteRouteImport } from './routes/_authenticated/cliente/site'
+import { Route as AuthenticatedAdminClienteesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminClienteesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
+import { Route as AuthenticatedBriefingProjetoIdRouteImport } from './routes/_authenticated/briefing.$projectId'
+import { Route as AuthenticatedClienteeIndexRouteImport } from './routes/_authenticated/cliente/index'
+import { Route as AuthenticatedClienteeAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
+import { Route as AuthenticatedClienteeDocumentosRouteImport } from './routes/_authenticated/cliente/documentos'
+import { Route as AuthenticatedClienteeMensagensRouteImport } from './routes/_authenticated/cliente/mensagens'
+import { Route as AuthenticatedClienteeNotificacoesRouteImport } from './routes/_authenticated/cliente/notificacoes'
+import { Route as AuthenticatedClienteePagamentosRouteImport } from './routes/_authenticated/cliente/pagamentos'
+import { Route as AuthenticatedClienteePerfilRouteImport } from './routes/_authenticated/cliente/perfil'
+import { Route as AuthenticatedClienteeProjetoRouteImport } from './routes/_authenticated/cliente/projeto'
+import { Route as AuthenticatedClienteeResetPasswordRouteImport } from './routes/_authenticated/cliente.reset-password'
+import { Route as AuthenticatedClienteeReunioesRouteImport } from './routes/_authenticated/cliente/reunioes'
+import { Route as AuthenticatedClienteeSiteRouteImport } from './routes/_authenticated/cliente/site'
 import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated/leads.$leadId'
-import { Route as AuthenticatedProjetosProjectIdRouteImport } from './routes/_authenticated/projetos.$projectId'
+import { Route as AuthenticatedProjetosProjetoIdRouteImport } from './routes/_authenticated/projetos.$projectId'
 import { Route as AuthenticatedReuniaoMeetingIdRouteImport } from './routes/_authenticated/reuniao/$meetingId'
 import { Route as AuthenticatedReunioesIndexRouteImport } from './routes/_authenticated/reunioes/index'
-import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
-import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
-import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor.clientes'
-import { Route as AuthenticatedVendedorClientesLoginRouteImport } from './routes/_authenticated/vendedor/clientes-login'
+import { Route as AuthenticatedSitePlannerProjetoIdRouteImport } from './routes/_authenticated/site-planner.$projectId'
+import { Route as AuthenticatedStudioProjetoIdRouteImport } from './routes/_authenticated/studio.$projectId'
+import { Route as AuthenticatedVendedorClienteesRouteImport } from './routes/_authenticated/vendedor.clientes'
+import { Route as AuthenticatedVendedorClienteesLoginRouteImport } from './routes/_authenticated/vendedor/clientes-login'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 import { Route as ComeceSeuProjetoRefTokenRouteImport } from './routes/comece-seu-projeto/ref.$token'
 
@@ -94,13 +94,13 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedClienteRouteRoute =
-  AuthenticatedClienteRouteRouteImport.update({
+const AuthenticatedClienteeRouteRoute =
+  AuthenticatedClienteeRouteRouteImport.update({
     id: '/cliente',
     path: '/cliente',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
+const AuthenticatedClienteesRoute = AuthenticatedClienteesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
   getParentRoute: () => AuthenticatedRouteRoute,
@@ -198,17 +198,17 @@ const AprovacaoTokenRoute = AprovacaoTokenRouteImport.update({
   path: '/aprovacao/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClienteLoginRoute = ClienteLoginRouteImport.update({
+const ClienteeLoginRoute = ClienteeLoginRouteImport.update({
   id: '/cliente/login',
   path: '/cliente/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientePrimeiroAcessoRoute = ClientePrimeiroAcessoRouteImport.update({
+const ClienteePrimeiroAcessoRoute = ClienteePrimeiroAcessoRouteImport.update({
   id: '/cliente/primeiro-acesso',
   path: '/cliente/primeiro-acesso',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClienteRecuperarSenhaRoute = ClienteRecuperarSenhaRouteImport.update({
+const ClienteeRecuperarSenhaRoute = ClienteeRecuperarSenhaRouteImport.update({
   id: '/cliente/recuperar-senha',
   path: '/cliente/recuperar-senha',
   getParentRoute: () => rootRouteImport,
@@ -218,89 +218,89 @@ const ComeceSeuProjetoIndexRoute = ComeceSeuProjetoIndexRouteImport.update({
   path: '/comece-seu-projeto/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminClientesRoute =
-  AuthenticatedAdminClientesRouteImport.update({
+const AuthenticatedAdminClienteesRoute =
+  AuthenticatedAdminClienteesRouteImport.update({
     id: '/clientes',
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminClientesLoginRoute =
-  AuthenticatedAdminClientesLoginRouteImport.update({
+const AuthenticatedAdminClienteesLoginRoute =
+  AuthenticatedAdminClienteesLoginRouteImport.update({
     id: '/clientes-login',
     path: '/clientes-login',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedBriefingProjectIdRoute =
-  AuthenticatedBriefingProjectIdRouteImport.update({
+const AuthenticatedBriefingProjetoIdRoute =
+  AuthenticatedBriefingProjetoIdRouteImport.update({
     id: '/briefing/$projectId',
     path: '/briefing/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedClienteIndexRoute =
-  AuthenticatedClienteIndexRouteImport.update({
+const AuthenticatedClienteeIndexRoute =
+  AuthenticatedClienteeIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteAprovacoesRoute =
-  AuthenticatedClienteAprovacoesRouteImport.update({
+const AuthenticatedClienteeAprovacoesRoute =
+  AuthenticatedClienteeAprovacoesRouteImport.update({
     id: '/aprovacoes',
     path: '/aprovacoes',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteDocumentosRoute =
-  AuthenticatedClienteDocumentosRouteImport.update({
+const AuthenticatedClienteeDocumentosRoute =
+  AuthenticatedClienteeDocumentosRouteImport.update({
     id: '/documentos',
     path: '/documentos',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteMensagensRoute =
-  AuthenticatedClienteMensagensRouteImport.update({
+const AuthenticatedClienteeMensagensRoute =
+  AuthenticatedClienteeMensagensRouteImport.update({
     id: '/mensagens',
     path: '/mensagens',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteNotificacoesRoute =
-  AuthenticatedClienteNotificacoesRouteImport.update({
+const AuthenticatedClienteeNotificacoesRoute =
+  AuthenticatedClienteeNotificacoesRouteImport.update({
     id: '/notificacoes',
     path: '/notificacoes',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClientePagamentosRoute =
-  AuthenticatedClientePagamentosRouteImport.update({
+const AuthenticatedClienteePagamentosRoute =
+  AuthenticatedClienteePagamentosRouteImport.update({
     id: '/pagamentos',
     path: '/pagamentos',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClientePerfilRoute =
-  AuthenticatedClientePerfilRouteImport.update({
+const AuthenticatedClienteePerfilRoute =
+  AuthenticatedClienteePerfilRouteImport.update({
     id: '/perfil',
     path: '/perfil',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteProjetoRoute =
-  AuthenticatedClienteProjetoRouteImport.update({
+const AuthenticatedClienteeProjetoRoute =
+  AuthenticatedClienteeProjetoRouteImport.update({
     id: '/projeto',
     path: '/projeto',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteResetPasswordRoute =
-  AuthenticatedClienteResetPasswordRouteImport.update({
+const AuthenticatedClienteeResetPasswordRoute =
+  AuthenticatedClienteeResetPasswordRouteImport.update({
     id: '/reset-password',
     path: '/reset-password',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteReunioesRoute =
-  AuthenticatedClienteReunioesRouteImport.update({
+const AuthenticatedClienteeReunioesRoute =
+  AuthenticatedClienteeReunioesRouteImport.update({
     id: '/reunioes',
     path: '/reunioes',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
-const AuthenticatedClienteSiteRoute =
-  AuthenticatedClienteSiteRouteImport.update({
+const AuthenticatedClienteeSiteRoute =
+  AuthenticatedClienteeSiteRouteImport.update({
     id: '/site',
     path: '/site',
-    getParentRoute: () => AuthenticatedClienteRouteRoute,
+    getParentRoute: () => AuthenticatedClienteeRouteRoute,
   } as any)
 const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
   id: '/leads/',
@@ -313,8 +313,8 @@ const AuthenticatedLeadsLeadIdRoute =
     path: '/leads/$leadId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedProjetosProjectIdRoute =
-  AuthenticatedProjetosProjectIdRouteImport.update({
+const AuthenticatedProjetosProjetoIdRoute =
+  AuthenticatedProjetosProjetoIdRouteImport.update({
     id: '/$projectId',
     path: '/$projectId',
     getParentRoute: () => AuthenticatedProjetosRoute,
@@ -331,26 +331,26 @@ const AuthenticatedReunioesIndexRoute =
     path: '/reunioes/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedSitePlannerProjectIdRoute =
-  AuthenticatedSitePlannerProjectIdRouteImport.update({
+const AuthenticatedSitePlannerProjetoIdRoute =
+  AuthenticatedSitePlannerProjetoIdRouteImport.update({
     id: '/site-planner/$projectId',
     path: '/site-planner/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedStudioProjectIdRoute =
-  AuthenticatedStudioProjectIdRouteImport.update({
+const AuthenticatedStudioProjetoIdRoute =
+  AuthenticatedStudioProjetoIdRouteImport.update({
     id: '/studio/$projectId',
     path: '/studio/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedVendedorClientesRoute =
-  AuthenticatedVendedorClientesRouteImport.update({
+const AuthenticatedVendedorClienteesRoute =
+  AuthenticatedVendedorClienteesRouteImport.update({
     id: '/vendedor/clientes',
     path: '/vendedor/clientes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedVendedorClientesLoginRoute =
-  AuthenticatedVendedorClientesLoginRouteImport.update({
+const AuthenticatedVendedorClienteesLoginRoute =
+  AuthenticatedVendedorClienteesLoginRouteImport.update({
     id: '/vendedor/clientes-login',
     path: '/vendedor/clientes-login',
     getParentRoute: () => AuthenticatedRouteRoute,
@@ -371,10 +371,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
+  '/cliente': typeof AuthenticatedClienteeRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
-  '/clientes': typeof AuthenticatedClientesRoute
+  '/clientes': typeof AuthenticatedClienteesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/criacao': typeof AuthenticatedCriacaoRoute
@@ -393,33 +393,33 @@ export interface FileRoutesByFullPath {
   '/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
-  '/cliente/login': typeof ClienteLoginRoute
-  '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
-  '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/cliente/login': typeof ClienteeLoginRoute
+  '/cliente/primeiro-acesso': typeof ClienteePrimeiroAcessoRoute
+  '/cliente/recuperar-senha': typeof ClienteeRecuperarSenhaRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
-  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
-  '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
-  '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
-  '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
-  '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
-  '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
-  '/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
-  '/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
-  '/cliente/perfil': typeof AuthenticatedClientePerfilRoute
-  '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
-  '/cliente/reset-password': typeof AuthenticatedClienteResetPasswordRoute
-  '/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
-  '/cliente/site': typeof AuthenticatedClienteSiteRoute
+  '/admin/clientes': typeof AuthenticatedAdminClienteesRoute
+  '/admin/clientes-login': typeof AuthenticatedAdminClienteesLoginRoute
+  '/briefing/$projectId': typeof AuthenticatedBriefingProjetoIdRoute
+  '/cliente/aprovacoes': typeof AuthenticatedClienteeAprovacoesRoute
+  '/cliente/documentos': typeof AuthenticatedClienteeDocumentosRoute
+  '/cliente/mensagens': typeof AuthenticatedClienteeMensagensRoute
+  '/cliente/notificacoes': typeof AuthenticatedClienteeNotificacoesRoute
+  '/cliente/pagamentos': typeof AuthenticatedClienteePagamentosRoute
+  '/cliente/perfil': typeof AuthenticatedClienteePerfilRoute
+  '/cliente/projeto': typeof AuthenticatedClienteeProjetoRoute
+  '/cliente/reset-password': typeof AuthenticatedClienteeResetPasswordRoute
+  '/cliente/reunioes': typeof AuthenticatedClienteeReunioesRoute
+  '/cliente/site': typeof AuthenticatedClienteeSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
-  '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/projetos/$projectId': typeof AuthenticatedProjetosProjetoIdRoute
   '/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
-  '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
-  '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
-  '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
-  '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
+  '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjetoIdRoute
+  '/studio/$projectId': typeof AuthenticatedStudioProjetoIdRoute
+  '/vendedor/clientes': typeof AuthenticatedVendedorClienteesRoute
+  '/vendedor/clientes-login': typeof AuthenticatedVendedorClienteesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
-  '/cliente/': typeof AuthenticatedClienteIndexRoute
+  '/cliente/': typeof AuthenticatedClienteeIndexRoute
   '/leads/': typeof AuthenticatedLeadsIndexRoute
   '/reunioes/': typeof AuthenticatedReunioesIndexRoute
 }
@@ -429,7 +429,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
-  '/clientes': typeof AuthenticatedClientesRoute
+  '/clientes': typeof AuthenticatedClienteesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/criacao': typeof AuthenticatedCriacaoRoute
@@ -448,33 +448,33 @@ export interface FileRoutesByTo {
   '/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
-  '/cliente/login': typeof ClienteLoginRoute
-  '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
-  '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/cliente/login': typeof ClienteeLoginRoute
+  '/cliente/primeiro-acesso': typeof ClienteePrimeiroAcessoRoute
+  '/cliente/recuperar-senha': typeof ClienteeRecuperarSenhaRoute
   '/comece-seu-projeto': typeof ComeceSeuProjetoIndexRoute
-  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
-  '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
-  '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
-  '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
-  '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
-  '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
-  '/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
-  '/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
-  '/cliente/perfil': typeof AuthenticatedClientePerfilRoute
-  '/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
-  '/cliente/reset-password': typeof AuthenticatedClienteResetPasswordRoute
-  '/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
-  '/cliente/site': typeof AuthenticatedClienteSiteRoute
+  '/admin/clientes': typeof AuthenticatedAdminClienteesRoute
+  '/admin/clientes-login': typeof AuthenticatedAdminClienteesLoginRoute
+  '/briefing/$projectId': typeof AuthenticatedBriefingProjetoIdRoute
+  '/cliente/aprovacoes': typeof AuthenticatedClienteeAprovacoesRoute
+  '/cliente/documentos': typeof AuthenticatedClienteeDocumentosRoute
+  '/cliente/mensagens': typeof AuthenticatedClienteeMensagensRoute
+  '/cliente/notificacoes': typeof AuthenticatedClienteeNotificacoesRoute
+  '/cliente/pagamentos': typeof AuthenticatedClienteePagamentosRoute
+  '/cliente/perfil': typeof AuthenticatedClienteePerfilRoute
+  '/cliente/projeto': typeof AuthenticatedClienteeProjetoRoute
+  '/cliente/reset-password': typeof AuthenticatedClienteeResetPasswordRoute
+  '/cliente/reunioes': typeof AuthenticatedClienteeReunioesRoute
+  '/cliente/site': typeof AuthenticatedClienteeSiteRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
-  '/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/projetos/$projectId': typeof AuthenticatedProjetosProjetoIdRoute
   '/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
-  '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
-  '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
-  '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
-  '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
+  '/site-planner/$projectId': typeof AuthenticatedSitePlannerProjetoIdRoute
+  '/studio/$projectId': typeof AuthenticatedStudioProjetoIdRoute
+  '/vendedor/clientes': typeof AuthenticatedVendedorClienteesRoute
+  '/vendedor/clientes-login': typeof AuthenticatedVendedorClienteesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
-  '/cliente': typeof AuthenticatedClienteIndexRoute
+  '/cliente': typeof AuthenticatedClienteeIndexRoute
   '/leads': typeof AuthenticatedLeadsIndexRoute
   '/reunioes': typeof AuthenticatedReunioesIndexRoute
 }
@@ -484,10 +484,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
+  '/_authenticated/cliente': typeof AuthenticatedClienteeRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
-  '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/clientes': typeof AuthenticatedClienteesRoute
   '/_authenticated/comissoes': typeof AuthenticatedComissoesRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/criacao': typeof AuthenticatedCriacaoRoute
@@ -506,33 +506,33 @@ export interface FileRoutesById {
   '/_authenticated/projetos': typeof AuthenticatedProjetosRouteWithChildren
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/aprovacao/$token': typeof AprovacaoTokenRoute
-  '/cliente/login': typeof ClienteLoginRoute
-  '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
-  '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/cliente/login': typeof ClienteeLoginRoute
+  '/cliente/primeiro-acesso': typeof ClienteePrimeiroAcessoRoute
+  '/cliente/recuperar-senha': typeof ClienteeRecuperarSenhaRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
-  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
-  '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
-  '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
-  '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
-  '/_authenticated/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
-  '/_authenticated/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
-  '/_authenticated/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
-  '/_authenticated/cliente/pagamentos': typeof AuthenticatedClientePagamentosRoute
-  '/_authenticated/cliente/perfil': typeof AuthenticatedClientePerfilRoute
-  '/_authenticated/cliente/projeto': typeof AuthenticatedClienteProjetoRoute
-  '/_authenticated/cliente/reset-password': typeof AuthenticatedClienteResetPasswordRoute
-  '/_authenticated/cliente/reunioes': typeof AuthenticatedClienteReunioesRoute
-  '/_authenticated/cliente/site': typeof AuthenticatedClienteSiteRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClienteesRoute
+  '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClienteesLoginRoute
+  '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjetoIdRoute
+  '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteeAprovacoesRoute
+  '/_authenticated/cliente/documentos': typeof AuthenticatedClienteeDocumentosRoute
+  '/_authenticated/cliente/mensagens': typeof AuthenticatedClienteeMensagensRoute
+  '/_authenticated/cliente/notificacoes': typeof AuthenticatedClienteeNotificacoesRoute
+  '/_authenticated/cliente/pagamentos': typeof AuthenticatedClienteePagamentosRoute
+  '/_authenticated/cliente/perfil': typeof AuthenticatedClienteePerfilRoute
+  '/_authenticated/cliente/projeto': typeof AuthenticatedClienteeProjetoRoute
+  '/_authenticated/cliente/reset-password': typeof AuthenticatedClienteeResetPasswordRoute
+  '/_authenticated/cliente/reunioes': typeof AuthenticatedClienteeReunioesRoute
+  '/_authenticated/cliente/site': typeof AuthenticatedClienteeSiteRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
-  '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjectIdRoute
+  '/_authenticated/projetos/$projectId': typeof AuthenticatedProjetosProjetoIdRoute
   '/_authenticated/reuniao/$meetingId': typeof AuthenticatedReuniaoMeetingIdRoute
-  '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjectIdRoute
-  '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
-  '/_authenticated/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
-  '/_authenticated/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
+  '/_authenticated/site-planner/$projectId': typeof AuthenticatedSitePlannerProjetoIdRoute
+  '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjetoIdRoute
+  '/_authenticated/vendedor/clientes': typeof AuthenticatedVendedorClienteesRoute
+  '/_authenticated/vendedor/clientes-login': typeof AuthenticatedVendedorClienteesLoginRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
-  '/_authenticated/cliente/': typeof AuthenticatedClienteIndexRoute
+  '/_authenticated/cliente/': typeof AuthenticatedClienteeIndexRoute
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
   '/_authenticated/reunioes/': typeof AuthenticatedReunioesIndexRoute
 }
@@ -713,9 +713,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   AprovacaoTokenRoute: typeof AprovacaoTokenRoute
-  ClienteLoginRoute: typeof ClienteLoginRoute
-  ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
-  ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
+  ClienteeLoginRoute: typeof ClienteeLoginRoute
+  ClienteePrimeiroAcessoRoute: typeof ClienteePrimeiroAcessoRoute
+  ClienteeRecuperarSenhaRoute: typeof ClienteeRecuperarSenhaRoute
   ComeceSeuProjetoIndexRoute: typeof ComeceSeuProjetoIndexRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
   ComeceSeuProjetoRefTokenRoute: typeof ComeceSeuProjetoRefTokenRoute
@@ -769,14 +769,14 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/cliente'
       path: '/cliente'
       fullPath: '/cliente'
-      preLoaderRoute: typeof AuthenticatedClienteRouteRouteImport
+      preLoaderRoute: typeof AuthenticatedClienteeRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clientes': {
       id: '/_authenticated/clientes'
       path: '/clientes'
       fullPath: '/clientes'
-      preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      preLoaderRoute: typeof AuthenticatedClienteesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/comissoes': {
@@ -909,21 +909,21 @@ declare module '@tanstack/react-router' {
       id: '/cliente/login'
       path: '/cliente/login'
       fullPath: '/cliente/login'
-      preLoaderRoute: typeof ClienteLoginRouteImport
+      preLoaderRoute: typeof ClienteeLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cliente/primeiro-acesso': {
       id: '/cliente/primeiro-acesso'
       path: '/cliente/primeiro-acesso'
       fullPath: '/cliente/primeiro-acesso'
-      preLoaderRoute: typeof ClientePrimeiroAcessoRouteImport
+      preLoaderRoute: typeof ClienteePrimeiroAcessoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cliente/recuperar-senha': {
       id: '/cliente/recuperar-senha'
       path: '/cliente/recuperar-senha'
       fullPath: '/cliente/recuperar-senha'
-      preLoaderRoute: typeof ClienteRecuperarSenhaRouteImport
+      preLoaderRoute: typeof ClienteeRecuperarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comece-seu-projeto/': {
@@ -937,99 +937,99 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/admin/clientes'
       path: '/clientes'
       fullPath: '/admin/clientes'
-      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminClienteesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/clientes-login': {
       id: '/_authenticated/admin/clientes-login'
       path: '/clientes-login'
       fullPath: '/admin/clientes-login'
-      preLoaderRoute: typeof AuthenticatedAdminClientesLoginRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminClienteesLoginRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/briefing/$projectId': {
       id: '/_authenticated/briefing/$projectId'
       path: '/briefing/$projectId'
       fullPath: '/briefing/$projectId'
-      preLoaderRoute: typeof AuthenticatedBriefingProjectIdRouteImport
+      preLoaderRoute: typeof AuthenticatedBriefingProjetoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cliente/': {
       id: '/_authenticated/cliente/'
       path: '/'
       fullPath: '/cliente/'
-      preLoaderRoute: typeof AuthenticatedClienteIndexRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeIndexRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/aprovacoes': {
       id: '/_authenticated/cliente/aprovacoes'
       path: '/aprovacoes'
       fullPath: '/cliente/aprovacoes'
-      preLoaderRoute: typeof AuthenticatedClienteAprovacoesRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/documentos': {
       id: '/_authenticated/cliente/documentos'
       path: '/documentos'
       fullPath: '/cliente/documentos'
-      preLoaderRoute: typeof AuthenticatedClienteDocumentosRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeDocumentosRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/mensagens': {
       id: '/_authenticated/cliente/mensagens'
       path: '/mensagens'
       fullPath: '/cliente/mensagens'
-      preLoaderRoute: typeof AuthenticatedClienteMensagensRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeMensagensRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/notificacoes': {
       id: '/_authenticated/cliente/notificacoes'
       path: '/notificacoes'
       fullPath: '/cliente/notificacoes'
-      preLoaderRoute: typeof AuthenticatedClienteNotificacoesRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/pagamentos': {
       id: '/_authenticated/cliente/pagamentos'
       path: '/pagamentos'
       fullPath: '/cliente/pagamentos'
-      preLoaderRoute: typeof AuthenticatedClientePagamentosRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteePagamentosRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/perfil': {
       id: '/_authenticated/cliente/perfil'
       path: '/perfil'
       fullPath: '/cliente/perfil'
-      preLoaderRoute: typeof AuthenticatedClientePerfilRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteePerfilRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/projeto': {
       id: '/_authenticated/cliente/projeto'
       path: '/projeto'
       fullPath: '/cliente/projeto'
-      preLoaderRoute: typeof AuthenticatedClienteProjetoRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeProjetoRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/reset-password': {
       id: '/_authenticated/cliente/reset-password'
       path: '/reset-password'
       fullPath: '/cliente/reset-password'
-      preLoaderRoute: typeof AuthenticatedClienteResetPasswordRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeResetPasswordRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/reunioes': {
       id: '/_authenticated/cliente/reunioes'
       path: '/reunioes'
       fullPath: '/cliente/reunioes'
-      preLoaderRoute: typeof AuthenticatedClienteReunioesRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeReunioesRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/cliente/site': {
       id: '/_authenticated/cliente/site'
       path: '/site'
       fullPath: '/cliente/site'
-      preLoaderRoute: typeof AuthenticatedClienteSiteRouteImport
-      parentRoute: typeof AuthenticatedClienteRouteRoute
+      preLoaderRoute: typeof AuthenticatedClienteeSiteRouteImport
+      parentRoute: typeof AuthenticatedClienteeRouteRoute
     }
     '/_authenticated/leads/': {
       id: '/_authenticated/leads/'
@@ -1049,7 +1049,7 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/projetos/$projectId'
       path: '/$projectId'
       fullPath: '/projetos/$projectId'
-      preLoaderRoute: typeof AuthenticatedProjetosProjectIdRouteImport
+      preLoaderRoute: typeof AuthenticatedProjetosProjetoIdRouteImport
       parentRoute: typeof AuthenticatedProjetosRoute
     }
     '/_authenticated/reuniao/$meetingId': {
@@ -1070,28 +1070,28 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/site-planner/$projectId'
       path: '/site-planner/$projectId'
       fullPath: '/site-planner/$projectId'
-      preLoaderRoute: typeof AuthenticatedSitePlannerProjectIdRouteImport
+      preLoaderRoute: typeof AuthenticatedSitePlannerProjetoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/studio/$projectId': {
       id: '/_authenticated/studio/$projectId'
       path: '/studio/$projectId'
       fullPath: '/studio/$projectId'
-      preLoaderRoute: typeof AuthenticatedStudioProjectIdRouteImport
+      preLoaderRoute: typeof AuthenticatedStudioProjetoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vendedor/clientes': {
       id: '/_authenticated/vendedor/clientes'
       path: '/vendedor/clientes'
       fullPath: '/vendedor/clientes'
-      preLoaderRoute: typeof AuthenticatedVendedorClientesRouteImport
+      preLoaderRoute: typeof AuthenticatedVendedorClienteesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vendedor/clientes-login': {
       id: '/_authenticated/vendedor/clientes-login'
       path: '/vendedor/clientes-login'
       fullPath: '/vendedor/clientes-login'
-      preLoaderRoute: typeof AuthenticatedVendedorClientesLoginRouteImport
+      preLoaderRoute: typeof AuthenticatedVendedorClienteesLoginRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/prospecting/search': {
@@ -1111,61 +1111,61 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedClienteRouteRouteChildren {
-  AuthenticatedClienteAprovacoesRoute: typeof AuthenticatedClienteAprovacoesRoute
-  AuthenticatedClienteDocumentosRoute: typeof AuthenticatedClienteDocumentosRoute
-  AuthenticatedClienteMensagensRoute: typeof AuthenticatedClienteMensagensRoute
-  AuthenticatedClienteNotificacoesRoute: typeof AuthenticatedClienteNotificacoesRoute
-  AuthenticatedClientePagamentosRoute: typeof AuthenticatedClientePagamentosRoute
-  AuthenticatedClientePerfilRoute: typeof AuthenticatedClientePerfilRoute
-  AuthenticatedClienteProjetoRoute: typeof AuthenticatedClienteProjetoRoute
-  AuthenticatedClienteResetPasswordRoute: typeof AuthenticatedClienteResetPasswordRoute
-  AuthenticatedClienteReunioesRoute: typeof AuthenticatedClienteReunioesRoute
-  AuthenticatedClienteSiteRoute: typeof AuthenticatedClienteSiteRoute
-  AuthenticatedClienteIndexRoute: typeof AuthenticatedClienteIndexRoute
+interface AuthenticatedClienteeRouteRouteChildren {
+  AuthenticatedClienteeAprovacoesRoute: typeof AuthenticatedClienteeAprovacoesRoute
+  AuthenticatedClienteeDocumentosRoute: typeof AuthenticatedClienteeDocumentosRoute
+  AuthenticatedClienteeMensagensRoute: typeof AuthenticatedClienteeMensagensRoute
+  AuthenticatedClienteeNotificacoesRoute: typeof AuthenticatedClienteeNotificacoesRoute
+  AuthenticatedClienteePagamentosRoute: typeof AuthenticatedClienteePagamentosRoute
+  AuthenticatedClienteePerfilRoute: typeof AuthenticatedClienteePerfilRoute
+  AuthenticatedClienteeProjetoRoute: typeof AuthenticatedClienteeProjetoRoute
+  AuthenticatedClienteeResetPasswordRoute: typeof AuthenticatedClienteeResetPasswordRoute
+  AuthenticatedClienteeReunioesRoute: typeof AuthenticatedClienteeReunioesRoute
+  AuthenticatedClienteeSiteRoute: typeof AuthenticatedClienteeSiteRoute
+  AuthenticatedClienteeIndexRoute: typeof AuthenticatedClienteeIndexRoute
 }
 
-const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChildren =
+const AuthenticatedClienteeRouteRouteChildren: AuthenticatedClienteeRouteRouteChildren =
   {
-    AuthenticatedClienteAprovacoesRoute: AuthenticatedClienteAprovacoesRoute,
-    AuthenticatedClienteDocumentosRoute: AuthenticatedClienteDocumentosRoute,
-    AuthenticatedClienteMensagensRoute: AuthenticatedClienteMensagensRoute,
-    AuthenticatedClienteNotificacoesRoute:
-      AuthenticatedClienteNotificacoesRoute,
-    AuthenticatedClientePagamentosRoute: AuthenticatedClientePagamentosRoute,
-    AuthenticatedClientePerfilRoute: AuthenticatedClientePerfilRoute,
-    AuthenticatedClienteProjetoRoute: AuthenticatedClienteProjetoRoute,
-    AuthenticatedClienteResetPasswordRoute:
-      AuthenticatedClienteResetPasswordRoute,
-    AuthenticatedClienteReunioesRoute: AuthenticatedClienteReunioesRoute,
-    AuthenticatedClienteSiteRoute: AuthenticatedClienteSiteRoute,
-    AuthenticatedClienteIndexRoute: AuthenticatedClienteIndexRoute,
+    AuthenticatedClienteeAprovacoesRoute: AuthenticatedClienteeAprovacoesRoute,
+    AuthenticatedClienteeDocumentosRoute: AuthenticatedClienteeDocumentosRoute,
+    AuthenticatedClienteeMensagensRoute: AuthenticatedClienteeMensagensRoute,
+    AuthenticatedClienteeNotificacoesRoute:
+      AuthenticatedClienteeNotificacoesRoute,
+    AuthenticatedClienteePagamentosRoute: AuthenticatedClienteePagamentosRoute,
+    AuthenticatedClienteePerfilRoute: AuthenticatedClienteePerfilRoute,
+    AuthenticatedClienteeProjetoRoute: AuthenticatedClienteeProjetoRoute,
+    AuthenticatedClienteeResetPasswordRoute:
+      AuthenticatedClienteeResetPasswordRoute,
+    AuthenticatedClienteeReunioesRoute: AuthenticatedClienteeReunioesRoute,
+    AuthenticatedClienteeSiteRoute: AuthenticatedClienteeSiteRoute,
+    AuthenticatedClienteeIndexRoute: AuthenticatedClienteeIndexRoute,
   }
 
-const AuthenticatedClienteRouteRouteWithChildren =
-  AuthenticatedClienteRouteRoute._addFileChildren(
-    AuthenticatedClienteRouteRouteChildren,
+const AuthenticatedClienteeRouteRouteWithChildren =
+  AuthenticatedClienteeRouteRoute._addFileChildren(
+    AuthenticatedClienteeRouteRouteChildren,
   )
 
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
-  AuthenticatedAdminClientesLoginRoute: typeof AuthenticatedAdminClientesLoginRoute
+  AuthenticatedAdminClienteesRoute: typeof AuthenticatedAdminClienteesRoute
+  AuthenticatedAdminClienteesLoginRoute: typeof AuthenticatedAdminClienteesLoginRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
-  AuthenticatedAdminClientesLoginRoute: AuthenticatedAdminClientesLoginRoute,
+  AuthenticatedAdminClienteesRoute: AuthenticatedAdminClienteesRoute,
+  AuthenticatedAdminClienteesLoginRoute: AuthenticatedAdminClienteesLoginRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedProjetosRouteChildren {
-  AuthenticatedProjetosProjectIdRoute: typeof AuthenticatedProjetosProjectIdRoute
+  AuthenticatedProjetosProjetoIdRoute: typeof AuthenticatedProjetosProjetoIdRoute
 }
 
 const AuthenticatedProjetosRouteChildren: AuthenticatedProjetosRouteChildren = {
-  AuthenticatedProjetosProjectIdRoute: AuthenticatedProjetosProjectIdRoute,
+  AuthenticatedProjetosProjetoIdRoute: AuthenticatedProjetosProjetoIdRoute,
 }
 
 const AuthenticatedProjetosRouteWithChildren =
@@ -1174,10 +1174,10 @@ const AuthenticatedProjetosRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedClienteRouteRoute: typeof AuthenticatedClienteRouteRouteWithChildren
+  AuthenticatedClienteeRouteRoute: typeof AuthenticatedClienteeRouteRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
-  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedClienteesRoute: typeof AuthenticatedClienteesRoute
   AuthenticatedComissoesRoute: typeof AuthenticatedComissoesRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedCriacaoRoute: typeof AuthenticatedCriacaoRoute
@@ -1195,22 +1195,22 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRouteWithChildren
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
-  AuthenticatedBriefingProjectIdRoute: typeof AuthenticatedBriefingProjectIdRoute
+  AuthenticatedBriefingProjetoIdRoute: typeof AuthenticatedBriefingProjetoIdRoute
   AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
   AuthenticatedReuniaoMeetingIdRoute: typeof AuthenticatedReuniaoMeetingIdRoute
-  AuthenticatedSitePlannerProjectIdRoute: typeof AuthenticatedSitePlannerProjectIdRoute
-  AuthenticatedStudioProjectIdRoute: typeof AuthenticatedStudioProjectIdRoute
-  AuthenticatedVendedorClientesRoute: typeof AuthenticatedVendedorClientesRoute
-  AuthenticatedVendedorClientesLoginRoute: typeof AuthenticatedVendedorClientesLoginRoute
+  AuthenticatedSitePlannerProjetoIdRoute: typeof AuthenticatedSitePlannerProjetoIdRoute
+  AuthenticatedStudioProjetoIdRoute: typeof AuthenticatedStudioProjetoIdRoute
+  AuthenticatedVendedorClienteesRoute: typeof AuthenticatedVendedorClienteesRoute
+  AuthenticatedVendedorClienteesLoginRoute: typeof AuthenticatedVendedorClienteesLoginRoute
   AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
   AuthenticatedReunioesIndexRoute: typeof AuthenticatedReunioesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedClienteRouteRoute: AuthenticatedClienteRouteRouteWithChildren,
+  AuthenticatedClienteeRouteRoute: AuthenticatedClienteeRouteRouteWithChildren,
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
-  AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedClienteesRoute: AuthenticatedClienteesRoute,
   AuthenticatedComissoesRoute: AuthenticatedComissoesRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedCriacaoRoute: AuthenticatedCriacaoRoute,
@@ -1228,15 +1228,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedProjetosRoute: AuthenticatedProjetosRouteWithChildren,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
-  AuthenticatedBriefingProjectIdRoute: AuthenticatedBriefingProjectIdRoute,
+  AuthenticatedBriefingProjetoIdRoute: AuthenticatedBriefingProjetoIdRoute,
   AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
   AuthenticatedReuniaoMeetingIdRoute: AuthenticatedReuniaoMeetingIdRoute,
-  AuthenticatedSitePlannerProjectIdRoute:
-    AuthenticatedSitePlannerProjectIdRoute,
-  AuthenticatedStudioProjectIdRoute: AuthenticatedStudioProjectIdRoute,
-  AuthenticatedVendedorClientesRoute: AuthenticatedVendedorClientesRoute,
-  AuthenticatedVendedorClientesLoginRoute:
-    AuthenticatedVendedorClientesLoginRoute,
+  AuthenticatedSitePlannerProjetoIdRoute:
+    AuthenticatedSitePlannerProjetoIdRoute,
+  AuthenticatedStudioProjetoIdRoute: AuthenticatedStudioProjetoIdRoute,
+  AuthenticatedVendedorClienteesRoute: AuthenticatedVendedorClienteesRoute,
+  AuthenticatedVendedorClienteesLoginRoute:
+    AuthenticatedVendedorClienteesLoginRoute,
   AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
   AuthenticatedReunioesIndexRoute: AuthenticatedReunioesIndexRoute,
 }
@@ -1250,9 +1250,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   AprovacaoTokenRoute: AprovacaoTokenRoute,
-  ClienteLoginRoute: ClienteLoginRoute,
-  ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
-  ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
+  ClienteeLoginRoute: ClienteeLoginRoute,
+  ClienteePrimeiroAcessoRoute: ClienteePrimeiroAcessoRoute,
+  ClienteeRecuperarSenhaRoute: ClienteeRecuperarSenhaRoute,
   ComeceSeuProjetoIndexRoute: ComeceSeuProjetoIndexRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,
   ComeceSeuProjetoRefTokenRoute: ComeceSeuProjetoRefTokenRoute,

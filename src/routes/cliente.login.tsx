@@ -1,7 +1,7 @@
 
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Sparkles, ArrowRight, Lock, User } from "lucide-react";
+import { Sparkles, ArrowRight, Lock, Usuário } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +12,11 @@ import { z } from "zod";
 export const Route = createFileRoute("/cliente/login")({
   head: () => ({
     meta: [
-      { title: "Login — Portal do Cliente ScaleNexus" },
-      { name: "description", content: "Acesse seu painel profissional no Portal do Cliente ScaleNexus." },
+      { title: "Login — Portal do Clientee ScaleNexus" },
+      { name: "description", content: "Acesse seu painel profissional no Portal do Clientee ScaleNexus." },
     ],
   }),
-  component: ClientLoginPage,
+  component: ClienteLoginPage,
 });
 
 const loginSchema = z.object({
@@ -24,7 +24,7 @@ const loginSchema = z.object({
   password: z.string().min(1, "Informe a senha"),
 });
 
-function ClientLoginPage() {
+function ClienteLoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,14 +41,14 @@ function ClientLoginPage() {
     const roles = rolesData?.map(r => r.role) || [];
     
     if (roles.includes("cliente")) {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await supabase.auth.getUsuário();
       if (userData?.user?.user_metadata?.['must_change_password']) {
         navigate({ to: "/cliente/primeiro-acesso", replace: true });
       } else {
         navigate({ to: "/cliente", replace: true });
       }
     } else {
-      toast.error("Este acesso não pertence ao Portal do Cliente.");
+      toast.error("Este acesso não pertence ao Portal do Clientee.");
       await supabase.auth.signOut();
     }
   }
@@ -78,7 +78,7 @@ function ClientLoginPage() {
             <Sparkles className="size-8 text-white" />
           </div>
           <h1 className="text-xl font-bold tracking-widest uppercase">ScaleNexus</h1>
-          <p className="text-sm text-primary font-medium">Portal do Cliente</p>
+          <p className="text-sm text-primary font-medium">Portal do Clientee</p>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
@@ -87,7 +87,7 @@ function ClientLoginPage() {
             <div className="space-y-2">
               <Label htmlFor="email">Usuário / E-mail</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-white/40" />
+                <Usuário className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-white/40" />
                 <Input
                   id="email"
                   value={email}
