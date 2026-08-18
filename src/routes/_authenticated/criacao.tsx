@@ -20,6 +20,9 @@ import {
   Target,
   History,
   LayoutDashboard,
+  ArrowUpRight,
+  Briefcase,
+  UserCheck
 } from "lucide-react";
 import {
   Bar,
@@ -36,6 +39,9 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardSection } from "@/components/DashboardSection";
 import { Button } from "@/components/ui/button";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
@@ -48,7 +54,6 @@ import { currency, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/lib/auth";
 import { SalesProgression } from "@/components/SalesProgression";
-
 
 export const Route = createFileRoute("/_authenticated/criacao")({
   beforeLoad: () => requireCriador(),
@@ -97,15 +102,6 @@ function PainelCriador() {
 
   const urgent = deadlines.filter(d => d!.diff <= 0);
   const near = deadlines.filter(d => d!.diff > 0 && d!.diff <= 3);
-  const onTime = deadlines.filter(d => d!.diff > 3);
-
-  // Desempenho
-  const finishedOnTimeCount = delivered.filter(p => {
-    if (!p.delivered_at || !p.due_date) return true;
-    return new Date(p.delivered_at) <= new Date(p.due_date);
-  }).length;
-  
-  const completionRate = mine.length > 0 ? Math.round((delivered.length / mine.length) * 100) : 0;
 
   const progressionData = [
     { name: "Recebidos", value: mine.length, color: "var(--primary)" },
@@ -114,6 +110,7 @@ function PainelCriador() {
     { name: "Aprovados", value: approved.length, color: "#10B981" },
     { name: "Entregues", value: delivered.length, color: "#8B5CF6" },
   ];
+
 
   return (
     <AppShell
