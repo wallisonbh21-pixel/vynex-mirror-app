@@ -8,7 +8,9 @@ import {
   Wallet,
   FileText,
   Trophy,
+  ArrowUpRight,
 } from "lucide-react";
+
 import {
   Bar,
   BarChart,
