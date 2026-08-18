@@ -97,26 +97,48 @@ function Painel() {
             : "Seu funil comercial, metas e comissões previstas."
       }
       actions={
-        <Button asChild>
+        <Button asChild className="shadow-glow bg-primary hover:bg-primary/90">
           <Link to="/pipeline">Abrir pipeline</Link>
         </Button>
       }
     >
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Leads ativos" value={String(activeLeads.length)} hint={`${leads.length} no funil`} icon={Target} />
-        <StatCard label="Contatos realizados" value={String(contacts.length)} hint="Ligações, WhatsApp, reuniões" icon={Phone} />
-        <StatCard label="Propostas enviadas" value={String(sentProposals.length)} hint={`${proposals.length} criadas`} icon={FileText} />
-        <StatCard label="Contratos fechados" value={String(contracts.length)} hint={`${monthContracts.length} neste mês`} icon={Handshake} />
-        <StatCard label="Taxa de conversão" value={`${conversion}%`} hint={`${closed.length} leads convertidos`} icon={Percent} />
-        <StatCard label="Vendido no mês" value={currency(monthRevenue)} hint={shortDate(`${monthKey}-01`)} icon={TrendingUp} />
-        <StatCard label="Comissão prevista" value={currency(commission)} hint={`${rate}% sobre o mês`} icon={Wallet} />
-        <StatCard
-          label="Melhor Meta do Mês"
-          value={goal ? currency(goal.revenue_target) : "Sem meta"}
-          hint={goal ? `${goalPercent}% alcançado` : "Cadastre em Metas"}
-          icon={Trophy}
+      <DashboardShell>
+        <DashboardHeader 
+          title="Minha Performance"
+          description="Acompanhe seus leads, conversões e metas do mês."
         />
-      </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard 
+            label="Leads ativos" 
+            value={String(activeLeads.length)} 
+            hint={`${leads.length} no funil`} 
+            icon={Target} 
+            status={activeLeads.length > 0 ? 'active' : 'idle'}
+          />
+          <StatCard 
+            label="Contatos realizados" 
+            value={String(contacts.length)} 
+            hint="Total de interações" 
+            icon={Phone} 
+          />
+          <StatCard 
+            label="Contratos fechados" 
+            value={String(contracts.length)} 
+            hint={`${monthContracts.length} este mês`} 
+            icon={Handshake} 
+            status={monthContracts.length > 0 ? 'success' : 'idle'}
+            trend={{ value: `${conversion}%`, positive: conversion > 20, label: "conversão" }}
+          />
+          <StatCard 
+            label="Comissão prevista" 
+            value={currency(commission)} 
+            hint={`${rate}% sobre o mês`} 
+            icon={Wallet} 
+            status="active"
+          />
+        </div>
+
 
       {goal ? (
         <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-panel">
