@@ -312,6 +312,7 @@ function AdminDashboardPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
       </DashboardShell>
     </AppShell>
   );
