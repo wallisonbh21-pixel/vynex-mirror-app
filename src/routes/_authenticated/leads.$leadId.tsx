@@ -165,25 +165,24 @@ function LeadDetail() {
 
   return (
     <AppShell
-      title={lead.company || lead.name}
-      description={`${lead.niche || "Sem nicho"} · ${lead.city || "—"}${lead.state ? `/${lead.state}` : ""}`}
+      title="DETALHES DA OPORTUNIDADE"
       actions={
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm" className="text-xs font-bold uppercase tracking-widest">
             <Link to="/leads">
-              <ArrowLeft className="size-4" /> Voltar
+              <ArrowLeft className="mr-2 size-4" /> Voltar
             </Link>
           </Button>
           <Select
             value={lead.status}
             onValueChange={(status) => changeStatus.mutate({ lead, status, userId: user.id })}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48 bg-card/50 border-border/50 font-bold text-xs uppercase tracking-widest h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {LEAD_STATUS.map((item) => (
-                <SelectItem key={item} value={item}>
+                <SelectItem key={item} value={item} className="text-xs font-bold uppercase tracking-widest">
                   {label(item)}
                 </SelectItem>
               ))}
@@ -194,24 +193,34 @@ function LeadDetail() {
             fields={leadFields}
             initial={lead}
             onSubmit={(values) => saveLead.mutate({ ...values, id: lead.id })}
-            trigger={<Button variant="secondary">Editar</Button>}
+            trigger={<Button variant="secondary" className="text-xs font-bold uppercase tracking-widest h-9">Editar</Button>}
           />
         </div>
       }
     >
-      <div className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-panel">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-6 flex items-center gap-2">
-          <CalendarClock className="size-4 text-brand-500" /> Progresso da Oportunidade
-        </h2>
-        <SalesProgression status={lead.status} />
-      </div>
+      <DashboardShell>
+        <DashboardHeader 
+          title={lead.company || lead.name}
+          description={`${lead.niche || "Sem nicho"} · ${lead.city || "—"}${lead.state ? `/${lead.state}` : ""}`}
+        />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">Dados do lead</h2>
-            <StatusBadge status={lead.status} />
-          </div>
+        <div className="mb-6 rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+          <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
+            <CalendarClock className="size-4 text-primary" /> Jornada de Conversão
+          </h2>
+          <SalesProgression status={lead.status} />
+        </div>
+
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <FileText className="size-4 text-primary" /> Informações do Lead
+              </h2>
+              <StatusBadge status={lead.status} className="h-5 px-2 text-[10px]" />
+            </div>
+
           <dl className="mt-4 space-y-3 text-sm">
             <Row term="Empresa" value={lead.company} icon={FileText} />
             <Row term="Nicho" value={lead.niche} />
@@ -316,10 +325,11 @@ function LeadDetail() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold flex items-center gap-2 mb-4">
-            <span role="img" aria-label="briefing">📋</span> Briefing Completo
-          </h2>
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-6">
+              <PackageCheck className="size-4 text-primary" /> Briefing do Projeto
+            </h2>
+
           
           <div className="space-y-6">
             {briefing?.briefingItems && briefing.briefingItems.length > 0 ? (
@@ -369,9 +379,12 @@ function LeadDetail() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">Linha do tempo</h2>
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel lg:col-span-2">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <History className="size-4 text-primary" /> Linha do Tempo
+              </h2>
+
             <RecordDialog
               title="Adicionar atividade"
               fields={activityFields}
