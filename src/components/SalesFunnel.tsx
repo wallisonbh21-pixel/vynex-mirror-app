@@ -97,7 +97,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
       <div className="flex flex-col gap-2">
         {counts.filter(c => c.status !== 'perdido').map((item, index, filteredCounts) => {
           const config = (FUNNEL_CONFIG[item.status as string] || DEFAULT_CONFIG) as FunnelConfig;
-          const Icon = config.icon;
+          const IconComponent = config.icon;
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
           
@@ -120,7 +120,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
             >
               <div className="flex items-center gap-4">
                 <div className={cn("flex size-10 items-center justify-center rounded-lg bg-background shadow-sm", config.text)}>
-                  <Icon size={20} aria-hidden="true" />
+                  <IconComponent size={20} aria-hidden="true" />
                 </div>
                 <div className="text-left">
                   <span className="block text-sm font-bold text-foreground">
