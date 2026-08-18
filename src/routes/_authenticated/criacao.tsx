@@ -20,6 +20,9 @@ import {
   Target,
   History,
   LayoutDashboard,
+  ArrowUpRight,
+  Briefcase,
+  UserCheck
 } from "lucide-react";
 import {
   Bar,
@@ -36,6 +39,9 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardSection } from "@/components/DashboardSection";
 import { Button } from "@/components/ui/button";
 import { requireCriador } from "@/lib/guard";
 import { useRows } from "@/lib/data";
@@ -48,7 +54,7 @@ import { currency, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useProfile } from "@/lib/auth";
 import { SalesProgression } from "@/components/SalesProgression";
-
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_authenticated/criacao")({
   beforeLoad: () => requireCriador(),
@@ -117,332 +123,283 @@ function PainelCriador() {
 
   return (
     <AppShell
-      title="Central de Produção"
-      description="Gerencie seus projetos, prazos e desempenho profissional."
+      title="CENTRAL DE PRODUÇÃO"
     >
-      {/* 1. HEADER BOAS-VINDAS */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Olá, {profile?.nickname || profile?.full_name?.split(' ')[0] || "Criador"} 👋</h1>
-          <p className="text-muted-foreground mt-1">Veja seus projetos, prazos e desempenho em tempo real.</p>
+      <DashboardShell>
+        <DashboardHeader 
+          title={`Olá, ${profile?.full_name?.split(' ')[0] || "Criador"} 👋`}
+          description="Gerencie seus projetos, prazos e desempenho profissional."
+        />
+        
+        <div className="flex justify-end mb-6">
+          <Button asChild className="shadow-glow bg-primary hover:bg-primary/90">
+            <Link to="/disponiveis">
+              <Rocket className="mr-2 size-4" /> Criar novo site
+            </Link>
+          </Button>
         </div>
-        <Button asChild size="lg" className="gap-2 shadow-glow animate-pulse-subtle bg-gradient-brand border-none hover:opacity-90">
-          <Link to="/disponiveis">
-            <Rocket className="size-5" /> Criar novo site
-          </Link>
-        </Button>
-      </div>
 
-      {/* 2. CARDS DE RESUMO */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div onClick={() => navigate({ to: "/meus-projetos" })} className="cursor-pointer">
+        {/* 2. CARDS DE RESUMO */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard 
-            label="Projetos em andamento" 
+            label="Em andamento" 
             value={String(active.length)} 
-            hint="Acompanhar progresso" 
-            icon={Layers} 
+            icon={Layers}
+            onClick={() => navigate({ to: "/meus-projetos" })}
           />
-        </div>
-        <div onClick={() => navigate({ to: "/aprovacoes" })} className="cursor-pointer">
           <StatCard 
             label="Aguardando aprovação" 
             value={String(pendingApproval.length)} 
-            hint="Revisão final" 
             icon={Clock} 
+            status={pendingApproval.length > 0 ? 'warning' : 'idle'}
+            onClick={() => navigate({ to: "/aprovacoes" })}
           />
-        </div>
-        <div onClick={() => navigate({ to: "/meus-projetos" })} className="cursor-pointer">
           <StatCard 
             label="Projetos entregues" 
             value={String(delivered.length)} 
-            hint="Total histórico" 
             icon={PackageCheck} 
+            status="success"
+            onClick={() => navigate({ to: "/meus-projetos" })}
           />
-        </div>
-        <div onClick={() => navigate({ to: "/comissoes" })} className="cursor-pointer">
           <StatCard 
             label="Comissão acumulada" 
             value={currency(earnings.paid + earnings.released + earnings.pending)} 
-            hint="Total gerado" 
             icon={Banknote} 
+            onClick={() => navigate({ to: "/comissoes" })}
           />
-        </div>
-        <div onClick={() => navigate({ to: "/meus-saques" })} className="cursor-pointer">
           <StatCard 
-            label="Comissão disponível" 
+            label="Disponível saque" 
             value={currency(earnings.balance)} 
-            hint="Liberado para saque" 
             icon={Wallet} 
+            status={earnings.balance > 0 ? 'active' : 'idle'}
+            onClick={() => navigate({ to: "/meus-saques" })}
           />
         </div>
-      </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        {/* 3. MEUS PROJETOS (Resumo) */}
-        <section className="lg:col-span-2 space-y-6">
-          <div className="rounded-2xl border border-border bg-card shadow-panel overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <h2 className="font-semibold flex items-center gap-2">
-                <History className="size-4 text-brand-500" /> Projetos em Andamento
-              </h2>
-              <Button asChild variant="ghost" size="sm" className="text-brand-500 hover:text-brand-600">
-                <Link to="/meus-projetos">Ver todos</Link>
-              </Button>
-            </div>
-            <div className="divide-y divide-border">
-              {active.slice(0, 5).map((project) => (
-                <div key={project.id} className="p-5 hover:bg-muted/30 transition-colors">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="min-w-0 flex-1 pr-4">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate font-bold text-base">{project.title}</span>
-                        <StatusBadge status={project.status} />
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          {/* 3. MEUS PROJETOS (Resumo) */}
+          <section className="lg:col-span-2 space-y-6">
+            <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel overflow-hidden">
+              <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <History className="size-4 text-primary" /> Projetos em Andamento
+                </h2>
+                <Button asChild variant="ghost" size="sm" className="text-xs text-brand-500 hover:text-brand-600 uppercase font-bold tracking-widest">
+                  <Link to="/meus-projetos">Ver todos</Link>
+                </Button>
+              </div>
+              <div className="divide-y divide-border/30">
+                {active.slice(0, 5).map((project) => (
+                  <div key={project.id} className="p-6 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="min-w-0 flex-1 pr-4">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate font-bold text-base">{project.title}</span>
+                          <StatusBadge status={project.status} className="h-5 px-2 text-[10px]" />
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground font-medium uppercase tracking-tight">
+                          <span className="flex items-center gap-1"><Rocket className="size-3" /> {project.site_type || "Site"}</span>
+                          <span className="flex items-center gap-1"><Calendar className="size-3" /> Início: {shortDate(project.assigned_at || project.created_at)}</span>
+                        </div>
                       </div>
-                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Rocket className="size-3" /> {project.site_type || "Site"}</span>
-                        <span className="flex items-center gap-1"><Calendar className="size-3" /> Início: {shortDate(project.assigned_at || project.created_at)}</span>
+                      <div className="text-right">
+                        <div className="font-black text-primary text-xl">{currency(earnings.commissionOf(project))}</div>
+                        <Button asChild size="sm" variant="outline" className="h-8 mt-2 border-primary/30 text-primary hover:bg-primary/10 text-[10px] font-bold uppercase tracking-widest">
+                          <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
+                            Gerenciar <ExternalLink className="size-3" />
+                          </Link>
+                        </Button>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-brand-500 text-lg">{currency(earnings.commissionOf(project))}</div>
-                      <Button asChild size="sm" variant="outline" className="h-8 mt-1 border-brand-500/30 text-brand-500 hover:bg-brand-500/10">
-                        <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
-                          Gerenciar <ExternalLink className="size-3" />
-                        </Link>
-                      </Button>
-                    </div>
+                    <SalesProgression status={project.status} />
                   </div>
-                  <SalesProgression status={project.status} />
-                </div>
-              ))}
-              {active.length === 0 && (
-                <div className="p-12 text-center text-sm text-muted-foreground flex flex-col items-center gap-3">
-                  <div className="p-4 rounded-full bg-muted">
-                    <Layers className="size-8 opacity-20" />
+                ))}
+                {active.length === 0 && (
+                  <div className="p-12 text-center text-sm text-muted-foreground flex flex-col items-center gap-3 italic">
+                    <p>Você não tem projetos ativos no momento.</p>
+                    <Button asChild variant="link" className="text-brand-500 font-bold uppercase tracking-widest text-[10px]">
+                      <Link to="/disponiveis">Ver projetos disponíveis</Link>
+                    </Button>
                   </div>
-                  <p>Você não tem projetos ativos no momento.</p>
-                  <Button asChild variant="link" className="text-brand-500">
-                    <Link to="/disponiveis">Ver projetos disponíveis</Link>
-                  </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Grafico de Meu Progresso */}
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+            {/* Grafico de Meu Progresso */}
+            <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
                 <TrendingUp className="size-4 text-primary" /> Meu progresso
               </h2>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={progressionData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
-                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
-                  <Tooltip 
-                    cursor={{ opacity: 0.1 }} 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={40}>
-                    {progressionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={progressionData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} opacity={0.5} />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
+                    <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
+                    <Tooltip 
+                      cursor={{ opacity: 0.1 }} 
+                      contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px' }}
+                    />
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={40}>
+                      {progressionData.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+
+            {/* Volume Histórico */}
+            <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+                <History className="size-4 text-brand-500" /> Histórico de Volume (6 meses)
+              </h2>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={series}>
+                    <defs>
+                      <linearGradient id="colorProjetos" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} opacity={0.5} />
+                    <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
+                    <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
+                    <Tooltip 
+                      cursor={{ opacity: 0.1 }} 
+                      contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="projetos" 
+                      stroke="var(--primary)" 
+                      fillOpacity={1} 
+                      fill="url(#colorProjetos)" 
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+          </section>
+
+          <aside className="space-y-6">
+            {/* 5. PRAZOS */}
+            <section className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+              <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Calendar className="size-4 text-primary" /> Próximos Prazos
+              </h2>
+              <div className="p-4 space-y-4">
+                {urgent.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-destructive flex items-center gap-1">
+                      <AlertCircle className="size-3" /> Entrega hoje ou atrasado
+                    </span>
+                    {urgent.map(d => (
+                      <div key={d!.id} className="rounded-lg bg-destructive/10 border border-destructive/20 p-2 text-xs">
+                        <div className="font-bold flex justify-between">
+                          <span className="truncate">{d!.title}</span>
+                          <span className="text-destructive whitespace-nowrap">{d!.diff < 0 ? 'ATRASADO' : 'HOJE'}</span>
+                        </div>
+                        <div className="text-muted-foreground mt-0.5 font-medium">{shortDate(d!.due_date)}</div>
+                      </div>
                     ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </section>
+                  </div>
+                )}
 
-          {/* Volume Histórico */}
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
-              <History className="size-4 text-brand-500" /> Histórico de Volume (6 meses)
-            </h2>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={series}>
-                  <defs>
-                    <linearGradient id="colorProjetos" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} className="text-[10px] font-bold uppercase" />
-                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} className="text-xs" width={30} />
-                  <Tooltip 
-                    cursor={{ opacity: 0.1 }} 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="projetos" 
-                    stroke="hsl(var(--primary))" 
-                    fillOpacity={1} 
-                    fill="url(#colorProjetos)" 
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </section>
-
-        </section>
-
-        <aside className="space-y-6">
-          {/* 5. PRAZOS */}
-          <section className="rounded-2xl border border-border bg-card shadow-panel">
-            <h2 className="border-b border-border px-4 py-3 text-sm font-semibold flex items-center gap-2">
-              <Calendar className="size-4 text-primary" /> Próximos Prazos
-            </h2>
-            <div className="p-4 space-y-4">
-              {urgent.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-destructive flex items-center gap-1">
-                    <AlertCircle className="size-3" /> Entrega hoje ou atrasado
-                  </span>
-                  {urgent.map(d => (
-                    <div key={d!.id} className="rounded-lg bg-destructive/10 border border-destructive/20 p-2 text-xs">
-                      <div className="font-bold flex justify-between">
-                        <span className="truncate">{d!.title}</span>
-                        <span className="text-destructive whitespace-nowrap">{d!.diff < 0 ? 'ATRASADO' : 'HOJE'}</span>
+                {near.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-warning">🟠 Entrega próxima</span>
+                    {near.map(d => (
+                      <div key={d!.id} className="rounded-lg bg-warning/10 border border-warning/20 p-2 text-xs">
+                        <div className="font-bold flex justify-between">
+                          <span className="truncate">{d!.title}</span>
+                          <span className="text-warning whitespace-nowrap">{d!.diff} dia{d!.diff > 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="text-muted-foreground mt-0.5 font-medium">{shortDate(d!.due_date)}</div>
                       </div>
-                      <div className="text-muted-foreground mt-0.5">{shortDate(d!.due_date)}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
 
-              {near.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-warning">🟠 Entrega próxima</span>
-                  {near.map(d => (
-                    <div key={d!.id} className="rounded-lg bg-warning/10 border border-warning/20 p-2 text-xs">
-                      <div className="font-bold flex justify-between">
-                        <span className="truncate">{d!.title}</span>
-                        <span className="text-warning whitespace-nowrap">{d!.diff} dia{d!.diff > 1 ? 's' : ''}</span>
+                {onTime.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-success">🟢 Dentro do prazo</span>
+                    {onTime.slice(0, 3).map(d => (
+                      <div key={d!.id} className="rounded-lg bg-success/10 border border-success/20 p-2 text-xs">
+                        <div className="font-bold flex justify-between">
+                          <span className="truncate">{d!.title}</span>
+                          <span className="text-success whitespace-nowrap">{d!.diff} dias</span>
+                        </div>
+                        <div className="text-muted-foreground mt-0.5 font-medium">{shortDate(d!.due_date)}</div>
                       </div>
-                      <div className="text-muted-foreground mt-0.5">{shortDate(d!.due_date)}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
 
-              {onTime.length > 0 && (
+                {deadlines.length === 0 && (
+                  <p className="text-center py-4 text-xs text-muted-foreground italic">Sem prazos definidos.</p>
+                )}
+              </div>
+            </section>
+
+            {/* 6. COMISSÕES (Resumo) */}
+            <section className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+              <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Wallet className="size-4 text-primary" /> Resumo Financeiro
+              </h2>
+              <div className="p-5 space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">Total gerado</span>
+                  <span className="font-bold">{currency(earnings.paid + earnings.released + earnings.pending)}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">Liberado</span>
+                  <span className="font-black text-success">{currency(earnings.balance)}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm border-t border-border/30 pt-4">
+                  <span className="text-muted-foreground font-medium">Recebido</span>
+                  <span className="font-bold">{currency(earnings.withdrawn)}</span>
+                </div>
+                <Button asChild className="w-full mt-2 font-bold uppercase tracking-widest text-[10px] shadow-glow bg-primary hover:bg-primary/90">
+                  <Link to="/meus-saques">
+                    Solicitar Saque <ArrowRight className="ml-2 size-3" />
+                  </Link>
+                </Button>
+              </div>
+            </section>
+
+            {/* 7. DESEMPENHO */}
+            <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+                <Trophy className="size-4 text-primary" /> Meu Desempenho
+              </h2>
+              <div className="space-y-6">
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-success">🟢 Dentro do prazo</span>
-                  {onTime.slice(0, 3).map(d => (
-                    <div key={d!.id} className="rounded-lg bg-success/10 border border-success/20 p-2 text-xs">
-                      <div className="font-bold flex justify-between">
-                        <span className="truncate">{d!.title}</span>
-                        <span className="text-success whitespace-nowrap">{d!.diff} dias</span>
-                      </div>
-                      <div className="text-muted-foreground mt-0.5">{shortDate(d!.due_date)}</div>
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-tighter">
+                    <span>Taxa de Entrega</span>
+                    <span className="text-primary">{completionRate}%</span>
+                  </div>
+                  <Progress value={completionRate} className="h-1.5" />
                 </div>
-              )}
-
-              {deadlines.length === 0 && (
-                <p className="text-center py-4 text-xs text-muted-foreground">Sem prazos definidos.</p>
-              )}
-            </div>
-          </section>
-
-          {/* 6. COMISSÕES (Resumo) */}
-          <section className="rounded-2xl border border-border bg-card shadow-panel">
-            <h2 className="border-b border-border px-4 py-3 text-sm font-semibold flex items-center gap-2">
-              <Wallet className="size-4 text-primary" /> Resumo Financeiro
-            </h2>
-            <div className="p-4 space-y-3">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Total de comissões</span>
-                <span className="font-semibold">{currency(earnings.paid + earnings.released + earnings.pending)}</span>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-xl bg-muted/20 p-3 border border-border/50">
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Entregas no Prazo</p>
+                    <p className="text-lg font-black text-primary">{finishedOnTimeCount}</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/20 p-3 border border-border/50">
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Média Mensal</p>
+                    <p className="text-lg font-black text-primary">{(delivered.length / Math.max(1, series.length)).toFixed(1)}</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Disponível</span>
-                <span className="font-bold text-success">{currency(earnings.balance)}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">A receber</span>
-                <span className="font-medium text-warning">{currency(earnings.pending)}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm border-t border-border pt-2">
-                <span className="text-muted-foreground">Já recebido</span>
-                <span className="font-medium">{currency(earnings.withdrawn)}</span>
-              </div>
-              <Button asChild size="sm" className="w-full mt-2 gap-2 shadow-glow bg-gradient-brand border-none hover:opacity-90">
-                <Link to="/meus-saques">
-                  Solicitar Saque <ArrowRight className="size-3" />
-                </Link>
-              </Button>
-            </div>
-          </section>
-
-          {/* 7. DESEMPENHO */}
-          <section className="rounded-2xl border border-border bg-card shadow-panel">
-            <h2 className="border-b border-border px-4 py-3 text-sm font-semibold flex items-center gap-2">
-              <TrendingUp className="size-4 text-primary" /> Meu Desempenho
-            </h2>
-            <div className="p-4 grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{delivered.length}</div>
-                <div className="text-[10px] text-muted-foreground uppercase">Projetos Concluídos</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{completionRate}%</div>
-                <div className="text-[10px] text-muted-foreground uppercase">Taxa de Conclusão</div>
-              </div>
-            </div>
-
-            <div className="px-4 pb-4 space-y-2">
-              <div className="text-xs font-semibold mb-2">Conquistas & Troféus</div>
-              <div className="grid grid-cols-2 gap-2">
-                <AchievementCard 
-                  icon={Trophy} 
-                  label="Concluídos" 
-                  value={delivered.length} 
-                  active={delivered.length > 0} 
-                />
-                <AchievementCard 
-                  icon={Flame} 
-                  label="No Prazo" 
-                  value={finishedOnTimeCount} 
-                  active={finishedOnTimeCount > 0} 
-                />
-                <AchievementCard 
-                  icon={Star} 
-                  label="Destaque" 
-                  value="" 
-                  active={completionRate >= 90 && delivered.length >= 5} 
-                />
-                <AchievementCard 
-                  icon={Gem} 
-                  label="10 Concluídos" 
-                  value="" 
-                  active={delivered.length >= 10} 
-                />
-              </div>
-            </div>
-          </section>
-        </aside>
-      </div>
+            </section>
+          </aside>
+        </div>
+      </DashboardShell>
     </AppShell>
-  );
-}
-
-function AchievementCard({ icon: Icon, label, value, active }: { icon: any, label: string, value: string | number, active: boolean }) {
-  return (
-    <div className={cn(
-      "flex flex-col items-center justify-center rounded-xl border p-2 text-center transition-all",
-      active ? "bg-primary/5 border-primary/20 text-primary shadow-sm" : "bg-muted/50 border-border text-muted-foreground opacity-50 grayscale"
-    )}>
-      <Icon className="size-4 mb-1" />
-      <span className="text-[9px] font-bold uppercase leading-none">{label}</span>
-      {value !== "" && <span className="text-xs font-bold mt-0.5">{value}</span>}
-    </div>
   );
 }

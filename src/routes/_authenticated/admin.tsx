@@ -9,11 +9,16 @@ import {
   FileText, 
   ArrowUpRight,
   TrendingDown,
-  Plus
+  Plus,
+  Briefcase,
+  UserCheck
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardSection } from "@/components/DashboardSection";
 import { useRoles } from "@/lib/auth";
 import { requireAdmin } from "@/lib/guard";
 import { currency, shortDate } from "@/lib/format";
@@ -44,6 +49,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   }),
   component: AdminDashboardPage,
 });
+
 
 function AdminDashboardPage() {
   const { isAdmin, loading: rolesLoading } = useRoles();
@@ -84,67 +90,60 @@ function AdminDashboardPage() {
 
   return (
     <AppShell 
-      title="VISÃO GERAL DA OPERAÇÃO" 
-      description="Indicadores consolidados de vendas, produção e financeiro."
+      title="ADMINISTRAÇÃO" 
     >
-      {/* Cards Executivos */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Receita do Mês</CardTitle>
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{currency(stats?.revenue || 0)}</div>
-            <p className="text-xs text-emerald-500 flex items-center mt-1">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +18,2% <span className="text-muted-foreground ml-1">vs. mês anterior</span>
-            </p>
-          </CardContent>
-        </Card>
+      <DashboardShell>
+        <DashboardHeader 
+          title="Visão Geral da Operação"
+          description="Indicadores consolidados de vendas, produção e financeiro."
+        />
 
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Contratos Ativos</CardTitle>
-            <FileText className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeContractsCount || 0}</div>
-            <p className="text-xs text-blue-500 flex items-center mt-1">
-              <Plus className="h-3 w-3 mr-1" />
-              +7 <span className="text-muted-foreground ml-1">novos este mês</span>
-            </p>
-          </CardContent>
-        </Card>
+        {/* Cards Executivos */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard 
+            label="Receita do Mês"
+            value={currency(stats?.revenue || 0)}
+            icon={TrendingUp}
+            trend={{ value: "+18,2%", positive: true, label: "vs. mês anterior" }}
+          />
 
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">MRR (Mensalidades)</CardTitle>
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{currency(stats?.mrr || 0)}</div>
-            <p className="text-xs text-emerald-500 flex items-center mt-1">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +9,4% <span className="text-muted-foreground ml-1">recorrência</span>
-            </p>
-          </CardContent>
-        </Card>
+          <StatCard 
+            label="Contratos Ativos"
+            value={String(stats?.activeContractsCount || 0)}
+            icon={FileText}
+            trend={{ value: "+7", positive: true, label: "novos este mês" }}
+          />
 
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Comissões a Pagar</CardTitle>
-            <Wallet className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{currency(stats?.commissionsPending || 0)}</div>
-            <div className="mt-1 flex items-center">
-               <StatusBadge status="pendente" className="h-4 py-0 text-[10px]" />
-               <span className="text-xs text-muted-foreground ml-2">pendentes</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <StatCard 
+            label="MRR (Mensalidades)"
+            value={currency(stats?.mrr || 0)}
+            icon={TrendingUp}
+            trend={{ value: "+9,4%", positive: true, label: "recorrência" }}
+          />
+
+          <StatCard 
+            label="Comissões a Pagar"
+            value={currency(stats?.commissionsPending || 0)}
+            icon={Wallet}
+            hint="Aguardando liberação"
+          />
+          
+          {/* Adicionais solicitados na Fase 2 */}
+          <StatCard 
+            label="Projetos Ativos"
+            value="32" 
+            icon={Briefcase}
+            hint="Em produção"
+          />
+
+          <StatCard 
+            label="Clientes Ativos"
+            value="48"
+            icon={UserCheck}
+            hint="Base total"
+          />
+        </div>
+
 
       {/* Gráficos */}
       <div className="grid gap-6 mt-6 lg:grid-cols-3">
@@ -314,6 +313,7 @@ function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+      </DashboardShell>
     </AppShell>
   );
 }

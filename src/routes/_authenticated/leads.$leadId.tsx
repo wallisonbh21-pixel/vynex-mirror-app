@@ -13,8 +13,22 @@ import {
   Trash2,
   Phone,
   AlertTriangle,
+  History as HistoryIcon,
+  PackageCheck,
+  TrendingUp,
+  Target,
+  ArrowRight,
+  ShieldCheck,
+  Layers,
+  Clock,
+  Briefcase,
+  UserCheck
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardSection } from "@/components/DashboardSection";
+
 import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -165,25 +179,24 @@ function LeadDetail() {
 
   return (
     <AppShell
-      title={lead.company || lead.name}
-      description={`${lead.niche || "Sem nicho"} · ${lead.city || "—"}${lead.state ? `/${lead.state}` : ""}`}
+      title="DETALHES DA OPORTUNIDADE"
       actions={
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm" className="text-xs font-bold uppercase tracking-widest">
             <Link to="/leads">
-              <ArrowLeft className="size-4" /> Voltar
+              <ArrowLeft className="mr-2 size-4" /> Voltar
             </Link>
           </Button>
           <Select
             value={lead.status}
             onValueChange={(status) => changeStatus.mutate({ lead, status, userId: user.id })}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48 bg-card/50 border-border/50 font-bold text-xs uppercase tracking-widest h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {LEAD_STATUS.map((item) => (
-                <SelectItem key={item} value={item}>
+                <SelectItem key={item} value={item} className="text-xs font-bold uppercase tracking-widest">
                   {label(item)}
                 </SelectItem>
               ))}
@@ -194,37 +207,49 @@ function LeadDetail() {
             fields={leadFields}
             initial={lead}
             onSubmit={(values) => saveLead.mutate({ ...values, id: lead.id })}
-            trigger={<Button variant="secondary">Editar</Button>}
+            trigger={<Button variant="secondary" className="text-xs font-bold uppercase tracking-widest h-9">Editar</Button>}
           />
         </div>
       }
     >
-      <div className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-panel">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-6 flex items-center gap-2">
-          <CalendarClock className="size-4 text-brand-500" /> Progresso da Oportunidade
-        </h2>
-        <SalesProgression status={lead.status} />
-      </div>
+      <DashboardShell>
+        <DashboardHeader 
+          title={lead.company || lead.name}
+          description={`${lead.niche || "Sem nicho"} · ${lead.city || "—"}${lead.state ? `/${lead.state}` : ""}`}
+        />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">Dados do lead</h2>
-            <StatusBadge status={lead.status} />
-          </div>
-          <dl className="mt-4 space-y-3 text-sm">
-            <Row term="Empresa" value={lead.company} icon={FileText} />
-            <Row term="Nicho" value={lead.niche} />
-            <Row term="Contato" value={lead.name} />
-            <div className="flex justify-between gap-3 pt-1">
-              <dt className="text-muted-foreground flex items-center gap-1.5"><Phone className="size-3.5" /> Contato</dt>
+        <div className="mb-6 rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+          <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
+            <CalendarClock className="size-4 text-primary" /> Jornada de Conversão
+          </h2>
+          <SalesProgression status={lead.status} />
+        </div>
+
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <FileText className="size-4 text-primary" /> Informações do Lead
+              </h2>
+              <StatusBadge status={lead.status} className="h-5 px-2 text-[10px]" />
+            </div>
+
+          <dl className="space-y-1">
+            <Row term="Empresa" value={lead.company} icon={Briefcase} />
+            <Row term="Nicho" value={lead.niche} icon={Layers} />
+            <Row term="Contato" value={lead.name} icon={UserCheck} />
+            <div className="flex justify-between items-center gap-4 py-2 border-b border-border/30 last:border-0">
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Phone className="size-3.5 text-primary/70" /> WhatsApp
+              </dt>
               <dd className="text-right">
-                <div className="flex flex-col items-end">
-                  {lead.whatsapp && (
-                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-brand-500 font-medium hover:underline">
-                      {lead.whatsapp}
-                    </a>
-                  )}
+                {lead.whatsapp ? (
+                  <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary hover:underline">
+                    {lead.whatsapp}
+                  </a>
+                ) : <span className="text-sm text-muted-foreground">—</span>}
+
                   {lead.email && <span className="text-xs">{lead.email}</span>}
                 </div>
               </dd>
@@ -316,10 +341,11 @@ function LeadDetail() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold flex items-center gap-2 mb-4">
-            <span role="img" aria-label="briefing">📋</span> Briefing Completo
-          </h2>
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-6">
+              <PackageCheck className="size-4 text-primary" /> Briefing do Projeto
+            </h2>
+
           
           <div className="space-y-6">
             {briefing?.briefingItems && briefing.briefingItems.length > 0 ? (
@@ -369,9 +395,12 @@ function LeadDetail() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">Linha do tempo</h2>
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel lg:col-span-2">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <HistoryIcon className="size-4 text-primary" /> Linha do Tempo
+              </h2>
+
             <RecordDialog
               title="Adicionar atividade"
               fields={activityFields}
@@ -396,14 +425,18 @@ function LeadDetail() {
 
           <ol className="mt-4 space-y-3">
             {activities.map((activity) => (
-              <li key={activity.id} className="flex gap-3 rounded-xl border border-border p-3">
-                <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary">
+              <li key={activity.id} className="flex gap-4 rounded-xl border border-border/50 bg-card/20 p-4 transition-colors hover:bg-card/40">
+                <span className={cn(
+                  "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl",
+                  activity.type === "observacao" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                )}>
                   {activity.type === "observacao" || activity.type === "status" ? (
                     <MessageSquare className="size-4" />
                   ) : (
                     <CalendarClock className="size-4" />
                   )}
                 </span>
+
                 <span className="min-w-0">
                   <span className="block text-sm">{activity.description}</span>
                   <span className="text-xs text-muted-foreground">
@@ -415,18 +448,22 @@ function LeadDetail() {
                 </span>
               </li>
             ))}
-            {activities.length === 0 ? (
-              <li className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            {activities.length === 0 && (
+              <li className="rounded-xl border border-dashed border-border/50 p-12 text-center text-sm text-muted-foreground italic">
                 Nenhuma atividade registrada para esta oportunidade.
               </li>
-            ) : null}
+            )}
+
           </ol>
         </section>
       </div>
 
-      <section className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-panel">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Propostas comerciais</h2>
+        <section className="mt-6 rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <PackageCheck className="size-4 text-primary" /> Propostas Comerciais
+            </h2>
+
           <RecordDialog
             title="Nova proposta"
             fields={proposalFields}
@@ -457,7 +494,7 @@ function LeadDetail() {
           {proposals.map((proposal) => (
             <li
               key={proposal.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-3 text-sm"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/50 bg-card/20 p-4 transition-colors hover:bg-card/40"
             >
               <span className="min-w-0">
                 <span className="block font-medium">{proposal.title}</span>
@@ -502,11 +539,12 @@ function LeadDetail() {
               </span>
             </li>
           ))}
-          {proposals.length === 0 ? (
-            <li className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Nenhuma proposta criada para esta oportunidade.
-            </li>
-          ) : null}
+            {proposals.length === 0 && (
+              <li className="rounded-xl border border-dashed border-border/50 p-12 text-center text-sm text-muted-foreground italic">
+                Nenhuma proposta criada para esta oportunidade.
+              </li>
+            )}
+
         </ul>
       </section>
 
@@ -555,18 +593,21 @@ function LeadDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </DashboardShell>
     </AppShell>
   );
 }
 
+
 function Row({ term, value, icon: Icon }: { term: string; value: string | null | undefined, icon?: any }) {
   return (
-    <div className="flex justify-between gap-3">
-      <dt className="text-muted-foreground flex items-center gap-1.5">
-        {Icon && <Icon className="size-3.5" />}
+    <div className="flex justify-between items-center gap-4 py-2 border-b border-border/30 last:border-0">
+      <dt className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+        {Icon && <Icon className="size-3.5 text-primary/70" />}
         {term}
       </dt>
-      <dd className="max-w-[60%] text-right font-medium">{value || "—"}</dd>
+      <dd className="text-sm font-medium text-foreground">{value || "—"}</dd>
     </div>
   );
 }
+
