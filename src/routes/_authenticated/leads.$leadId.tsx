@@ -235,19 +235,21 @@ function LeadDetail() {
               <StatusBadge status={lead.status} className="h-5 px-2 text-[10px]" />
             </div>
 
-          <dl className="mt-4 space-y-3 text-sm">
-            <Row term="Empresa" value={lead.company} icon={FileText} />
-            <Row term="Nicho" value={lead.niche} />
-            <Row term="Contato" value={lead.name} />
-            <div className="flex justify-between gap-3 pt-1">
-              <dt className="text-muted-foreground flex items-center gap-1.5"><Phone className="size-3.5" /> Contato</dt>
+          <dl className="space-y-1">
+            <Row term="Empresa" value={lead.company} icon={Briefcase} />
+            <Row term="Nicho" value={lead.niche} icon={Layers} />
+            <Row term="Contato" value={lead.name} icon={UserCheck} />
+            <div className="flex justify-between items-center gap-4 py-2 border-b border-border/30 last:border-0">
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Phone className="size-3.5 text-primary/70" /> WhatsApp
+              </dt>
               <dd className="text-right">
-                <div className="flex flex-col items-end">
-                  {lead.whatsapp && (
-                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-brand-500 font-medium hover:underline">
-                      {lead.whatsapp}
-                    </a>
-                  )}
+                {lead.whatsapp ? (
+                  <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary hover:underline">
+                    {lead.whatsapp}
+                  </a>
+                ) : <span className="text-sm text-muted-foreground">—</span>}
+
                   {lead.email && <span className="text-xs">{lead.email}</span>}
                 </div>
               </dd>
