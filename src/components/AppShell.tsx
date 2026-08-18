@@ -70,7 +70,6 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
-  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { 
     to: "/clientes", 
@@ -82,11 +81,10 @@ const NAV_VENDEDOR: NavItem[] = [
     ]
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
-  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
+  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
-
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/metas", label: "Metas", icon: BarChart3 },
