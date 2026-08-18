@@ -1,4 +1,3 @@
-
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useClientePortalData } from "@/lib/client";
@@ -23,9 +22,13 @@ import {
   Video,
   Send,
   Wallet,
-  Activity
+  Activity,
+  ArrowUpRight
 } from "lucide-react";
 import { ProjectProgression } from "@/components/ProjectProgression";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { StatCard } from "@/components/StatCard";
 import { PROJECT_STATUS, getProjectProgress, getProjectNextStep, label } from "@/lib/format";
 import { useNotifications } from "@/lib/notifications";
 import { useQuery } from "@tanstack/react-query";
@@ -60,7 +63,6 @@ function ClienteDashboard() {
     queryKey: ["client-recent-activity", client?.id],
     enabled: !!client,
     queryFn: async () => {
-      // Unificando notificações como atividades recentes
       const { data, error } = await supabase
         .from("notifications")
         .select("*")
@@ -117,7 +119,7 @@ function ClienteDashboard() {
       title: "Seu projeto está aguardando aprovação.",
       buttonText: "REVISAR PROJETO",
       link: "/cliente/aprovacoes",
-      icon: <ShieldCheck className="size-5 text-yellow-500" />
+      icon: <ShieldCheck className="size-5 text-warning" />
     };
   } else if (unreadMessages > 0) {
     actionRequired = {
@@ -136,57 +138,52 @@ function ClienteDashboard() {
   }
 
   return (
-    <AppShell title="Portal do Clientee">
-      <div className="space-y-8 pb-10">
-        {/* TOPO */}
-        <div className="flex flex-col gap-2">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Olá, {client.contact_name || "Clientee"}! 👋
-          </h2>
-          <p className="text-muted-foreground">
-            Acompanhe tudo que a ScaleNexus está desenvolvendo para <span className="font-semibold text-foreground">{client.company || "sua empresa"}</span>.
-          </p>
-        </div>
+    <AppShell title="PORTAL DO CLIENTE">
+      <DashboardShell>
+        <DashboardHeader 
+          title={`Olá, ${client.contact_name || "Cliente"}! 👋`}
+          description={`Acompanhe o desenvolvimento da ${client.company || "sua empresa"} na ScaleNexus.`}
+        />
 
         {activeProjeto ? (
           <div className="grid gap-6 lg:grid-cols-12">
             {/* CARD PRINCIPAL - PROJETO ATUAL */}
-            <Card className="lg:col-span-8 border-sidebar-border/50 bg-sidebar/30 backdrop-blur-sm shadow-xl">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/10">
+            <Card className="lg:col-span-8 border-border/50 bg-card/30 backdrop-blur-sm shadow-panel overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border/50 px-6 py-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">PROJETO ATUAL</p>
-                  <CardTitle className="text-2xl font-bold">{activeProjeto.title}</CardTitle>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Projeto em Foco</p>
+                  <CardTitle className="text-xl font-bold">{activeProjeto.title}</CardTitle>
                 </div>
-                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
                   {label(activeProjeto.status)}
                 </Badge>
               </CardHeader>
-              <CardContent className="pt-6 space-y-8">
+              <CardContent className="pt-6 px-6 pb-6 space-y-8">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-background/40 border border-border/50">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">TIPO</p>
-                    <p className="font-medium">{activeProjeto.site_type || "Desenvolvimento Web"}</p>
+                  <div className="p-4 rounded-xl bg-muted/20 border border-border/50">
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1">TIPO DE SOLUÇÃO</p>
+                    <p className="text-sm font-semibold">{activeProjeto.site_type || "Desenvolvimento Web"}</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-background/40 border border-border/50">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">PRÓXIMA ETAPA</p>
-                    <p className="font-medium text-primary">{getProjectNextStep(activeProjeto.status)}</p>
+                  <div className="p-4 rounded-xl bg-muted/20 border border-border/50">
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1">PRÓXIMA ETAPA</p>
+                    <p className="text-sm font-bold text-primary">{getProjectNextStep(activeProjeto.status)}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
-                    <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">PROGRESSO</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Progresso do Desenvolvimento</p>
                     <p className="text-2xl font-black text-primary">{getProjectProgress(activeProjeto.status)}%</p>
                   </div>
-                  <div className="h-4 w-full bg-secondary/50 rounded-full overflow-hidden border border-border/20">
+                  <div className="h-3 w-full bg-muted/30 rounded-full overflow-hidden border border-border/20">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary/80 to-primary shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out"
+                      className="h-full bg-primary shadow-glow transition-all duration-1000 ease-out"
                       style={{ width: `${getProjectProgress(activeProjeto.status)}%` }}
                     />
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border/10">
+                <div className="pt-6 border-t border-border/30">
                   <ProjectProgression steps={[...PROJECT_STATUS].filter(s => s !== 'cancelado')} currentStatus={activeProjeto.status} />
                 </div>
               </CardContent>
@@ -196,75 +193,75 @@ function ClienteDashboard() {
             <div className="lg:col-span-4 space-y-6">
               {/* AÇÃO NECESSÁRIA */}
               <Card className={cn(
-                "border-2 transition-all duration-300",
-                actionRequired ? "border-primary/30 bg-primary/5 shadow-glow" : "border-border/50 bg-background/40"
+                "border transition-all duration-300 backdrop-blur-sm",
+                actionRequired ? "border-primary/30 bg-primary/5 shadow-glow" : "border-border/50 bg-card/30 shadow-panel"
               )}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                    {actionRequired ? <AlertCircle className="size-4 text-primary animate-pulse" /> : <CheckCircle2 className="size-4 text-green-500" />}
-                    {actionRequired ? "Ação Necessária" : "Tudo em ordem"}
+                <CardHeader className="pb-2 px-5 pt-4">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                    {actionRequired ? <AlertCircle className="size-3 text-primary animate-pulse" /> : <CheckCircle2 className="size-3 text-success" />}
+                    {actionRequired ? "Ação Requerida" : "Status Atualizado"}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 px-5 pb-5">
                   {actionRequired ? (
                     <>
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-background/60 border border-primary/20">
+                      <div className="flex items-start gap-3 p-3 rounded-lg bg-card/50 border border-primary/20">
                         <div className="mt-0.5">{actionRequired.icon}</div>
-                        <p className="text-sm font-medium leading-tight">{actionRequired.title}</p>
+                        <p className="text-xs font-bold leading-tight">{actionRequired.title}</p>
                       </div>
-                      <Button asChild className="w-full font-bold tracking-wide shadow-glow">
+                      <Button asChild className="w-full font-bold uppercase tracking-widest text-[10px] shadow-glow bg-primary hover:bg-primary/90">
                         <Link to={actionRequired.link}>
                           {actionRequired.buttonText}
-                          <ArrowRight className="ml-2 size-4" />
+                          <ArrowRight className="ml-2 size-3" />
                         </Link>
                       </Button>
                     </>
                   ) : (
                     <div className="flex items-center gap-3 py-2">
-                      <div className="size-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
-                        <CheckCircle2 size={18} />
+                      <div className="size-8 rounded-full bg-success/10 flex items-center justify-center text-success">
+                        <CheckCircle2 size={16} />
                       </div>
-                      <p className="text-sm text-muted-foreground">Nenhuma ação necessária no momento.</p>
+                      <p className="text-xs text-muted-foreground font-medium">Você está em dia com seu projeto.</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
 
               {/* PRÓXIMA REUNIÃO */}
-              <Card className="border-sidebar-border/50 bg-sidebar/30">
-                <CardHeader className="pb-2 border-b border-border/10">
-                  <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                    <Calendar className="size-4" />
-                    Próxima Reunião
+              <Card className="border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+                <CardHeader className="pb-3 px-5 pt-4 border-b border-border/50">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <Calendar className="size-3" />
+                    Agendas & Reuniões
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-4">
+                <CardContent className="p-5">
                   {nextMeeting ? (
                     <div className="space-y-4">
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-center gap-4">
                         <div className="size-10 rounded-xl bg-primary/10 flex flex-col items-center justify-center text-primary border border-primary/20">
-                          <span className="text-xs font-bold leading-none">{new Date(nextMeeting.scheduled_at).getDate()}</span>
-                          <span className="text-[10px] font-medium uppercase leading-none mt-1">
+                          <span className="text-sm font-black leading-none">{new Date(nextMeeting.scheduled_at).getDate()}</span>
+                          <span className="text-[8px] font-bold uppercase leading-none mt-1">
                             {new Date(nextMeeting.scheduled_at).toLocaleString('pt-BR', { month: 'short' })}
                           </span>
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold text-sm truncate">{nextMeeting.title}</p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5 font-medium">
                             <Clock className="size-3" />
                             {new Date(nextMeeting.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
                       </div>
-                      <Button asChild variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-wider">
+                      <Button asChild variant="outline" size="sm" className="w-full text-[10px] font-bold uppercase tracking-widest border-primary/30 text-primary hover:bg-primary/5">
                         <Link to="/reuniao/$meetingId" params={{ meetingId: nextMeeting.id }}>
-                          Entrar na Reunião
+                          Acessar Sala Virtual
                         </Link>
                       </Button>
                     </div>
                   ) : (
-                    <div className="py-4 text-center">
-                      <p className="text-xs text-muted-foreground italic">Nenhuma reunião agendada</p>
+                    <div className="py-2 text-center">
+                      <p className="text-[10px] text-muted-foreground italic font-medium">Nenhum compromisso agendado</p>
                     </div>
                   )}
                 </CardContent>
@@ -280,10 +277,10 @@ function ClienteDashboard() {
             </div>
           </div>
         ) : (
-          <Card className="p-20 text-center border-dashed border-2 bg-sidebar/10">
+          <Card className="p-20 text-center border-dashed border-2 border-border/50 bg-card/10 rounded-2xl">
             <Inbox className="mx-auto size-16 text-muted-foreground/20 mb-6" />
-            <h3 className="text-xl font-bold mb-2">Seu projeto ainda não foi iniciado.</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
+            <h3 className="text-xl font-bold mb-2 uppercase tracking-tight">Seu projeto ainda não foi iniciado.</h3>
+            <p className="text-muted-foreground max-w-md mx-auto text-sm">
               Nossa equipe está preparando tudo para começar. Você será notificado assim que o primeiro passo for dado.
             </p>
           </Card>
@@ -291,23 +288,23 @@ function ClienteDashboard() {
 
         {/* RESUMO EM CARDS COMPACTOS */}
         {activeProjeto && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard label="PROGRESSO" value={`${getProjectProgress(activeProjeto.status)}%`} icon={<Activity size={14} />} />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <StatCard label="PROGRESSO REAL" value={`${getProjectProgress(activeProjeto.status)}%`} icon={<Activity size={14} />} />
             <StatCard 
               label="MENSAGENS" 
-              value={unreadMessages > 0 ? `${unreadMessages} novas` : "Nenhuma nova"} 
+              value={unreadMessages > 0 ? `${unreadMessages} novas` : "Em dia"} 
               icon={<MessageSquare size={14} />} 
               status={unreadMessages > 0 ? 'active' : 'idle'}
             />
             <StatCard 
               label="DOCUMENTOS" 
-              value={newDocuments > 0 ? `${newDocuments} novo` : "Nenhum novo"} 
+              value={newDocuments > 0 ? `${newDocuments} novo` : "Nenhum"} 
               icon={<FileText size={14} />} 
               status={newDocuments > 0 ? 'active' : 'idle'}
             />
             <StatCard 
               label="APROVAÇÕES" 
-              value={pendingApprovals > 0 ? "1 pendente" : "Em dia"} 
+              value={pendingApprovals > 0 ? "1 pendente" : "Concluído"} 
               icon={<ShieldCheck size={14} />} 
               status={pendingApprovals > 0 ? 'warning' : 'success'}
             />
@@ -315,85 +312,60 @@ function ClienteDashboard() {
         )}
 
         {/* ATIVIDADE RECENTE */}
-        <Card className="border-sidebar-border/50 bg-sidebar/30">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between border-b border-border/10">
-            <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <Activity className="size-5 text-primary" />
-              Atividade Recente
+        <Card className="border-border/50 bg-card/30 backdrop-blur-sm shadow-panel mt-6 overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 px-6 py-4">
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Activity className="size-4 text-primary" />
+              Linha do Tempo do Projeto
             </CardTitle>
-            <Button variant="ghost" size="sm" asChild className="text-xs text-muted-foreground">
-              <Link to="/cliente/notificacoes">Ver tudo</Link>
+            <Button variant="ghost" size="sm" asChild className="text-[10px] font-bold uppercase tracking-widest text-brand-500 hover:text-brand-600">
+              <Link to="/cliente/notificacoes">Ver histórico completo</Link>
             </Button>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-border/30">
+          <CardContent className="pt-6 px-6 pb-6">
+            <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-border/30">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity, idx) => (
                   <div key={idx} className="relative pl-8 group">
-                    <div className="absolute left-0 top-1 size-[24px] rounded-full border-2 border-background bg-sidebar flex items-center justify-center z-10 group-hover:border-primary/50 transition-colors">
-                      <div className="size-2 rounded-full bg-primary" />
+                    <div className="absolute left-0 top-1 size-[22px] rounded-full border border-border bg-card flex items-center justify-center z-10 group-hover:border-primary/50 transition-colors shadow-sm">
+                      <div className="size-1.5 rounded-full bg-primary" />
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <div>
-                        <p className="text-sm font-semibold">{activity.title}</p>
-                        <p className="text-xs text-muted-foreground">{activity.body}</p>
+                        <p className="text-sm font-bold">{activity.title}</p>
+                        <p className="text-xs text-muted-foreground font-medium">{activity.body}</p>
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 bg-muted/30 px-2 py-0.5 rounded shrink-0">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 bg-muted/30 px-2 py-0.5 rounded shrink-0 w-fit">
                         {new Date(activity.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground italic pl-8">Nenhuma atividade registrada recentemente.</p>
+                <p className="text-xs text-muted-foreground italic pl-8 font-medium">Nenhuma atividade registrada recentemente.</p>
               )}
             </div>
           </CardContent>
         </Card>
-      </div>
+      </DashboardShell>
     </AppShell>
   );
 }
 
 function QuickLink({ to, icon, label, badge }: { to: string; icon: any; label: string; badge?: number }) {
   return (
-    <Button asChild variant="outline" className="h-20 flex-col gap-2 bg-background/40 hover:bg-primary/5 hover:border-primary/30 transition-all border-border/50 relative">
+    <Button asChild variant="outline" className="h-20 flex-col gap-2 bg-card/30 hover:bg-primary/5 hover:border-primary/30 transition-all border-border/50 relative shadow-panel group">
       <Link to={to}>
-        <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
           {icon}
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+        <span className="text-[9px] font-bold uppercase tracking-widest">{label}</span>
         {badge ? (
-          <span className="absolute top-2 right-2 size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center animate-bounce">
+          <span className="absolute top-2 right-2 size-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center animate-bounce shadow-glow">
             {badge}
           </span>
         ) : null}
       </Link>
     </Button>
-  );
-}
-
-function StatCard({ label, value, icon, status = 'idle' }: { label: string; value: string; icon: any; status?: 'idle' | 'active' | 'warning' | 'success' }) {
-  return (
-    <Card className="border-sidebar-border/50 bg-sidebar/30 p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <div className={cn(
-          "size-6 rounded flex items-center justify-center",
-          status === 'active' && "bg-primary/10 text-primary",
-          status === 'warning' && "bg-yellow-500/10 text-yellow-500",
-          status === 'success' && "bg-green-500/10 text-green-500",
-          status === 'idle' && "bg-muted text-muted-foreground"
-        )}>
-          {icon}
-        </div>
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
-      </div>
-      <p className={cn(
-        "text-lg font-black tracking-tight",
-        status === 'active' && "text-primary",
-        status === 'warning' && "text-yellow-500",
-        status === 'success' && "text-green-500"
-      )}>{value}</p>
-    </Card>
   );
 }
