@@ -24,6 +24,9 @@ import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { SalesFunnel } from "@/components/SalesFunnel";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProfile, useRoles, useSession } from "@/lib/auth";
