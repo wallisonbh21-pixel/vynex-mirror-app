@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import React from "react";
 import { 
   Users, 
   MessageSquare, 
@@ -97,7 +98,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
       <div className="flex flex-col gap-2">
         {counts.filter(c => c.status !== 'perdido').map((item, index, filteredCounts) => {
           const config = (FUNNEL_CONFIG[item.status as string] || DEFAULT_CONFIG) as FunnelConfig;
-          const Icon = config.icon;
+          const IconComponent = config.icon;
           const funnelWidth = 100 - index * 6;
           const isActive = activeStep === item.status;
           
@@ -120,7 +121,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
             >
               <div className="flex items-center gap-4">
                 <div className={cn("flex size-10 items-center justify-center rounded-lg bg-background shadow-sm", config.text)}>
-                  <Icon size={20} />
+                  <IconComponent size={20} aria-hidden="true" />
                 </div>
                 <div className="text-left">
                   <span className="block text-sm font-bold text-foreground">
@@ -149,7 +150,7 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
                     Valor Potencial
                   </span>
                 </div>
-                <ChevronRight size={16} className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                <ChevronRight size={16} className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
               </div>
               
               <div className="absolute -bottom-4 left-1/2 h-4 w-px -translate-x-1/2 bg-border/50" />
@@ -196,13 +197,13 @@ export function ProgressionLine({ steps, currentStep, onStepClick, leads }: Prog
                 )}
               >
                 {isCompleted ? (
-                  <CheckCircle2 size={18} />
+                  <CheckCircle2 size={18} aria-hidden="true" />
                 ) : isCurrent ? (
                   <motion.div
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                   >
-                    <Target size={20} />
+                    <Target size={20} aria-hidden="true" />
                   </motion.div>
                 ) : (
                   <span className="text-xs font-bold">{index + 1}</span>
@@ -265,7 +266,7 @@ export function LeadFunnelCard({ lead, onOpen }: { lead: Lead; onOpen: () => voi
             {lead.company || lead.name}
           </button>
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-            <Users size={12} />
+            <Users size={12} aria-hidden="true" />
             <span className="truncate">{lead.name}</span>
           </div>
         </div>

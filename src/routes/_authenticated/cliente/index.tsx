@@ -289,23 +289,23 @@ function ClienteDashboard() {
         {/* RESUMO EM CARDS COMPACTOS */}
         {activeProjeto && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <StatCard label="PROGRESSO REAL" value={`${getProjectProgress(activeProjeto.status)}%`} icon={<Activity size={14} />} />
+            <StatCard label="PROGRESSO REAL" value={`${getProjectProgress(activeProjeto.status)}%`} icon={Activity} />
             <StatCard 
               label="MENSAGENS" 
               value={unreadMessages > 0 ? `${unreadMessages} novas` : "Em dia"} 
-              icon={<MessageSquare size={14} />} 
+              icon={MessageSquare} 
               status={unreadMessages > 0 ? 'active' : 'idle'}
             />
             <StatCard 
               label="DOCUMENTOS" 
               value={newDocuments > 0 ? `${newDocuments} novo` : "Nenhum"} 
-              icon={<FileText size={14} />} 
+              icon={FileText} 
               status={newDocuments > 0 ? 'active' : 'idle'}
             />
             <StatCard 
               label="APROVAÇÕES" 
               value={pendingApprovals > 0 ? "1 pendente" : "Concluído"} 
-              icon={<ShieldCheck size={14} />} 
+              icon={ShieldCheck} 
               status={pendingApprovals > 0 ? 'warning' : 'success'}
             />
           </div>

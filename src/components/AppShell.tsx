@@ -70,23 +70,21 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Target },
   { to: "/pipeline", label: "Funil de Vendas", icon: KanbanSquare },
-  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { 
     to: "/clientes", 
-    label: "Clientee", 
+    label: "Cliente", 
     icon: Users,
     submenu: [
-      { to: "/clientes", label: "Clientees", icon: Users },
-      { to: "/vendedor/clientes-login", label: "Login do Clientee", icon: Lock },
+      { to: "/clientes", label: "Clientes", icon: Users },
+      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
     ]
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
-  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
+  { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
-
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/comissoes", label: "Comissões", icon: CircleDollarSign },
   { to: "/metas", label: "Metas", icon: BarChart3 },
@@ -191,7 +189,7 @@ export function AppShell({
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
-  const { isAdmin, isCriador, isClientee, primaryRole } = useRoles() as any;
+  const { isAdmin, isCriador, isCliente, primaryRole } = useRoles();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -241,7 +239,7 @@ export function AppShell({
           ...NAV_CRIADOR,
           { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ]
-      : isClientee
+      : isCliente
       ? [
           ...NAV_CLIENTE,
         ]
@@ -388,7 +386,7 @@ function SidebarContent({
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
+                    <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} aria-hidden="true" />
                     <span className="truncate font-medium">{item.label}</span>
                   </div>
                   <ChevronDown className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")} />
@@ -403,7 +401,7 @@ function SidebarContent({
                       : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                   )}
                 >
-                  <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
+                  <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} aria-hidden="true" />
                   <span className="truncate font-medium">{item.label}</span>
                 </Link>
               )}

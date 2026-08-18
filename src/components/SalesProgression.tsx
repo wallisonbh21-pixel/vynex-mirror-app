@@ -4,17 +4,18 @@ import { cn } from "@/lib/utils";
 export const PROJECT_STATUS_STEPS = [
   { id: "disponivel", label: "Disponível" },
   { id: "briefing", label: "Briefing" },
-  { id: "production", label: "Criação" },
-  { id: "revision", label: "Revisão" },
-  { id: "adjustments", label: "Ajustes" },
-  { id: "approval", label: "Aprovação" },
-  { id: "delivered", label: "Entrega" },
+  { id: "em_producao", label: "Criação" },
+  { id: "aguardando_aprovacao", label: "Revisão" },
+  { id: "ajustes", label: "Ajustes" },
+  { id: "aprovado", label: "Aprovação" },
+  { id: "entregue", label: "Entrega" },
+  { id: "finalizado", label: "Finalizado" },
 ];
 
 export const LEAD_STATUS_STEPS = [
   { id: "novo", label: "Novo" },
-  { id: "contato", label: "Contato" },
-  { id: "reuniao", label: "Reunião" },
+  { id: "contatado", label: "Contato" },
+  { id: "interessado", label: "Interesse" },
   { id: "proposta", label: "Proposta" },
   { id: "negociacao", label: "Negociação" },
   { id: "fechado", label: "Fechado" },
@@ -22,8 +23,8 @@ export const LEAD_STATUS_STEPS = [
 
 export const APPROVAL_STATUS_STEPS = [
   { id: "interna", label: "Revisão Interna" },
-  { id: "liberado", label: "Com Clientee" },
-  { id: "ajustes_cliente", label: "Ajustes" },
+  { id: "aguardando_cliente", label: "Com Cliente" },
+  { id: "ajustes_solicitados", label: "Ajustes" },
   { id: "aprovado", label: "Aprovado" },
 ];
 

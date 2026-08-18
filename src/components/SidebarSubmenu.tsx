@@ -38,7 +38,7 @@ export function SidebarSubmenu({ items, pathname, isOpen }: SidebarSubmenuProps)
               )}
             >
               <div className="flex items-center gap-2">
-                <item.icon className={cn("size-3", active && "text-primary")} />
+                <item.icon className={cn("size-3", active && "text-primary")} aria-hidden="true" />
                 <span className="font-medium">{item.label}</span>
               </div>
               {item.description && (
