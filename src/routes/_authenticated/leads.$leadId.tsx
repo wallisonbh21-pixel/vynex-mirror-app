@@ -13,8 +13,22 @@ import {
   Trash2,
   Phone,
   AlertTriangle,
+  History as HistoryIcon,
+  PackageCheck,
+  TrendingUp,
+  Target,
+  ArrowRight,
+  ShieldCheck,
+  Layers,
+  Clock,
+  Briefcase,
+  UserCheck
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { DashboardShell } from "@/components/DashboardShell";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardSection } from "@/components/DashboardSection";
+
 import { requireVendedor } from "@/lib/guard";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/StatusBadge";
