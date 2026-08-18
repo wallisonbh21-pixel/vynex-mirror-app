@@ -102,14 +102,16 @@ function PainelCriador() {
 
   const urgent = deadlines.filter(d => d!.diff <= 0);
   const near = deadlines.filter(d => d!.diff > 0 && d!.diff <= 3);
+  const onTime = deadlines.filter(d => d!.diff > 3);
 
-  const progressionData = [
-    { name: "Recebidos", value: mine.length, color: "var(--primary)" },
-    { name: "Produção", value: inProduction.length, color: "#3B82F6" },
-    { name: "Revisão", value: pendingApproval.length, color: "#F59E0B" },
-    { name: "Aprovados", value: approved.length, color: "#10B981" },
-    { name: "Entregues", value: delivered.length, color: "#8B5CF6" },
-  ];
+  // Desempenho
+  const finishedOnTimeCount = delivered.filter(p => {
+    if (!p.delivered_at || !p.due_date) return true;
+    return new Date(p.delivered_at) <= new Date(p.due_date);
+  }).length;
+  
+  const completionRate = mine.length > 0 ? Math.round((delivered.length / mine.length) * 100) : 0;
+
 
 
   return (
@@ -227,12 +229,11 @@ function PainelCriador() {
           </div>
 
           {/* Grafico de Meu Progresso */}
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="size-4 text-primary" /> Meu progresso
-              </h2>
-            </div>
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+              <TrendingUp className="size-4 text-primary" /> Meu progresso
+            </h2>
+
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={progressionData}>
@@ -254,10 +255,11 @@ function PainelCriador() {
           </section>
 
           {/* Volume Histórico */}
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
               <History className="size-4 text-brand-500" /> Histórico de Volume (6 meses)
             </h2>
+
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={series}>
@@ -291,10 +293,11 @@ function PainelCriador() {
 
         <aside className="space-y-6">
           {/* 5. PRAZOS */}
-          <section className="rounded-2xl border border-border bg-card shadow-panel">
-            <h2 className="border-b border-border px-4 py-3 text-sm font-semibold flex items-center gap-2">
+          <section className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+            <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <Calendar className="size-4 text-primary" /> Próximos Prazos
             </h2>
+
             <div className="p-4 space-y-4">
               {urgent.length > 0 && (
                 <div className="space-y-2">
@@ -350,10 +353,11 @@ function PainelCriador() {
           </section>
 
           {/* 6. COMISSÕES (Resumo) */}
-          <section className="rounded-2xl border border-border bg-card shadow-panel">
-            <h2 className="border-b border-border px-4 py-3 text-sm font-semibold flex items-center gap-2">
+          <section className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+            <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <Wallet className="size-4 text-primary" /> Resumo Financeiro
             </h2>
+
             <div className="p-4 space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Total de comissões</span>
