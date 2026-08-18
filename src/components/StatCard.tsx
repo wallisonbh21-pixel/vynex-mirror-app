@@ -7,7 +7,7 @@ interface StatCardProps {
   label: string;
   value: string;
   hint?: string;
-  icon: LucideIcon | React.ComponentType<LucideProps>;
+  icon: LucideIcon | React.ComponentType<LucideProps> | React.ReactNode;
   trend?: {
     value: string;
     positive: boolean;
