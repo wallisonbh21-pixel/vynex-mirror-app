@@ -1,4 +1,5 @@
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon, LucideProps } from "lucide-react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
@@ -6,7 +7,7 @@ interface StatCardProps {
   label: string;
   value: string;
   hint?: string;
-  icon: LucideIcon | React.ReactNode;
+  icon: LucideIcon | React.ComponentType<LucideProps>;
   trend?: {
     value: string;
     positive: boolean;
@@ -27,7 +28,7 @@ export function StatCard({
   className,
   onClick,
 }: StatCardProps) {
-  const isLucide = typeof Icon === 'function';
+  const IconComponent = Icon;
 
   return (
     <div
@@ -46,7 +47,7 @@ export function StatCard({
           status === 'warning' && "bg-warning/10 text-warning group-hover:bg-warning/20",
           status === 'active' && "bg-primary/10 text-primary group-hover:bg-primary/20"
         )}>
-          {isLucide ? <Icon className="size-4" /> : (Icon as any)}
+          <IconComponent className="size-4" />
         </span>
       </div>
       <div className="mt-3 flex items-baseline gap-2">
