@@ -5,7 +5,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/card-table"; // Assuming we want a premium wrapper
+} from "@/components/ui/table";
+
 import { cn } from "@/lib/utils";
 import { type ReactNode } from "react";
 
