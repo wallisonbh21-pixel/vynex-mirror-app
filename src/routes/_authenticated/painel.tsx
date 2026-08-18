@@ -140,93 +140,118 @@ function Painel() {
         </div>
 
 
-      {goal ? (
-        <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
-              <Trophy className="size-4 text-warning" />
-              <span className="font-semibold text-primary">Conquistas & Troféus: Meta Batida</span>
+        {goal ? (
+          <div className="mt-4 rounded-2xl border border-border/50 bg-card/30 p-5 backdrop-blur-sm shadow-panel">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <Trophy className="size-4 text-warning" />
+                <span className="font-semibold text-primary uppercase tracking-wider text-xs">Meta de Vendas</span>
+              </div>
+              <span className="text-muted-foreground font-medium">
+                {currency(monthRevenue)} / {currency(goal.revenue_target)}
+              </span>
             </div>
-            <span className="text-muted-foreground">
-              {currency(monthRevenue)} de {currency(goal.revenue_target)}
-            </span>
-          </div>
-          <Progress value={goalPercent} className="mt-3 h-3 shadow-inner" />
-          {goalPercent >= 100 && (
-            <p className="mt-2 text-center text-xs font-bold animate-bounce text-success">
-              🏆 META BATIDA! VOCÊ É UM CAMPEÃO! 🏆
-            </p>
-          )}
-        </div>
-      ) : null}
-
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel lg:col-span-2">
-          <h2 className="text-sm font-semibold">Evolução de vendas</h2>
-          <div className="mt-4 h-64">
-            {evolution.length === 0 ? (
-              <p className="pt-16 text-center text-sm text-muted-foreground">
-                Nenhum contrato fechado ainda.
+            <Progress value={goalPercent} className="mt-3 h-2 shadow-inner bg-muted/30" />
+            {goalPercent >= 100 && (
+              <p className="mt-2 text-center text-[10px] font-black tracking-widest animate-bounce text-success uppercase">
+                🏆 Meta Atingida! 🏆
               </p>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={evolution}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                  <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip
-                    cursor={{ fill: "var(--muted)" }}
-                    contentStyle={{
-                      background: "var(--popover)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 12,
-                      color: "var(--popover-foreground)",
-                    }}
-                    formatter={(value: number) => currency(value)}
-                  />
-                  <Bar dataKey="total" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            )}
+          </div>
+        ) : null}
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          <section className="lg:col-span-2 rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+              <TrendingUp className="size-4 text-primary" /> Evolução de Vendas
+            </h2>
+            <div className="h-64">
+              {evolution.length === 0 ? (
+                <p className="pt-16 text-center text-sm text-muted-foreground">
+                  Nenhum contrato fechado ainda.
+                </p>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={evolution}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} opacity={0.5} />
+                    <XAxis 
+                      dataKey="month" 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{fill: 'var(--muted-foreground)', fontSize: 11}}
+                    />
+                    <YAxis 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{fill: 'var(--muted-foreground)', fontSize: 11}}
+                      tickFormatter={(val) => `R$ ${val/1000}k`}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "var(--muted)", opacity: 0.1 }}
+                      contentStyle={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 12,
+                      }}
+                      formatter={(value: number) => currency(value)}
+                    />
+                    <Bar dataKey="total" fill="var(--primary)" radius={[4, 4, 0, 0]} barSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
+              <Target className="size-4 text-primary" /> Funil Comercial
+            </h2>
+            <SalesFunnel leads={leads} />
+          </section>
+        </div>
+
+        <section className="mt-6 overflow-hidden rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+          <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <ArrowUpRight className="size-4 text-primary" /> Minhas Oportunidades
+            </h2>
+            <Button asChild variant="ghost" size="sm" className="text-xs text-brand-500 hover:text-brand-600 uppercase font-bold tracking-widest">
+              <Link to="/pipeline">Ver Pipeline</Link>
+            </Button>
+          </div>
+          <div className="divide-y divide-border/30">
+            {leads.slice(0, 6).map((lead) => (
+              <div key={lead.id} className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-muted/20 transition-colors cursor-pointer group">
+                <div className="min-w-0">
+                  <Link
+                    to="/leads/$leadId"
+                    params={{ leadId: lead.id }}
+                    className="block truncate font-bold text-sm group-hover:text-primary transition-colors"
+                  >
+                    {lead.company || lead.name}
+                  </Link>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight">
+                      {currency(lead.closed_value || lead.estimated_value)}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground/40">•</span>
+                    <span className="text-[10px] text-muted-foreground/60">
+                      Contato: {shortDate(lead.next_contact_at)}
+                    </span>
+                  </div>
+                </div>
+                <StatusBadge status={lead.status} className="h-5 px-2 text-[10px]" />
+              </div>
+            ))}
+            {leads.length === 0 && (
+              <div className="px-6 py-12 text-center text-sm text-muted-foreground italic">
+                Nenhuma oportunidade cadastrada ainda.
+              </div>
             )}
           </div>
         </section>
-
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-panel">
-          <h2 className="text-sm font-semibold mb-6">Funil Comercial (Visual)</h2>
-          <SalesFunnel leads={leads} />
-        </section>
-      </div>
-
-      <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-panel">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold">
-          Minhas oportunidades recentes
-        </h2>
-        <ul className="divide-y divide-border">
-          {leads.slice(0, 6).map((lead) => (
-            <li key={lead.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
-              <span className="min-w-0">
-                <Link
-                  to="/leads/$leadId"
-                  params={{ leadId: lead.id }}
-                  className="block truncate font-medium hover:text-primary"
-                >
-                  {lead.company || lead.name}
-                </Link>
-                <span className="text-xs text-muted-foreground">
-                  {currency(lead.closed_value || lead.estimated_value)} · próximo contato{" "}
-                  {shortDate(lead.next_contact_at)}
-                </span>
-              </span>
-              <StatusBadge status={lead.status} />
-            </li>
-          ))}
-          {leads.length === 0 ? (
-            <li className="px-4 py-12 text-center text-sm text-muted-foreground">
-              Nenhuma oportunidade cadastrada ainda.
-            </li>
-          ) : null}
-        </ul>
-      </section>
+      </DashboardShell>
     </AppShell>
   );
 }
+
