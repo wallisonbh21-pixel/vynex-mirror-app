@@ -189,7 +189,7 @@ export function AppShell({
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
-  const { isAdmin, isCriador, isClientee, primaryRole } = useRoles() as any;
+  const { isAdmin, isCriador, isClientee, primaryRole } = useRoles();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
 
