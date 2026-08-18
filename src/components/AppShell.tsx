@@ -73,16 +73,16 @@ const NAV_VENDEDOR: NavItem[] = [
   { to: "/followups", label: "Acompanhamentos", icon: CalendarClock },
   { 
     to: "/clientes", 
-    label: "Clientee", 
+    label: "Cliente", 
     icon: Users,
     submenu: [
-      { to: "/clientes", label: "Clientees", icon: Users },
-      { to: "/vendedor/clientes-login", label: "Login do Clientee", icon: Lock },
+      { to: "/clientes", label: "Clientes", icon: Users },
+      { to: "/vendedor/clientes-login", label: "Login do Cliente", icon: Lock },
     ]
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
-  { to: "/indicar", label: "Indicação de Clientees", icon: Share2 },
+  { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
   { to: "/historico", label: "Histórico", icon: History },
   { to: "/projetos", label: "Projetos", icon: Palette },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
