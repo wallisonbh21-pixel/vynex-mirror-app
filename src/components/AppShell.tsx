@@ -386,7 +386,7 @@ function SidebarContent({
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
+                    <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} aria-hidden="true" />
                     <span className="truncate font-medium">{item.label}</span>
                   </div>
                   <ChevronDown className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")} />
@@ -401,7 +401,7 @@ function SidebarContent({
                       : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                   )}
                 >
-                  <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} />
+                  <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} aria-hidden="true" />
                   <span className="truncate font-medium">{item.label}</span>
                 </Link>
               )}
