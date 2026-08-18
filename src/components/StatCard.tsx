@@ -14,6 +14,7 @@ interface StatCardProps {
   };
   status?: 'active' | 'success' | 'warning' | 'idle';
   className?: string;
+  onClick?: () => void;
 }
 
 export function StatCard({
@@ -24,6 +25,7 @@ export function StatCard({
   trend,
   status = 'idle',
   className,
+  onClick,
 }: StatCardProps) {
   
   const renderIcon = () => {
@@ -44,8 +46,8 @@ export function StatCard({
     return Icon as React.ReactNode;
   };
 
-  return (
-    <div className={cn("premium-card p-5 space-y-4", className)}>
+  const content = (
+    <>
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -86,6 +88,27 @@ export function StatCard({
           )}
         </div>
       )}
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button 
+        type="button"
+        onClick={onClick}
+        className={cn(
+          "premium-card p-5 space-y-4 text-left w-full transition-all hover:border-primary/30 hover:shadow-glow-sm cursor-pointer", 
+          className
+        )}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div className={cn("premium-card p-5 space-y-4", className)}>
+      {content}
     </div>
   );
 }
