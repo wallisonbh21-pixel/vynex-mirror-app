@@ -437,9 +437,12 @@ function LeadDetail() {
         </section>
       </div>
 
-      <section className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-panel">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Propostas comerciais</h2>
+        <section className="mt-6 rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <PackageCheck className="size-4 text-primary" /> Propostas Comerciais
+            </h2>
+
           <RecordDialog
             title="Nova proposta"
             fields={proposalFields}
@@ -568,9 +571,11 @@ function LeadDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </DashboardShell>
     </AppShell>
   );
 }
+
 
 function Row({ term, value, icon: Icon }: { term: string; value: string | null | undefined, icon?: any }) {
   return (
