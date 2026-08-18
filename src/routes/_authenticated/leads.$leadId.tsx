@@ -423,14 +423,18 @@ function LeadDetail() {
 
           <ol className="mt-4 space-y-3">
             {activities.map((activity) => (
-              <li key={activity.id} className="flex gap-3 rounded-xl border border-border p-3">
-                <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary">
+              <li key={activity.id} className="flex gap-4 rounded-xl border border-border/50 bg-card/20 p-4 transition-colors hover:bg-card/40">
+                <span className={cn(
+                  "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl",
+                  activity.type === "observacao" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                )}>
                   {activity.type === "observacao" || activity.type === "status" ? (
                     <MessageSquare className="size-4" />
                   ) : (
                     <CalendarClock className="size-4" />
                   )}
                 </span>
+
                 <span className="min-w-0">
                   <span className="block text-sm">{activity.description}</span>
                   <span className="text-xs text-muted-foreground">
@@ -442,11 +446,12 @@ function LeadDetail() {
                 </span>
               </li>
             ))}
-            {activities.length === 0 ? (
-              <li className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            {activities.length === 0 && (
+              <li className="rounded-xl border border-dashed border-border/50 p-12 text-center text-sm text-muted-foreground italic">
                 Nenhuma atividade registrada para esta oportunidade.
               </li>
-            ) : null}
+            )}
+
           </ol>
         </section>
       </div>
@@ -487,7 +492,7 @@ function LeadDetail() {
           {proposals.map((proposal) => (
             <li
               key={proposal.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-3 text-sm"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/50 bg-card/20 p-4 transition-colors hover:bg-card/40"
             >
               <span className="min-w-0">
                 <span className="block font-medium">{proposal.title}</span>
@@ -532,11 +537,12 @@ function LeadDetail() {
               </span>
             </li>
           ))}
-          {proposals.length === 0 ? (
-            <li className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Nenhuma proposta criada para esta oportunidade.
-            </li>
-          ) : null}
+            {proposals.length === 0 && (
+              <li className="rounded-xl border border-dashed border-border/50 p-12 text-center text-sm text-muted-foreground italic">
+                Nenhuma proposta criada para esta oportunidade.
+              </li>
+            )}
+
         </ul>
       </section>
 
@@ -593,12 +599,13 @@ function LeadDetail() {
 
 function Row({ term, value, icon: Icon }: { term: string; value: string | null | undefined, icon?: any }) {
   return (
-    <div className="flex justify-between gap-3">
-      <dt className="text-muted-foreground flex items-center gap-1.5">
-        {Icon && <Icon className="size-3.5" />}
+    <div className="flex justify-between items-center gap-4 py-2 border-b border-border/30 last:border-0">
+      <dt className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+        {Icon && <Icon className="size-3.5 text-primary/70" />}
         {term}
       </dt>
-      <dd className="max-w-[60%] text-right font-medium">{value || "—"}</dd>
+      <dd className="text-sm font-medium text-foreground">{value || "—"}</dd>
     </div>
   );
 }
+
