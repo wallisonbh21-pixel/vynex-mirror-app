@@ -46,7 +46,7 @@ export function StatCard({
           status === 'warning' && "bg-warning/10 text-warning group-hover:bg-warning/20",
           status === 'active' && "bg-primary/10 text-primary group-hover:bg-primary/20"
         )}>
-          {isLucide ? <Icon className="size-4" /> : Icon}
+          {isLucide ? <Icon className="size-4" /> : (Icon as any)}
         </span>
       </div>
       <div className="mt-3 flex items-baseline gap-2">
