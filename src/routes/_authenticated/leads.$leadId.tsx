@@ -396,7 +396,7 @@ function LeadDetail() {
           <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <History className="size-4 text-primary" /> Linha do Tempo
+                <HistoryIcon className="size-4 text-primary" /> Linha do Tempo
               </h2>
 
             <RecordDialog
