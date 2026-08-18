@@ -244,13 +244,13 @@ function LeadDetail() {
                 <Phone className="size-3.5 text-primary/70" /> WhatsApp
               </dt>
               <dd className="text-right">
-                {lead.whatsapp ? (
-                  <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary hover:underline">
-                    {lead.whatsapp}
-                  </a>
-                ) : <span className="text-sm text-muted-foreground">—</span>}
-
-                  {lead.email && <span className="text-xs">{lead.email}</span>}
+                <div className="flex flex-col items-end">
+                  {lead.whatsapp ? (
+                    <a href={sanitizeExternalUrl(`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`)} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-primary hover:underline">
+                      {lead.whatsapp}
+                    </a>
+                  ) : <span className="text-sm text-muted-foreground">—</span>}
+                  {lead.email && <span className="text-xs text-muted-foreground">{lead.email}</span>}
                 </div>
               </dd>
             </div>
