@@ -112,6 +112,9 @@ function Painel() {
           title="Minha Performance"
           description="Acompanhe seus leads, conversões e metas do mês."
         />
+        <p className="mt-2 text-sm font-bold uppercase tracking-widest text-primary">
+          TESTE EXTENSÃO ATIVA
+        </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
