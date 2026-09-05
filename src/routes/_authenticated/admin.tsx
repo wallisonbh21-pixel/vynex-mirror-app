@@ -6,19 +6,12 @@ import {
   Wallet, 
   ShieldCheck, 
   TrendingUp, 
-  FileText, 
-  ArrowUpRight,
-  TrendingDown,
-  Plus,
-  Briefcase,
-  UserCheck
+  FileText
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LegacyMetricCard } from "@/components/admin/LegacyMetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DashboardShell } from "@/components/DashboardShell";
-import { DashboardHeader } from "@/components/DashboardHeader";
-import { DashboardSection } from "@/components/DashboardSection";
 import { useRoles } from "@/lib/auth";
 import { requireAdmin } from "@/lib/guard";
 import { currency, shortDate } from "@/lib/format";
@@ -107,7 +100,6 @@ function AdminDashboardPage() {
             icon={TrendingUp}
             tone="primary"
             hint="Contratos ativos"
-            trend={{ value: "18,2%", positive: true }}
           />
 
           <LegacyMetricCard
