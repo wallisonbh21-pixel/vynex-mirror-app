@@ -6,19 +6,12 @@ import {
   Wallet, 
   ShieldCheck, 
   TrendingUp, 
-  FileText, 
-  ArrowUpRight,
-  TrendingDown,
-  Plus,
-  Briefcase,
-  UserCheck
+  FileText
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { StatCard } from "@/components/StatCard";
+import { LegacyMetricCard } from "@/components/admin/LegacyMetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DashboardShell } from "@/components/DashboardShell";
-import { DashboardHeader } from "@/components/DashboardHeader";
-import { DashboardSection } from "@/components/DashboardSection";
 import { useRoles } from "@/lib/auth";
 import { requireAdmin } from "@/lib/guard";
 import { currency, shortDate } from "@/lib/format";
@@ -73,84 +66,90 @@ function AdminDashboardPage() {
   const stats = data?.stats;
   const funnelData = Object.entries(data?.funnel || {}).map(([name, value]) => ({ name, value }));
   
-  // Mock data for history chart (as per prompt to show monthly evolution when possible)
-  const historyData = [
-    { name: "Jan", total: 45000, mrr: 12000 },
-    { name: "Fev", total: 52000, mrr: 15000 },
-    { name: "Mar", total: 61000, mrr: 18000 },
-    { name: "Abr", total: 58000, mrr: 22000 },
-    { name: "Mai", total: 75000, mrr: 28000 },
-    { name: "Jun", total: 98000, mrr: 35000 },
-    { name: "Jul", total: revenueToChart(stats?.revenue), mrr: stats?.mrr || 0 },
-  ];
-
-  function revenueToChart(val: number | undefined) {
-    return val || 0;
-  }
+  // Série construída apenas com dados reais dos contratos retornados pelo backend.
+  const historyData = [...(data?.recentContracts ?? [])]
+    .reverse()
+    .map((contract: any) => ({
+      name: shortDate(contract.signed_at || contract.created_at),
+      total: Number(contract.amount) || 0,
+      mrr: Number(contract.monthly_fee) || 0,
+    }));
 
   return (
     <AppShell 
       title="ADMINISTRAÇÃO" 
     >
-      <DashboardShell>
-        <DashboardHeader 
-          title="Visão Geral da Operação"
-          description="Indicadores consolidados de vendas, produção e financeiro."
-        />
+      <DashboardShell className="font-sans">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+            Painel executivo
+          </span>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+            Visão Geral da Operação
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Indicadores consolidados de vendas, produção e financeiro.
+          </p>
+        </div>
 
-        {/* Cards Executivos */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard 
+        {/* Linha 1 — Cards executivos */}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <LegacyMetricCard
             label="Receita do Mês"
             value={currency(stats?.revenue || 0)}
             icon={TrendingUp}
-            trend={{ value: "+18,2%", positive: true, label: "vs. mês anterior" }}
+            tone="primary"
+            hint="Contratos ativos"
           />
 
-          <StatCard 
+          <LegacyMetricCard
             label="Contratos Ativos"
             value={String(stats?.activeContractsCount || 0)}
             icon={FileText}
-            trend={{ value: "+7", positive: true, label: "novos este mês" }}
+            tone="accent"
+            hint="Base contratada"
           />
 
-          <StatCard 
+          <LegacyMetricCard
             label="MRR (Mensalidades)"
             value={currency(stats?.mrr || 0)}
-            icon={TrendingUp}
-            trend={{ value: "+9,4%", positive: true, label: "recorrência" }}
+            icon={BarChart3}
+            tone="success"
+            hint="Recorrência mensal"
           />
 
-          <StatCard 
+          <LegacyMetricCard
             label="Comissões a Pagar"
             value={currency(stats?.commissionsPending || 0)}
             icon={Wallet}
+            tone="warning"
             hint="Aguardando liberação"
           />
-          
-          {/* Adicionais solicitados na Fase 2 */}
-          <StatCard 
-            label="Projetos Ativos"
-            value="32" 
-            icon={Briefcase}
-            hint="Em produção"
+
+          <LegacyMetricCard
+            label="Leads no Funil"
+            value={String(funnelData.reduce((acc, f) => acc + Number(f.value || 0), 0))}
+            icon={Users}
+            tone="primary"
+            hint="Total em pipeline"
           />
 
-          <StatCard 
-            label="Clientes Ativos"
-            value="48"
-            icon={UserCheck}
-            hint="Base total"
+          <LegacyMetricCard
+            label="Destaques do Time"
+            value={String(data?.highlights?.length || 0)}
+            icon={ShieldCheck}
+            tone="muted"
+            hint="Vendedores com contratos ativos"
           />
         </div>
 
-
-      {/* Gráficos */}
+      {/* Linha 2 — Área analítica */}
       <div className="grid gap-6 mt-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 bg-card/50 border-border/50">
+        <Card className="lg:col-span-2 rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
+
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Receita e Recorrência</CardTitle>
-            <p className="text-xs text-muted-foreground font-normal">Evolução dos últimos 7 meses</p>
+            <CardTitle className="font-display text-base font-semibold">Receita e Recorrência</CardTitle>
+            <p className="text-xs text-muted-foreground font-normal">Contratos recentes — valor total e mensalidade</p>
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -161,8 +160,8 @@ function AdminDashboardPage() {
                     <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorMRR" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
@@ -183,15 +182,15 @@ function AdminDashboardPage() {
                   itemStyle={{ fontSize: '12px' }}
                 />
                 <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" name="Receita Total" />
-                <Area type="monotone" dataKey="mrr" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorMRR)" name="Recorrência / MRR" />
+                <Area type="monotone" dataKey="mrr" stroke="var(--accent)" strokeWidth={3} fillOpacity={1} fill="url(#colorMRR)" name="Recorrência / MRR" />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50 border-border/50">
+        <Card className="rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Funil de Leads</CardTitle>
+            <CardTitle className="font-display text-base font-semibold">Funil de Leads</CardTitle>
             <p className="text-xs text-muted-foreground font-normal">Distribuição por etapa</p>
           </CardHeader>
           <CardContent className="h-[300px]">
@@ -212,7 +211,7 @@ function AdminDashboardPage() {
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24} name="Leads">
                   {funnelData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? "var(--primary)" : index === 1 ? "#0ea5e9" : "#38bdf8"} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? "var(--primary)" : index === 1 ? "var(--accent)" : "var(--chart-3)"} />
                   ))}
                 </Bar>
               </BarChart>
@@ -223,9 +222,9 @@ function AdminDashboardPage() {
 
       {/* Tabelas e Destaques */}
       <div className="grid gap-6 mt-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 bg-card/50 border-border/50">
+        <Card className="lg:col-span-2 rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Contratos Recentes</CardTitle>
+            <CardTitle className="font-display text-base font-semibold">Contratos Recentes</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -265,9 +264,9 @@ function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50 border-border/50">
+        <Card className="rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Destaques do Time</CardTitle>
+            <CardTitle className="font-display text-base font-semibold">Destaques do Time</CardTitle>
             <p className="text-xs text-muted-foreground font-normal">Desempenho no mês</p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -294,22 +293,6 @@ function AdminDashboardPage() {
                 Sem dados suficientes
               </div>
             )}
-            
-            {/* Exemplo de Criador se houver dados futuramente */}
-            <div className="pt-4 mt-4 border-t border-border/50">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10">
-                <div className="flex items-center gap-3">
-                   <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground">
-                    C
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">Camila Duarte</div>
-                    <div className="text-[10px] text-muted-foreground font-medium">Criadora • sites entregues</div>
-                  </div>
-                </div>
-                <div className="text-sm font-bold">14 sites</div>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
