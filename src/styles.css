@@ -199,3 +199,29 @@
 @utility shadow-glow {
   box-shadow: var(--shadow-glow);
 }
+
+@utility shadow-glow-sm {
+  box-shadow: 0 0 0 1px oklch(0.78 0.15 214 / 0.18), 0 10px 24px -14px oklch(0.78 0.15 214 / 0.4);
+}
+
+/* Superfície padrão (Legacy .surface) */
+@utility surface {
+  border-radius: var(--radius-xl);
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  background-color: color-mix(in oklab, var(--card) 70%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility premium-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  background-color: color-mix(in oklab, var(--card) 70%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
