@@ -1,20 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  BarChart3, 
-  Users, 
-  Wallet, 
-  ShieldCheck, 
-  TrendingUp, 
-  FileText
-} from "lucide-react";
+import { BarChart3, Wallet, TrendingUp, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LegacyMetricCard } from "@/components/admin/LegacyMetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useRoles } from "@/lib/auth";
 import { requireAdmin } from "@/lib/guard";
-import { currency, shortDate } from "@/lib/format";
+import { currency, shortDate, label as statusLabel, LEAD_STATUS } from "@/lib/format";
 import { getAdminDashboardData } from "@/lib/admin-dashboard.functions";
 import {
   AreaChart,
@@ -26,7 +19,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell
 } from "recharts";
 import { cn } from "@/lib/utils";
 
