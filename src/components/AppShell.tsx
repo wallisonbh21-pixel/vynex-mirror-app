@@ -284,8 +284,8 @@ export function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 border-b border-border bg-background/85 px-5 py-4 backdrop-blur lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/80 px-4 backdrop-blur-xl md:px-8">
+          <div className="flex h-16 items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               {/* Botão ☰ — abre o menu lateral no celular */}
               <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -296,16 +296,16 @@ export function AppShell({
                 </SheetTrigger>
                 <SheetContent
                   side="left"
-                  className="flex w-72 flex-col gap-0 border-sidebar-border bg-sidebar px-4 py-6"
+                  className="flex w-[18rem] flex-col gap-0 border-sidebar-border bg-sidebar px-4 py-6"
                 >
                   <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
                   {sidebar}
                 </SheetContent>
               </Sheet>
               <div className="min-w-0">
-                <h1 className="truncate text-xl font-semibold tracking-tight">{title}</h1>
+                <h1 className="truncate font-display text-base font-semibold tracking-tight md:text-lg">{title}</h1>
                 {description ? (
-                  <p className="text-sm text-muted-foreground">{description}</p>
+                  <p className="truncate text-xs text-muted-foreground">{description}</p>
                 ) : null}
               </div>
             </div>
@@ -317,7 +317,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 px-5 py-6 lg:px-8">{children}</main>
+        <main className="flex-1 space-y-6 p-4 md:p-8">{children}</main>
       </div>
     </div>
   );
@@ -353,11 +353,11 @@ function SidebarContent({
   return (
     <>
       <Link to="/" className="flex items-center gap-3 px-2 transition-opacity hover:opacity-80">
-        <span className="flex size-9 items-center justify-center rounded-full bg-gradient-brand text-primary-foreground shadow-glow">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-brand text-primary-foreground shadow-elev">
           <Sparkles className="size-4" />
         </span>
         <span>
-          <span className="block text-sm font-bold tracking-[0.28em] uppercase">ScaleNexus</span>
+          <span className="block font-display text-base font-bold uppercase tracking-[0.18em]">ScaleNexus</span>
           <span className="block text-[10px] tracking-[0.2em] text-muted-foreground font-medium">
             DIGITAL BUSINESS
           </span>
@@ -379,14 +379,14 @@ function SidebarContent({
                     if (window.innerWidth >= 1024 && !isExpanded) toggleExpand(item.label);
                   }}
                   className={cn(
-                    "group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                    "group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     active
-                      ? "bg-sidebar-accent/50 text-sidebar-accent-foreground shadow-glow"
-                      : "text-muted-foreground hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground",
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} aria-hidden="true" />
+                    <item.icon className={cn("size-4 shrink-0 transition-colors", !active && "text-muted-foreground")} aria-hidden="true" />
                     <span className="truncate font-medium">{item.label}</span>
                   </div>
                   <ChevronDown className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")} />
@@ -395,13 +395,13 @@ function SidebarContent({
                 <Link
                   to={item.to}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 hover:-translate-y-0.5",
+                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-glow"
-                      : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   )}
                 >
-                  <item.icon className={cn("size-4 shrink-0 transition-colors", active && "text-primary")} aria-hidden="true" />
+                  <item.icon className={cn("size-4 shrink-0 transition-colors", !active && "text-muted-foreground")} aria-hidden="true" />
                   <span className="truncate font-medium">{item.label}</span>
                 </Link>
               )}
