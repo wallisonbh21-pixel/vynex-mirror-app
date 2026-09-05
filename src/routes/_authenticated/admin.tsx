@@ -197,7 +197,7 @@ function AdminDashboardPage() {
             </div>
             <div className="h-[260px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart layout="vertical" data={[...funnelData].sort((a, b) => Number(b.value) - Number(a.value))}>
+                <BarChart layout="vertical" data={funnelData} margin={{ left: 4, right: 12 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                   <XAxis type="number" hide />
                   <YAxis
@@ -205,8 +205,8 @@ function AdminDashboardPage() {
                     type="category"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "var(--foreground)", fontSize: 12 }}
-                    width={90}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                    width={104}
                   />
                   <Tooltip
                     cursor={{ fill: "transparent" }}
@@ -217,20 +217,15 @@ function AdminDashboardPage() {
                       color: "var(--foreground)",
                     }}
                   />
-                  <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={22} name="Leads">
-                    {funnelData.map((_entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          index === 0
-                            ? "var(--chart-1)"
-                            : index === 1
-                              ? "var(--chart-2)"
-                              : "var(--chart-3)"
-                        }
-                      />
-                    ))}
-                  </Bar>
+                  <Bar
+                    dataKey="value"
+                    radius={[0, 4, 4, 0]}
+                    barSize={16}
+                    name="Leads"
+                    fill="var(--chart-1)"
+                  />
+                </BarChart>
+
                 </BarChart>
               </ResponsiveContainer>
             </div>
