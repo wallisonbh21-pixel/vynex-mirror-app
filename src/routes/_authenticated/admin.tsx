@@ -76,20 +76,13 @@ function AdminDashboardPage() {
 
   return (
     <AppShell 
-      title="ADMINISTRAÇÃO" 
+      title="Visão Geral da Operação"
+      description="Indicadores consolidados de vendas, produção e financeiro."
     >
       <DashboardShell className="animate-fade-in space-y-4 font-sans">
-        <div className="flex flex-col gap-1">
-          <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            Visão Geral da Operação
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Indicadores consolidados de vendas, produção e financeiro.
-          </p>
-          <span className="text-xs text-muted-foreground/80">
-            {funnelTotal} leads em pipeline · {data?.highlights?.length || 0} vendedores com contratos ativos
-          </span>
-        </div>
+        <span className="block text-xs text-muted-foreground/80">
+          {funnelTotal} leads em pipeline · {data?.highlights?.length || 0} vendedores com contratos ativos
+        </span>
 
         {/* Faixa 1 — Cards executivos */}
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
