@@ -92,62 +92,75 @@ function AdminDashboardPage() {
     <AppShell 
       title="ADMINISTRAÇÃO" 
     >
-      <DashboardShell>
-        <DashboardHeader 
-          title="Visão Geral da Operação"
-          description="Indicadores consolidados de vendas, produção e financeiro."
-        />
+      <DashboardShell className="font-sans">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+            Painel executivo
+          </span>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+            Visão Geral da Operação
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Indicadores consolidados de vendas, produção e financeiro.
+          </p>
+        </div>
 
-        {/* Cards Executivos */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard 
+        {/* Linha 1 — Cards executivos */}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <LegacyMetricCard
             label="Receita do Mês"
             value={currency(stats?.revenue || 0)}
             icon={TrendingUp}
-            trend={{ value: "+18,2%", positive: true, label: "vs. mês anterior" }}
+            tone="primary"
+            hint="Contratos ativos"
+            trend={{ value: "18,2%", positive: true }}
           />
 
-          <StatCard 
+          <LegacyMetricCard
             label="Contratos Ativos"
             value={String(stats?.activeContractsCount || 0)}
             icon={FileText}
-            trend={{ value: "+7", positive: true, label: "novos este mês" }}
+            tone="accent"
+            hint="Base contratada"
           />
 
-          <StatCard 
+          <LegacyMetricCard
             label="MRR (Mensalidades)"
             value={currency(stats?.mrr || 0)}
-            icon={TrendingUp}
-            trend={{ value: "+9,4%", positive: true, label: "recorrência" }}
+            icon={BarChart3}
+            tone="success"
+            hint="Recorrência mensal"
           />
 
-          <StatCard 
+          <LegacyMetricCard
             label="Comissões a Pagar"
             value={currency(stats?.commissionsPending || 0)}
             icon={Wallet}
+            tone="warning"
             hint="Aguardando liberação"
           />
-          
-          {/* Adicionais solicitados na Fase 2 */}
-          <StatCard 
-            label="Projetos Ativos"
-            value="32" 
-            icon={Briefcase}
-            hint="Em produção"
+
+          <LegacyMetricCard
+            label="Leads no Funil"
+            value={String(funnelData.reduce((acc, f) => acc + Number(f.value || 0), 0))}
+            icon={Users}
+            tone="primary"
+            hint="Total em pipeline"
           />
 
-          <StatCard 
-            label="Clientes Ativos"
-            value="48"
-            icon={UserCheck}
-            hint="Base total"
+          <LegacyMetricCard
+            label="Destaques do Time"
+            value={String(data?.highlights?.length || 0)}
+            icon={ShieldCheck}
+            tone="muted"
+            hint="Vendedores com contratos ativos"
           />
         </div>
 
-
-      {/* Gráficos */}
+      {/* Linha 2 — Área analítica */}
       <div className="grid gap-6 mt-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 bg-card/50 border-border/50">
+        <Card className="lg:col-span-2 rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
+
           <CardHeader>
             <CardTitle className="text-base font-semibold">Receita e Recorrência</CardTitle>
             <p className="text-xs text-muted-foreground font-normal">Evolução dos últimos 7 meses</p>
