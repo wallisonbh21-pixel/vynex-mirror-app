@@ -54,7 +54,16 @@ function AdminDashboardPage() {
   }
 
   const stats = data?.stats;
-  const funnelData = Object.entries(data?.funnel || {}).map(([name, value]) => ({ name, value }));
+  const rawFunnel = data?.funnel || {};
+  const funnelData = Object.entries(rawFunnel)
+    .map(([status, value]) => ({ status, name: statusLabel(status), value: Number(value) || 0 }))
+    .sort(
+      (a, b) =>
+        (LEAD_STATUS.indexOf(a.status as never) + 1 || 99) -
+        (LEAD_STATUS.indexOf(b.status as never) + 1 || 99),
+    );
+  const funnelTotal = funnelData.reduce((acc, f) => acc + f.value, 0);
+
   
   // Série construída apenas com dados reais dos contratos retornados pelo backend.
   const historyData = [...(data?.recentContracts ?? [])]
