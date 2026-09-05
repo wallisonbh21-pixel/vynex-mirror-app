@@ -77,17 +77,17 @@ function AdminDashboardPage() {
     <AppShell 
       title="ADMINISTRAÇÃO" 
     >
-      <DashboardShell className="animate-fade-in space-y-6 font-sans">
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted-foreground">
-            Painel executivo
-          </span>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground">
+      <DashboardShell className="animate-fade-in space-y-4 font-sans">
+        <div className="flex flex-col gap-1">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">
             Visão Geral da Operação
           </h2>
           <p className="text-sm text-muted-foreground">
             Indicadores consolidados de vendas, produção e financeiro.
           </p>
+          <span className="text-xs text-muted-foreground/80">
+            {funnelTotal} leads em pipeline · {data?.highlights?.length || 0} vendedores com contratos ativos
+          </span>
         </div>
 
         {/* Faixa 1 — Cards executivos */}
@@ -119,21 +119,8 @@ function AdminDashboardPage() {
             icon={Wallet}
             hint="Aguardando liberação"
           />
-
-          <LegacyMetricCard
-            label="Leads no Funil"
-            value={String(funnelData.reduce((acc, f) => acc + Number(f.value || 0), 0))}
-            icon={Users}
-            hint="Total em pipeline"
-          />
-
-          <LegacyMetricCard
-            label="Destaques do Time"
-            value={String(data?.highlights?.length || 0)}
-            icon={ShieldCheck}
-            hint="Vendedores com contratos ativos"
-          />
         </div>
+
 
         {/* Faixa 2 — Área analítica */}
         <div className="grid gap-4 lg:grid-cols-3">
