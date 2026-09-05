@@ -28,8 +28,6 @@ import {
   Bar,
   Cell
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -79,12 +77,12 @@ function AdminDashboardPage() {
     <AppShell 
       title="ADMINISTRAÇÃO" 
     >
-      <DashboardShell className="font-sans">
+      <DashboardShell className="animate-fade-in space-y-6 font-sans">
         <div className="flex flex-col gap-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+          <span className="text-xs text-muted-foreground">
             Painel executivo
           </span>
-          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground">
             Visão Geral da Operação
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -92,13 +90,12 @@ function AdminDashboardPage() {
           </p>
         </div>
 
-        {/* Linha 1 — Cards executivos */}
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {/* Faixa 1 — Cards executivos */}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <LegacyMetricCard
             label="Receita do Mês"
             value={currency(stats?.revenue || 0)}
             icon={TrendingUp}
-            tone="primary"
             hint="Contratos ativos"
           />
 
@@ -106,7 +103,6 @@ function AdminDashboardPage() {
             label="Contratos Ativos"
             value={String(stats?.activeContractsCount || 0)}
             icon={FileText}
-            tone="accent"
             hint="Base contratada"
           />
 
@@ -114,7 +110,6 @@ function AdminDashboardPage() {
             label="MRR (Mensalidades)"
             value={currency(stats?.mrr || 0)}
             icon={BarChart3}
-            tone="success"
             hint="Recorrência mensal"
           />
 
@@ -122,7 +117,6 @@ function AdminDashboardPage() {
             label="Comissões a Pagar"
             value={currency(stats?.commissionsPending || 0)}
             icon={Wallet}
-            tone="warning"
             hint="Aguardando liberação"
           />
 
@@ -130,7 +124,6 @@ function AdminDashboardPage() {
             label="Leads no Funil"
             value={String(funnelData.reduce((acc, f) => acc + Number(f.value || 0), 0))}
             icon={Users}
-            tone="primary"
             hint="Total em pipeline"
           />
 
@@ -138,165 +131,221 @@ function AdminDashboardPage() {
             label="Destaques do Time"
             value={String(data?.highlights?.length || 0)}
             icon={ShieldCheck}
-            tone="muted"
             hint="Vendedores com contratos ativos"
           />
         </div>
 
-      {/* Linha 2 — Área analítica */}
-      <div className="grid gap-6 mt-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
+        {/* Faixa 2 — Área analítica */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <section className="surface p-5 lg:col-span-2">
+            <div className="mb-4">
+              <h3 className="font-display text-lg font-semibold">Receita e Recorrência</h3>
+              <p className="text-sm text-muted-foreground">
+                Contratos recentes — valor total e mensalidade
+              </p>
+            </div>
+            <div className="h-[260px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={historyData}>
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.5} />
+                      <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorMRR" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                    tickFormatter={(val) => `R$ ${val / 1000}k`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
+                      borderRadius: "12px",
+                      color: "var(--foreground)",
+                    }}
+                    itemStyle={{ fontSize: "12px" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="total"
+                    stroke="var(--chart-1)"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorTotal)"
+                    name="Receita Total"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="mrr"
+                    stroke="var(--chart-2)"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorMRR)"
+                    name="Recorrência / MRR"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
 
-          <CardHeader>
-            <CardTitle className="font-display text-base font-semibold">Receita e Recorrência</CardTitle>
-            <p className="text-xs text-muted-foreground font-normal">Contratos recentes — valor total e mensalidade</p>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historyData}>
-                <defs>
-                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorMRR" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: 'var(--muted-foreground)', fontSize: 12}}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: 'var(--muted-foreground)', fontSize: 12}}
-                  tickFormatter={(val) => `R$ ${val/1000}k`}
-                />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }}
-                  itemStyle={{ fontSize: '12px' }}
-                />
-                <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" name="Receita Total" />
-                <Area type="monotone" dataKey="mrr" stroke="var(--accent)" strokeWidth={3} fillOpacity={1} fill="url(#colorMRR)" name="Recorrência / MRR" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          <section className="surface p-5">
+            <div className="mb-4">
+              <h3 className="font-display text-lg font-semibold">Funil de Leads</h3>
+              <p className="text-sm text-muted-foreground">Distribuição por etapa</p>
+            </div>
+            <div className="h-[260px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart layout="vertical" data={[...funnelData].sort((a, b) => Number(b.value) - Number(a.value))}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
+                  <XAxis type="number" hide />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "var(--foreground)", fontSize: 12 }}
+                    width={90}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "transparent" }}
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
+                      borderRadius: "12px",
+                      color: "var(--foreground)",
+                    }}
+                  />
+                  <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={22} name="Leads">
+                    {funnelData.map((_entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          index === 0
+                            ? "var(--chart-1)"
+                            : index === 1
+                              ? "var(--chart-2)"
+                              : "var(--chart-3)"
+                        }
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+        </div>
 
-        <Card className="rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
-          <CardHeader>
-            <CardTitle className="font-display text-base font-semibold">Funil de Leads</CardTitle>
-            <p className="text-xs text-muted-foreground font-normal">Distribuição por etapa</p>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart layout="vertical" data={funnelData.sort((a,b) => b.value - a.value)}>
-                <XAxis type="number" hide />
-                <YAxis 
-                  dataKey="name" 
-                  type="category" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: 'var(--foreground)', fontSize: 11, fontWeight: 500}}
-                  width={90}
-                />
-                <Tooltip 
-                   cursor={{fill: 'transparent'}}
-                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24} name="Leads">
-                  {funnelData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? "var(--primary)" : index === 1 ? "var(--accent)" : "var(--chart-3)"} />
+        {/* Faixa 3 — Tabelas e destaques */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <section className="surface overflow-hidden lg:col-span-2">
+            <div className="border-b border-border/60 p-5">
+              <h3 className="font-display text-lg font-semibold">Contratos Recentes</h3>
+              <p className="text-sm text-muted-foreground">Últimos contratos registrados</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-5 py-3 font-medium">Cliente</th>
+                    <th className="px-5 py-3 font-medium">Vendedor</th>
+                    <th className="px-5 py-3 text-right font-medium">Valor</th>
+                    <th className="px-5 py-3 text-right font-medium">Mensal</th>
+                    <th className="px-5 py-3 text-center font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.recentContracts.map((contract: any) => (
+                    <tr
+                      key={contract.id}
+                      className="border-t border-border/60 transition-colors hover:bg-muted/30"
+                    >
+                      <td className="px-5 py-3">
+                        <div className="truncate font-medium">
+                          {contract.clients?.company || "Cliente N/A"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {shortDate(contract.created_at)}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 text-muted-foreground">
+                        <span className="block max-w-[180px] truncate">
+                          {contract.profiles?.full_name || "N/A"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-right font-medium">
+                        {currency(contract.amount)}
+                      </td>
+                      <td className="px-5 py-3 text-right text-muted-foreground">
+                        {currency(contract.monthly_fee)}
+                      </td>
+                      <td className="px-5 py-3 text-center">
+                        <StatusBadge status={contract.status} className="h-5 px-2 text-xs" />
+                      </td>
+                    </tr>
                   ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+                  {(!data?.recentContracts || data.recentContracts.length === 0) && (
+                    <tr className="border-t border-border/60">
+                      <td colSpan={5} className="px-5 py-10 text-center text-sm text-muted-foreground">
+                        Sem contratos recentes.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-      {/* Tabelas e Destaques */}
-      <div className="grid gap-6 mt-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
-          <CardHeader>
-            <CardTitle className="font-display text-base font-semibold">Contratos Recentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent border-border/50">
-                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Cliente</TableHead>
-                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Vendedor</TableHead>
-                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold text-right">Valor</TableHead>
-                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold text-right">Mensal</TableHead>
-                  <TableHead className="text-xs uppercase tracking-wider text-muted-foreground font-semibold text-center">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data?.recentContracts.map((contract: any) => (
-                  <TableRow key={contract.id} className="border-border/50 group cursor-pointer hover:bg-muted/30 transition-colors">
-                    <TableCell className="py-4">
-                      <div className="font-medium text-sm">{contract.clients?.company || "Cliente N/A"}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">{shortDate(contract.created_at)}</div>
-                    </TableCell>
-                    <TableCell className="text-sm py-4">{contract.profiles?.full_name || "N/A"}</TableCell>
-                    <TableCell className="text-sm text-right py-4 font-semibold">{currency(contract.amount)}</TableCell>
-                    <TableCell className="text-sm text-right py-4 text-muted-foreground">{currency(contract.monthly_fee)}</TableCell>
-                    <TableCell className="text-center py-4">
-                      <StatusBadge status={contract.status} className="h-5 px-2 text-[10px]" />
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {(!data?.recentContracts || data.recentContracts.length === 0) && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground text-sm border-none">
-                      Sem contratos recentes.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-xl border-border/70 bg-card/70 shadow-panel backdrop-blur">
-          <CardHeader>
-            <CardTitle className="font-display text-base font-semibold">Destaques do Time</CardTitle>
-            <p className="text-xs text-muted-foreground font-normal">Desempenho no mês</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {data?.highlights.map((seller: any, idx: number) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/50">
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "h-10 w-10 rounded-full flex items-center justify-center font-bold text-xs text-white",
-                    idx === 0 ? "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]" : 
-                    idx === 1 ? "bg-slate-400" : "bg-amber-700"
-                  )}>
+          <section className="surface p-5">
+            <div className="mb-4">
+              <h3 className="font-display text-lg font-semibold">Destaques do Time</h3>
+              <p className="text-sm text-muted-foreground">Desempenho no mês</p>
+            </div>
+            <ul className="space-y-3">
+              {data?.highlights.map((seller: any, idx: number) => (
+                <li
+                  key={idx}
+                  className="flex items-center gap-3 rounded-lg border border-border/60 p-3"
+                >
+                  <span
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary",
+                    )}
+                  >
                     {seller.name.charAt(0)}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">{seller.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {seller.count} contratos
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-sm font-semibold">{seller.name}</div>
-                    <div className="text-[10px] text-muted-foreground">Vendedor • {seller.count} contratos</div>
-                  </div>
-                </div>
-                <div className="text-sm font-bold">{currency(seller.value)}</div>
-              </div>
-            ))}
+                  <div className="text-sm font-semibold">{currency(seller.value)}</div>
+                </li>
+              ))}
+            </ul>
             {(!data?.highlights || data.highlights.length === 0) && (
-              <div className="text-center py-10 text-muted-foreground text-sm border border-dashed border-border rounded-xl">
+              <div className="rounded-lg border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
                 Sem dados suficientes
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </section>
+        </div>
       </DashboardShell>
     </AppShell>
   );
 }
+
