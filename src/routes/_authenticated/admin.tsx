@@ -1,20 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  BarChart3, 
-  Users, 
-  Wallet, 
-  ShieldCheck, 
-  TrendingUp, 
-  FileText
-} from "lucide-react";
+import { BarChart3, Wallet, TrendingUp, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LegacyMetricCard } from "@/components/admin/LegacyMetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useRoles } from "@/lib/auth";
 import { requireAdmin } from "@/lib/guard";
-import { currency, shortDate } from "@/lib/format";
+import { currency, shortDate, label as statusLabel, LEAD_STATUS } from "@/lib/format";
 import { getAdminDashboardData } from "@/lib/admin-dashboard.functions";
 import {
   AreaChart,
@@ -26,7 +19,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell
 } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +54,16 @@ function AdminDashboardPage() {
   }
 
   const stats = data?.stats;
-  const funnelData = Object.entries(data?.funnel || {}).map(([name, value]) => ({ name, value }));
+  const rawFunnel = data?.funnel || {};
+  const funnelData = Object.entries(rawFunnel)
+    .map(([status, value]) => ({ status, name: statusLabel(status), value: Number(value) || 0 }))
+    .sort(
+      (a, b) =>
+        (LEAD_STATUS.indexOf(a.status as never) + 1 || 99) -
+        (LEAD_STATUS.indexOf(b.status as never) + 1 || 99),
+    );
+  const funnelTotal = funnelData.reduce((acc, f) => acc + f.value, 0);
+
   
   // Série construída apenas com dados reais dos contratos retornados pelo backend.
   const historyData = [...(data?.recentContracts ?? [])]
@@ -77,17 +78,17 @@ function AdminDashboardPage() {
     <AppShell 
       title="ADMINISTRAÇÃO" 
     >
-      <DashboardShell className="animate-fade-in space-y-6 font-sans">
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted-foreground">
-            Painel executivo
-          </span>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground">
+      <DashboardShell className="animate-fade-in space-y-4 font-sans">
+        <div className="flex flex-col gap-1">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">
             Visão Geral da Operação
           </h2>
           <p className="text-sm text-muted-foreground">
             Indicadores consolidados de vendas, produção e financeiro.
           </p>
+          <span className="text-xs text-muted-foreground/80">
+            {funnelTotal} leads em pipeline · {data?.highlights?.length || 0} vendedores com contratos ativos
+          </span>
         </div>
 
         {/* Faixa 1 — Cards executivos */}
@@ -119,21 +120,8 @@ function AdminDashboardPage() {
             icon={Wallet}
             hint="Aguardando liberação"
           />
-
-          <LegacyMetricCard
-            label="Leads no Funil"
-            value={String(funnelData.reduce((acc, f) => acc + Number(f.value || 0), 0))}
-            icon={Users}
-            hint="Total em pipeline"
-          />
-
-          <LegacyMetricCard
-            label="Destaques do Time"
-            value={String(data?.highlights?.length || 0)}
-            icon={ShieldCheck}
-            hint="Vendedores com contratos ativos"
-          />
         </div>
+
 
         {/* Faixa 2 — Área analítica */}
         <div className="grid gap-4 lg:grid-cols-3">
@@ -209,7 +197,7 @@ function AdminDashboardPage() {
             </div>
             <div className="h-[260px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart layout="vertical" data={[...funnelData].sort((a, b) => Number(b.value) - Number(a.value))}>
+                <BarChart layout="vertical" data={funnelData} margin={{ left: 4, right: 12 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                   <XAxis type="number" hide />
                   <YAxis
@@ -217,8 +205,8 @@ function AdminDashboardPage() {
                     type="category"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: "var(--foreground)", fontSize: 12 }}
-                    width={90}
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                    width={104}
                   />
                   <Tooltip
                     cursor={{ fill: "transparent" }}
@@ -229,21 +217,15 @@ function AdminDashboardPage() {
                       color: "var(--foreground)",
                     }}
                   />
-                  <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={22} name="Leads">
-                    {funnelData.map((_entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          index === 0
-                            ? "var(--chart-1)"
-                            : index === 1
-                              ? "var(--chart-2)"
-                              : "var(--chart-3)"
-                        }
-                      />
-                    ))}
-                  </Bar>
+                  <Bar
+                    dataKey="value"
+                    radius={[0, 4, 4, 0]}
+                    barSize={16}
+                    name="Leads"
+                    fill="var(--chart-1)"
+                  />
                 </BarChart>
+
               </ResponsiveContainer>
             </div>
           </section>
@@ -314,19 +296,20 @@ function AdminDashboardPage() {
               <h3 className="font-display text-lg font-semibold">Destaques do Time</h3>
               <p className="text-sm text-muted-foreground">Desempenho no mês</p>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {data?.highlights.map((seller: any, idx: number) => (
                 <li
                   key={idx}
-                  className="flex items-center gap-3 rounded-lg border border-border/60 p-3"
+                  className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2"
                 >
                   <span
                     className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary",
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary",
                     )}
                   >
                     {seller.name.charAt(0)}
                   </span>
+
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium">{seller.name}</div>
                     <div className="text-xs text-muted-foreground">
