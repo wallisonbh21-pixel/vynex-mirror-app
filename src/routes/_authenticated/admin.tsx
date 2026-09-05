@@ -226,7 +226,6 @@ function AdminDashboardPage() {
                   />
                 </BarChart>
 
-                </BarChart>
               </ResponsiveContainer>
             </div>
           </section>
