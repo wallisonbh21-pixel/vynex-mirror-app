@@ -97,7 +97,7 @@ export function StatCard({
         type="button"
         onClick={onClick}
         className={cn(
-          "premium-card p-5 space-y-4 text-left w-full transition-all hover:border-primary/30 hover:shadow-glow-sm cursor-pointer", 
+          "premium-card card-hover min-h-32 w-full space-y-3 p-5 text-left cursor-pointer", 
           className
         )}
       >
@@ -107,7 +107,7 @@ export function StatCard({
   }
 
   return (
-    <div className={cn("premium-card p-5 space-y-4", className)}>
+    <div className={cn("premium-card card-hover min-h-32 space-y-3 p-5", className)}>
       {content}
     </div>
   );

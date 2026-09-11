@@ -48,9 +48,9 @@ export function CriadorWorkspace({ project }: { project: any }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* 6. CHECKLIST */}
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+      <section className="premium-card card-hover p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <CheckSquare className="size-5 text-primary" /> Checklist de Produção
@@ -72,7 +72,7 @@ export function CriadorWorkspace({ project }: { project: any }) {
       </section>
 
       {/* 8. NOTAS */}
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-panel">
+      <section className="premium-card card-hover p-5">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <MessageSquare className="size-5 text-primary" /> Notas do Projeto
         </h2>
@@ -97,7 +97,7 @@ export function CriadorWorkspace({ project }: { project: any }) {
 
       {/* 9. ENVIO */}
       {project.status === "em_producao" && (
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-panel text-center">
+        <section className="premium-card card-hover p-5 text-center">
           <Button size="lg" className="w-full gap-2" onClick={handleSendApproval}>
             <Send className="size-5" /> Enviar para Aprovação
           </Button>

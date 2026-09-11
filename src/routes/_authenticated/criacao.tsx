@@ -176,10 +176,10 @@ function PainelCriador() {
           />
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {/* 3. MEUS PROJETOS (Resumo) */}
-          <section className="lg:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel overflow-hidden">
+          <section className="space-y-4 lg:col-span-2">
+            <div className="premium-card card-hover overflow-hidden">
               <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
                 <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                   <History className="size-4 text-primary" /> Projetos em Andamento
@@ -226,7 +226,7 @@ function PainelCriador() {
             </div>
 
             {/* Grafico de Meu Progresso */}
-            <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <section className="premium-card card-hover p-5">
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
                 <TrendingUp className="size-4 text-primary" /> Meu progresso
               </h2>
@@ -251,7 +251,7 @@ function PainelCriador() {
             </section>
 
             {/* Volume Histórico */}
-            <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <section className="premium-card card-hover p-5">
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
                 <History className="size-4 text-brand-500" /> Histórico de Volume (6 meses)
               </h2>
@@ -285,9 +285,9 @@ function PainelCriador() {
             </section>
           </section>
 
-          <aside className="space-y-6">
+          <aside className="space-y-4">
             {/* 5. PRAZOS */}
-            <section className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+            <section className="premium-card card-hover">
               <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <Calendar className="size-4 text-primary" /> Próximos Prazos
               </h2>
@@ -346,7 +346,7 @@ function PainelCriador() {
             </section>
 
             {/* 6. COMISSÕES (Resumo) */}
-            <section className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+            <section className="premium-card card-hover">
               <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <Wallet className="size-4 text-primary" /> Resumo Financeiro
               </h2>
@@ -372,7 +372,7 @@ function PainelCriador() {
             </section>
 
             {/* 7. DESEMPENHO */}
-            <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+            <section className="premium-card card-hover p-5">
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
                 <Trophy className="size-4 text-primary" /> Meu Desempenho
               </h2>

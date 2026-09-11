@@ -146,9 +146,9 @@ function ClienteDashboard() {
         />
 
         {activeProjeto ? (
-          <div className="grid gap-6 lg:grid-cols-12">
+          <div className="grid gap-4 lg:grid-cols-12">
             {/* CARD PRINCIPAL - PROJETO ATUAL */}
-            <Card className="lg:col-span-8 border-border/50 bg-card/30 backdrop-blur-sm shadow-panel overflow-hidden">
+            <Card className="surface card-hover overflow-hidden lg:col-span-8">
               <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border/50 px-6 py-4">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Projeto em Foco</p>
@@ -190,11 +190,11 @@ function ClienteDashboard() {
             </Card>
 
             {/* LATERAL DIREITA */}
-            <div className="lg:col-span-4 space-y-6">
+            <div className="space-y-4 lg:col-span-4">
               {/* AÇÃO NECESSÁRIA */}
               <Card className={cn(
-                "border transition-all duration-300 backdrop-blur-sm",
-                actionRequired ? "border-primary/30 bg-primary/5 shadow-glow" : "border-border/50 bg-card/30 shadow-panel"
+                "surface card-hover",
+                actionRequired && "border-primary/30"
               )}>
                 <CardHeader className="pb-2 px-5 pt-4">
                   <CardTitle className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
@@ -228,7 +228,7 @@ function ClienteDashboard() {
               </Card>
 
               {/* PRÓXIMA REUNIÃO */}
-              <Card className="border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+              <Card className="surface card-hover">
                 <CardHeader className="pb-3 px-5 pt-4 border-b border-border/50">
                   <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                     <Calendar className="size-3" />
@@ -277,7 +277,7 @@ function ClienteDashboard() {
             </div>
           </div>
         ) : (
-          <Card className="p-20 text-center border-dashed border-2 border-border/50 bg-card/10 rounded-2xl">
+          <Card className="surface card-hover border-dashed p-12 text-center">
             <Inbox className="mx-auto size-16 text-muted-foreground/20 mb-6" />
             <h3 className="text-xl font-bold mb-2 uppercase tracking-tight">Seu projeto ainda não foi iniciado.</h3>
             <p className="text-muted-foreground max-w-md mx-auto text-sm">
@@ -312,7 +312,7 @@ function ClienteDashboard() {
         )}
 
         {/* ATIVIDADE RECENTE */}
-        <Card className="border-border/50 bg-card/30 backdrop-blur-sm shadow-panel mt-6 overflow-hidden">
+        <Card className="surface card-hover mt-4 overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 px-6 py-4">
             <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <Activity className="size-4 text-primary" />
