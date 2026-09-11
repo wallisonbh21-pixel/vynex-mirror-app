@@ -21,9 +21,9 @@ interface PremiumTableProps {
 
 export function PremiumTable({ headers, children, className }: PremiumTableProps) {
   return (
-    <div className={cn("overflow-x-auto", className)}>
+    <div className={cn("surface card-hover overflow-x-auto", className)}>
       <table className="w-full text-left text-sm border-collapse">
-        <thead className="border-b border-border/50">
+        <thead className="border-b border-border/60 bg-muted/40">
           <tr>
             {headers.map((header) => (
               <th

@@ -26,11 +26,6 @@ export function LegacyMetricCard({
 
   return (
     <div className={cn("surface card-hover relative overflow-hidden p-5", className)}>
-      <div
-        className="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full bg-primary/10 blur-2xl"
-        aria-hidden="true"
-      />
-
       <div className="relative flex items-start justify-between gap-3">
         <p className="min-w-0 truncate text-sm font-medium text-muted-foreground">{label}</p>
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

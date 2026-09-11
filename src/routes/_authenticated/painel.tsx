@@ -146,7 +146,7 @@ function Painel() {
 
 
         {goal ? (
-          <div className="mt-4 rounded-2xl border border-border/50 bg-card/30 p-5 backdrop-blur-sm shadow-panel">
+          <div className="premium-card card-hover mt-4 p-5">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <Trophy className="size-4 text-warning" />
@@ -165,8 +165,8 @@ function Painel() {
           </div>
         ) : null}
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <section className="lg:col-span-2 rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <section className="premium-card card-hover p-5 lg:col-span-2">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
               <TrendingUp className="size-4 text-primary" /> Evolução de Vendas
             </h2>
@@ -207,7 +207,7 @@ function Painel() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm shadow-panel">
+          <section className="premium-card card-hover p-5">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
               <Target className="size-4 text-primary" /> Funil Comercial
             </h2>
@@ -215,7 +215,7 @@ function Painel() {
           </section>
         </div>
 
-        <section className="mt-6 overflow-hidden rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-panel">
+        <section className="premium-card card-hover mt-4 overflow-hidden">
           <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <ArrowUpRight className="size-4 text-primary" /> Minhas Oportunidades

@@ -118,7 +118,7 @@ function AdminDashboardPage() {
 
         {/* Faixa 2 — Área analítica */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <section className="surface p-5 lg:col-span-2">
+          <section className="surface card-hover p-5 lg:col-span-2">
             <div className="mb-4">
               <h3 className="font-display text-lg font-semibold">Receita e Recorrência</h3>
               <p className="text-sm text-muted-foreground">
@@ -183,7 +183,7 @@ function AdminDashboardPage() {
             </div>
           </section>
 
-          <section className="surface p-5">
+          <section className="surface card-hover p-5">
             <div className="mb-4">
               <h3 className="font-display text-lg font-semibold">Funil de Leads</h3>
               <p className="text-sm text-muted-foreground">Distribuição por etapa</p>
@@ -226,7 +226,7 @@ function AdminDashboardPage() {
 
         {/* Faixa 3 — Tabelas e destaques */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <section className="surface overflow-hidden lg:col-span-2">
+          <section className="surface card-hover overflow-hidden lg:col-span-2">
             <div className="border-b border-border/60 p-5">
               <h3 className="font-display text-lg font-semibold">Contratos Recentes</h3>
               <p className="text-sm text-muted-foreground">Últimos contratos registrados</p>
@@ -284,7 +284,7 @@ function AdminDashboardPage() {
             </div>
           </section>
 
-          <section className="surface p-5">
+          <section className="surface card-hover p-5">
             <div className="mb-4">
               <h3 className="font-display text-lg font-semibold">Destaques do Time</h3>
               <p className="text-sm text-muted-foreground">Desempenho no mês</p>
