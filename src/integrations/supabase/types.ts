@@ -1683,6 +1683,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_meeting_participant: {
+        Args: { _meeting_id: string; _user_id: string }
+        Returns: boolean
+      }
       set_client_token: { Args: { token: string }; Returns: undefined }
     }
     Enums: {
