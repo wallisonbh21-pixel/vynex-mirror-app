@@ -86,7 +86,7 @@ function ClienteDashboard() {
     );
   }
 
-  if (isError || !client) {
+  if (isError) {
     return (
       <AppShell title="Dashboard">
         <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
@@ -101,6 +101,31 @@ function ClienteDashboard() {
             Tentar novamente
           </Button>
         </div>
+      </AppShell>
+    );
+  }
+
+  if (!client) {
+    return (
+      <AppShell title="PORTAL DO CLIENTE">
+        <DashboardShell>
+          <DashboardHeader
+            title="Bem-vindo à ScaleNexus! 👋"
+            description="Sua conta está ativa e o seu cadastro comercial está a ser preparado."
+          />
+          <Card className="surface card-hover border-dashed p-12 text-center">
+            <Inbox className="mx-auto size-16 text-muted-foreground/20 mb-6" />
+            <h3 className="text-xl font-bold mb-2 uppercase tracking-tight">Ainda não há dados para mostrar.</h3>
+            <p className="text-muted-foreground max-w-md mx-auto text-sm">
+              Assim que a nossa equipa vincular o seu cadastro, o acompanhamento do projeto aparece aqui.
+            </p>
+            <div className="mt-6">
+              <Button variant="outline" onClick={() => refetch()}>
+                Atualizar
+              </Button>
+            </div>
+          </Card>
+        </DashboardShell>
       </AppShell>
     );
   }
