@@ -178,9 +178,10 @@ function PainelCriador() {
 
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {/* 3. MEUS PROJETOS (Resumo) */}
-          <section className="space-y-4 lg:col-span-2">
+          <section className="min-w-0 space-y-4 lg:col-span-2">
             <div className="premium-card card-hover overflow-hidden">
-              <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+              <div className="flex items-center justify-between gap-3 border-b border-border/50 px-4 py-4 sm:px-6">
+
                 <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                   <History className="size-4 text-primary" /> Projetos em Andamento
                 </h2>
@@ -190,9 +191,10 @@ function PainelCriador() {
               </div>
               <div className="divide-y divide-border/30">
                 {active.slice(0, 5).map((project) => (
-                  <div key={project.id} className="p-6 hover:bg-muted/20 transition-colors">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="min-w-0 flex-1 pr-4">
+                  <div key={project.id} className="p-4 transition-colors hover:bg-muted/20 sm:p-6">
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+
                         <div className="flex items-center gap-2">
                           <span className="truncate font-bold text-base">{project.title}</span>
                           <StatusBadge status={project.status} className="h-5 px-2 text-[10px]" />
@@ -202,8 +204,9 @@ function PainelCriador() {
                           <span className="flex items-center gap-1"><Calendar className="size-3" /> Início: {shortDate(project.assigned_at || project.created_at)}</span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-black text-primary text-xl">{currency(earnings.commissionOf(project))}</div>
+                      <div className="shrink-0 text-right">
+                        <div className="font-black text-primary text-lg sm:text-xl">{currency(earnings.commissionOf(project))}</div>
+
                         <Button asChild size="sm" variant="outline" className="h-8 mt-2 border-primary/30 text-primary hover:bg-primary/10 text-[10px] font-bold uppercase tracking-widest">
                           <Link to="/projetos/$projectId" params={{ projectId: project.id }} className="gap-1">
                             Gerenciar <ExternalLink className="size-3" />
@@ -226,7 +229,8 @@ function PainelCriador() {
             </div>
 
             {/* Grafico de Meu Progresso */}
-            <section className="premium-card card-hover p-5">
+            <section className="premium-card card-hover min-w-0 p-5">
+
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
                 <TrendingUp className="size-4 text-primary" /> Meu progresso
               </h2>
@@ -285,7 +289,7 @@ function PainelCriador() {
             </section>
           </section>
 
-          <aside className="space-y-4">
+          <aside className="min-w-0 space-y-4">
             {/* 5. PRAZOS */}
             <section className="premium-card card-hover">
               <h2 className="border-b border-border/50 px-5 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
