@@ -248,6 +248,19 @@ export function AppShell({
           { to: "/perfil", label: "Meu perfil", icon: UserRound },
         ];
 
+  // Papel exibido segue o contexto de navegação (um usuário pode ter vários papéis).
+  const contextRole = (
+    pathname.startsWith("/cliente") && isCliente
+      ? "cliente"
+      : isAdmin
+        ? "admin"
+        : isCriador
+          ? "criador"
+          : isCliente && !roles.includes("vendedor")
+            ? "cliente"
+            : primaryRole
+  ) as typeof primaryRole;
+
   const displayName = profile?.nickname || profile?.full_name || "Sem nome";
   const initials = displayName
     .split(" ")
@@ -268,7 +281,7 @@ export function AppShell({
       items={items}
       pathname={pathname}
       displayName={displayName}
-      roleLabel={ROLE_LABEL[primaryRole] ?? primaryRole}
+      roleLabel={ROLE_LABEL[contextRole] ?? contextRole}
       email={user?.email ?? null}
       avatarUrl={avatarUrl ?? null}
       initials={initials}
