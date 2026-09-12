@@ -56,10 +56,11 @@ export function useClienteProjetos() {
  * Busca dados detalhados do cliente para o portal.
  */
 export function useClientePortalData() {
-  const { user } = useSession();
-  return useQuery({
+  const { user, loading: sessionLoading } = useSession();
+  const query = useQuery({
     queryKey: ["client-portal-data", user?.id],
     enabled: !!user,
+    retry: 1,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clients")
@@ -67,9 +68,7 @@ export function useClientePortalData() {
           *,
           projects(
             *,
-            contracts(title, amount, status),
-            briefings(status, updated_at),
-            site_plans(status)
+            contracts(title, amount, status)
           )
         `)
         .eq("user_id", user!.id)
@@ -78,6 +77,14 @@ export function useClientePortalData() {
       return data;
     },
   });
+
+  return {
+    ...query,
+    // Sem sessão resolvida ainda: continua carregando.
+    // Sessão resolvida e sem utilizador: não fica preso em loading.
+    isLoading: sessionLoading || (!!user && query.isLoading),
+    isError: query.isError || (!sessionLoading && !user),
+  };
 }
 
 /**
