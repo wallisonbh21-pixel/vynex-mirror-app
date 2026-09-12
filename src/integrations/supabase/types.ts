@@ -14,6 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_charge_events: {
+        Row: {
+          actor_id: string | null
+          amount: number | null
+          charge_id: string
+          created_at: string
+          event_type: string
+          from_status: string | null
+          id: string
+          metadata: Json | null
+          to_status: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          amount?: number | null
+          charge_id: string
+          created_at?: string
+          event_type: string
+          from_status?: string | null
+          id?: string
+          metadata?: Json | null
+          to_status?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          amount?: number | null
+          charge_id?: string
+          created_at?: string
+          event_type?: string
+          from_status?: string | null
+          id?: string
+          metadata?: Json | null
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_charge_events_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "client_charges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_charges: {
+        Row: {
+          amount: number
+          charge_type: string
+          checkout_url: string | null
+          client_id: string
+          contract_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          due_date: string | null
+          expires_at: string | null
+          id: string
+          paid_at: string | null
+          payment_method: string | null
+          payment_provider: string | null
+          pix_code: string | null
+          pix_qr_code: string | null
+          project_id: string | null
+          provider_charge_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          charge_type?: string
+          checkout_url?: string | null
+          client_id: string
+          contract_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description: string
+          due_date?: string | null
+          expires_at?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_provider?: string | null
+          pix_code?: string | null
+          pix_qr_code?: string | null
+          project_id?: string | null
+          provider_charge_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          charge_type?: string
+          checkout_url?: string | null
+          client_id?: string
+          contract_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          due_date?: string | null
+          expires_at?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_provider?: string | null
+          pix_code?: string | null
+          pix_qr_code?: string | null
+          project_id?: string | null
+          provider_charge_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_charges_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_charges_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_charges_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           city: string | null
