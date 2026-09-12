@@ -112,28 +112,28 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
               whileTap={{ scale: 0.99 }}
               onClick={() => onStepClick?.(item.status)}
               className={cn(
-                "group relative mx-auto flex h-16 w-full items-center justify-between rounded-xl border px-6 transition-all",
+                "group relative mx-auto flex min-h-16 w-full items-center justify-between gap-3 overflow-hidden rounded-xl border px-4 py-2 transition-all",
                 config.bg,
                 config.border,
                 isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : "hover:bg-opacity-20 shadow-sm"
               )}
               style={{ maxWidth: `${funnelWidth}%` }}
             >
-              <div className="flex items-center gap-4">
-                <div className={cn("flex size-10 items-center justify-center rounded-lg bg-background shadow-sm", config.text)}>
-                  <IconComponent size={20} aria-hidden="true" />
+              <div className="flex min-w-0 items-center gap-3">
+                <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg bg-background shadow-sm", config.text)}>
+                  <IconComponent size={18} aria-hidden="true" />
                 </div>
-                <div className="text-left">
-                  <span className="block text-sm font-bold text-foreground">
+                <div className="min-w-0 text-left">
+                  <span className="block truncate text-sm font-bold text-foreground">
                     {item.status === 'novo' ? 'Novo — Aguardando Contato' : label(item.status)}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="block truncate text-xs text-muted-foreground">
                     {index > 0 ? `${conversionRate}% conversão` : 'Entrada'}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-8">
+              <div className="flex shrink-0 items-center gap-4">
                 <div className="text-right">
                   <span className="block text-lg font-mono font-bold leading-none">
                     {item.count}
@@ -142,16 +142,17 @@ export function SalesFunnel({ leads, activeStep, onStepClick }: SalesFunnelProps
                     Leads
                   </span>
                 </div>
-                <div className="hidden text-right sm:block">
-                  <span className="block text-sm font-semibold text-foreground">
+                <div className="hidden text-right lg:block">
+                  <span className="block whitespace-nowrap text-sm font-semibold text-foreground">
                     {currency(item.value)}
                   </span>
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Valor Potencial
+                    Valor
                   </span>
                 </div>
                 <ChevronRight size={16} className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
               </div>
+
               
               <div className="absolute -bottom-4 left-1/2 h-4 w-px -translate-x-1/2 bg-border/50" />
             </motion.button>
