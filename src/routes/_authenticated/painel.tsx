@@ -166,7 +166,7 @@ function Painel() {
         ) : null}
 
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          <section className="premium-card card-hover p-5 lg:col-span-2">
+          <section className="premium-card card-hover min-w-0 p-5 lg:col-span-2">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
               <TrendingUp className="size-4 text-primary" /> Evolução de Vendas
             </h2>
@@ -207,7 +207,7 @@ function Painel() {
             </div>
           </section>
 
-          <section className="premium-card card-hover p-5">
+          <section className="premium-card card-hover min-w-0 p-5">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-6">
               <Target className="size-4 text-primary" /> Funil Comercial
             </h2>
