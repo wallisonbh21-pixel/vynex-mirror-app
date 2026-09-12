@@ -226,6 +226,10 @@ export function AppShell({
           to: "/admin/saques", 
           label: "Financeiro / Saques", 
           icon: Wallet,
+          submenu: [
+            { to: "/admin/saques", label: "Saques", icon: Wallet },
+            { to: "/admin/cobrancas", label: "Cobranças de clientes", icon: Wallet },
+          ],
         },
         { 
           to: "/admin/configuracoes", 
