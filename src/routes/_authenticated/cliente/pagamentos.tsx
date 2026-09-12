@@ -147,17 +147,17 @@ function MyPayments() {
         </div>
 
         {/* STATUS E PRÓXIMO VENCIMENTO */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="border-sidebar-border/50 bg-sidebar/30">
+        <div className="grid min-w-0 gap-6 md:grid-cols-2">
+          <Card className="min-w-0 border-sidebar-border/50 bg-sidebar/30">
             <CardHeader className="pb-2 border-b border-border/10">
               <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
                 Status Financeiro
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="min-w-0 pt-6">
               <div
                 className={cn(
-                  "flex items-center gap-4 p-4 rounded-xl border",
+                  "flex min-w-0 items-center gap-4 p-4 rounded-xl border",
                   !hasCharges
                     ? "bg-background/40 border-border/50"
                     : isUpToDate
@@ -168,6 +168,7 @@ function MyPayments() {
                 <div
                   className={cn(
                     "size-12 rounded-full flex items-center justify-center",
+                    "shrink-0",
                     !hasCharges
                       ? "bg-muted text-muted-foreground"
                       : isUpToDate
@@ -183,7 +184,7 @@ function MyPayments() {
                     <AlertTriangle size={24} />
                   )}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-lg font-bold">
                     {!hasCharges
                       ? "Sem cobranças"
@@ -203,15 +204,15 @@ function MyPayments() {
             </CardContent>
           </Card>
 
-          <Card className="border-sidebar-border/50 bg-sidebar/30">
+          <Card className="min-w-0 border-sidebar-border/50 bg-sidebar/30">
             <CardHeader className="pb-2 border-b border-border/10">
               <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
                 Próximo Vencimento
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background/40">
-                <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+            <CardContent className="min-w-0 pt-6">
+              <div className="flex min-w-0 items-center gap-4 p-4 rounded-xl border border-border/50 bg-background/40">
+                <div className="size-12 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                   <Calendar size={24} />
                 </div>
                 <div className="min-w-0">
