@@ -33,9 +33,15 @@ export function LegacyMetricCard({
         </span>
       </div>
 
-      <p className="relative mt-3 truncate font-display text-2xl font-semibold tracking-tight md:text-3xl">
+      <p
+        className={cn(
+          "relative mt-3 font-display font-semibold tracking-tight",
+          value.length > 11 ? "text-xl md:text-2xl" : "text-2xl md:text-3xl",
+        )}
+      >
         {value}
       </p>
+
 
       {(hint || trend) && (
         <div className="relative mt-3 flex items-center gap-2">
