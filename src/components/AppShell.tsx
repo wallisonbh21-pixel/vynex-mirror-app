@@ -189,7 +189,7 @@ export function AppShell({
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_url);
-  const { isAdmin, isCriador, isCliente, primaryRole } = useRoles();
+  const { isAdmin, isCriador, isCliente, isVendedor, primaryRole } = useRoles();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -256,7 +256,7 @@ export function AppShell({
         ? "admin"
         : isCriador
           ? "criador"
-          : isCliente && !roles.includes("vendedor")
+          : isCliente && !isVendedor
             ? "cliente"
             : primaryRole
   ) as typeof primaryRole;
