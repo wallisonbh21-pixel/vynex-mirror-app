@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.is_meeting_participant(uuid, uuid) FROM anon;
