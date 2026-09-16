@@ -249,7 +249,10 @@ export const NEXUS_TOOLS: NexusTool[] = [
     run: async (args, rt) => {
       let q = rt.supabase
         .from("project_documents")
-        .select("id,name,category,project_id,size_bytes,created_at")
+        .select(
+          "id,name,original_name,category,project_id,size_bytes,mime_type,extension,status,extraction_status,created_at",
+        )
+        .eq("status", "pronto")
         .order("created_at", { ascending: false })
         .limit(25);
       if (args?.project_id) q = q.eq("project_id", String(args.project_id));
