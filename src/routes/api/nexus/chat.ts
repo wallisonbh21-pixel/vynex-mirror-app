@@ -12,6 +12,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { buildSystemPrompt } from "@/lib/nexus/prompt";
+import { classifyEffort } from "@/lib/nexus/core";
+import { loadActiveContext, resolveActiveProjectId } from "@/lib/nexus/core/context.server";
+
 import { callModel, resolveModel, type NexusChatMessage } from "@/lib/nexus/provider.server";
 import { NEXUS_TOOLS, NEXUS_UNAVAILABLE_TOOLS, findTool, toolSchemas } from "@/lib/nexus/tools.server";
 
