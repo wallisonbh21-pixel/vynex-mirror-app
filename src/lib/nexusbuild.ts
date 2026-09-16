@@ -33,10 +33,12 @@ export interface NexusMessage {
 const CONVERSATIONS_KEY = ["nexusbuild", "conversations"];
 const messagesKey = (id: string) => ["nexusbuild", "messages", id];
 
-/** Permissão de uso da NEXUSBUILD AI (espelha a regra aplicada no banco). */
+/** Permissão de uso da NEXUSBUILD AI (espelha exatamente a regra aplicada no banco). */
 export function useNexusAccess() {
-  const { isAdmin, isCriador } = useRoles();
-  return { canUse: Boolean(isAdmin || isCriador), isAdmin, isCriador };
+  const { roles } = useRoles();
+  const isAdmin = roles.includes("admin");
+  const isCriador = roles.includes("criador");
+  return { canUse: isAdmin || isCriador, isAdmin, isCriador };
 }
 
 export function useNexusConversations() {
