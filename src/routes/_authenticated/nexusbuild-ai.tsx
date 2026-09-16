@@ -68,6 +68,7 @@ function NexusBuildPage() {
 
   async function handleSend(text: string) {
     setError(null);
+    setView("chat");
     let conversationId = activeId;
     const isFirst = !conversationId || (messages.data?.length ?? 0) === 0;
     if (!conversationId) {
