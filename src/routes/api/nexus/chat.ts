@@ -120,8 +120,11 @@ export const Route = createFileRoute("/api/nexus/chat")({
         const messages: NexusChatMessage[] = [
           { role: "system", content: system },
           ...((history ?? []) as any[])
+            .slice()
+            .reverse()
             .filter((m) => m.role === "user" || m.role === "assistant")
             .map((m) => ({ role: m.role as "user" | "assistant", content: m.content as string })),
+
           {
             role: "user",
             content: body.web_research_requested
