@@ -38,10 +38,14 @@ export function VisualCentral({
   projects,
   initialProjectId,
   emptyHint,
+  canGenerate = true,
+  canDelete = true,
 }: {
   projects: ProjectOption[];
   initialProjectId?: string | undefined;
   emptyHint?: string;
+  canGenerate?: boolean;
+  canDelete?: boolean;
 }) {
   const queryClient = useQueryClient();
   const fetchAssets = useServerFn(listVisualAssets);
