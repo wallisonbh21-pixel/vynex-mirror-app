@@ -58,6 +58,7 @@ function NexusBuildPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [view, setView] = useState<"chat" | "templates">("chat");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [referenceOpen, setReferenceOpen] = useState(false);
 
   const conversations = useNexusConversations();
   const messages = useNexusMessages(activeId);
