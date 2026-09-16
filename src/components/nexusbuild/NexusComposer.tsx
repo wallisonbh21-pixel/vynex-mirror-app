@@ -86,9 +86,15 @@ export function NexusComposer({
         <div className="mx-auto mt-2 flex w-full max-w-3xl items-center gap-2 px-2 text-xs text-primary">
           <Globe2 className="size-3.5" />
           Pesquisa na web ativada
-          <button type="button" className="ml-auto text-muted-foreground hover:text-foreground" onClick={() => setWebResearch(false)}>
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="ml-auto h-auto p-0 text-xs text-muted-foreground"
+            onClick={() => setWebResearch(false)}
+          >
             Remover
-          </button>
+          </Button>
         </div>
       )}
       <p className="mx-auto mt-2 w-full max-w-3xl text-center text-[11px] text-muted-foreground">
