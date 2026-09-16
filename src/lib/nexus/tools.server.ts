@@ -23,6 +23,7 @@ import {
 import { executeBuildOperations, loadStudioState } from "./builder.server";
 import { VISUAL_LIMITS } from "@/lib/visual/constants";
 import { generateProjectVisual } from "@/lib/visual/generate.server";
+import { setActiveProject } from "./core/context.server";
 
 export type NexusToolCategory = "READ" | "WRITE" | "DESTRUCTIVE";
 
@@ -68,6 +69,8 @@ async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
   ]);
   if (error) throw new Error(error.message);
   if (!project) throw new Error("Projeto não encontrado ou sem permissão de acesso.");
+  // Contexto ativo (ATA #021): a conversa passa a apontar para o projeto realmente usado.
+  await setActiveProject(rt.supabase, rt.conversationId, projectId).catch(() => undefined);
   return {
     project,
     briefing: (briefing.data?.data ?? null) as any,
@@ -75,6 +78,7 @@ async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
     studio: (studio.data as any) ?? null,
   };
 }
+
 
 export const NEXUS_TOOLS: NexusTool[] = [
   {
@@ -448,6 +452,9 @@ export const NEXUS_TOOLS: NexusTool[] = [
         .select("id,title,status,site_type")
         .single();
       if (error) throw new Error(`Não foi possível criar o projeto: ${error.message}`);
+
+      // Projeto recém-criado vira o projeto ativo da conversa (ATA #021).
+      await setActiveProject(rt.supabase, rt.conversationId, (project as any).id).catch(() => undefined);
 
       let briefingSaved = false;
       let briefingError: string | null = null;
