@@ -172,11 +172,28 @@ function NexusBuildPage() {
               {(messages.data ?? []).map((message) => (
                 <NexusMessageBubble key={message.id} message={message} />
               ))}
-              {sendMessage.isPending && (
+              {chat.streaming && (
+                <NexusMessageBubble
+                  message={{
+                    id: "streaming",
+                    conversation_id: activeId,
+                    user_id: "",
+                    role: "assistant",
+                    content: chat.streaming,
+                    metadata: {},
+                    created_at: new Date().toISOString(),
+                  }}
+                />
+              )}
+              {chat.pending && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="size-3 animate-spin" /> NEXUSBUILD AI está escrevendo...
+                  <Loader2 className="size-3 animate-spin" />
+                  {chat.toolActivity
+                    ? `Usando a ferramenta ${chat.toolActivity}...`
+                    : "NEXUSBUILD AI está pensando..."}
                 </div>
               )}
+              {error && <p className="text-xs text-destructive">{error}</p>}
               <div ref={bottomRef} />
             </div>
           )}
@@ -184,7 +201,7 @@ function NexusBuildPage() {
 
         <NexusComposer
           onSend={handleSend}
-          pending={sendMessage.isPending || createConversation.isPending}
+          pending={chat.pending || createConversation.isPending}
           disabled={!canUse}
         />
       </div>
