@@ -14,6 +14,13 @@ import { buildProjectContext, buildStudioSnapshot, generateIntelligence } from "
 import { createBuildPlan } from "@/lib/forge";
 import type { NexusToolSchema } from "./provider.server";
 import { inspectWebsite, searchWeb } from "./web-research.server";
+import {
+  availableSectionTemplates,
+  describeOperation,
+  validateBuildPlan,
+  MAX_OPERATIONS_PER_CALL,
+} from "./build-plan";
+import { executeBuildOperations, loadStudioState } from "./builder.server";
 
 export type NexusToolCategory = "READ" | "WRITE" | "DESTRUCTIVE";
 
@@ -34,11 +41,16 @@ export interface NexusTool {
 
 /** Capacidades previstas na arquitetura, ainda não implementadas. */
 export const NEXUS_UNAVAILABLE_TOOLS = [
-  { name: "project_creation", reason: "criação de projetos pela IA ainda não foi liberada" },
-  { name: "website_builder", reason: "construção automática de sites ainda não foi liberada" },
   { name: "app_builder", reason: "construção de aplicativos ainda não foi liberada" },
   { name: "document_generator", reason: "geração de arquivos pela IA ainda não foi liberada" },
   { name: "deployment_assistant", reason: "assistente de publicação ainda não foi liberado" },
+  {
+    name: "website_builder (páginas múltiplas, navegação, formulários, gráficos, animações e integrações)",
+    reason:
+      "o construtor atual monta apenas a página única do Studio, por seções da biblioteca; páginas extras, navegação, formulários, gráficos, animações e integrações ainda não são executáveis",
+  },
+  { name: "template_engine", reason: "ainda não há template real cadastrado para gerar projeto automaticamente" },
+  { name: "image_generation", reason: "geração de imagens pela IA ainda não foi liberada" },
 ];
 
 async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
@@ -365,6 +377,217 @@ export const NEXUS_TOOLS: NexusTool[] = [
       if (error) throw new Error(error.message);
       return { saved: true };
     },
+  },
+  {
+    name: "create_project",
+    category: "WRITE",
+    description:
+      "Cria um projeto real no ScaleNexus, com o usuário atual como dono e criador, e grava o briefing levantado na conversa. Só execute depois de apresentar ao usuário o que será criado e receber confirmação explícita (confirmed=true).",
+    parameters: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Nome do projeto" },
+        description: { type: "string", description: "Resumo do objetivo do projeto" },
+        site_type: { type: "string", description: "Tipo: landing, institucional, loja, portfolio, blog, sistema" },
+        briefing: {
+          type: "object",
+          description:
+            "Requisitos levantados na conversa. Campos úteis: businessName, niche, description, objectives[], audience, differentiators[], visualStyle[], references.",
+        },
+        confirmed: { type: "boolean", description: "true somente depois de o usuário confirmar a criação" },
+      },
+      required: ["title", "confirmed"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      const title = String(args.title ?? "").trim().slice(0, 140);
+      if (!title) throw new Error("Informe o nome do projeto.");
+      if (!rt.roles.includes("admin") && !rt.roles.includes("criador")) {
+        throw new Error("Seu perfil não tem permissão para criar projetos.");
+      }
+      if (args.confirmed !== true) {
+        return {
+          requires_confirmation: true,
+          preview: {
+            title,
+            description: args.description ?? null,
+            site_type: args.site_type ?? null,
+            briefing_incluido: Boolean(args.briefing),
+          },
+          message: "Apresente esse resumo ao usuário e chame novamente com confirmed=true após a confirmação.",
+        };
+      }
+
+      const startedAt = Date.now();
+      const { data: project, error } = await rt.supabase
+        .from("projects")
+        .insert({
+          owner_id: rt.userId,
+          creator_id: rt.userId,
+          title,
+          description: args.description ? String(args.description).slice(0, 2000) : null,
+          site_type: args.site_type ? String(args.site_type).slice(0, 60) : null,
+          status: "em_producao",
+        } as never)
+        .select("id,title,status,site_type")
+        .single();
+      if (error) throw new Error(`Não foi possível criar o projeto: ${error.message}`);
+
+      let briefingSaved = false;
+      let briefingError: string | null = null;
+      if (args.briefing && typeof args.briefing === "object") {
+        const { error: bErr } = await rt.supabase
+          .from("project_briefings")
+          .upsert({ project_id: (project as any).id, data: args.briefing } as never);
+        briefingSaved = !bErr;
+        briefingError = bErr?.message ?? null;
+      }
+
+      await rt.supabase.from("nexusbuild_build_operations").insert({
+        user_id: rt.userId,
+        conversation_id: rt.conversationId,
+        project_id: (project as any).id,
+        operation_type: "CREATE_PROJECT",
+        params: { title, site_type: args.site_type ?? null, briefing: briefingSaved },
+        status: "OK",
+        detail: "Projeto criado pela NEXUSBUILD AI.",
+        duration_ms: Date.now() - startedAt,
+      } as never);
+
+      return {
+        project_id: (project as any).id,
+        project: project,
+        briefing_saved: briefingSaved,
+        briefing_error: briefingError,
+        next_step:
+          "Use project_forge para gerar o plano de construção, apresente o plano ao usuário e só depois chame website_builder.",
+      };
+    },
+  },
+  {
+    name: "project_briefing_save",
+    category: "WRITE",
+    description:
+      "Grava ou atualiza o briefing de um projeto existente com os requisitos levantados na conversa. Explique ao usuário o que será registrado antes de executar.",
+    parameters: {
+      type: "object",
+      properties: {
+        project_id: { type: "string" },
+        briefing: { type: "object", description: "Objeto com os requisitos levantados" },
+      },
+      required: ["project_id", "briefing"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      if (!args.briefing || typeof args.briefing !== "object") throw new Error("Briefing inválido.");
+      await loadProjectBundle(String(args.project_id), rt);
+      const { error } = await rt.supabase
+        .from("project_briefings")
+        .upsert({ project_id: String(args.project_id), data: args.briefing } as never);
+      if (error) throw new Error(error.message);
+      return { saved: true, project_id: args.project_id };
+    },
+  },
+  {
+    name: "website_builder",
+    category: "WRITE",
+    description:
+      "Executa a construção real do site do projeto no Studio do ScaleNexus, aplicando operações estruturadas. Operações suportadas hoje: ADD_SECTION, UPDATE_SECTION, REORDER_SECTIONS, UPDATE_DESIGN_SYSTEM e REMOVE_SECTION (destrutiva). Chame primeiro com confirmed=false para validar e mostrar o plano; execute apenas com confirmed=true após confirmação do usuário. Use list_section_templates para conhecer as seções disponíveis.",
+    parameters: {
+      type: "object",
+      properties: {
+        project_id: { type: "string" },
+        operations: {
+          type: "array",
+          description: `Lista de operações estruturadas (máximo ${MAX_OPERATIONS_PER_CALL}).`,
+          items: {
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                enum: ["ADD_SECTION", "UPDATE_SECTION", "REORDER_SECTIONS", "UPDATE_DESIGN_SYSTEM", "REMOVE_SECTION"],
+              },
+              params: {
+                type: "object",
+                description:
+                  "ADD_SECTION: { template, position?, texts?: {title,subtitle,paragraph,button}, styles? } | UPDATE_SECTION: { section_id, texts?, styles? } | REORDER_SECTIONS: { section_ids[] } | UPDATE_DESIGN_SYSTEM: { colors?, typography?, buttons?, cards? } | REMOVE_SECTION: { section_id }",
+              },
+            },
+            required: ["type", "params"],
+          },
+        },
+        confirmed: { type: "boolean" },
+      },
+      required: ["project_id", "operations"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      const projectId = String(args.project_id ?? "");
+      const bundle = await loadProjectBundle(projectId, rt);
+      const state = await loadStudioState(rt.supabase, projectId);
+      const validation = validateBuildPlan(args.operations, state.sections.length);
+
+      if (!validation.valid) {
+        return {
+          executed: false,
+          valid: false,
+          issues: validation.issues,
+          message:
+            "O plano de construção não passou na validação do servidor. Nenhuma alteração foi feita. Corrija as operações ou informe ao usuário o que não é suportado.",
+        };
+      }
+
+      if (args.confirmed !== true) {
+        return {
+          executed: false,
+          valid: true,
+          requires_confirmation: true,
+          destructive: validation.destructive,
+          project: { id: projectId, title: (bundle.project as any).title },
+          operations: validation.operations.map(describeOperation),
+          message:
+            "Plano validado, mas nada foi executado. Apresente estas operações ao usuário e chame novamente com confirmed=true após a confirmação.",
+        };
+      }
+
+      const startedAt = Date.now();
+      let report: Awaited<ReturnType<typeof executeBuildOperations>> | null = null;
+      try {
+        report = await executeBuildOperations(rt.supabase, projectId, validation.operations);
+        return {
+          executed: true,
+          project_id: projectId,
+          ...report,
+          next_step:
+            report.failed > 0
+              ? "Informe ao usuário exatamente quais operações falharam e por quê. Não afirme que tudo foi concluído."
+              : "Use project_analysis para revisar o resultado e propor melhorias.",
+        };
+      } finally {
+        const rows = (report?.entries ?? [{ type: "BUILD", status: "FALHOU" as const, detail: "Execução interrompida." }]).map(
+          (entry) => ({
+            user_id: rt.userId,
+            conversation_id: rt.conversationId,
+            project_id: projectId,
+            operation_type: entry.type,
+            params: {},
+            status: entry.status === "APLICADA" ? "OK" : "ERRO",
+            detail: entry.detail.slice(0, 500),
+            duration_ms: Date.now() - startedAt,
+          }),
+        );
+        const { error: logError } = await rt.supabase.from("nexusbuild_build_operations").insert(rows as never);
+        if (logError) console.error("[NEXUSBUILD BUILD] Falha ao registrar operações:", logError.message);
+      }
+    },
+  },
+  {
+    name: "list_section_templates",
+    category: "READ",
+    description:
+      "Lista as seções realmente disponíveis na biblioteca do Studio para uso em ADD_SECTION. Use antes de montar um plano de construção.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+    run: async () => ({ templates: availableSectionTemplates() }),
   },
 ];
 

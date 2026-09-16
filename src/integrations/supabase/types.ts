@@ -686,6 +686,45 @@ export type Database = {
           },
         ]
       }
+      nexusbuild_build_operations: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          detail: string | null
+          duration_ms: number | null
+          id: string
+          operation_type: string
+          params: Json
+          project_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          detail?: string | null
+          duration_ms?: number | null
+          id?: string
+          operation_type: string
+          params?: Json
+          project_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          detail?: string | null
+          duration_ms?: number | null
+          id?: string
+          operation_type?: string
+          params?: Json
+          project_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       nexusbuild_conversations: {
         Row: {
           archived: boolean

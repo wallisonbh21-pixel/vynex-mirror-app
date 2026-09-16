@@ -104,6 +104,8 @@ export const Route = createFileRoute("/api/nexus/chat")({
           memories: (memories ?? []) as any,
           availableTools: NEXUS_TOOLS.map((t) => `${t.name} [${t.category}] — ${t.description}`),
           unavailableTools: NEXUS_UNAVAILABLE_TOOLS,
+          conversationObjective: ((conversation as any)?.context?.objective ?? null) as string | null,
+          conversationTemplate: ((conversation as any)?.context?.template ?? null) as string | null,
         });
 
         const messages: NexusChatMessage[] = [
