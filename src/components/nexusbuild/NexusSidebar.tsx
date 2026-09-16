@@ -51,12 +51,14 @@ export function NexusSidebar({
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
       <div className="flex items-center gap-2 px-1">
-        <div className="flex size-9 items-center justify-center rounded-xl border border-primary/30 bg-primary/10">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-primary/10">
           <Sparkles className="size-4 text-primary" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold tracking-wide">NEXUSBUILD AI</p>
-          <p className="truncate text-[11px] text-muted-foreground">Assistente do ScaleNexus</p>
+          <p className="truncate text-[11px] text-muted-foreground">
+            Assistente inteligente oficial do ScaleNexus
+          </p>
         </div>
       </div>
 
@@ -65,7 +67,39 @@ export function NexusSidebar({
         Nova conversa
       </Button>
 
+      <div className="space-y-1">
+        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Criar
+        </p>
+        {[
+          { icon: Globe, label: "Criar Site", onClick: onCreateSite, active: false },
+          { icon: Smartphone, label: "Criar Aplicativo", onClick: onCreateApp, active: false },
+          { icon: LayoutGrid, label: "Templates", onClick: onOpenTemplates, active: templatesActive },
+        ].map((action) => (
+          <button
+            key={action.label}
+            type="button"
+            disabled={actionsDisabled}
+            onClick={action.onClick}
+            className={cn(
+              "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs transition-colors disabled:opacity-50",
+              action.active
+                ? "bg-primary/10 text-foreground"
+                : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+            )}
+          >
+            <action.icon
+              className={cn("size-3.5 shrink-0", action.active ? "text-primary" : "text-muted-foreground")}
+            />
+            <span className="truncate">{action.label}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+        <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Conversas
+        </p>
         {groups.length === 0 && (
           <p className="px-2 py-4 text-xs text-muted-foreground">Nenhuma conversa ainda.</p>
         )}
