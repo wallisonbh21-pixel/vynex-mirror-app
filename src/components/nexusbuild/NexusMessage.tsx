@@ -71,6 +71,22 @@ export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
               </div>
             </div>
           )}
+          {!isUser && visuals.length > 0 && (
+            <div className="mt-4 grid gap-3 border-t border-border pt-3 sm:grid-cols-2">
+              {visuals.map((asset) => (
+                <VisualAssetCard
+                  key={asset.id}
+                  asset={asset}
+                  {...(onVisualRequest
+                    ? {
+                        onVariation: (item: VisualAsset) => onVisualRequest(item, "variacao"),
+                        onNew: (item: VisualAsset) => onVisualRequest(item, "nova"),
+                      }
+                    : {})}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {!isUser && (
