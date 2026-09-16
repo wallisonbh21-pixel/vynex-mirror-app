@@ -249,7 +249,10 @@ export const NEXUS_TOOLS: NexusTool[] = [
     run: async (args, rt) => {
       let q = rt.supabase
         .from("project_documents")
-        .select("id,name,category,project_id,size_bytes,created_at")
+        .select(
+          "id,name,original_name,category,project_id,size_bytes,mime_type,extension,status,extraction_status,created_at",
+        )
+        .eq("status", "pronto")
         .order("created_at", { ascending: false })
         .limit(25);
       if (args?.project_id) q = q.eq("project_id", String(args.project_id));
@@ -273,11 +276,18 @@ export const NEXUS_TOOLS: NexusTool[] = [
     run: async (args, rt) => {
       const { data: doc, error } = await rt.supabase
         .from("project_documents")
-        .select("id,name,category,file_path,size_bytes,project_id")
+        .select("id,name,original_name,category,file_path,size_bytes,project_id,extension,mime_type,status")
         .eq("id", String(args.document_id))
         .maybeSingle();
       if (error) throw new Error(error.message);
       if (!doc) throw new Error("Documento não encontrado ou sem permissão de acesso.");
+      if ((doc as { status?: string }).status !== "pronto") {
+        return {
+          document: doc,
+          content: null,
+          note: "Documento ainda não está pronto (envio ou processamento pendente). Informe isso ao usuário.",
+        };
+      }
 
       const textLike = /\.(txt|md|markdown|csv|json|yml|yaml)$/i.test(doc.name);
       if (!textLike) {

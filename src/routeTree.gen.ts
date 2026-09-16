@@ -21,6 +21,7 @@ import { Route as AuthenticatedComissoesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
 import { Route as AuthenticatedCriacaoRouteImport } from './routes/_authenticated/criacao'
 import { Route as AuthenticatedDisponiveisRouteImport } from './routes/_authenticated/disponiveis'
+import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFollowupsRouteImport } from './routes/_authenticated/followups'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
@@ -132,6 +133,11 @@ const AuthenticatedDisponiveisRoute =
     path: '/disponiveis',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   id: '/financeiro',
   path: '/financeiro',
@@ -420,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/contratos': typeof AuthenticatedContratosRoute
   '/criacao': typeof AuthenticatedCriacaoRoute
   '/disponiveis': typeof AuthenticatedDisponiveisRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
@@ -481,6 +488,7 @@ export interface FileRoutesByTo {
   '/contratos': typeof AuthenticatedContratosRoute
   '/criacao': typeof AuthenticatedCriacaoRoute
   '/disponiveis': typeof AuthenticatedDisponiveisRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/followups': typeof AuthenticatedFollowupsRoute
   '/historico': typeof AuthenticatedHistoricoRoute
@@ -545,6 +553,7 @@ export interface FileRoutesById {
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/criacao': typeof AuthenticatedCriacaoRoute
   '/_authenticated/disponiveis': typeof AuthenticatedDisponiveisRoute
+  '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/followups': typeof AuthenticatedFollowupsRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
@@ -609,6 +618,7 @@ export interface FileRouteTypes {
     | '/contratos'
     | '/criacao'
     | '/disponiveis'
+    | '/documentos'
     | '/financeiro'
     | '/followups'
     | '/historico'
@@ -670,6 +680,7 @@ export interface FileRouteTypes {
     | '/contratos'
     | '/criacao'
     | '/disponiveis'
+    | '/documentos'
     | '/financeiro'
     | '/followups'
     | '/historico'
@@ -733,6 +744,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contratos'
     | '/_authenticated/criacao'
     | '/_authenticated/disponiveis'
+    | '/_authenticated/documentos'
     | '/_authenticated/financeiro'
     | '/_authenticated/followups'
     | '/_authenticated/historico'
@@ -883,6 +895,13 @@ declare module '@tanstack/react-router' {
       path: '/disponiveis'
       fullPath: '/disponiveis'
       preLoaderRoute: typeof AuthenticatedDisponiveisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documentos': {
+      id: '/_authenticated/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financeiro': {
@@ -1310,6 +1329,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedCriacaoRoute: typeof AuthenticatedCriacaoRoute
   AuthenticatedDisponiveisRoute: typeof AuthenticatedDisponiveisRoute
+  AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFollowupsRoute: typeof AuthenticatedFollowupsRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
@@ -1344,6 +1364,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedCriacaoRoute: AuthenticatedCriacaoRoute,
   AuthenticatedDisponiveisRoute: AuthenticatedDisponiveisRoute,
+  AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFollowupsRoute: AuthenticatedFollowupsRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,

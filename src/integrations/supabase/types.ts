@@ -1173,36 +1173,162 @@ export type Database = {
           },
         ]
       }
+      project_document_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          id: string
+          project_id: string
+          token_count: number | null
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          id?: string
+          project_id: string
+          token_count?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          project_id?: string
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_document_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "project_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_document_chunks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_document_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          detail: Json
+          document_id: string | null
+          event: string
+          id: string
+          project_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          document_id?: string | null
+          event: string
+          id?: string
+          project_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          document_id?: string | null
+          event?: string
+          id?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_document_events_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "project_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_document_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_documents: {
         Row: {
           category: string
+          checksum: string | null
           created_at: string
+          error_message: string | null
+          extension: string | null
+          extracted_text: string | null
+          extraction_status: string
           file_path: string
           id: string
+          mime_type: string | null
           name: string
+          original_name: string | null
+          processed_at: string | null
           project_id: string
+          safe_name: string | null
           size_bytes: number | null
+          status: string
+          updated_at: string
           uploaded_by: string
+          version: number
         }
         Insert: {
           category?: string
+          checksum?: string | null
           created_at?: string
+          error_message?: string | null
+          extension?: string | null
+          extracted_text?: string | null
+          extraction_status?: string
           file_path: string
           id?: string
+          mime_type?: string | null
           name: string
+          original_name?: string | null
+          processed_at?: string | null
           project_id: string
+          safe_name?: string | null
           size_bytes?: number | null
+          status?: string
+          updated_at?: string
           uploaded_by: string
+          version?: number
         }
         Update: {
           category?: string
+          checksum?: string | null
           created_at?: string
+          error_message?: string | null
+          extension?: string | null
+          extracted_text?: string | null
+          extraction_status?: string
           file_path?: string
           id?: string
+          mime_type?: string | null
           name?: string
+          original_name?: string | null
+          processed_at?: string | null
           project_id?: string
+          safe_name?: string | null
           size_bytes?: number | null
+          status?: string
+          updated_at?: string
           uploaded_by?: string
+          version?: number
         }
         Relationships: [
           {
@@ -1968,7 +2094,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      project_document_usage: {
+        Row: {
+          file_count: number | null
+          project_id: string | null
+          total_bytes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
