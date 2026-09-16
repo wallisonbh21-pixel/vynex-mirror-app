@@ -2,13 +2,20 @@ import { useState } from "react";
 import { Check, Copy, ExternalLink, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NexusMessage as NexusMessageType } from "@/lib/nexusbuild";
+import { VisualAssetCard, type VisualAsset } from "@/components/visual/VisualAssetCard";
 
 /**
  * Bolha de mensagem da NEXUSBUILD AI.
  * O corpo é renderizado em blocos simples, preparado para receber Markdown,
  * tabelas e blocos de código em uma etapa futura.
  */
-export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
+export function NexusMessageBubble({
+  message,
+  onVisualRequest,
+}: {
+  message: NexusMessageType;
+  onVisualRequest?: (asset: VisualAsset, mode: "variacao" | "nova") => void;
+}) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
   const sources = Array.isArray(message.metadata?.["sources"])
