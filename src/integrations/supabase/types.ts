@@ -716,6 +716,53 @@ export type Database = {
         }
         Relationships: []
       }
+      nexusbuild_memories: {
+        Row: {
+          active: boolean
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          project_id: string | null
+          relevance: number
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          content: string
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id?: string | null
+          relevance?: number
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id?: string | null
+          relevance?: number
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nexusbuild_memories_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nexusbuild_messages: {
         Row: {
           content: string
@@ -747,6 +794,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "nexusbuild_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "nexusbuild_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nexusbuild_tool_runs: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          duration_ms: number | null
+          id: string
+          status: string
+          summary: string | null
+          tool_name: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          status?: string
+          summary?: string | null
+          tool_name: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          status?: string
+          summary?: string | null
+          tool_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nexusbuild_tool_runs_conversation_id_fkey"
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "nexusbuild_conversations"
