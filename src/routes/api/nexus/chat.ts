@@ -74,21 +74,27 @@ export const Route = createFileRoute("/api/nexus/chat")({
           .maybeSingle();
         if (!conversation) return new Response("Conversa não encontrada", { status: 404 });
 
-        const [{ data: profile }, { data: memories }, { data: history }] = await Promise.all([
+        const conversationContext = ((conversation as any)?.context ?? null) as Record<string, unknown> | null;
+        const activeProjectId = await resolveActiveProjectId(supabase, body.conversation_id, conversationContext);
+
+        const [{ data: profile }, { data: memories }, { data: history }, activeContext] = await Promise.all([
           supabase.from("profiles").select("full_name,nickname").eq("id", user.id).maybeSingle(),
           supabase
             .from("nexusbuild_memories")
-            .select("kind,content")
+            .select("kind,content,project_id")
             .eq("active", true)
+            .or(activeProjectId ? `project_id.is.null,project_id.eq.${activeProjectId}` : "project_id.not.is.null,project_id.is.null")
             .order("relevance", { ascending: false })
             .order("created_at", { ascending: false })
             .limit(12),
+          // Mais recentes primeiro; a ordem cronológica é restaurada abaixo.
           supabase
             .from("nexusbuild_messages")
-            .select("role,content")
+            .select("role,content,created_at")
             .eq("conversation_id", body.conversation_id)
-            .order("created_at", { ascending: true })
+            .order("created_at", { ascending: false })
             .limit(HISTORY_LIMIT),
+          loadActiveContext(supabase, body.conversation_id, activeProjectId),
         ]);
 
         await supabase.from("nexusbuild_messages").insert({
@@ -104,9 +110,12 @@ export const Route = createFileRoute("/api/nexus/chat")({
           memories: (memories ?? []) as any,
           availableTools: NEXUS_TOOLS.map((t) => `${t.name} [${t.category}] — ${t.description}`),
           unavailableTools: NEXUS_UNAVAILABLE_TOOLS,
-          conversationObjective: ((conversation as any)?.context?.objective ?? null) as string | null,
-          conversationTemplate: ((conversation as any)?.context?.template ?? null) as string | null,
+          conversationObjective: (conversationContext?.["objective"] ?? null) as string | null,
+          conversationTemplate: (conversationContext?.["template"] ?? null) as string | null,
+          activeContext,
+          effort: classifyEffort(body.message),
         });
+
 
         const messages: NexusChatMessage[] = [
           { role: "system", content: system },
