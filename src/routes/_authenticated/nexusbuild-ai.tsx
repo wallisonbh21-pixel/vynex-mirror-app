@@ -91,18 +91,45 @@ function NexusBuildPage() {
     if (id === activeId) setActiveId(null);
   }
 
+  /** Abre uma conversa nova já com o objetivo declarado (site, app ou template). */
+  async function startFlow(title: string, objective: NexusObjective, prompt: string, template?: string) {
+    setError(null);
+    setMobileOpen(false);
+    setView("chat");
+    try {
+      const created = await createConversation.mutateAsync({
+        title,
+        context: { objective, ...(template ? { template } : {}) },
+      });
+      setActiveId(created.id);
+      await chat.send(prompt, created.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao iniciar o fluxo.");
+    }
+  }
+
   const sidebar = (
     <NexusSidebar
       conversations={list}
       activeId={activeId}
       onSelect={(id) => {
         setActiveId(id);
+        setView("chat");
         setMobileOpen(false);
       }}
       onNew={() => {
         setActiveId(null);
+        setView("chat");
         setMobileOpen(false);
       }}
+      onCreateSite={() => startFlow("Criar Site", "CRIAR_SITE", siteFlowPrompt())}
+      onCreateApp={() => startFlow("Criar Aplicativo", "CRIAR_APLICATIVO", appFlowPrompt())}
+      onOpenTemplates={() => {
+        setView("templates");
+        setMobileOpen(false);
+      }}
+      templatesActive={view === "templates"}
+      actionsDisabled={!canUse || chat.pending || createConversation.isPending}
       onRename={(id, title) => renameConversation.mutate({ id, title })}
       onDelete={handleDelete}
       backTo={isAdmin ? "/admin" : "/criacao"}
