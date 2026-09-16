@@ -92,6 +92,13 @@ export const NEXUS_BUILD_FLOW = `CRIAÇÃO DE PROJETOS E SITES (fluxo obrigatór
 export function buildSystemPrompt(ctx: NexusPromptContext): string {
   const parts = [NEXUS_IDENTITY, NEXUS_RULES, NEXUS_BUILD_FLOW];
 
+  const objective = ctx.conversationObjective ? OBJECTIVE_LABELS[ctx.conversationObjective] : null;
+  if (objective) {
+    parts.push(
+      `OBJETIVO DESTA CONVERSA\n${objective}${ctx.conversationTemplate ? `\nModelo escolhido: ${ctx.conversationTemplate}.` : ""}`,
+    );
+  }
+
   parts.push(
     `CONTEXTO DO USUÁRIO
 Nome: ${ctx.userName?.trim() || "não informado"} (use o nome naturalmente, sem repetir em excesso; nunca invente nomes)
