@@ -7,6 +7,7 @@ import { NexusSidebar } from "@/components/nexusbuild/NexusSidebar";
 import { NexusComposer } from "@/components/nexusbuild/NexusComposer";
 import { NexusMessageBubble } from "@/components/nexusbuild/NexusMessage";
 import { NexusTemplates } from "@/components/nexusbuild/NexusTemplates";
+import { VisualReferenceDialog } from "@/components/visual/VisualReferenceDialog";
 import {
   appFlowPrompt,
   siteFlowPrompt,
@@ -261,6 +262,18 @@ function NexusBuildPage() {
           onSend={handleSend}
           pending={chat.pending || createConversation.isPending}
           disabled={!canUse}
+          onAttachReference={() => setReferenceOpen(true)}
+        />
+
+        <VisualReferenceDialog
+          open={referenceOpen}
+          onOpenChange={setReferenceOpen}
+          conversationId={activeId}
+          onRegistered={(info) =>
+            void handleSend(
+              `Enviei uma imagem de referência para o projeto ${info.projectId} (reference_asset_id: ${info.assetId}, arquivo "${info.fileName}"). Considere-a apenas como inspiração de estilo.`,
+            )
+          }
         />
       </div>
     </div>
