@@ -15,7 +15,7 @@ import {
   useNexusConversations,
   useNexusMessages,
   useRenameConversation,
-  useSendMessage,
+  useNexusChat,
 } from "@/lib/nexusbuild";
 
 export const Route = createFileRoute("/_authenticated/nexusbuild-ai")({
@@ -55,28 +55,32 @@ function NexusBuildPage() {
   const createConversation = useCreateConversation();
   const renameConversation = useRenameConversation();
   const deleteConversation = useDeleteConversation();
-  const sendMessage = useSendMessage(activeId);
+  const chat = useNexusChat(activeId);
+  const [error, setError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
-  }, [messages.data?.length, sendMessage.isPending]);
+  }, [messages.data?.length, chat.pending, chat.streaming]);
 
   const list = conversations.data ?? [];
 
   async function handleSend(text: string) {
+    setError(null);
     let conversationId = activeId;
+    const isFirst = !conversationId || (messages.data?.length ?? 0) === 0;
     if (!conversationId) {
       const created = await createConversation.mutateAsync(deriveTitle(text));
       conversationId = created.id;
       setActiveId(created.id);
     }
-    await sendMessage.mutateAsync(text, {
-      onError: () => undefined,
-    });
-    const isFirst = (messages.data?.length ?? 0) === 0;
-    if (isFirst && conversationId) {
-      renameConversation.mutate({ id: conversationId, title: deriveTitle(text) });
+    try {
+      await chat.send(text, conversationId);
+      if (isFirst) {
+        renameConversation.mutate({ id: conversationId, title: deriveTitle(text) });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao falar com a NEXUSBUILD AI.");
     }
   }
 
@@ -168,11 +172,28 @@ function NexusBuildPage() {
               {(messages.data ?? []).map((message) => (
                 <NexusMessageBubble key={message.id} message={message} />
               ))}
-              {sendMessage.isPending && (
+              {chat.streaming && (
+                <NexusMessageBubble
+                  message={{
+                    id: "streaming",
+                    conversation_id: activeId,
+                    user_id: "",
+                    role: "assistant",
+                    content: chat.streaming,
+                    metadata: {},
+                    created_at: new Date().toISOString(),
+                  }}
+                />
+              )}
+              {chat.pending && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="size-3 animate-spin" /> NEXUSBUILD AI está escrevendo...
+                  <Loader2 className="size-3 animate-spin" />
+                  {chat.toolActivity
+                    ? `Usando a ferramenta ${chat.toolActivity}...`
+                    : "NEXUSBUILD AI está pensando..."}
                 </div>
               )}
+              {error && <p className="text-xs text-destructive">{error}</p>}
               <div ref={bottomRef} />
             </div>
           )}
@@ -180,7 +201,7 @@ function NexusBuildPage() {
 
         <NexusComposer
           onSend={handleSend}
-          pending={sendMessage.isPending || createConversation.isPending}
+          pending={chat.pending || createConversation.isPending}
           disabled={!canUse}
         />
       </div>

@@ -67,6 +67,7 @@ import { Route as AuthenticatedSitePlannerProjectIdRouteImport } from './routes/
 import { Route as AuthenticatedStudioProjectIdRouteImport } from './routes/_authenticated/studio.$projectId'
 import { Route as AuthenticatedVendedorClientesRouteImport } from './routes/_authenticated/vendedor.clientes'
 import { Route as AuthenticatedVendedorClientesLoginRouteImport } from './routes/_authenticated/vendedor/clientes-login'
+import { Route as ApiNexusChatRouteImport } from './routes/api/nexus/chat'
 import { Route as ApiProspectingSearchRouteImport } from './routes/api/prospecting/search'
 import { Route as ComeceSeuProjetoRefTokenRouteImport } from './routes/comece-seu-projeto/ref.$token'
 
@@ -390,6 +391,11 @@ const AuthenticatedVendedorClientesLoginRoute =
     path: '/vendedor/clientes-login',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiNexusChatRoute = ApiNexusChatRouteImport.update({
+  id: '/api/nexus/chat',
+  path: '/api/nexus/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProspectingSearchRoute = ApiProspectingSearchRouteImport.update({
   id: '/api/prospecting/search',
   path: '/api/prospecting/search',
@@ -457,6 +463,7 @@ export interface FileRoutesByFullPath {
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
   '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
+  '/api/nexus/chat': typeof ApiNexusChatRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
   '/cliente/': typeof AuthenticatedClienteIndexRoute
@@ -517,6 +524,7 @@ export interface FileRoutesByTo {
   '/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
   '/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
+  '/api/nexus/chat': typeof ApiNexusChatRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
   '/cliente': typeof AuthenticatedClienteIndexRoute
@@ -580,6 +588,7 @@ export interface FileRoutesById {
   '/_authenticated/studio/$projectId': typeof AuthenticatedStudioProjectIdRoute
   '/_authenticated/vendedor/clientes': typeof AuthenticatedVendedorClientesRoute
   '/_authenticated/vendedor/clientes-login': typeof AuthenticatedVendedorClientesLoginRoute
+  '/api/nexus/chat': typeof ApiNexusChatRoute
   '/api/prospecting/search': typeof ApiProspectingSearchRoute
   '/comece-seu-projeto/ref/$token': typeof ComeceSeuProjetoRefTokenRoute
   '/_authenticated/cliente/': typeof AuthenticatedClienteIndexRoute
@@ -643,6 +652,7 @@ export interface FileRouteTypes {
     | '/studio/$projectId'
     | '/vendedor/clientes'
     | '/vendedor/clientes-login'
+    | '/api/nexus/chat'
     | '/api/prospecting/search'
     | '/comece-seu-projeto/ref/$token'
     | '/cliente/'
@@ -703,6 +713,7 @@ export interface FileRouteTypes {
     | '/studio/$projectId'
     | '/vendedor/clientes'
     | '/vendedor/clientes-login'
+    | '/api/nexus/chat'
     | '/api/prospecting/search'
     | '/comece-seu-projeto/ref/$token'
     | '/cliente'
@@ -765,6 +776,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio/$projectId'
     | '/_authenticated/vendedor/clientes'
     | '/_authenticated/vendedor/clientes-login'
+    | '/api/nexus/chat'
     | '/api/prospecting/search'
     | '/comece-seu-projeto/ref/$token'
     | '/_authenticated/cliente/'
@@ -782,6 +794,7 @@ export interface RootRouteChildren {
   ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
   ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
   ComeceSeuProjetoIndexRoute: typeof ComeceSeuProjetoIndexRoute
+  ApiNexusChatRoute: typeof ApiNexusChatRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
   ComeceSeuProjetoRefTokenRoute: typeof ComeceSeuProjetoRefTokenRoute
 }
@@ -1194,6 +1207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVendedorClientesLoginRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/nexus/chat': {
+      id: '/api/nexus/chat'
+      path: '/api/nexus/chat'
+      fullPath: '/api/nexus/chat'
+      preLoaderRoute: typeof ApiNexusChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/prospecting/search': {
       id: '/api/prospecting/search'
       path: '/api/prospecting/search'
@@ -1364,6 +1384,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
   ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
   ComeceSeuProjetoIndexRoute: ComeceSeuProjetoIndexRoute,
+  ApiNexusChatRoute: ApiNexusChatRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,
   ComeceSeuProjetoRefTokenRoute: ComeceSeuProjetoRefTokenRoute,
 }

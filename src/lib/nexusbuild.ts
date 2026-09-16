@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession, useRoles } from "@/lib/auth";
@@ -116,57 +117,83 @@ export function useDeleteConversation() {
 }
 
 /**
- * Motor de resposta local (placeholder). Nenhum modelo externo é chamado nesta versão.
- * Substituível por chamada ao provedor de IA + streaming sem alterar a interface.
+ * Conversa com o orquestrador da NEXUSBUILD AI (`/api/nexus/chat`).
+ * O servidor autentica, aplica permissões, executa ferramentas e persiste as
+ * mensagens; aqui apenas transmitimos o texto em tempo real para a tela.
  */
-export function replyEngine(prompt: string): string {
-  const clean = prompt.trim();
-  return [
-    "Recebi sua mensagem:",
-    "",
-    `> ${clean.slice(0, 500)}`,
-    "",
-    "Ainda estou operando sem modelo de linguagem conectado — esta é a interface oficial da NEXUSBUILD AI dentro do ScaleNexus.",
-    "Assim que o modelo for ligado, responderei com análise de projeto, planejamento e apoio à criação usando o contexto do seu histórico.",
-  ].join("\n");
-}
-
-export function useSendMessage(conversationId: string | null) {
+export function useNexusChat(conversationId: string | null) {
   const client = useQueryClient();
-  const { user } = useSession();
+  const [streaming, setStreaming] = useState("");
+  const [toolActivity, setToolActivity] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  return useMutation({
-    mutationFn: async (content: string) => {
-      if (!user) throw new Error("Sessão expirada.");
-      if (!conversationId) throw new Error("Nenhuma conversa aberta.");
+  const send = useCallback(
+    async (content: string, targetId?: string) => {
+      const id = targetId ?? conversationId;
+      if (!id) throw new Error("Nenhuma conversa aberta.");
 
-      const { error: userError } = await supabase.from("nexusbuild_messages").insert({
-        conversation_id: conversationId,
-        user_id: user.id,
-        role: "user",
-        content,
-      });
-      if (userError) throw userError;
+      setPending(true);
+      setStreaming("");
+      setToolActivity(null);
 
-      const { error: aiError } = await supabase.from("nexusbuild_messages").insert({
-        conversation_id: conversationId,
-        user_id: user.id,
-        role: "assistant",
-        content: replyEngine(content),
-        metadata: { engine: "local-placeholder", version: 1 },
-      });
-      if (aiError) throw aiError;
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (!token) throw new Error("Sessão expirada.");
 
-      await supabase
-        .from("nexusbuild_conversations")
-        .update({ updated_at: new Date().toISOString() })
-        .eq("id", conversationId);
+        const response = await fetch("/api/nexus/chat", {
+          method: "POST",
+          headers: { "content-type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ conversation_id: id, message: content }),
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(
+            response.status === 403
+              ? "Você não tem permissão para usar a NEXUSBUILD AI."
+              : "Não foi possível falar com a NEXUSBUILD AI agora.",
+          );
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let failure: string | null = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let nl: number;
+          while ((nl = buffer.indexOf("\n")) !== -1) {
+            const line = buffer.slice(0, nl).trim();
+            buffer = buffer.slice(nl + 1);
+            if (!line.startsWith("data:")) continue;
+            let event: any;
+            try {
+              event = JSON.parse(line.slice(5).trim());
+            } catch {
+              continue;
+            }
+            if (event.type === "delta") setStreaming((prev) => prev + event.text);
+            if (event.type === "tool") setToolActivity(event.name);
+            if (event.type === "error") failure = event.message;
+          }
+        }
+
+        if (failure) throw new Error(failure);
+      } finally {
+        setPending(false);
+        setToolActivity(null);
+        setStreaming("");
+        await client.invalidateQueries({ queryKey: messagesKey(id) });
+        await client.invalidateQueries({ queryKey: CONVERSATIONS_KEY });
+      }
     },
-    onSuccess: () => {
-      if (conversationId) client.invalidateQueries({ queryKey: messagesKey(conversationId) });
-      client.invalidateQueries({ queryKey: CONVERSATIONS_KEY });
-    },
-  });
+    [client, conversationId],
+  );
+
+  return { send, streaming, toolActivity, pending };
 }
 
 /** Título automático a partir da primeira mensagem do usuário. */
