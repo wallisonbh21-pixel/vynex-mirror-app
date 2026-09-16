@@ -218,7 +218,17 @@ function NexusBuildPage() {
                 </div>
               )}
               {(messages.data ?? []).map((message) => (
-                <NexusMessageBubble key={message.id} message={message} />
+                <NexusMessageBubble
+                  key={message.id}
+                  message={message}
+                  onVisualRequest={(asset, mode) =>
+                    void handleSend(
+                      mode === "variacao"
+                        ? `Crie uma variação da imagem "${asset.title ?? "atual"}" (id ${asset.id}) mantendo a mesma identidade visual, gerando a próxima versão.`
+                        : `Crie uma nova imagem para o mesmo projeto, com uma direção visual diferente de "${asset.title ?? "atual"}".`,
+                    )
+                  }
+                />
               ))}
               {chat.streaming && (
                 <NexusMessageBubble
