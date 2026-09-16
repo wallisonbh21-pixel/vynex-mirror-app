@@ -6,6 +6,13 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { NexusSidebar } from "@/components/nexusbuild/NexusSidebar";
 import { NexusComposer } from "@/components/nexusbuild/NexusComposer";
 import { NexusMessageBubble } from "@/components/nexusbuild/NexusMessage";
+import { NexusTemplates } from "@/components/nexusbuild/NexusTemplates";
+import {
+  appFlowPrompt,
+  siteFlowPrompt,
+  templateFlowPrompt,
+  type NexusObjective,
+} from "@/lib/nexus/catalog";
 import { requireCriadorOuAdmin } from "@/lib/guard";
 import {
   deriveTitle,
