@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, SendHorizonal } from "lucide-react";
+import { Globe2, Loader2, Plus, SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 /** Campo de mensagem da NEXUSBUILD AI (Enter envia, Shift+Enter quebra linha). */
 export function NexusComposer({
@@ -8,11 +9,12 @@ export function NexusComposer({
   pending,
   disabled,
 }: {
-  onSend: (text: string) => void;
+  onSend: (text: string, options?: { webResearch?: boolean }) => void;
   pending: boolean;
   disabled?: boolean;
 }) {
   const [value, setValue] = useState("");
+  const [webResearch, setWebResearch] = useState(false);
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -25,13 +27,34 @@ export function NexusComposer({
   function submit() {
     const text = value.trim();
     if (!text || pending || disabled) return;
-    onSend(text);
+    onSend(text, { webResearch });
     setValue("");
+    setWebResearch(false);
   }
 
   return (
     <div className="border-t border-border bg-background/80 px-3 py-3 backdrop-blur sm:px-6 sm:py-4">
       <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-2xl border border-border bg-card p-2 focus-within:border-primary/40">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant={webResearch ? "secondary" : "ghost"}
+              size="icon"
+              disabled={pending || disabled}
+              aria-label="Mais ações"
+              className="size-10 shrink-0 rounded-xl"
+            >
+              <Plus className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onSelect={() => setWebResearch(true)}>
+              <Globe2 className="size-4" />
+              Pesquisar na web
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <textarea
           ref={ref}
           rows={1}
@@ -59,6 +82,15 @@ export function NexusComposer({
           {pending ? <Loader2 className="size-4 animate-spin" /> : <SendHorizonal className="size-4" />}
         </Button>
       </div>
+      {webResearch && (
+        <div className="mx-auto mt-2 flex w-full max-w-3xl items-center gap-2 px-2 text-xs text-primary">
+          <Globe2 className="size-3.5" />
+          Pesquisa na web ativada
+          <button type="button" className="ml-auto text-muted-foreground hover:text-foreground" onClick={() => setWebResearch(false)}>
+            Remover
+          </button>
+        </div>
+      )}
       <p className="mx-auto mt-2 w-full max-w-3xl text-center text-[11px] text-muted-foreground">
         Enter envia • Shift + Enter quebra linha
       </p>

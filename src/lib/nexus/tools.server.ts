@@ -13,6 +13,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildProjectContext, buildStudioSnapshot, generateIntelligence } from "@/lib/ai-core";
 import { createBuildPlan } from "@/lib/forge";
 import type { NexusToolSchema } from "./provider.server";
+import { inspectWebsite, searchWeb } from "./web-research.server";
 
 export type NexusToolCategory = "READ" | "WRITE" | "DESTRUCTIVE";
 
@@ -20,6 +21,7 @@ export interface NexusToolRuntime {
   supabase: SupabaseClient<any, any, any>;
   userId: string;
   roles: string[];
+  conversationId: string;
 }
 
 export interface NexusTool {
@@ -32,7 +34,6 @@ export interface NexusTool {
 
 /** Capacidades previstas na arquitetura, ainda não implementadas. */
 export const NEXUS_UNAVAILABLE_TOOLS = [
-  { name: "web_research", reason: "não há provedor de busca na web configurado no ScaleNexus" },
   { name: "project_creation", reason: "criação de projetos pela IA ainda não foi liberada" },
   { name: "website_builder", reason: "construção automática de sites ainda não foi liberada" },
   { name: "app_builder", reason: "construção de aplicativos ainda não foi liberada" },
@@ -58,6 +59,52 @@ async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
 }
 
 export const NEXUS_TOOLS: NexusTool[] = [
+  {
+    name: "web_research",
+    category: "READ",
+    description:
+      "Pesquisa informações atuais na internet com fontes verificáveis. Use seletivamente quando o usuário pedir pesquisa ou quando preços, políticas, requisitos, versões, APIs, documentação ou tendências atuais precisarem de confirmação. Para temas técnicos, legais, políticas e publicação, formule a consulta priorizando fontes oficiais.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Consulta objetiva; inclua site:dominio-oficial quando apropriado" },
+        objective: { type: "string", description: "O que precisa ser verificado ou decidido com a pesquisa" },
+        result_count: { type: "number", description: "Quantidade entre 2 e 8; use 5 por padrão" },
+        project_id: { type: "string", description: "Projeto relacionado, quando houver" },
+      },
+      required: ["query", "objective"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      const startedAt = Date.now();
+      const query = String(args.query ?? "").trim().slice(0, 500);
+      const objective = String(args.objective ?? "").trim().slice(0, 1_000);
+      if (!query || !objective) throw new Error("Consulta e objetivo da pesquisa são obrigatórios.");
+      let result: Awaited<ReturnType<typeof searchWeb>> | null = null;
+      let failure: unknown;
+      try {
+        result = await searchWeb({ query, objective, limit: Number(args.result_count) || 5 });
+        if (result.sources.length === 0) throw new Error("Nenhuma fonte verificável foi encontrada.");
+        return result;
+      } catch (error) {
+        failure = error;
+        throw error;
+      } finally {
+        const { error: logError } = await rt.supabase.from("nexusbuild_web_researches").insert({
+          user_id: rt.userId,
+          conversation_id: rt.conversationId,
+          project_id: args.project_id ? String(args.project_id) : null,
+          query,
+          objective,
+          sources: result?.sources ?? [],
+          result_summary: result ? `${result.sources.length} fonte(s) encontrada(s).` : failure instanceof Error ? failure.message : "Falha na pesquisa.",
+          status: result ? "OK" : "ERRO",
+          duration_ms: Date.now() - startedAt,
+        } as never);
+        if (logError) console.error("[NEXUSBUILD WEB] Falha ao registrar pesquisa:", logError.message);
+      }
+    },
+  },
   {
     name: "list_projects",
     category: "READ",
@@ -247,37 +294,7 @@ export const NEXUS_TOOLS: NexusTool[] = [
       required: ["url"],
       additionalProperties: false,
     },
-    run: async (args) => {
-      const url = String(args.url);
-      if (!/^https?:\/\//i.test(url)) throw new Error("URL inválida.");
-      const res = await fetch(url, {
-        headers: { "user-agent": "ScaleNexus-NexusbuildAI/1.0 (+site analysis)" },
-      });
-      if (!res.ok) throw new Error(`Site respondeu com status ${res.status}.`);
-      const html = (await res.text()).slice(0, 400000);
-      const pick = (re: RegExp) => html.match(re)?.[1]?.trim() ?? null;
-      const all = (re: RegExp, limit = 25) =>
-        Array.from(html.matchAll(re))
-          .map((m) => m[1]!.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim())
-          .filter(Boolean)
-          .slice(0, limit);
-      const tech: string[] = [];
-      if (/__NEXT_DATA__|\/_next\//.test(html)) tech.push("Next.js");
-      if (/wp-content|wp-includes/.test(html)) tech.push("WordPress");
-      if (/cdn\.shopify\.com/.test(html)) tech.push("Shopify");
-      if (/data-reactroot|react/i.test(html)) tech.push("React (provável)");
-      if (/tailwind/i.test(html)) tech.push("Tailwind CSS (provável)");
-      return {
-        url,
-        title: pick(/<title[^>]*>([\s\S]*?)<\/title>/i),
-        description: pick(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i),
-        headings: { h1: all(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, 5), h2: all(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, 20) },
-        nav_links: all(/<nav[\s\S]{0,4000}?<\/nav>/gi, 1).slice(0, 1),
-        sections_detected: (html.match(/<section/gi) ?? []).length,
-        tech_hints: tech,
-        source: { url, consulted_at: new Date().toISOString() },
-      };
-    },
+    run: async (args) => inspectWebsite(String(args.url ?? "")),
   },
   {
     name: "memory_list",

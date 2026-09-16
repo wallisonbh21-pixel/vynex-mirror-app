@@ -136,7 +136,7 @@ export function useNexusChat(conversationId: string | null) {
   const [pending, setPending] = useState(false);
 
   const send = useCallback(
-    async (content: string, targetId?: string) => {
+    async (content: string, targetId?: string, options?: { webResearch?: boolean }) => {
       const id = targetId ?? conversationId;
       if (!id) throw new Error("Nenhuma conversa aberta.");
 
@@ -152,7 +152,11 @@ export function useNexusChat(conversationId: string | null) {
         const response = await fetch("/api/nexus/chat", {
           method: "POST",
           headers: { "content-type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ conversation_id: id, message: content }),
+          body: JSON.stringify({
+            conversation_id: id,
+            message: content,
+            web_research_requested: options?.webResearch ?? false,
+          }),
         });
 
         if (!response.ok || !response.body) {
