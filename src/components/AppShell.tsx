@@ -37,6 +37,7 @@ import {
   ChevronDown,
   Clock,
   FolderOpen,
+  Image as ImageIcon,
   Lock,
   Share2,
 } from "lucide-react";
@@ -82,6 +83,7 @@ const NAV_VENDEDOR: NavItem[] = [
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
   { to: "/documentos", label: "Documentos", icon: FolderOpen },
+  { to: "/central-visual", label: "Central Visual", icon: ImageIcon },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
   { to: "/historico", label: "Histórico", icon: History },
@@ -158,6 +160,7 @@ const NAV_CRIADOR: NavItem[] = [
     ]
   },
   { to: "/documentos", label: "Documentos", icon: FolderOpen },
+  { to: "/central-visual", label: "Central Visual", icon: ImageIcon },
   { to: "/nexusbuild-ai", label: "NEXUSBUILD AI", icon: Sparkles },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ];

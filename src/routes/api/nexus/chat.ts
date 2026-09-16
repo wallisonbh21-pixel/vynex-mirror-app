@@ -124,6 +124,7 @@ export const Route = createFileRoute("/api/nexus/chat")({
         const encoder = new TextEncoder();
         const toolsUsed: string[] = [];
         const sourcesUsed: Array<{ title: string; url: string; domain: string; consulted_at: string }> = [];
+        const visualsCreated: Array<Record<string, unknown>> = [];
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
@@ -230,6 +231,15 @@ export const Route = createFileRoute("/api/nexus/chat")({
                           }
                         }
                       }
+                      const resultVisuals = (result as any)?.visual_assets;
+                      if (Array.isArray(resultVisuals)) {
+                        for (const asset of resultVisuals) {
+                          if (asset?.id && !visualsCreated.some((item) => item["id"] === asset.id)) {
+                            visualsCreated.push(asset as Record<string, unknown>);
+                          }
+                        }
+                        if (resultVisuals.length > 0) send({ type: "visual", assets: resultVisuals });
+                      }
                     }
                   } catch (error) {
                     status = "ERRO";
@@ -264,6 +274,7 @@ export const Route = createFileRoute("/api/nexus/chat")({
                     model: resolveModel(),
                     tools: toolsUsed,
                     sources: sourcesUsed,
+                    visuals: visualsCreated,
                   },
                 });
                 await supabase

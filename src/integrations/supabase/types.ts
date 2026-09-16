@@ -1495,6 +1495,216 @@ export type Database = {
           },
         ]
       }
+      project_visual_assets: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          conversation_id: string | null
+          created_at: string
+          created_by: string
+          delegated_by: string | null
+          document_id: string | null
+          file_path: string
+          generation_id: string | null
+          id: string
+          kind: string
+          mime_type: string
+          origin: string
+          parent_asset_id: string | null
+          project_id: string
+          prompt: string | null
+          purpose: string
+          size_bytes: number | null
+          specialist_id: string | null
+          status: string
+          task_id: string | null
+          title: string
+          updated_at: string
+          use_in_builder: boolean
+          version: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          created_by: string
+          delegated_by?: string | null
+          document_id?: string | null
+          file_path: string
+          generation_id?: string | null
+          id?: string
+          kind?: string
+          mime_type?: string
+          origin?: string
+          parent_asset_id?: string | null
+          project_id: string
+          prompt?: string | null
+          purpose?: string
+          size_bytes?: number | null
+          specialist_id?: string | null
+          status?: string
+          task_id?: string | null
+          title: string
+          updated_at?: string
+          use_in_builder?: boolean
+          version?: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          created_by?: string
+          delegated_by?: string | null
+          document_id?: string | null
+          file_path?: string
+          generation_id?: string | null
+          id?: string
+          kind?: string
+          mime_type?: string
+          origin?: string
+          parent_asset_id?: string | null
+          project_id?: string
+          prompt?: string | null
+          purpose?: string
+          size_bytes?: number | null
+          specialist_id?: string | null
+          status?: string
+          task_id?: string | null
+          title?: string
+          updated_at?: string
+          use_in_builder?: boolean
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_visual_assets_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "project_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_visual_assets_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "project_visual_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_visual_assets_parent_asset_id_fkey"
+            columns: ["parent_asset_id"]
+            isOneToOne: false
+            referencedRelation: "project_visual_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_visual_assets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_visual_generations: {
+        Row: {
+          aspect_ratio: string
+          conversation_id: string | null
+          created_at: string
+          delegated_by: string | null
+          error_message: string | null
+          estimated_cost: number | null
+          external_id: string | null
+          generated_count: number
+          id: string
+          model: string
+          parent_asset_id: string | null
+          project_id: string
+          prompt: string
+          provider: string
+          purpose: string
+          reference_asset_id: string | null
+          requested_count: number
+          specialist_id: string | null
+          status: string
+          task_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          aspect_ratio?: string
+          conversation_id?: string | null
+          created_at?: string
+          delegated_by?: string | null
+          error_message?: string | null
+          estimated_cost?: number | null
+          external_id?: string | null
+          generated_count?: number
+          id?: string
+          model: string
+          parent_asset_id?: string | null
+          project_id: string
+          prompt: string
+          provider?: string
+          purpose?: string
+          reference_asset_id?: string | null
+          requested_count?: number
+          specialist_id?: string | null
+          status?: string
+          task_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          aspect_ratio?: string
+          conversation_id?: string | null
+          created_at?: string
+          delegated_by?: string | null
+          error_message?: string | null
+          estimated_cost?: number | null
+          external_id?: string | null
+          generated_count?: number
+          id?: string
+          model?: string
+          parent_asset_id?: string | null
+          project_id?: string
+          prompt?: string
+          provider?: string
+          purpose?: string
+          reference_asset_id?: string | null
+          requested_count?: number
+          specialist_id?: string | null
+          status?: string
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_visual_generations_parent_fk"
+            columns: ["parent_asset_id"]
+            isOneToOne: false
+            referencedRelation: "project_visual_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_visual_generations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_visual_generations_reference_fk"
+            columns: ["reference_asset_id"]
+            isOneToOne: false
+            referencedRelation: "project_visual_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           approved_to_client_at: string | null

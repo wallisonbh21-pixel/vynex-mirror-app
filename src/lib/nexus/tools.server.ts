@@ -21,6 +21,8 @@ import {
   MAX_OPERATIONS_PER_CALL,
 } from "./build-plan";
 import { executeBuildOperations, loadStudioState } from "./builder.server";
+import { VISUAL_LIMITS } from "@/lib/visual/constants";
+import { generateProjectVisual } from "@/lib/visual/generate.server";
 
 export type NexusToolCategory = "READ" | "WRITE" | "DESTRUCTIVE";
 
@@ -50,7 +52,11 @@ export const NEXUS_UNAVAILABLE_TOOLS = [
       "o construtor atual monta apenas a página única do Studio, por seções da biblioteca; páginas extras, navegação, formulários, gráficos, animações e integrações ainda não são executáveis",
   },
   { name: "template_engine", reason: "ainda não há template real cadastrado para gerar projeto automaticamente" },
-  { name: "image_generation", reason: "geração de imagens pela IA ainda não foi liberada" },
+  {
+    name: "image_editing (edição pixel a pixel, recorte, upscale e remoção de fundo)",
+    reason:
+      "a IA gera imagens novas e variações a partir de referência, mas ainda não edita uma imagem existente ponto a ponto",
+  },
 ];
 
 async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
@@ -598,6 +604,122 @@ export const NEXUS_TOOLS: NexusTool[] = [
       "Lista as seções realmente disponíveis na biblioteca do Studio para uso em ADD_SECTION. Use antes de montar um plano de construção.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
     run: async () => ({ templates: availableSectionTemplates() }),
+  },
+  {
+    name: "visual_assets_list",
+    category: "READ",
+    description:
+      "Lista as imagens da Central Visual de um projeto (geradas, referências, versões e status de aprovação). Use antes de criar variações para saber o que já existe.",
+    parameters: {
+      type: "object",
+      properties: {
+        project_id: { type: "string" },
+        kind: { type: "string", enum: ["gerada", "referencia"] },
+      },
+      required: ["project_id"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      let q = rt.supabase
+        .from("project_visual_assets")
+        .select("id,title,purpose,kind,version,status,parent_asset_id,use_in_builder,created_at")
+        .eq("project_id", String(args.project_id))
+        .order("created_at", { ascending: false })
+        .limit(40);
+      if (args.kind) q = q.eq("kind", String(args.kind));
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      return { assets: data ?? [] };
+    },
+  },
+  {
+    name: "image_generation",
+    category: "WRITE",
+    description:
+      "Gera imagens originais reais para um projeto (logo, identidade visual, banner, imagem de produto, imagem para site, ilustração, social media, conceito visual ou variação). O servidor valida permissão, limites e armazena a imagem privada no projeto, com versão e status. Explique ao usuário o que será gerado e chame com confirmed=true. Para uma nova versão de uma imagem existente, informe parent_asset_id; para usar uma imagem enviada como inspiração, informe reference_asset_id. Nunca copie marcas ou identidade de terceiros.",
+    parameters: {
+      type: "object",
+      properties: {
+        project_id: { type: "string" },
+        prompt: { type: "string", description: "Descrição visual detalhada e original da imagem desejada" },
+        purpose: {
+          type: "string",
+          enum: [
+            "logo",
+            "identidade_visual",
+            "banner",
+            "imagem_produto",
+            "imagem_site",
+            "ilustracao",
+            "social_media",
+            "conceito_visual",
+            "variacao",
+          ],
+        },
+        aspect: { type: "string", enum: ["1:1", "16:9", "4:3", "3:4", "9:16"] },
+        count: { type: "number", description: `Quantidade de imagens (máximo ${VISUAL_LIMITS.perRequest})` },
+        reference_asset_id: { type: "string", description: "Imagem de referência já registrada no projeto" },
+        parent_asset_id: { type: "string", description: "Imagem que será versionada (gera a próxima versão)" },
+        context: { type: "string", description: "Contexto curto da marca/projeto que ajude a direção visual" },
+        confirmed: { type: "boolean", description: "true somente depois de o usuário confirmar a geração" },
+      },
+      required: ["project_id", "prompt", "purpose"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      const projectId = String(args.project_id ?? "");
+      const bundle = await loadProjectBundle(projectId, rt);
+      const count = Math.min(Math.max(Number(args.count) || 1, 1), VISUAL_LIMITS.perRequest);
+
+      if (args.confirmed !== true) {
+        return {
+          generated: false,
+          requires_confirmation: true,
+          preview: {
+            project: (bundle.project as any).title,
+            purpose: args.purpose,
+            aspect: args.aspect ?? "1:1",
+            count,
+            prompt: String(args.prompt ?? "").slice(0, 600),
+            reference: Boolean(args.reference_asset_id),
+            nova_versao_de: args.parent_asset_id ?? null,
+          },
+          message:
+            "Nada foi gerado ainda. Apresente esse resumo ao usuário e chame novamente com confirmed=true após a confirmação.",
+        };
+      }
+
+      const result = await generateProjectVisual(rt.supabase, rt.userId, {
+        projectId,
+        prompt: String(args.prompt ?? ""),
+        purpose: String(args.purpose ?? "imagem_site"),
+        aspect: String(args.aspect ?? "1:1"),
+        count,
+        conversationId: rt.conversationId,
+        referenceAssetId: args.reference_asset_id ? String(args.reference_asset_id) : null,
+        parentAssetId: args.parent_asset_id ? String(args.parent_asset_id) : null,
+        context: args.context ? String(args.context).slice(0, 600) : null,
+      });
+
+      if (!result.ok) {
+        return {
+          generated: false,
+          error: result.error,
+          message:
+            "A geração falhou e nada foi salvo. Informe ao usuário exatamente o que falhou e ofereça tentar novamente.",
+        };
+      }
+
+      return {
+        generated: true,
+        project_id: projectId,
+        generation_id: result.generationId,
+        assets: result.assets,
+        visual_assets: result.assets,
+        message:
+          "As imagens já aparecem na conversa e na Central Visual do projeto. Peça ao usuário para aprovar, pedir variação ou solicitar outra versão.",
+      };
+    },
   },
 ];
 

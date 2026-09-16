@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
+import { Route as AuthenticatedCentralVisualRouteImport } from './routes/_authenticated/central-visual'
 import { Route as AuthenticatedClienteRouteRouteImport } from './routes/_authenticated/cliente/route'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedComissoesRouteImport } from './routes/_authenticated/comissoes'
@@ -101,6 +102,12 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCentralVisualRoute =
+  AuthenticatedCentralVisualRouteImport.update({
+    id: '/central-visual',
+    path: '/central-visual',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedClienteRouteRoute =
   AuthenticatedClienteRouteRouteImport.update({
     id: '/cliente',
@@ -421,6 +428,7 @@ export interface FileRoutesByFullPath {
   '/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/central-visual': typeof AuthenticatedCentralVisualRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
   '/contratos': typeof AuthenticatedContratosRoute
@@ -483,6 +491,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/central-visual': typeof AuthenticatedCentralVisualRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
   '/contratos': typeof AuthenticatedContratosRoute
@@ -548,6 +557,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/_authenticated/central-visual': typeof AuthenticatedCentralVisualRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/comissoes': typeof AuthenticatedComissoesRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
@@ -613,6 +623,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/admin'
     | '/aprovacoes'
+    | '/central-visual'
     | '/clientes'
     | '/comissoes'
     | '/contratos'
@@ -675,6 +686,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/admin'
     | '/aprovacoes'
+    | '/central-visual'
     | '/clientes'
     | '/comissoes'
     | '/contratos'
@@ -739,6 +751,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente'
     | '/_authenticated/admin'
     | '/_authenticated/aprovacoes'
+    | '/_authenticated/central-visual'
     | '/_authenticated/clientes'
     | '/_authenticated/comissoes'
     | '/_authenticated/contratos'
@@ -853,6 +866,13 @@ declare module '@tanstack/react-router' {
       path: '/aprovacoes'
       fullPath: '/aprovacoes'
       preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/central-visual': {
+      id: '/_authenticated/central-visual'
+      path: '/central-visual'
+      fullPath: '/central-visual'
+      preLoaderRoute: typeof AuthenticatedCentralVisualRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cliente': {
@@ -1324,6 +1344,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClienteRouteRoute: typeof AuthenticatedClienteRouteRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
+  AuthenticatedCentralVisualRoute: typeof AuthenticatedCentralVisualRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedComissoesRoute: typeof AuthenticatedComissoesRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
@@ -1359,6 +1380,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClienteRouteRoute: AuthenticatedClienteRouteRouteWithChildren,
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
+  AuthenticatedCentralVisualRoute: AuthenticatedCentralVisualRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedComissoesRoute: AuthenticatedComissoesRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
