@@ -173,6 +173,7 @@ const NAV_CLIENTE: NavItem[] = [
   { to: "/cliente/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/cliente/mensagens", label: "Mensagens", icon: Send },
   { to: "/cliente/documentos", label: "Documentos", icon: FileSignature },
+  { to: "/cliente/central-visual", label: "Central Visual", icon: ImageIcon },
   { to: "/cliente/pagamentos", label: "Pagamentos", icon: Wallet },
   { to: "/cliente/aprovacoes", label: "Aprovações", icon: ShieldCheck },
   { to: "/cliente/notificacoes", label: "Notificações", icon: BellRing },
