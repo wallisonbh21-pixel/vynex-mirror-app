@@ -48,6 +48,7 @@ const SUGGESTIONS = [
 function NexusBuildPage() {
   const { canUse, isAdmin } = useNexusAccess();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [view, setView] = useState<"chat" | "templates">("chat");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const conversations = useNexusConversations();
