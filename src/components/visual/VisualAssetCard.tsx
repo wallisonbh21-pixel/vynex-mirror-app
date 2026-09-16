@@ -106,7 +106,10 @@ export function VisualAssetCard({ asset, onVariation, onNew, showGalleryLink = t
     mutationFn: (status: "aprovada" | "em_analise" | "rejeitada") =>
       approveFn({ data: { assetId: asset.id, status } }),
     onSuccess: (result) => {
-      if (!result.ok) return toast.error(result.error);
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
       toast.success("Status atualizado.");
       refresh();
     },
@@ -116,7 +119,10 @@ export function VisualAssetCard({ asset, onVariation, onNew, showGalleryLink = t
   const useInProject = useMutation({
     mutationFn: (value: boolean) => useFn({ data: { assetId: asset.id, use: value } }),
     onSuccess: (result) => {
-      if (!result.ok) return toast.error(result.error);
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
       toast.success("Imagem liberada para o projeto.");
       refresh();
     },
@@ -126,7 +132,10 @@ export function VisualAssetCard({ asset, onVariation, onNew, showGalleryLink = t
   const remove = useMutation({
     mutationFn: () => deleteFn({ data: { assetId: asset.id } }),
     onSuccess: (result) => {
-      if (!result.ok) return toast.error(result.error);
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
       toast.success("Imagem excluída.");
       refresh();
     },
