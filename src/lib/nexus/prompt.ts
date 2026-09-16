@@ -10,7 +10,18 @@ export interface NexusPromptContext {
   memories: { kind: string; content: string }[];
   availableTools: string[];
   unavailableTools: { name: string; reason: string }[];
+  /** Objetivo declarado da conversa (ex.: CRIAR_SITE), vindo do contexto salvo. */
+  conversationObjective?: string | null;
+  conversationTemplate?: string | null;
 }
+
+const OBJECTIVE_LABELS: Record<string, string> = {
+  CRIAR_SITE: "MODE: website_creation — o objetivo desta conversa é criar um site. Siga o fluxo de criação.",
+  CRIAR_APLICATIVO:
+    "MODE: app_planning — o objetivo desta conversa é um aplicativo. O App Builder ainda não existe: conduza o levantamento e o planejamento e deixe isso claro.",
+  CRIAR_COM_TEMPLATE:
+    "MODE: template_start — o usuário escolheu um modelo como ponto de partida. Ainda não há template real cadastrado: confirme as expectativas e planeje.",
+};
 
 export const NEXUS_IDENTITY = `Você é a NEXUSBUILD AI, a inteligência artificial oficial do ScaleNexus.
 O ScaleNexus é uma plataforma de criação, desenvolvimento e operação de projetos digitais
