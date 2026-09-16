@@ -1,6 +1,18 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Check, MessageSquare, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Globe,
+  LayoutGrid,
+  MessageSquare,
+  Pencil,
+  Plus,
+  Smartphone,
+  Sparkles,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { groupByPeriod, type NexusConversation } from "@/lib/nexusbuild";
@@ -10,6 +22,11 @@ export function NexusSidebar({
   activeId,
   onSelect,
   onNew,
+  onCreateSite,
+  onCreateApp,
+  onOpenTemplates,
+  templatesActive,
+  actionsDisabled,
   onRename,
   onDelete,
   backTo,
@@ -18,6 +35,11 @@ export function NexusSidebar({
   activeId: string | null;
   onSelect: (id: string) => void;
   onNew: () => void;
+  onCreateSite: () => void;
+  onCreateApp: () => void;
+  onOpenTemplates: () => void;
+  templatesActive: boolean;
+  actionsDisabled: boolean;
   onRename: (id: string, title: string) => void;
   onDelete: (id: string) => void;
   backTo: string;
