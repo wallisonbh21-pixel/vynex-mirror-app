@@ -85,7 +85,11 @@ export function useCreateConversation() {
       const context = typeof input === "string" ? undefined : input?.context;
       const { data, error } = await supabase
         .from("nexusbuild_conversations")
-        .insert({ user_id: user.id, title: title || "Nova conversa", ...(context ? { context } : {}) })
+        .insert({
+          user_id: user.id,
+          title: title || "Nova conversa",
+          ...(context ? { context: context as never } : {}),
+        })
         .select("*")
         .single();
       if (error) throw error;
