@@ -90,7 +90,7 @@ export type DocumentValidationResult =
 export function validateDocumentMetadata(input: {
   name: string;
   size: number;
-  mimeType?: string | null;
+  mimeType?: string | null | undefined;
 }): DocumentValidationResult {
   const name = (input.name ?? "").trim();
   if (!name || name.length > 180) {

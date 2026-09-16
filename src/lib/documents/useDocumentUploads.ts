@@ -14,7 +14,7 @@ export type UploadItem = {
   size: number;
   status: "enviando" | "processando" | "pronto" | "erro";
   progress: number;
-  error?: string;
+  error?: string | undefined;
 };
 
 async function sha256(file: File): Promise<string | null> {
