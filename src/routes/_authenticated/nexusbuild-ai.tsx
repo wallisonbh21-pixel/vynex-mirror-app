@@ -176,6 +176,18 @@ function NexusBuildPage() {
             <p className="mx-auto max-w-md text-center text-sm text-muted-foreground">
               Você não tem permissão para usar a NEXUSBUILD AI.
             </p>
+          ) : view === "templates" ? (
+            <NexusTemplates
+              pending={chat.pending || createConversation.isPending}
+              onUse={(template, category) =>
+                startFlow(
+                  `Template: ${template}`,
+                  "CRIAR_COM_TEMPLATE",
+                  templateFlowPrompt(template, category),
+                  template,
+                )
+              }
+            />
           ) : !activeId ? (
             <div className="mx-auto flex h-full max-w-3xl flex-col items-center justify-center gap-6 text-center">
               <div className="flex size-14 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10">
