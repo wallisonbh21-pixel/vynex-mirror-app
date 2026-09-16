@@ -16,6 +16,9 @@ export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
         (source) => typeof source?.url === "string" && /^https?:\/\//i.test(source.url),
       )
     : [];
+  const visuals = Array.isArray(message.metadata?.["visuals"])
+    ? (message.metadata["visuals"] as VisualAsset[]).filter((asset) => Boolean(asset?.id && asset?.project_id))
+    : [];
 
   async function copy() {
     try {
