@@ -73,7 +73,7 @@ function NexusBuildPage() {
 
   const list = conversations.data ?? [];
 
-  async function handleSend(text: string) {
+  async function handleSend(text: string, options?: { webResearch?: boolean }) {
     setError(null);
     setView("chat");
     let conversationId = activeId;
@@ -84,7 +84,7 @@ function NexusBuildPage() {
       setActiveId(created.id);
     }
     try {
-      await chat.send(text, conversationId);
+      await chat.send(text, conversationId, options);
       if (isFirst) {
         renameConversation.mutate({ id: conversationId, title: deriveTitle(text) });
       }

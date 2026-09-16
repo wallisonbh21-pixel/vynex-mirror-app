@@ -18,6 +18,7 @@ import { NEXUS_TOOLS, NEXUS_UNAVAILABLE_TOOLS, findTool, toolSchemas } from "@/l
 const bodySchema = z.object({
   conversation_id: z.string().uuid(),
   message: z.string().min(1).max(8000),
+  web_research_requested: z.boolean().optional().default(false),
 });
 
 const MAX_TOOL_ROUNDS = 5;
@@ -68,7 +69,7 @@ export const Route = createFileRoute("/api/nexus/chat")({
         // Conversa precisa pertencer ao usuário (RLS garante, checamos para erro claro).
         const { data: conversation } = await supabase
           .from("nexusbuild_conversations")
-          .select("id")
+          .select("id,context")
           .eq("id", body.conversation_id)
           .maybeSingle();
         if (!conversation) return new Response("Conversa não encontrada", { status: 404 });
@@ -110,11 +111,17 @@ export const Route = createFileRoute("/api/nexus/chat")({
           ...((history ?? []) as any[])
             .filter((m) => m.role === "user" || m.role === "assistant")
             .map((m) => ({ role: m.role as "user" | "assistant", content: m.content as string })),
-          { role: "user", content: body.message },
+          {
+            role: "user",
+            content: body.web_research_requested
+              ? `[INTENÇÃO EXPLÍCITA: PESQUISAR NA WEB. Use web_research antes de responder e apresente as fontes realmente consultadas.]\n\n${body.message}`
+              : body.message,
+          },
         ];
 
         const encoder = new TextEncoder();
         const toolsUsed: string[] = [];
+        const sourcesUsed: Array<{ title: string; url: string; domain: string; consulted_at: string }> = [];
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
@@ -201,8 +208,26 @@ export const Route = createFileRoute("/api/nexus/chat")({
                       result = { unavailable: true, message: "Essa capacidade ainda não está disponível." };
                     } else {
                       const args = call.args ? JSON.parse(call.args) : {};
-                      result = await tool.run(args, { supabase, userId: user.id, roles });
+                      result = await tool.run(args, {
+                        supabase,
+                        userId: user.id,
+                        roles,
+                        conversationId: body.conversation_id,
+                      });
                       toolsUsed.push(call.name);
+                      const resultSources = (result as any)?.sources;
+                      if (Array.isArray(resultSources)) {
+                        for (const source of resultSources) {
+                          if (source?.url && !sourcesUsed.some((item) => item.url === source.url)) {
+                            sourcesUsed.push({
+                              title: String(source.title ?? source.url),
+                              url: String(source.url),
+                              domain: String(source.domain ?? ""),
+                              consulted_at: String(source.consulted_at ?? new Date().toISOString()),
+                            });
+                          }
+                        }
+                      }
                     }
                   } catch (error) {
                     status = "ERRO";
@@ -232,7 +257,12 @@ export const Route = createFileRoute("/api/nexus/chat")({
                   user_id: user.id,
                   role: "assistant",
                   content: full,
-                  metadata: { engine: "lovable-ai-gateway", model: resolveModel(), tools: toolsUsed },
+                  metadata: {
+                    engine: "lovable-ai-gateway",
+                    model: resolveModel(),
+                    tools: toolsUsed,
+                    sources: sourcesUsed,
+                  },
                 });
                 await supabase
                   .from("nexusbuild_conversations")

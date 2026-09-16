@@ -842,6 +842,63 @@ export type Database = {
           },
         ]
       }
+      nexusbuild_web_researches: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          duration_ms: number
+          id: string
+          objective: string
+          project_id: string | null
+          query: string
+          result_summary: string | null
+          sources: Json
+          status: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          duration_ms?: number
+          id?: string
+          objective: string
+          project_id?: string | null
+          query: string
+          result_summary?: string | null
+          sources?: Json
+          status?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          duration_ms?: number
+          id?: string
+          objective?: string
+          project_id?: string | null
+          query?: string
+          result_summary?: string | null
+          sources?: Json
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nexusbuild_web_researches_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "nexusbuild_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nexusbuild_web_researches_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
