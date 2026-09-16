@@ -14,6 +14,13 @@ import { buildProjectContext, buildStudioSnapshot, generateIntelligence } from "
 import { createBuildPlan } from "@/lib/forge";
 import type { NexusToolSchema } from "./provider.server";
 import { inspectWebsite, searchWeb } from "./web-research.server";
+import {
+  availableSectionTemplates,
+  describeOperation,
+  validateBuildPlan,
+  MAX_OPERATIONS_PER_CALL,
+} from "./build-plan";
+import { executeBuildOperations, loadStudioState } from "./builder.server";
 
 export type NexusToolCategory = "READ" | "WRITE" | "DESTRUCTIVE";
 
