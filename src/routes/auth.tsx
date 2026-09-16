@@ -309,7 +309,6 @@ function AuthPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="vendedor">Vendedor</SelectItem>
-                      <SelectItem value="criador">Criador</SelectItem>
                       {!adminExists ? (
                         <SelectItem value="admin">Administrador (primeiro acesso)</SelectItem>
                       ) : null}
