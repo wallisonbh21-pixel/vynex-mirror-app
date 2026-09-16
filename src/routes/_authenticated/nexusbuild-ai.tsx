@@ -61,23 +61,26 @@ function NexusBuildPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
-  }, [messages.data?.length, sendMessage.isPending]);
+  }, [messages.data?.length, chat.pending, chat.streaming]);
 
   const list = conversations.data ?? [];
 
   async function handleSend(text: string) {
+    setError(null);
     let conversationId = activeId;
+    const isFirst = !conversationId || (messages.data?.length ?? 0) === 0;
     if (!conversationId) {
       const created = await createConversation.mutateAsync(deriveTitle(text));
       conversationId = created.id;
       setActiveId(created.id);
     }
-    await sendMessage.mutateAsync(text, {
-      onError: () => undefined,
-    });
-    const isFirst = (messages.data?.length ?? 0) === 0;
-    if (isFirst && conversationId) {
-      renameConversation.mutate({ id: conversationId, title: deriveTitle(text) });
+    try {
+      await chat.send(text, conversationId);
+      if (isFirst) {
+        renameConversation.mutate({ id: conversationId, title: deriveTitle(text) });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao falar com a NEXUSBUILD AI.");
     }
   }
 
