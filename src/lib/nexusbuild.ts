@@ -77,11 +77,19 @@ export function useCreateConversation() {
   const client = useQueryClient();
   const { user } = useSession();
   return useMutation({
-    mutationFn: async (title?: string): Promise<NexusConversation> => {
+    mutationFn: async (
+      input?: string | { title?: string; context?: Record<string, unknown> },
+    ): Promise<NexusConversation> => {
       if (!user) throw new Error("Sessão expirada.");
+      const title = typeof input === "string" ? input : input?.title;
+      const context = typeof input === "string" ? undefined : input?.context;
       const { data, error } = await supabase
         .from("nexusbuild_conversations")
-        .insert({ user_id: user.id, title: title || "Nova conversa" })
+        .insert({
+          user_id: user.id,
+          title: title || "Nova conversa",
+          ...(context ? { context: context as never } : {}),
+        })
         .select("*")
         .single();
       if (error) throw error;

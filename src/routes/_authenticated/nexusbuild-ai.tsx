@@ -6,6 +6,13 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { NexusSidebar } from "@/components/nexusbuild/NexusSidebar";
 import { NexusComposer } from "@/components/nexusbuild/NexusComposer";
 import { NexusMessageBubble } from "@/components/nexusbuild/NexusMessage";
+import { NexusTemplates } from "@/components/nexusbuild/NexusTemplates";
+import {
+  appFlowPrompt,
+  siteFlowPrompt,
+  templateFlowPrompt,
+  type NexusObjective,
+} from "@/lib/nexus/catalog";
 import { requireCriadorOuAdmin } from "@/lib/guard";
 import {
   deriveTitle,
@@ -48,6 +55,7 @@ const SUGGESTIONS = [
 function NexusBuildPage() {
   const { canUse, isAdmin } = useNexusAccess();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [view, setView] = useState<"chat" | "templates">("chat");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const conversations = useNexusConversations();
@@ -67,6 +75,7 @@ function NexusBuildPage() {
 
   async function handleSend(text: string) {
     setError(null);
+    setView("chat");
     let conversationId = activeId;
     const isFirst = !conversationId || (messages.data?.length ?? 0) === 0;
     if (!conversationId) {
@@ -89,18 +98,45 @@ function NexusBuildPage() {
     if (id === activeId) setActiveId(null);
   }
 
+  /** Abre uma conversa nova já com o objetivo declarado (site, app ou template). */
+  async function startFlow(title: string, objective: NexusObjective, prompt: string, template?: string) {
+    setError(null);
+    setMobileOpen(false);
+    setView("chat");
+    try {
+      const created = await createConversation.mutateAsync({
+        title,
+        context: { objective, ...(template ? { template } : {}) },
+      });
+      setActiveId(created.id);
+      await chat.send(prompt, created.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao iniciar o fluxo.");
+    }
+  }
+
   const sidebar = (
     <NexusSidebar
       conversations={list}
       activeId={activeId}
       onSelect={(id) => {
         setActiveId(id);
+        setView("chat");
         setMobileOpen(false);
       }}
       onNew={() => {
         setActiveId(null);
+        setView("chat");
         setMobileOpen(false);
       }}
+      onCreateSite={() => startFlow("Criar Site", "CRIAR_SITE", siteFlowPrompt())}
+      onCreateApp={() => startFlow("Criar Aplicativo", "CRIAR_APLICATIVO", appFlowPrompt())}
+      onOpenTemplates={() => {
+        setView("templates");
+        setMobileOpen(false);
+      }}
+      templatesActive={view === "templates"}
+      actionsDisabled={!canUse || chat.pending || createConversation.isPending}
       onRename={(id, title) => renameConversation.mutate({ id, title })}
       onDelete={handleDelete}
       backTo={isAdmin ? "/admin" : "/criacao"}
@@ -140,6 +176,18 @@ function NexusBuildPage() {
             <p className="mx-auto max-w-md text-center text-sm text-muted-foreground">
               Você não tem permissão para usar a NEXUSBUILD AI.
             </p>
+          ) : view === "templates" ? (
+            <NexusTemplates
+              pending={chat.pending || createConversation.isPending}
+              onUse={(template, category) =>
+                startFlow(
+                  `Template: ${template}`,
+                  "CRIAR_COM_TEMPLATE",
+                  templateFlowPrompt(template, category),
+                  template,
+                )
+              }
+            />
           ) : !activeId ? (
             <div className="mx-auto flex h-full max-w-3xl flex-col items-center justify-center gap-6 text-center">
               <div className="flex size-14 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10">
