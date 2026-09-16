@@ -219,19 +219,23 @@ export function VisualCentral({
             <VisualAssetCard
               key={asset.id}
               asset={asset}
-              allowDelete
+              allowDelete={canDelete}
               showGalleryLink={false}
-              onVariation={(item) => {
-                setParentAssetId(item.id);
-                setPurpose(item.purpose ?? "imagem_site");
-                setPrompt(item.prompt ?? "");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              onNew={() => {
-                setParentAssetId(null);
-                setPrompt("");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
+              {...(canGenerate
+                ? {
+                    onVariation: (item: VisualAsset) => {
+                      setParentAssetId(item.id);
+                      setPurpose(item.purpose ?? "imagem_site");
+                      setPrompt(item.prompt ?? "");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    },
+                    onNew: () => {
+                      setParentAssetId(null);
+                      setPrompt("");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    },
+                  }
+                : {})}
             />
           ))}
         </div>
