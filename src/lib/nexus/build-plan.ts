@@ -37,7 +37,7 @@ export const MAX_TEXT_LENGTH = 600;
 
 export interface NexusBuildOperation {
   type: NexusBuildOperationType;
-  params: Record<string, any>;
+  params: any;
 }
 
 export interface ValidationIssue {
@@ -104,7 +104,7 @@ export function validateBuildPlan(rawOperations: unknown, currentSectionCount: n
 
   rawOperations.forEach((raw: any, index) => {
     const type = String(raw?.type ?? "").toUpperCase();
-    const params = (raw?.params ?? {}) as Record<string, any>;
+    const params = (raw?.params ?? {}) as any;
 
     if (UNSUPPORTED_OPERATIONS[type]) {
       issues.push({ index, type, message: `Operação não suportada: ${UNSUPPORTED_OPERATIONS[type]}.` });
