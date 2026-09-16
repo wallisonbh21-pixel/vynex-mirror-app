@@ -15,7 +15,7 @@ import {
   useNexusConversations,
   useNexusMessages,
   useRenameConversation,
-  useSendMessage,
+  useNexusChat,
 } from "@/lib/nexusbuild";
 
 export const Route = createFileRoute("/_authenticated/nexusbuild-ai")({
@@ -55,7 +55,8 @@ function NexusBuildPage() {
   const createConversation = useCreateConversation();
   const renameConversation = useRenameConversation();
   const deleteConversation = useDeleteConversation();
-  const sendMessage = useSendMessage(activeId);
+  const chat = useNexusChat(activeId);
+  const [error, setError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
