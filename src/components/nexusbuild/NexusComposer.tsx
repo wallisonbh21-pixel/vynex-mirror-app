@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Globe2, Loader2, Plus, SendHorizonal } from "lucide-react";
+import { Globe2, ImagePlus, Loader2, Plus, SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -8,10 +8,12 @@ export function NexusComposer({
   onSend,
   pending,
   disabled,
+  onAttachReference,
 }: {
   onSend: (text: string, options?: { webResearch?: boolean }) => void;
   pending: boolean;
   disabled?: boolean;
+  onAttachReference?: () => void;
 }) {
   const [value, setValue] = useState("");
   const [webResearch, setWebResearch] = useState(false);
@@ -53,6 +55,12 @@ export function NexusComposer({
               <Globe2 className="size-4" />
               Pesquisar na web
             </DropdownMenuItem>
+            {onAttachReference && (
+              <DropdownMenuItem onSelect={() => onAttachReference()}>
+                <ImagePlus className="size-4" />
+                Enviar imagem de referência
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <textarea

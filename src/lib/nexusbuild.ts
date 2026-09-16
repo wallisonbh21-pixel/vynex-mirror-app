@@ -189,6 +189,10 @@ export function useNexusChat(conversationId: string | null) {
             }
             if (event.type === "delta") setStreaming((prev) => prev + event.text);
             if (event.type === "tool") setToolActivity(event.name);
+            if (event.type === "visual") {
+              setToolActivity("imagem gerada");
+              void client.invalidateQueries({ queryKey: ["visual-assets"] });
+            }
             if (event.type === "error") failure = event.message;
           }
         }

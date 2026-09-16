@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
+import { Route as AuthenticatedCentralVisualRouteImport } from './routes/_authenticated/central-visual'
 import { Route as AuthenticatedClienteRouteRouteImport } from './routes/_authenticated/cliente/route'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedComissoesRouteImport } from './routes/_authenticated/comissoes'
@@ -50,6 +51,7 @@ import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authen
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
 import { Route as AuthenticatedClienteIndexRouteImport } from './routes/_authenticated/cliente/index'
 import { Route as AuthenticatedClienteAprovacoesRouteImport } from './routes/_authenticated/cliente/aprovacoes'
+import { Route as AuthenticatedClienteCentralVisualRouteImport } from './routes/_authenticated/cliente/central-visual'
 import { Route as AuthenticatedClienteDocumentosRouteImport } from './routes/_authenticated/cliente/documentos'
 import { Route as AuthenticatedClienteMensagensRouteImport } from './routes/_authenticated/cliente/mensagens'
 import { Route as AuthenticatedClienteNotificacoesRouteImport } from './routes/_authenticated/cliente/notificacoes'
@@ -101,6 +103,12 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCentralVisualRoute =
+  AuthenticatedCentralVisualRouteImport.update({
+    id: '/central-visual',
+    path: '/central-visual',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedClienteRouteRoute =
   AuthenticatedClienteRouteRouteImport.update({
     id: '/cliente',
@@ -290,6 +298,12 @@ const AuthenticatedClienteAprovacoesRoute =
     path: '/aprovacoes',
     getParentRoute: () => AuthenticatedClienteRouteRoute,
   } as any)
+const AuthenticatedClienteCentralVisualRoute =
+  AuthenticatedClienteCentralVisualRouteImport.update({
+    id: '/central-visual',
+    path: '/central-visual',
+    getParentRoute: () => AuthenticatedClienteRouteRoute,
+  } as any)
 const AuthenticatedClienteDocumentosRoute =
   AuthenticatedClienteDocumentosRouteImport.update({
     id: '/documentos',
@@ -421,6 +435,7 @@ export interface FileRoutesByFullPath {
   '/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/central-visual': typeof AuthenticatedCentralVisualRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
   '/contratos': typeof AuthenticatedContratosRoute
@@ -454,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
+  '/cliente/central-visual': typeof AuthenticatedClienteCentralVisualRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
   '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
   '/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
@@ -483,6 +499,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/central-visual': typeof AuthenticatedCentralVisualRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
   '/contratos': typeof AuthenticatedContratosRoute
@@ -516,6 +533,7 @@ export interface FileRoutesByTo {
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
+  '/cliente/central-visual': typeof AuthenticatedClienteCentralVisualRoute
   '/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
   '/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
   '/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
@@ -548,6 +566,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/_authenticated/central-visual': typeof AuthenticatedCentralVisualRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/comissoes': typeof AuthenticatedComissoesRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
@@ -581,6 +600,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
   '/_authenticated/cliente/aprovacoes': typeof AuthenticatedClienteAprovacoesRoute
+  '/_authenticated/cliente/central-visual': typeof AuthenticatedClienteCentralVisualRoute
   '/_authenticated/cliente/documentos': typeof AuthenticatedClienteDocumentosRoute
   '/_authenticated/cliente/mensagens': typeof AuthenticatedClienteMensagensRoute
   '/_authenticated/cliente/notificacoes': typeof AuthenticatedClienteNotificacoesRoute
@@ -613,6 +633,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/admin'
     | '/aprovacoes'
+    | '/central-visual'
     | '/clientes'
     | '/comissoes'
     | '/contratos'
@@ -646,6 +667,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
+    | '/cliente/central-visual'
     | '/cliente/documentos'
     | '/cliente/mensagens'
     | '/cliente/notificacoes'
@@ -675,6 +697,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/admin'
     | '/aprovacoes'
+    | '/central-visual'
     | '/clientes'
     | '/comissoes'
     | '/contratos'
@@ -708,6 +731,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/briefing/$projectId'
     | '/cliente/aprovacoes'
+    | '/cliente/central-visual'
     | '/cliente/documentos'
     | '/cliente/mensagens'
     | '/cliente/notificacoes'
@@ -739,6 +763,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente'
     | '/_authenticated/admin'
     | '/_authenticated/aprovacoes'
+    | '/_authenticated/central-visual'
     | '/_authenticated/clientes'
     | '/_authenticated/comissoes'
     | '/_authenticated/contratos'
@@ -772,6 +797,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/briefing/$projectId'
     | '/_authenticated/cliente/aprovacoes'
+    | '/_authenticated/cliente/central-visual'
     | '/_authenticated/cliente/documentos'
     | '/_authenticated/cliente/mensagens'
     | '/_authenticated/cliente/notificacoes'
@@ -853,6 +879,13 @@ declare module '@tanstack/react-router' {
       path: '/aprovacoes'
       fullPath: '/aprovacoes'
       preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/central-visual': {
+      id: '/_authenticated/central-visual'
+      path: '/central-visual'
+      fullPath: '/central-visual'
+      preLoaderRoute: typeof AuthenticatedCentralVisualRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cliente': {
@@ -1100,6 +1133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClienteAprovacoesRouteImport
       parentRoute: typeof AuthenticatedClienteRouteRoute
     }
+    '/_authenticated/cliente/central-visual': {
+      id: '/_authenticated/cliente/central-visual'
+      path: '/central-visual'
+      fullPath: '/cliente/central-visual'
+      preLoaderRoute: typeof AuthenticatedClienteCentralVisualRouteImport
+      parentRoute: typeof AuthenticatedClienteRouteRoute
+    }
     '/_authenticated/cliente/documentos': {
       id: '/_authenticated/cliente/documentos'
       path: '/documentos'
@@ -1252,6 +1292,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedClienteRouteRouteChildren {
   AuthenticatedClienteAprovacoesRoute: typeof AuthenticatedClienteAprovacoesRoute
+  AuthenticatedClienteCentralVisualRoute: typeof AuthenticatedClienteCentralVisualRoute
   AuthenticatedClienteDocumentosRoute: typeof AuthenticatedClienteDocumentosRoute
   AuthenticatedClienteMensagensRoute: typeof AuthenticatedClienteMensagensRoute
   AuthenticatedClienteNotificacoesRoute: typeof AuthenticatedClienteNotificacoesRoute
@@ -1267,6 +1308,8 @@ interface AuthenticatedClienteRouteRouteChildren {
 const AuthenticatedClienteRouteRouteChildren: AuthenticatedClienteRouteRouteChildren =
   {
     AuthenticatedClienteAprovacoesRoute: AuthenticatedClienteAprovacoesRoute,
+    AuthenticatedClienteCentralVisualRoute:
+      AuthenticatedClienteCentralVisualRoute,
     AuthenticatedClienteDocumentosRoute: AuthenticatedClienteDocumentosRoute,
     AuthenticatedClienteMensagensRoute: AuthenticatedClienteMensagensRoute,
     AuthenticatedClienteNotificacoesRoute:
@@ -1324,6 +1367,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClienteRouteRoute: typeof AuthenticatedClienteRouteRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
+  AuthenticatedCentralVisualRoute: typeof AuthenticatedCentralVisualRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedComissoesRoute: typeof AuthenticatedComissoesRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
@@ -1359,6 +1403,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClienteRouteRoute: AuthenticatedClienteRouteRouteWithChildren,
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
+  AuthenticatedCentralVisualRoute: AuthenticatedCentralVisualRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedComissoesRoute: AuthenticatedComissoesRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,

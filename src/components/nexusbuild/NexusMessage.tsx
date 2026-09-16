@@ -2,19 +2,29 @@ import { useState } from "react";
 import { Check, Copy, ExternalLink, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NexusMessage as NexusMessageType } from "@/lib/nexusbuild";
+import { VisualAssetCard, type VisualAsset } from "@/components/visual/VisualAssetCard";
 
 /**
  * Bolha de mensagem da NEXUSBUILD AI.
  * O corpo é renderizado em blocos simples, preparado para receber Markdown,
  * tabelas e blocos de código em uma etapa futura.
  */
-export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
+export function NexusMessageBubble({
+  message,
+  onVisualRequest,
+}: {
+  message: NexusMessageType;
+  onVisualRequest?: (asset: VisualAsset, mode: "variacao" | "nova") => void;
+}) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
   const sources = Array.isArray(message.metadata?.["sources"])
     ? (message.metadata["sources"] as Array<{ title?: string; url?: string; domain?: string }>).filter(
         (source) => typeof source?.url === "string" && /^https?:\/\//i.test(source.url),
       )
+    : [];
+  const visuals = Array.isArray(message.metadata?.["visuals"])
+    ? (message.metadata["visuals"] as VisualAsset[]).filter((asset) => Boolean(asset?.id && asset?.project_id))
     : [];
 
   async function copy() {
@@ -66,6 +76,22 @@ export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
                   </a>
                 ))}
               </div>
+            </div>
+          )}
+          {!isUser && visuals.length > 0 && (
+            <div className="mt-4 grid gap-3 border-t border-border pt-3 sm:grid-cols-2">
+              {visuals.map((asset) => (
+                <VisualAssetCard
+                  key={asset.id}
+                  asset={asset}
+                  {...(onVisualRequest
+                    ? {
+                        onVariation: (item: VisualAsset) => onVisualRequest(item, "variacao"),
+                        onNew: (item: VisualAsset) => onVisualRequest(item, "nova"),
+                      }
+                    : {})}
+                />
+              ))}
             </div>
           )}
         </div>
