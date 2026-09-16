@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Copy, Sparkles, User } from "lucide-react";
+import { Check, Copy, ExternalLink, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NexusMessage as NexusMessageType } from "@/lib/nexusbuild";
 
@@ -11,6 +11,11 @@ import type { NexusMessage as NexusMessageType } from "@/lib/nexusbuild";
 export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
+  const sources = Array.isArray(message.metadata?.sources)
+    ? (message.metadata.sources as Array<{ title?: string; url?: string; domain?: string }>).filter(
+        (source) => typeof source?.url === "string" && /^https?:\/\//i.test(source.url),
+      )
+    : [];
 
   async function copy() {
     try {
@@ -44,6 +49,25 @@ export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
               {line}
             </p>
           ))}
+          {!isUser && sources.length > 0 && (
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="mb-2 text-[11px] font-semibold uppercase text-muted-foreground">Fontes consultadas</p>
+              <div className="flex flex-col gap-1.5">
+                {sources.map((source) => (
+                  <a
+                    key={source.url}
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-w-0 items-center gap-2 text-xs text-primary hover:underline"
+                  >
+                    <ExternalLink className="size-3 shrink-0" />
+                    <span className="truncate">{source.title || source.domain || source.url}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {!isUser && (

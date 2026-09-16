@@ -294,7 +294,32 @@ export const NEXUS_TOOLS: NexusTool[] = [
       required: ["url"],
       additionalProperties: false,
     },
-    run: async (args) => inspectWebsite(String(args.url ?? "")),
+    run: async (args, rt) => {
+      const startedAt = Date.now();
+      const requestedUrl = String(args.url ?? "");
+      let result: Awaited<ReturnType<typeof inspectWebsite>> | null = null;
+      let failure: unknown;
+      try {
+        result = await inspectWebsite(requestedUrl);
+        return result;
+      } catch (error) {
+        failure = error;
+        throw error;
+      } finally {
+        const { error: logError } = await rt.supabase.from("nexusbuild_web_researches").insert({
+          user_id: rt.userId,
+          conversation_id: rt.conversationId,
+          project_id: null,
+          query: requestedUrl.slice(0, 500),
+          objective: "Analisar a URL pública fornecida pelo usuário.",
+          sources: result?.sources ?? [],
+          result_summary: result ? "URL analisada com fonte registrada." : failure instanceof Error ? failure.message : "Falha na análise da URL.",
+          status: result ? "OK" : "ERRO",
+          duration_ms: Date.now() - startedAt,
+        } as never);
+        if (logError) console.error("[NEXUSBUILD WEB] Falha ao registrar análise de URL:", logError.message);
+      }
+    },
   },
   {
     name: "memory_list",
