@@ -81,6 +81,7 @@ const NAV_VENDEDOR: NavItem[] = [
     ]
   },
   { to: "/contratos", label: "Contratos", icon: FileSignature },
+  { to: "/documentos", label: "Documentos", icon: FolderOpen },
   { to: "/reunioes", label: "Reuniões", icon: CalendarClock },
   { to: "/indicar", label: "Indicação de Clientes", icon: Share2 },
   { to: "/historico", label: "Histórico", icon: History },
@@ -156,6 +157,7 @@ const NAV_CRIADOR: NavItem[] = [
       { to: "/meus-saques", label: "Meus saques", icon: Wallet },
     ]
   },
+  { to: "/documentos", label: "Documentos", icon: FolderOpen },
   { to: "/nexusbuild-ai", label: "NEXUSBUILD AI", icon: Sparkles },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ];
