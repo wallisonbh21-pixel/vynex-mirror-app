@@ -11,8 +11,8 @@ import type { NexusMessage as NexusMessageType } from "@/lib/nexusbuild";
 export function NexusMessageBubble({ message }: { message: NexusMessageType }) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
-  const sources = Array.isArray(message.metadata?.sources)
-    ? (message.metadata.sources as Array<{ title?: string; url?: string; domain?: string }>).filter(
+  const sources = Array.isArray(message.metadata?.["sources"])
+    ? (message.metadata["sources"] as Array<{ title?: string; url?: string; domain?: string }>).filter(
         (source) => typeof source?.url === "string" && /^https?:\/\//i.test(source.url),
       )
     : [];
