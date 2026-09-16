@@ -1,0 +1,10 @@
+REVOKE ALL ON FUNCTION public.check_prospecting_assignment() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.handle_new_seller_token() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.handle_project_notifications() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.leads_close_to_pipeline() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.protect_financial_integrity() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.validate_withdrawal_request() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.log_client_charge_event() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.generate_meeting_link() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.is_meeting_participant(uuid, uuid) FROM PUBLIC, anon;
