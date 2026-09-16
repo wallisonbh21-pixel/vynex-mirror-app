@@ -68,6 +68,8 @@ async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
   ]);
   if (error) throw new Error(error.message);
   if (!project) throw new Error("Projeto não encontrado ou sem permissão de acesso.");
+  // Contexto ativo (ATA #021): a conversa passa a apontar para o projeto realmente usado.
+  await setActiveProject(rt.supabase, rt.conversationId, projectId).catch(() => undefined);
   return {
     project,
     briefing: (briefing.data?.data ?? null) as any,
@@ -75,6 +77,7 @@ async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
     studio: (studio.data as any) ?? null,
   };
 }
+
 
 export const NEXUS_TOOLS: NexusTool[] = [
   {
