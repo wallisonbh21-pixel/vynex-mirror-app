@@ -156,6 +156,7 @@ const NAV_CRIADOR: NavItem[] = [
       { to: "/meus-saques", label: "Meus saques", icon: Wallet },
     ]
   },
+  { to: "/nexusbuild-ai", label: "NEXUSBUILD AI", icon: Sparkles },
   { to: "/notificacoes", label: "Notificações", icon: BellRing },
 ];
 
