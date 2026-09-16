@@ -79,7 +79,7 @@ export const NEXUS_BUILD_FLOW = `CRIAÇÃO DE PROJETOS E SITES (fluxo obrigatór
 11. DADOS: nunca invente dados reais. Conteúdo demonstrativo deve ser identificado como fictício.`;
 
 export function buildSystemPrompt(ctx: NexusPromptContext): string {
-  const parts = [NEXUS_IDENTITY, NEXUS_RULES];
+  const parts = [NEXUS_IDENTITY, NEXUS_RULES, NEXUS_BUILD_FLOW];
 
   parts.push(
     `CONTEXTO DO USUÁRIO

@@ -49,11 +49,13 @@ export const NEXUS_TEMPLATE_CATEGORIES: NexusTemplateCategory[] = [
 
 export function siteFlowPrompt() {
   return [
+    "MODE: website_creation.",
     "OBJETIVO DESTA CONVERSA: criar um site.",
     "Conduza o levantamento fazendo apenas as perguntas indispensáveis (marca, tipo de negócio,",
     "objetivo do site, público, estilo visual, cores, referências, páginas e funcionalidades).",
-    "Se a ferramenta de construção de site ainda não estiver disponível, diga isso com clareza",
-    "e siga organizando o planejamento.",
+    "Siga o fluxo oficial: descoberta → referências → create_project → project_forge → apresentação",
+    "do plano → confirmação → website_builder → validação → project_analysis.",
+    "Nunca finja ter construído algo: informe com clareza o que o construtor ainda não faz.",
   ].join(" ");
 }
 
