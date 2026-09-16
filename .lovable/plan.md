@@ -1,60 +1,24 @@
-# Plano de Padronização Visual Global — ScaleNexus
+# Etapa 3 — Pesquisa web da NEXUSBUILD AI
 
-O objetivo deste plano é unificar a experiência visual de todos os perfis (Admin, Vendedor, Criador e Cliente) sob um único **Design System Premium**, baseado na nova referência visual do Dashboard Administrativo.
+## Objetivo
+Adicionar pesquisa web real e análise segura de URLs à NEXUSBUILD AI, com fontes verificáveis, decisão automática pelo modelo e atalho manual no campo de mensagem.
 
-## 1. Fundação e Design System (Fase 1)
+## Implementação
+- Integrar o provedor Firecrawl já conectado, exclusivamente no servidor.
+- Registrar `web_research` como ferramenta READ com consulta, objetivo, limite controlado e preferência opcional por fontes oficiais.
+- Reforçar `website_research` para validar URLs públicas, bloquear destinos locais/privados, limitar conteúdo e tratar páginas externas como dados não confiáveis.
+- Armazenar consulta, objetivo, projeto opcional, fontes usadas, duração e resultado resumido no histórico de ferramentas, associados à conversa e ao usuário.
+- Incluir as fontes realmente retornadas nos metadados da resposta para uso futuro pela interface.
+- Atualizar o prompt central para decidir quando pesquisar, priorizar fontes oficiais, comparar fontes importantes e resistir a prompt injection.
+- Adicionar “Pesquisar na web” ao menu “+” do campo de mensagem; o atalho marcará explicitamente a próxima solicitação como pesquisa, sem impedir a decisão automática da IA.
 
-Criaremos a infraestrutura de componentes compartilhados que servirá de base para todos os painéis.
+## Segurança e limites
+- Preservar acesso exclusivo de admin e criador e todas as regras existentes.
+- Limitar resultados, tamanho de conteúdo, tempo e rodadas; sem navegação indefinida.
+- Não expor credenciais no navegador, não seguir instruções encontradas em páginas e não inventar fontes.
+- Não implementar construtores, publicação, lojas, criação automática de projetos ou geração de arquivos.
 
-### Componentes Globais a serem criados/refatorados:
-- **`DashboardShell`**: Layout estrutural com `sidebar` escura, fundo `dark premium` e `header` padronizado.
-- **`DashboardHeader`**: Título da área e descrição curta (ex: "Visão Geral" / "Resumo da operação").
-- **`StatCard` (Refatoração)**: Padronizar bordas discretas, cantos arredondados, ícones e indicadores de tendência (trending up/down).
-- **`DashboardSection`**: Container para agrupar cards e gráficos com espaçamento consistente.
-- **`PremiumTable`**: Wrapper para o componente de tabela com estilos de hover, bordas e responsividade (cards no mobile).
-- **`ActivityTimeline`**: Componente unificado para exibir "Atividades Recentes" em todos os painéis.
-
-## 2. Implementação por Perfil
-
-### Painel Administrador (Fase 2)
-- **Status**: Já iniciado, mas requer ajuste para usar os novos componentes globais.
-- **Foco**: Manter as métricas reais (Receita, MRR, Funil) com o layout final polido.
-
-### Painel Vendedor / CRM (Fase 3)
-- **Rota**: `/painel` e `/leads`.
-- **Novos Cards**: Leads novos, Em negociação, Propostas, Convertidos, Taxa de conversão.
-- **Gráfico**: Funil Comercial (evolução real dos leads).
-- **Seções**: "Minhas Indicações" e "Atividades Recentes".
-- **Restrição**: Ocultar dados financeiros globais.
-
-### Painel Criador (Fase 4)
-- **Rota**: `/criacao`.
-- **Foco**: Produção e prazos.
-- **Cards**: Projetos atribuídos, Em produção, Aguardando cliente, Entregues no mês.
-- **Gráfico/Status**: Progresso da produção e próximos prazos.
-- **Seções**: "Meus Projetos" (lista resumida) e "Próximas Entregas".
-
-### Painel Cliente (Fase 5)
-- **Rota**: `/cliente`.
-- **Estética**: Mais "clean" e amigável, sem ruído administrativo.
-- **Foco**: Transparência no progresso do projeto.
-- **Cards**: Progresso atual, Próxima Etapa, Ação necessária (ex: aprovar briefing).
-- **Acesso rápido**: Atalhos para Mensagens, Documentos e Reuniões.
-
-## 3. Padronização da Sidebar
-
-Unificaremos o componente `SidebarContent` no `AppShell.tsx`:
-- **Estilo**: Fundo dark consistente, estados de hover e active com glow ciano.
-- **Estrutura**: Logo no topo, navegação central, perfil do usuário com logout na base.
-- **Dinamismo**: Ícones e labels seguindo o mesmo peso visual para todos os cargos.
-
-## 4. Cronograma de Execução
-
-1.  **Dia 1**: Criação dos componentes `DashboardHeader`, `DashboardSection` e `PremiumTable`.
-2.  **Dia 2**: Migração do `AppShell` (Sidebar) e Dashboard Admin para os novos padrões.
-3.  **Dia 3**: Reformulação do Dashboard do Vendedor.
-4.  **Dia 4**: Reformulação do Dashboard do Criador.
-5.  **Dia 5**: Refinamento do Portal do Cliente e auditoria responsiva global.
-
----
-**Observação**: Nenhuma lógica de negócio, política de RLS ou fluxo de dados será alterado. O trabalho é estritamente de UI/UX e refatoração de componentes de apresentação.
+## Validação
+- Testar pesquisa simples, atual, documentação/política oficial, múltiplas fontes, URL válida/inválida, prompt injection, conversa existente e atalho manual.
+- Validar combinação com contexto de projeto/arquivo por tool calling, recusa de usuário sem permissão, streaming, desktop e mobile de 390 px.
+- Confirmar compilação, logs e ausência de regressões no chat existente.
