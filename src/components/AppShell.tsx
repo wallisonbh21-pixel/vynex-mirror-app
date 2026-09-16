@@ -204,6 +204,7 @@ export function AppShell({
         ...NAV_VENDEDOR,
         { to: "/aprovacoes", label: "Aprovação de sites", icon: ShieldCheck },
         { to: "/criacao", label: "Área do criador", icon: Layers },
+        { to: "/nexusbuild-ai", label: "NEXUSBUILD AI", icon: Sparkles },
         { 
           to: "/admin/clientes", 
           label: "Clientee", 

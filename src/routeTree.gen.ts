@@ -28,6 +28,7 @@ import { Route as AuthenticatedIndicarRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedMeusProjetosRouteImport } from './routes/_authenticated/meus-projetos'
 import { Route as AuthenticatedMeusSaquesRouteImport } from './routes/_authenticated/meus-saques'
+import { Route as AuthenticatedNexusbuildAiRouteImport } from './routes/_authenticated/nexusbuild-ai'
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
@@ -166,6 +167,12 @@ const AuthenticatedMeusSaquesRoute = AuthenticatedMeusSaquesRouteImport.update({
   path: '/meus-saques',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNexusbuildAiRoute =
+  AuthenticatedNexusbuildAiRouteImport.update({
+    id: '/nexusbuild-ai',
+    path: '/nexusbuild-ai',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedNotificacoesRoute =
   AuthenticatedNotificacoesRouteImport.update({
     id: '/notificacoes',
@@ -414,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/metas': typeof AuthenticatedMetasRoute
   '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/meus-saques': typeof AuthenticatedMeusSaquesRoute
+  '/nexusbuild-ai': typeof AuthenticatedNexusbuildAiRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -473,6 +481,7 @@ export interface FileRoutesByTo {
   '/metas': typeof AuthenticatedMetasRoute
   '/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/meus-saques': typeof AuthenticatedMeusSaquesRoute
+  '/nexusbuild-ai': typeof AuthenticatedNexusbuildAiRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -535,6 +544,7 @@ export interface FileRoutesById {
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/meus-projetos': typeof AuthenticatedMeusProjetosRoute
   '/_authenticated/meus-saques': typeof AuthenticatedMeusSaquesRoute
+  '/_authenticated/nexusbuild-ai': typeof AuthenticatedNexusbuildAiRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
@@ -597,6 +607,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/meus-projetos'
     | '/meus-saques'
+    | '/nexusbuild-ai'
     | '/notificacoes'
     | '/painel'
     | '/perfil'
@@ -656,6 +667,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/meus-projetos'
     | '/meus-saques'
+    | '/nexusbuild-ai'
     | '/notificacoes'
     | '/painel'
     | '/perfil'
@@ -717,6 +729,7 @@ export interface FileRouteTypes {
     | '/_authenticated/metas'
     | '/_authenticated/meus-projetos'
     | '/_authenticated/meus-saques'
+    | '/_authenticated/nexusbuild-ai'
     | '/_authenticated/notificacoes'
     | '/_authenticated/painel'
     | '/_authenticated/perfil'
@@ -906,6 +919,13 @@ declare module '@tanstack/react-router' {
       path: '/meus-saques'
       fullPath: '/meus-saques'
       preLoaderRoute: typeof AuthenticatedMeusSaquesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nexusbuild-ai': {
+      id: '/_authenticated/nexusbuild-ai'
+      path: '/nexusbuild-ai'
+      fullPath: '/nexusbuild-ai'
+      preLoaderRoute: typeof AuthenticatedNexusbuildAiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notificacoes': {
@@ -1277,6 +1297,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedMeusProjetosRoute: typeof AuthenticatedMeusProjetosRoute
   AuthenticatedMeusSaquesRoute: typeof AuthenticatedMeusSaquesRoute
+  AuthenticatedNexusbuildAiRoute: typeof AuthenticatedNexusbuildAiRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
@@ -1310,6 +1331,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedMeusProjetosRoute: AuthenticatedMeusProjetosRoute,
   AuthenticatedMeusSaquesRoute: AuthenticatedMeusSaquesRoute,
+  AuthenticatedNexusbuildAiRoute: AuthenticatedNexusbuildAiRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
