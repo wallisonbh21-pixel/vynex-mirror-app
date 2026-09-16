@@ -34,11 +34,16 @@ export interface NexusTool {
 
 /** Capacidades previstas na arquitetura, ainda não implementadas. */
 export const NEXUS_UNAVAILABLE_TOOLS = [
-  { name: "project_creation", reason: "criação de projetos pela IA ainda não foi liberada" },
-  { name: "website_builder", reason: "construção automática de sites ainda não foi liberada" },
   { name: "app_builder", reason: "construção de aplicativos ainda não foi liberada" },
   { name: "document_generator", reason: "geração de arquivos pela IA ainda não foi liberada" },
   { name: "deployment_assistant", reason: "assistente de publicação ainda não foi liberado" },
+  {
+    name: "website_builder (páginas múltiplas, navegação, formulários, gráficos, animações e integrações)",
+    reason:
+      "o construtor atual monta apenas a página única do Studio, por seções da biblioteca; páginas extras, navegação, formulários, gráficos, animações e integrações ainda não são executáveis",
+  },
+  { name: "template_engine", reason: "ainda não há template real cadastrado para gerar projeto automaticamente" },
+  { name: "image_generation", reason: "geração de imagens pela IA ainda não foi liberada" },
 ];
 
 async function loadProjectBundle(projectId: string, rt: NexusToolRuntime) {
