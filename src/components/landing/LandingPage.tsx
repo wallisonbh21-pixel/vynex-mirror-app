@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 
 /* ---------------- helpers ---------------- */
 
@@ -104,10 +105,14 @@ export function LandingPage() {
       <style>{`
         @keyframes sn-marquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
         @keyframes sn-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+        @keyframes floatY { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
         @keyframes sn-grow { 0% { transform: scaleY(0) } 100% { transform: scaleY(1) } }
+        @keyframes sn-shimmer { 0% { background-position: 0% 0 } 100% { background-position: 200% 0 } }
+        @keyframes sn-pulse { 0%,100% { opacity: 1; transform: scale(1) } 50% { opacity: 0.35; transform: scale(0.8) } }
         .sn-track { display: flex; width: max-content; animation-name: sn-marquee; animation-timing-function: linear; animation-iteration-count: infinite; }
         .sn-pause:hover .sn-track { animation-play-state: paused; }
         .sn-fade { -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+        .sn-bar { background: linear-gradient(90deg, #3b82f6 0%, #93c5fd 50%, #3b82f6 100%); background-size: 200% 100%; animation: sn-shimmer 2.4s linear infinite; }
       `}</style>
 
       {/* HEADER */}
@@ -120,7 +125,7 @@ export function LandingPage() {
           <nav className="hidden items-center gap-8 text-sm text-[#94a3b8] md:flex">
             <a href="#como-funciona" className="transition-colors hover:text-white">Como funciona</a>
             <a href="#o-que-fazemos" className="transition-colors hover:text-white">O que fazemos</a>
-            <a href="#modelos" className="transition-colors hover:text-white">Modelos</a>
+            <Link to="/modelos" className="transition-colors hover:text-white">Modelos</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link
@@ -145,20 +150,33 @@ export function LandingPage() {
           className="mx-auto w-full rounded-2xl border border-[#1f2937] bg-[#0f1424] p-5"
           style={{ maxWidth: 720, animation: "sn-float 6s ease-in-out infinite" }}
         >
-          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#60a5fa]">Sites em produção hoje</p>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#60a5fa]">Sites em produção hoje</p>
+            <span className="flex items-center gap-2 text-[10px] font-semibold text-[#64748b]">
+              <span className="size-2 rounded-full bg-[#22c55e]" style={{ animation: "sn-pulse 1.4s ease-in-out infinite" }} />
+              Dados em tempo real — atualiza a cada 15min
+            </span>
+          </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
               { l: "Em andamento", v: 19, s: "" },
               { l: "Aguardando", v: 11, s: "" },
               { l: "Entregues", v: 109, s: "" },
               { l: "Prazo médio", v: 48, s: "h" },
-            ].map((c) => (
-              <div key={c.l} className="flex h-[70px] flex-col justify-center rounded-xl border border-[#1f2937] bg-[#0b1020] px-4">
+            ].map((c, i) => (
+              <motion.div
+                key={c.l}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: i * 0.12 }}
+                className="flex h-[70px] flex-col justify-center rounded-xl border border-[#1f2937] bg-[#0b1020] px-4"
+                style={{ animation: `floatY 4s ease-in-out ${i * 0.3}s infinite` }}
+              >
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">{c.l}</span>
                 <span className="text-xl font-bold text-white">
                   <Counter value={c.v} suffix={c.s} />
                 </span>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -167,18 +185,28 @@ export function LandingPage() {
               <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Entregas da semana</p>
               <div className="flex h-8 items-end gap-2">
                 {WEEK_BARS.map((h, i) => (
-                  <div
+                  <motion.div
                     key={i}
-                    className="w-4 origin-bottom rounded-sm bg-[#3b82f6]"
-                    style={{ height: `${(h / 100) * 32}px`, animation: `sn-grow 0.8s ease-out ${i * 0.08}s both` }}
+                    className="sn-bar w-4 rounded-sm"
+                    initial={{ height: 0 }}
+                    animate={{ height: `${(h / 100) * 32}px` }}
+                    transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
                   />
                 ))}
               </div>
             </div>
-            <div className="text-right">
+            <div className="w-full sm:w-auto sm:text-right">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Próxima entrega</p>
               <p className="text-sm font-semibold text-white">Landing Institucional</p>
               <p className="text-xs text-[#60a5fa]">em 2 dias</p>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#1f2937] sm:w-40">
+                <motion.div
+                  className="sn-bar h-full rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "85%" }}
+                  transition={{ duration: 1.6, delay: 0.4, ease: "easeOut" }}
+                />
+              </div>
             </div>
           </div>
         </div>
