@@ -144,8 +144,53 @@ export function LandingPage() {
         </div>
       </header>
 
+      {/* HERO */}
+      <section className="relative overflow-hidden px-6 pt-20 pb-6 text-center">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[520px]"
+          style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.18), transparent 70%)" }}
+        />
+        <motion.div
+          className="relative mx-auto max-w-4xl"
+          initial={{ y: 24, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#1f2937] bg-[#0f1424] px-4 py-1.5 text-xs font-medium text-[#94a3b8]">
+            <span className="size-1.5 rounded-full bg-[#3b82f6]" style={{ animation: "sn-pulse 1.6s ease-in-out infinite" }} />
+            Agência de criação de sites e publicidade
+          </span>
+          <h1
+            className="mt-7 text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl"
+            style={{ animation: "floatY 7s ease-in-out infinite" }}
+          >
+            Criamos o Site Profissional
+            <br />
+            da Sua Empresa em <span className="text-[#60a5fa]">48h</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#94a3b8]">
+            Você escolhe o modelo, nossos especialistas e agentes de IA cuidam de todo o resto.
+            Design, textos e publicação. Pronto para vender.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/modelos"
+              className="rounded-xl bg-[#3b82f6] px-7 py-3.5 text-sm font-bold text-white transition-transform hover:scale-105"
+            >
+              Escolher meu modelo
+            </Link>
+            <a
+              href="#como-funciona"
+              className="rounded-xl border border-[#1f2937] bg-[#0f1424] px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:border-[#3b82f6]/60"
+            >
+              Ver como funciona
+            </a>
+          </div>
+        </motion.div>
+      </section>
+
       {/* DASHBOARD */}
-      <section className="px-6 pt-16 pb-20">
+      <section className="px-6 pt-10 pb-20">
         <div
           className="mx-auto w-full rounded-2xl border border-[#1f2937] bg-[#0f1424] p-5"
           style={{ maxWidth: 720, animation: "sn-float 6s ease-in-out infinite" }}
