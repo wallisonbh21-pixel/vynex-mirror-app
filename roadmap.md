@@ -12,4 +12,4 @@ Pedido reiterado em 09/09: mesma implementação visual global, usando a imagem 
 
 - [x] Adicionar movimento com profundidade ao painel “Sites em produção hoje”.
 - [x] Exibir miniaturas de sites completos nos modelos da página inicial e da página de modelos.
-- [ ] Validar visualmente em desktop e celular.
+- [x] Validar visualmente em desktop e celular.
