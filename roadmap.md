@@ -7,3 +7,9 @@
 - [x] Entregar relatório de alterações sem mudar dados, autenticação ou regras.
 
 Pedido reiterado em 09/09: mesma implementação visual global, usando a imagem reenviada como referência oficial.
+
+## Página inicial — interação e modelos
+
+- [x] Adicionar movimento com profundidade ao painel “Sites em produção hoje”.
+- [x] Exibir miniaturas de sites completos nos modelos da página inicial e da página de modelos.
+- [ ] Validar visualmente em desktop e celular.

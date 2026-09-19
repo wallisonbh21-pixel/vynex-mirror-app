@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { TEMPLATE_MODELS, TEMPLATE_PRICE, type TemplateModel } from "./templates-data";
+import { TemplateSitePreview } from "./TemplateSitePreview";
 
 export function TemplatesPage() {
   const [selected, setSelected] = useState<TemplateModel | null>(null);
@@ -60,7 +61,9 @@ export function TemplatesPage() {
               className="group overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424] transition-colors hover:border-[#3b82f6]/60"
             >
               <div className="relative">
-                <img src={t.img} alt={t.name} className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                <div className="h-56 w-full transition-transform duration-500 group-hover:scale-[1.02]">
+                  <TemplateSitePreview template={t} compact />
+                </div>
                 <span
                   className="absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
                   style={{ color: t.accent, backgroundColor: `${t.accent}22`, border: `1px solid ${t.accent}55` }}
@@ -113,13 +116,7 @@ export function TemplatesPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative">
-                <img src={selected.img} alt={selected.name} className="h-48 w-full object-cover" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/55 text-center">
-                  <p className="text-2xl font-bold text-white">{company.trim() || "Sua Empresa"}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: selected.accent }}>
-                    {selected.name}
-                  </p>
-                </div>
+                <div className="h-72 w-full"><TemplateSitePreview template={selected} company={company} /></div>
               </div>
               <div className="space-y-4 p-6">
                 <div>

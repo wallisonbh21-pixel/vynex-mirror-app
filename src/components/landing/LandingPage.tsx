@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { TEMPLATE_MODELS } from "./templates-data";
+import { TemplateSitePreview } from "./TemplateSitePreview";
 
 /* ---------------- helpers ---------------- */
 
@@ -46,19 +48,6 @@ function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
   );
 }
 
-const TEMPLATES = [
-  { name: "Advocacia", img: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80" },
-  { name: "Clínica", img: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80" },
-  { name: "Ecommerce Tech", img: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=800&q=80" },
-  { name: "Institucional", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" },
-  { name: "Portfólio Arquitetura", img: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=800&q=80" },
-  { name: "Restaurante Gourmet", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" },
-  { name: "Hamburgueria", img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=800&q=80" },
-  { name: "Barbearia", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80" },
-  { name: "Loja Roupas", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
-  { name: "Imobiliária", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" },
-];
-
 const BRANDS = [
   { label: "ScaleNexus", initial: "S", color: "#a855f7" },
   { label: "Valtrion AI", initial: "V", color: "#3b82f6" },
@@ -93,6 +82,80 @@ const TESTIMONIALS = [
 ];
 
 const WEEK_BARS = [40, 65, 50, 85, 70, 95, 60];
+
+function ProductionDashboard() {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: y * -8, y: x * 10 });
+  };
+
+  return (
+    <div className="mx-auto w-full [perspective:1100px]" style={{ maxWidth: 720, animation: "sn-float 6s ease-in-out infinite" }}>
+      <motion.div
+        onPointerMove={handlePointerMove}
+        onPointerLeave={() => setTilt({ x: 0, y: 0 })}
+        animate={{ rotateX: tilt.x, rotateY: tilt.y, scale: tilt.x || tilt.y ? 1.018 : 1 }}
+        transition={{ type: "spring", stiffness: 180, damping: 20, mass: 0.7 }}
+        className="w-full rounded-2xl border border-[#1f2937] bg-[#0f1424] p-5 will-change-transform"
+        style={{ transformStyle: "preserve-3d", boxShadow: tilt.x || tilt.y ? "0 28px 70px rgba(37,99,235,0.28)" : "0 18px 50px rgba(0,0,0,0.28)" }}
+      >
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 [transform:translateZ(18px)]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#60a5fa]">Sites em produção hoje</p>
+          <span className="flex items-center gap-2 text-[10px] font-semibold text-[#64748b]">
+            <span className="size-2 rounded-full bg-[#22c55e]" style={{ animation: "sn-pulse 1.4s ease-in-out infinite" }} />
+            Dados em tempo real — atualiza a cada 15min
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 [transform:translateZ(28px)]">
+          {[
+            { l: "Em andamento", v: 19, s: "" },
+            { l: "Aguardando", v: 11, s: "" },
+            { l: "Entregues", v: 109, s: "" },
+            { l: "Prazo médio", v: 48, s: "h" },
+          ].map((c, i) => (
+            <motion.div
+              key={c.l}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              whileHover={{ y: -5, borderColor: "rgba(96,165,250,0.65)" }}
+              transition={{ duration: 0.35, delay: i * 0.08 }}
+              className="flex h-[70px] flex-col justify-center rounded-xl border border-[#1f2937] bg-[#0b1020] px-4"
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">{c.l}</span>
+              <span className="text-xl font-bold text-white"><Counter value={c.v} suffix={c.s} /></span>
+            </motion.div>
+          ))}
+        </div>
+        <motion.div
+          className="mt-5 flex flex-col gap-4 rounded-xl border border-[#1f2937] bg-[#0b1020] p-4 sm:flex-row sm:items-end sm:justify-between [transform:translateZ(22px)]"
+          whileHover={{ y: -3 }}
+        >
+          <div>
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Entregas da semana</p>
+            <div className="flex h-8 items-end gap-2">
+              {WEEK_BARS.map((h, i) => (
+                <motion.div key={i} className="sn-bar w-4 rounded-sm" initial={{ height: 0 }} animate={{ height: `${(h / 100) * 32}px` }} transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }} />
+              ))}
+            </div>
+          </div>
+          <div className="w-full sm:w-auto sm:text-right">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Próxima entrega</p>
+            <p className="text-sm font-semibold text-white">Landing Institucional</p>
+            <p className="text-xs text-[#60a5fa]">em 2 dias</p>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#1f2937] sm:w-40">
+              <motion.div className="sn-bar h-full rounded-full" initial={{ width: "0%" }} animate={{ width: "85%" }} transition={{ duration: 1.6, delay: 0.4, ease: "easeOut" }} />
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
 
 /* ---------------- page ---------------- */
 
@@ -191,70 +254,7 @@ export function LandingPage() {
 
       {/* DASHBOARD */}
       <section className="px-6 pt-10 pb-20">
-        <div
-          className="mx-auto w-full rounded-2xl border border-[#1f2937] bg-[#0f1424] p-5"
-          style={{ maxWidth: 720, animation: "sn-float 6s ease-in-out infinite" }}
-        >
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#60a5fa]">Sites em produção hoje</p>
-            <span className="flex items-center gap-2 text-[10px] font-semibold text-[#64748b]">
-              <span className="size-2 rounded-full bg-[#22c55e]" style={{ animation: "sn-pulse 1.4s ease-in-out infinite" }} />
-              Dados em tempo real — atualiza a cada 15min
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {[
-              { l: "Em andamento", v: 19, s: "" },
-              { l: "Aguardando", v: 11, s: "" },
-              { l: "Entregues", v: 109, s: "" },
-              { l: "Prazo médio", v: 48, s: "h" },
-            ].map((c, i) => (
-              <motion.div
-                key={c.l}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="flex h-[70px] flex-col justify-center rounded-xl border border-[#1f2937] bg-[#0b1020] px-4"
-                style={{ animation: `floatY 4s ease-in-out ${i * 0.3}s infinite` }}
-              >
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">{c.l}</span>
-                <span className="text-xl font-bold text-white">
-                  <Counter value={c.v} suffix={c.s} />
-                </span>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="mt-5 flex flex-col gap-4 rounded-xl border border-[#1f2937] bg-[#0b1020] p-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Entregas da semana</p>
-              <div className="flex h-8 items-end gap-2">
-                {WEEK_BARS.map((h, i) => (
-                  <motion.div
-                    key={i}
-                    className="sn-bar w-4 rounded-sm"
-                    initial={{ height: 0 }}
-                    animate={{ height: `${(h / 100) * 32}px` }}
-                    transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="w-full sm:w-auto sm:text-right">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Próxima entrega</p>
-              <p className="text-sm font-semibold text-white">Landing Institucional</p>
-              <p className="text-xs text-[#60a5fa]">em 2 dias</p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#1f2937] sm:w-40">
-                <motion.div
-                  className="sn-bar h-full rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "85%" }}
-                  transition={{ duration: 1.6, delay: 0.4, ease: "easeOut" }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProductionDashboard />
       </section>
 
       {/* ECOSSISTEMA */}
@@ -361,13 +361,13 @@ export function LandingPage() {
         </h2>
         <div className="sn-pause sn-fade mx-auto mt-12 overflow-hidden" style={{ maxWidth: 1400 }}>
           <div className="sn-track" style={{ animationDuration: "70s", gap: "24px" }}>
-            {[...TEMPLATES, ...TEMPLATES].map((t, i) => (
+            {[...TEMPLATE_MODELS, ...TEMPLATE_MODELS].map((t, i) => (
               <div
                 key={i}
                 className="shrink-0 overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424]"
                 style={{ width: 340, height: 440, marginRight: 24 }}
               >
-                <img src={t.img} alt={t.name} className="h-[340px] w-full object-cover" loading="lazy" />
+                <div className="h-[340px] w-full"><TemplateSitePreview template={t} /></div>
                 <div className="p-5">
                   <h3 className="text-base font-bold text-white">{t.name}</h3>
                   <p className="mt-1 text-xs text-[#64748b]">Template pronto para personalizar</p>
@@ -383,9 +383,9 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-3xl font-bold md:text-4xl">Todos os templates</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {TEMPLATES.slice(0, 9).map((t) => (
+            {TEMPLATE_MODELS.slice(0, 9).map((t) => (
               <div key={t.name} className="overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424]">
-                <img src={t.img} alt={t.name} className="h-40 w-full object-cover" loading="lazy" />
+                <div className="h-48 w-full"><TemplateSitePreview template={t} compact /></div>
                 <div className="space-y-3 p-5">
                   <h3 className="text-base font-bold text-white">{t.name}</h3>
                   <input
