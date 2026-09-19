@@ -1,236 +1,303 @@
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, ChevronRight, Zap, Target, Palette, BrainCircuit, LayoutGrid, BarChart3, ShieldCheck, Gauge, Search } from "lucide-react";
+
+/* ---------------- helpers ---------------- */
+
+function useInView<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || seen) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setSeen(true);
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [seen]);
+  return { ref, seen };
+}
+
+function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const { ref, seen } = useInView<HTMLSpanElement>();
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!seen) return;
+    let raf = 0;
+    const start = performance.now();
+    const dur = 1200;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / dur);
+      setN(Math.round(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [seen, value]);
+  return (
+    <span ref={ref}>
+      {n}
+      {suffix}
+    </span>
+  );
+}
+
+const TEMPLATES = [
+  { name: "Advocacia", img: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80" },
+  { name: "Clínica", img: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80" },
+  { name: "Ecommerce Tech", img: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=800&q=80" },
+  { name: "Institucional", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" },
+  { name: "Portfólio Arquitetura", img: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=800&q=80" },
+  { name: "Restaurante Gourmet", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" },
+  { name: "Hamburgueria", img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=800&q=80" },
+  { name: "Barbearia", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80" },
+  { name: "Loja Roupas", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
+  { name: "Imobiliária", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" },
+];
+
+const BRANDS = [
+  { label: "ScaleNexus", initial: "S", color: "#a855f7" },
+  { label: "Valtrion AI", initial: "V", color: "#3b82f6" },
+  { label: "NexusBuild AI", initial: "N", color: "#22c55e" },
+  { label: "Aurevion Group", initial: "A", color: "#eab308" },
+];
+
+const CLIENT_NAMES = [
+  "Studio Kai", "Nova Vita", "Dominar", "Lumen Co.", "Vertigo",
+  "Northwave", "Southwave", "Aero Labs", "Bright & Co.",
+];
+
+const SERVICES = [
+  { t: "Criação completa do site", d: "Do layout ao lançamento, sem você precisar escrever uma linha." },
+  { t: "Publicidade que traz cliente", d: "Campanhas pensadas para gerar contato real, não só visita." },
+  { t: "Especialistas dedicados", d: "Time de design, texto e tecnologia cuidando do seu projeto." },
+  { t: "Agentes de IA no processo", d: "Inteligência aplicada para acelerar cada etapa da produção." },
+  { t: "Textos, fotos e identidade", d: "Conteúdo e visual prontos, alinhados com a sua marca." },
+  { t: "Suporte e manutenção", d: "Ajustes, atualizações e acompanhamento depois da entrega." },
+];
+
+const STEPS = [
+  { n: "01", t: "Escolha o modelo", d: "Selecione o template que combina com o seu negócio e veja como ele fica com o seu nome." },
+  { n: "02", t: "Envie sua marca", d: "Logo, cores, fotos e informações. Nosso time cuida de todo o resto da produção." },
+  { n: "03", t: "Receba em 48h", d: "Seu site publicado, responsivo e pronto para receber clientes em dois dias." },
+];
+
+const TESTIMONIALS = [
+  { name: "Diego Albuquerque", role: "Imobiliária Nova Vita", text: "Em dois dias o site estava no ar e já recebemos contatos na mesma semana." },
+  { name: "Rafael Menezes", role: "Hamburgueria Brasa", text: "O time entendeu a marca melhor que a gente. Ficou exatamente do jeito que queríamos." },
+  { name: "Camila Duarte", role: "Studio Kai", text: "Processo simples, sem enrolação. Enviei a marca e recebi tudo pronto." },
+];
+
+const WEEK_BARS = [40, 65, 50, 85, 70, 95, 60];
+
+/* ---------------- page ---------------- */
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-primary/30">
-      <LandingHeader />
+    <div
+      className="min-h-screen w-full overflow-x-hidden text-white"
+      style={{ backgroundColor: "#05070f", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
+    >
+      <style>{`
+        @keyframes sn-marquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
+        @keyframes sn-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+        @keyframes sn-grow { 0% { transform: scaleY(0) } 100% { transform: scaleY(1) } }
+        .sn-track { display: flex; width: max-content; animation-name: sn-marquee; animation-timing-function: linear; animation-iteration-count: infinite; }
+        .sn-pause:hover .sn-track { animation-play-state: paused; }
+        .sn-fade { -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+      `}</style>
 
-      {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-halo opacity-50" />
-        <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-            Transforme negócios em <span className="text-gradient-brand">crescimento digital.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            A ScaleNexus conecta prospecção, vendas, criação de sites e gestão em uma única plataforma inteligente.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild className="h-14 px-8 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow">
-              <Link to="/auth">🚀 Começar agora</Link>
-            </Button>
-            <Button variant="ghost" className="h-14 px-8 rounded-xl font-bold text-slate-300 hover:text-white border border-slate-800 hover:bg-slate-900">
-              ▶ Conhecer a ScaleNexus
-            </Button>
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 border-b border-[#141a2b] bg-[#05070f]/90 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-2">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-[#a855f7]/15 text-sm font-black text-[#a855f7]">S</div>
+            <span className="text-lg font-bold tracking-tight">ScaleNexus</span>
+          </div>
+          <nav className="hidden items-center gap-8 text-sm text-[#94a3b8] md:flex">
+            <a href="#como-funciona" className="transition-colors hover:text-white">Como funciona</a>
+            <a href="#o-que-fazemos" className="transition-colors hover:text-white">O que fazemos</a>
+            <a href="#modelos" className="transition-colors hover:text-white">Modelos</a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/auth"
+              className="hidden rounded-lg border border-white/70 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#05070f] sm:block"
+            >
+              Login/Cadastro
+            </Link>
+            <Link
+              to="/comece-seu-projeto"
+              className="rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Criar meu site
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* DASHBOARD */}
+      <section className="px-6 pt-16 pb-20">
+        <div
+          className="mx-auto w-full rounded-2xl border border-[#1f2937] bg-[#0f1424] p-5"
+          style={{ maxWidth: 720, animation: "sn-float 6s ease-in-out infinite" }}
+        >
+          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-[#60a5fa]">Sites em produção hoje</p>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {[
+              { l: "Em andamento", v: 19, s: "" },
+              { l: "Aguardando", v: 11, s: "" },
+              { l: "Entregues", v: 109, s: "" },
+              { l: "Prazo médio", v: 48, s: "h" },
+            ].map((c) => (
+              <div key={c.l} className="flex h-[70px] flex-col justify-center rounded-xl border border-[#1f2937] bg-[#0b1020] px-4">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">{c.l}</span>
+                <span className="text-xl font-bold text-white">
+                  <Counter value={c.v} suffix={c.s} />
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 flex flex-col gap-4 rounded-xl border border-[#1f2937] bg-[#0b1020] p-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Entregas da semana</p>
+              <div className="flex h-8 items-end gap-2">
+                {WEEK_BARS.map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-4 origin-bottom rounded-sm bg-[#3b82f6]"
+                    style={{ height: `${(h / 100) * 32}px`, animation: `sn-grow 0.8s ease-out ${i * 0.08}s both` }}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#64748b]">Próxima entrega</p>
+              <p className="text-sm font-semibold text-white">Landing Institucional</p>
+              <p className="text-xs text-[#60a5fa]">em 2 dias</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Ecossistema */}
-      <section id="ecossistema" className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Um ecossistema completo para fazer negócios crescerem.</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: Search, title: "Central de Prospecção", desc: "Encontre novas oportunidades comerciais." },
-              { icon: Target, title: "CRM", desc: "Organize leads, propostas e vendas." },
-              { icon: Palette, title: "ScaleNexus Studio", desc: "Crie sites profissionais dentro da plataforma." },
-              { icon: BrainCircuit, title: "Briefing Inteligente", desc: "Entenda o negócio antes de começar a criação." },
-              { icon: LayoutGrid, title: "Site Planner", desc: "Planeje a estrutura estratégica do site." },
-              { icon: Gauge, title: "Gestão de Projetos", desc: "Acompanhe cada projeto do início à entrega." },
-              { icon: BarChart3, title: "Gestão Financeira", desc: "Controle comissões, saques e resultados." },
-              { icon: Zap, title: "Inteligência ScaleNexus", desc: "Prepare-se para a próxima geração de criação inteligente." },
-            ].map((item, i) => (
-              <div key={i} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all shadow-panel hover:shadow-glow">
-                <item.icon className="size-8 text-primary mb-4" />
-                <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+      {/* ECOSSISTEMA */}
+      <section className="px-6 py-16">
+        <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Ecossistema</p>
+        <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl font-bold text-white md:text-4xl">
+          Fazemos parte do Aurevion Group
+        </h2>
+        <div className="sn-pause sn-fade mt-10 overflow-hidden">
+          <div className="sn-track gap-4" style={{ animationDuration: "60s" }}>
+            {[...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS].map((b, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 rounded-full border bg-[#0f1424] px-6 py-3"
+                style={{ borderColor: `${b.color}55` }}
+              >
+                <span className="flex size-7 items-center justify-center rounded-full text-xs font-black" style={{ color: b.color, backgroundColor: `${b.color}22` }}>
+                  {b.initial}
+                </span>
+                <span className="whitespace-nowrap text-sm font-semibold text-[#e2e8f0]">{b.label}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Fluxo Completo */}
-      <section id="fluxo" className="py-20 px-6 bg-slate-900/30">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Do primeiro contato à entrega.</h2>
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              { id: "01", icon: "🔎", label: "Prospecção" },
-              { id: "02", icon: "💬", label: "Lead" },
-              { id: "03", icon: "💼", label: "Venda" },
-              { id: "04", icon: "📋", label: "Projeto" },
-              { id: "05", icon: "🧠", label: "Briefing" },
-              { id: "06", icon: "📐", label: "Planejamento" },
-              { id: "07", icon: "🎨", label: "Criação" },
-              { id: "08", icon: "👤", label: "Aprovação" },
-              { id: "09", icon: "🚀", label: "Entrega" },
-            ].map((step, i, arr) => (
-              <div key={step.id} className="flex items-center">
-                <div className="flex flex-col items-center gap-2 group">
-                  <div className="size-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xl shadow-panel group-hover:border-primary/50 transition-all">
-                    {step.icon}
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-[10px] text-primary font-bold">{step.id}</span>
-                    <span className="text-sm font-medium text-slate-300">{step.label}</span>
-                  </div>
-                </div>
-                {i < arr.length - 1 && (
-                  <ChevronRight className="size-4 text-slate-700 mx-2 hidden lg:block" />
-                )}
+      {/* CARROSSEL NOMES */}
+      <section className="px-6 py-10">
+        <p className="text-center text-base text-[#94a3b8]">
+          Mais de 200+ empresas já tiveram o site criado pela ScaleNexus
+        </p>
+        <div className="sn-pause sn-fade mt-6 overflow-hidden">
+          <div className="sn-track" style={{ animationDuration: "120s", animationDirection: "reverse", gap: "40px" }}>
+            {[...CLIENT_NAMES, ...CLIENT_NAMES, ...CLIENT_NAMES, ...CLIENT_NAMES].map((n, i) => (
+              <span key={i} className="whitespace-nowrap text-lg font-semibold text-[#475569]" style={{ marginRight: 40 }}>
+                {n}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* O QUE FAZEMOS */}
+      <section id="o-que-fazemos" className="px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">O que fazemos</p>
+          <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl font-bold md:text-4xl">
+            Uma agência completa cuidando do seu site
+          </h2>
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {SERVICES.map((s) => (
+              <div key={s.t} className="rounded-[20px] border border-[#1f2937] bg-[#0f1424] p-6 transition-colors hover:border-[#3b82f6]/50">
+                <h3 className="mb-2 text-lg font-bold text-white">{s.t}</h3>
+                <p className="text-sm leading-relaxed text-[#94a3b8]">{s.d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ScaleNexus Studio */}
-      <section id="studio" className="py-20 px-6">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Crie experiências digitais profissionais.</h2>
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              {[
-                "Templates", "Seções", "Elementos", "Design System", 
-                "Responsividade", "Biblioteca", "Edição Visual", "Preview"
-              ].map(feat => (
-                <div key={feat} className="flex items-center gap-2 text-slate-300">
-                  <CheckCircle2 className="size-4 text-primary" />
-                  <span className="text-sm font-medium">{feat}</span>
+      {/* COMO FUNCIONA */}
+      <section id="como-funciona" className="relative px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Como funciona</p>
+          <h2 className="mx-auto mt-3 max-w-3xl text-center text-4xl font-bold md:text-5xl">
+            Três passos até o seu site no ar
+          </h2>
+          <div className="relative mt-16">
+            <div
+              className="absolute left-0 right-0 top-1/2 hidden h-px lg:block"
+              style={{ background: "linear-gradient(to right, transparent, #3b82f6, transparent)" }}
+            />
+            <div className="relative grid gap-8 lg:grid-cols-3">
+              {STEPS.map((s) => (
+                <div key={s.n} className="relative">
+                  <div
+                    className="pointer-events-none absolute -inset-5 rounded-[32px] blur-2xl"
+                    style={{ background: "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.22), transparent 70%)" }}
+                  />
+                  <div
+                    className="relative flex h-[340px] flex-col justify-between rounded-3xl border border-[#1f2937] bg-[#0f1424] p-8"
+                    style={{ boxShadow: "0 20px 60px rgba(59,130,246,0.25)" }}
+                  >
+                    <span className="font-black leading-none text-[#3b82f6]" style={{ fontSize: 72, opacity: 0.3 }}>
+                      {s.n}
+                    </span>
+                    <div>
+                      <h3 className="mb-3 text-2xl font-bold text-white">{s.t}</h3>
+                      <p className="text-sm leading-relaxed text-[#94a3b8]">{s.d}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-            <Button asChild className="h-12 px-8 rounded-xl font-bold">
-              <Link to="/auth">Conhecer o Studio</Link>
-            </Button>
-          </div>
-          <div className="relative rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden shadow-2xl group">
-            <img 
-              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80" 
-              alt="ScaleNexus Studio Preview" 
-              className="w-full opacity-80 group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
           </div>
         </div>
       </section>
 
-      {/* Inteligência */}
-      <section className="py-20 px-6 bg-slate-900/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Antes de criar, a ScaleNexus entende.</h2>
-          <div className="grid md:grid-cols-2 gap-12 mt-16 text-left">
-            <div className="space-y-4">
-              <div className="size-12 rounded-xl bg-primary/20 flex items-center justify-center">
-                <BrainCircuit className="size-6 text-primary" />
-              </div>
-              <h3 className="text-2xl font-bold italic">Briefing Inteligente</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Transforme informações do negócio em dados estruturados. O primeiro passo para uma estratégia de sucesso.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <div className="size-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                <LayoutGrid className="size-6 text-accent" />
-              </div>
-              <h3 className="text-2xl font-bold italic">Site Planner</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Transforme o briefing em uma estrutura estratégica de site. Planejamento visual antes de qualquer linha de código.
-              </p>
-            </div>
-          </div>
-          <div className="mt-16 flex items-center justify-center gap-2 md:gap-4 flex-wrap text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500">
-            <span>Briefing</span>
-            <ArrowRight className="size-3" />
-            <span>Estratégia</span>
-            <ArrowRight className="size-3" />
-            <span>Estrutura</span>
-            <ArrowRight className="size-3" />
-            <span>Design</span>
-            <ArrowRight className="size-3" />
-            <span>Aprovação</span>
-            <ArrowRight className="size-3" />
-            <span>Entrega</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Para quem é */}
-      <section id="publico" className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Uma plataforma. Diferentes profissionais.</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { role: "Vendedor", desc: "Encontre oportunidades, gerencie leads e feche negócios.", icon: Target },
-              { role: "Criador", desc: "Produza sites profissionais dentro da ScaleNexus.", icon: Palette },
-              { role: "Clientee", desc: "Acompanhe, revise e aprove seu projeto.", icon: ShieldCheck },
-            ].map(item => (
-              <div key={item.role} className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 text-center">
-                <item.icon className="size-10 text-primary mx-auto mb-6" />
-                <h3 className="text-xl font-bold mb-3">{item.role}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-center mt-12 text-slate-500 text-sm font-medium italic">
-            🚀 Futuramente: Gestor de Tráfego
-          </p>
-        </div>
-      </section>
-
-      {/* Diferenciais */}
-      <section className="py-20 px-6 bg-primary/5">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Por que ScaleNexus?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { title: "Tudo em um só lugar", icon: Zap },
-              { title: "Criação profissional", icon: Palette },
-              { title: "Inteligência orientada ao negócio", icon: BrainCircuit },
-              { title: "Gestão completa", icon: BarChart3 },
-              { title: "Segurança e controle", icon: ShieldCheck },
-              { title: "Estrutura preparada para escala", icon: Gauge },
-            ].map(diff => (
-              <div key={diff.title} className="flex items-center gap-4">
-                <div className="size-10 rounded-lg bg-slate-900 flex items-center justify-center border border-slate-800">
-                  <diff.icon className="size-5 text-primary" />
-                </div>
-                <span className="font-bold">{diff.title}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Templates */}
-      <section id="templates" className="py-20 px-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">Qualidade de nível mundial.</h2>
-          <p className="text-slate-400 text-center mb-16 max-w-2xl mx-auto">
-            Explore nossa biblioteca de templates profissionais desenvolvidos para alta conversão em diversos nichos.
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: "🍔 Hamburgueria", img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=600&q=80" },
-              { label: "🍕 Pizzaria", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80" },
-              { label: "💪 Academia", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80" },
-              { label: "💈 Barbearia", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80" },
-              { label: "🦷 Dentista", img: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=600&q=80" },
-              { label: "⚖️ Advocacia", img: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80" },
-              { label: "🏠 Imobiliária", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80" },
-              { label: "📸 Fotografia", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80" },
-            ].map(t => (
-              <div key={t.label} className="group relative rounded-xl overflow-hidden aspect-[4/3] border border-slate-800">
-                <img src={t.img} alt={t.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-60" />
-                <div className="absolute bottom-3 left-3">
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">{t.label}</span>
+      {/* MODELOS */}
+      <section id="modelos" className="py-20">
+        <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Modelos</p>
+        <h2 className="mx-auto mt-3 max-w-2xl px-6 text-center text-3xl font-bold md:text-4xl">
+          Escolha seu modelo e teste grátis
+        </h2>
+        <div className="sn-pause sn-fade mx-auto mt-12 overflow-hidden" style={{ maxWidth: 1400 }}>
+          <div className="sn-track" style={{ animationDuration: "70s", gap: "24px" }}>
+            {[...TEMPLATES, ...TEMPLATES].map((t, i) => (
+              <div
+                key={i}
+                className="shrink-0 overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424]"
+                style={{ width: 340, height: 440, marginRight: 24 }}
+              >
+                <img src={t.img} alt={t.name} className="h-[340px] w-full object-cover" loading="lazy" />
+                <div className="p-5">
+                  <h3 className="text-base font-bold text-white">{t.name}</h3>
+                  <p className="mt-1 text-xs text-[#64748b]">Template pronto para personalizar</p>
                 </div>
               </div>
             ))}
@@ -238,25 +305,107 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Final */}
-      <section className="py-32 px-6">
-        <div className="max-w-5xl mx-auto rounded-[3rem] bg-gradient-brand p-12 md:p-20 text-center relative overflow-hidden shadow-glow">
-          <div className="absolute inset-0 bg-slate-950/20" />
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black mb-6 text-white leading-tight">
-              Seu próximo crescimento <br /> começa aqui.
-            </h2>
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-              Tenha prospecção, vendas, criação e gestão trabalhando em um único ecossistema.
+      {/* TODOS OS TEMPLATES */}
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-bold md:text-4xl">Todos os templates</h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {TEMPLATES.slice(0, 9).map((t) => (
+              <div key={t.name} className="overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424]">
+                <img src={t.img} alt={t.name} className="h-40 w-full object-cover" loading="lazy" />
+                <div className="space-y-3 p-5">
+                  <h3 className="text-base font-bold text-white">{t.name}</h3>
+                  <input
+                    type="text"
+                    placeholder="Nome da sua empresa"
+                    className="w-full rounded-lg border border-[#1f2937] bg-[#0b1020] px-3 py-2 text-sm text-white placeholder:text-[#475569] focus:border-[#3b82f6] focus:outline-none"
+                  />
+                  <Link
+                    to="/comece-seu-projeto"
+                    className="block w-full rounded-lg bg-[#3b82f6] px-3 py-2 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  >
+                    Ver como meu site vai ficar →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DEPOIMENTOS */}
+      <section className="py-20">
+        <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Depoimentos</p>
+        <h2 className="mt-3 px-6 text-center text-3xl font-bold md:text-4xl">Empresas que já estão no ar</h2>
+        <div className="sn-pause sn-fade mt-12 overflow-hidden">
+          <div className="sn-track" style={{ animationDuration: "80s", gap: "24px" }}>
+            {[...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+              <div
+                key={i}
+                className="w-[380px] shrink-0 rounded-2xl border border-[#1f2937] bg-[#0f1424] p-6"
+                style={{ marginRight: 24 }}
+              >
+                <p className="text-sm leading-relaxed text-[#cbd5e1]">“{t.text}”</p>
+                <div className="mt-5">
+                  <p className="text-sm font-bold text-white">{t.name}</p>
+                  <p className="text-xs text-[#64748b]">{t.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="px-6 py-20">
+        <div
+          className="mx-auto max-w-5xl rounded-3xl p-12 text-center md:p-16"
+          style={{ background: "linear-gradient(135deg, #3b82f6 0%, #0f172a 100%)", borderRadius: 24 }}
+        >
+          <h2 className="text-3xl font-bold text-white md:text-4xl">Pronto para ter o site da sua empresa?</h2>
+          <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
+            Escolha um modelo e nossa equipe entrega em 48 horas
+          </p>
+          <Link
+            to="/comece-seu-projeto"
+            className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-base font-bold text-[#05070f] transition-transform hover:scale-105"
+          >
+            Quero meu site em 48h
+          </Link>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-[#141a2b] px-6 py-14">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[#a855f7]/15 text-sm font-black text-[#a855f7]">S</div>
+              <span className="text-lg font-bold">ScaleNexus</span>
+            </div>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#64748b]">
+              Agência de criação de sites e publicidade. Parte do Aurevion Group.
             </p>
-            <Button asChild className="h-16 px-10 rounded-2xl font-black bg-white text-slate-950 hover:bg-slate-100 text-lg shadow-2xl transition-all hover:scale-105 active:scale-95">
-              <Link to="/auth">🚀 Começar agora</Link>
-            </Button>
           </div>
+          {[
+            { t: "Serviços", items: ["Criação de sites", "Publicidade", "Identidade visual", "Manutenção"] },
+            { t: "Empresa", items: ["Sobre", "Aurevion Group", "Contato", "Trabalhe conosco"] },
+            { t: "Redes", items: ["Instagram", "LinkedIn", "YouTube", "WhatsApp"] },
+          ].map((col) => (
+            <div key={col.t}>
+              <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{col.t}</h4>
+              <ul className="space-y-2 text-sm text-[#64748b]">
+                {col.items.map((it) => (
+                  <li key={it} className="transition-colors hover:text-[#94a3b8]">{it}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-      </section>
-
-      <LandingFooter />
+        <p className="mx-auto mt-12 max-w-6xl border-t border-[#141a2b] pt-6 text-xs text-[#475569]">
+          © 2025 ScaleNexus. Todos os direitos reservados.
+        </p>
+      </footer>
     </div>
   );
 }
