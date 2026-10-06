@@ -7,20 +7,22 @@ interface ElementRendererProps {
   designSystem: StudioDesignSystem;
   isSelected?: boolean;
   onSelect?: (id: string) => void;
+  readOnly?: boolean | undefined;
 }
 
-export function ElementRenderer({ element, designSystem, isSelected, onSelect }: ElementRendererProps) {
+export function ElementRenderer({ element, designSystem, isSelected, onSelect, readOnly }: ElementRendererProps) {
   const { type, content, styles } = element;
 
   const handleClick = (e: React.MouseEvent) => {
+    if (readOnly) return;
     e.stopPropagation();
     onSelect?.(element.id);
   };
 
   const commonClasses = cn(
     "relative transition-all duration-200",
-    isSelected && "ring-2 ring-primary ring-offset-2 z-10",
-    "hover:ring-1 hover:ring-primary/50 cursor-pointer"
+    !readOnly && isSelected && "ring-2 ring-primary ring-offset-2 z-10",
+    !readOnly && "hover:ring-1 hover:ring-primary/50 cursor-pointer"
   );
 
   const getFontFamily = (type: 'heading' | 'body') => {
