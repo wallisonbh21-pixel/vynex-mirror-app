@@ -207,15 +207,6 @@ function ScaleNexusStudioPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
 
-  if (isLoading || !data) {
-
-    return (
-      <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-white">
-        <Loader2 className="size-10 animate-spin text-primary" />
-        <p className="animate-pulse font-medium">Carregando ScaleNexus Studio...</p>
-      </div>
-    );
-  }
 
   const handleAddElement = (type: StudioElement['type']) => {
     if (!data) return;
@@ -396,6 +387,16 @@ function ScaleNexusStudioPage() {
       console.error('AI Action failed:', error);
     }
   }, [data, updateData]);
+
+  if (isLoading || !data) {
+    return (
+      <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-white">
+        <Loader2 className="size-10 animate-spin text-primary" />
+        <p className="animate-pulse font-medium">Carregando ScaleNexus Studio...</p>
+      </div>
+    );
+  }
+
 
   const selectedElement = data.sections.flatMap(s => s.elements).find(el => el.id === selectedElementId) || null;
   const selectedSection = data.sections.find(s => s.id === selectedSectionId) || null;
