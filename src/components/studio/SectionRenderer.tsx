@@ -15,7 +15,7 @@ interface SectionRendererProps {
   onDuplicateSection: (id: string) => void;
   onDeleteSection: (id: string) => void;
   isSelected?: boolean;
-  readOnly?: boolean;
+  readOnly?: boolean | undefined;
 }
 
 export function SectionRenderer({ 

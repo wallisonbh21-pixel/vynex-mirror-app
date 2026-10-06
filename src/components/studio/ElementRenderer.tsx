@@ -7,7 +7,7 @@ interface ElementRendererProps {
   designSystem: StudioDesignSystem;
   isSelected?: boolean;
   onSelect?: (id: string) => void;
-  readOnly?: boolean;
+  readOnly?: boolean | undefined;
 }
 
 export function ElementRenderer({ element, designSystem, isSelected, onSelect, readOnly }: ElementRendererProps) {
