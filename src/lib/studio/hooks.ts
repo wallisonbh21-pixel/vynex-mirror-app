@@ -190,3 +190,38 @@ export function useSaveUserTemplate() {
     }
   });
 }
+
+// ===== Publicação versionada =====
+export function useProjectSite(projectId: string) {
+  return useQuery({
+    queryKey: ['project-site', projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('project_sites')
+        .select('id, slug, status, current_version_id, project_site_versions!project_site_versions_site_id_fkey(version_number, published_at)')
+        .eq('project_id', projectId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function usePublishSite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ projectId, slug }: { projectId: string; slug: string }) => {
+      const { data, error } = await supabase.rpc('publish_project_site', { p_project_id: projectId, p_slug: slug });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return row as { slug: string; version_number: number; version_id: string };
+    },
+    onSuccess: (_d, v) => qc.invalidateQueries({ queryKey: ['project-site', v.projectId] }),
+  });
+}
+
+export function slugify(input: string) {
+  return input
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+}
