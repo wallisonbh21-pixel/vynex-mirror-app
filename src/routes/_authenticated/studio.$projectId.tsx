@@ -27,6 +27,7 @@ import { StudioData, StudioSection, StudioElement, Viewport } from '@/types/stud
 import { LibraryPanel } from '@/components/studio/LibraryPanel';
 import { SectionRenderer } from '@/components/studio/SectionRenderer';
 import { PropertyPanel } from '@/components/studio/PropertyPanel';
+import { PublishSiteButton } from '@/components/studio/PublishSiteButton';
 import { AICorePanel } from '@/components/AICorePanel';
 import { ForgePanel } from '@/components/ForgePanel';
 import { generateId } from '@/lib/studio/utils';
@@ -501,8 +502,17 @@ function ScaleNexusStudioPage() {
           </Popover>
 
           <Button variant={isPreview ? "secondary" : "ghost"} size="sm" className="gap-2" onClick={() => setIsPreview(!isPreview)}>
-            <Eye className="size-4" /> {isPreview ? 'Editar' : 'Visualizar'}
+            <Eye className="size-4" /> {isPreview ? 'Editar' : 'Preview do rascunho'}
           </Button>
+
+          <PublishSiteButton
+            projectId={projectId}
+            defaultName={(briefing as any)?.company_name || 'meu-site'}
+            onSaveBeforePublish={async () => {
+              if (!data) throw new Error('Nada para publicar');
+              await saveMutation.mutateAsync({ projectId, data });
+            }}
+          />
 
           <Button 
             size="sm" 
