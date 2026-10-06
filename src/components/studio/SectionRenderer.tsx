@@ -15,6 +15,7 @@ interface SectionRendererProps {
   onDuplicateSection: (id: string) => void;
   onDeleteSection: (id: string) => void;
   isSelected?: boolean;
+  readOnly?: boolean;
 }
 
 export function SectionRenderer({ 
@@ -26,7 +27,8 @@ export function SectionRenderer({
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
-  isSelected
+  isSelected,
+  readOnly
 }: SectionRendererProps) {
   
   const { styles, elements } = section;
@@ -47,9 +49,10 @@ export function SectionRenderer({
         color: styles['backgroundColor'] === '#0f172a' ? '#ffffff' : designSystem.colors.text
       }}
 
-      onClick={() => onSelectSection(section.id)}
+      onClick={() => { if (!readOnly) onSelectSection(section.id); }}
     >
       {/* Section controls */}
+      {!readOnly && (
       <div className="absolute right-2 top-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
         <Button 
           variant="secondary" size="icon" className="size-8 rounded-lg shadow-md bg-white hover:bg-slate-100 text-slate-900 border"
@@ -76,6 +79,7 @@ export function SectionRenderer({
           <Trash2 className="size-4" />
         </Button>
       </div>
+      )}
 
       <div className={cn(
         "container mx-auto px-4",
@@ -94,6 +98,7 @@ export function SectionRenderer({
                 designSystem={designSystem}
                 isSelected={selectedElementId === element.id}
                 onSelect={onSelectElement}
+                readOnly={readOnly}
               />
             ))}
           </div>
