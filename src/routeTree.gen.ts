@@ -43,6 +43,7 @@ import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
 import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.primeiro-acesso'
 import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
 import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
+import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
 import { Route as AuthenticatedAdminCobrancasRouteImport } from './routes/_authenticated/admin/cobrancas'
@@ -248,6 +249,11 @@ const ClienteRecuperarSenhaRoute = ClienteRecuperarSenhaRouteImport.update({
 const ComeceSeuProjetoIndexRoute = ComeceSeuProjetoIndexRouteImport.update({
   id: '/comece-seu-projeto/',
   path: '/comece-seu-projeto/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SSlugRoute = SSlugRouteImport.update({
+  id: '/s/$slug',
+  path: '/s/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminClientesRoute =
@@ -467,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/cliente/login': typeof ClienteLoginRoute
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/s/$slug': typeof SSlugRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -532,6 +539,7 @@ export interface FileRoutesByTo {
   '/cliente/login': typeof ClienteLoginRoute
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/s/$slug': typeof SSlugRoute
   '/comece-seu-projeto': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -600,6 +608,7 @@ export interface FileRoutesById {
   '/cliente/login': typeof ClienteLoginRoute
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
+  '/s/$slug': typeof SSlugRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -668,6 +677,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
+    | '/s/$slug'
     | '/comece-seu-projeto/'
     | '/admin/clientes'
     | '/admin/clientes-login'
@@ -733,6 +743,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
+    | '/s/$slug'
     | '/comece-seu-projeto'
     | '/admin/clientes'
     | '/admin/clientes-login'
@@ -800,6 +811,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
+    | '/s/$slug'
     | '/comece-seu-projeto/'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/clientes-login'
@@ -844,6 +856,7 @@ export interface RootRouteChildren {
   ClienteLoginRoute: typeof ClienteLoginRoute
   ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
   ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
+  SSlugRoute: typeof SSlugRoute
   ComeceSeuProjetoIndexRoute: typeof ComeceSeuProjetoIndexRoute
   ApiNexusChatRoute: typeof ApiNexusChatRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
@@ -1088,6 +1101,13 @@ declare module '@tanstack/react-router' {
       path: '/comece-seu-projeto'
       fullPath: '/comece-seu-projeto/'
       preLoaderRoute: typeof ComeceSeuProjetoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$slug': {
+      id: '/s/$slug'
+      path: '/s/$slug'
+      fullPath: '/s/$slug'
+      preLoaderRoute: typeof SSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/clientes': {
@@ -1470,6 +1490,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteLoginRoute: ClienteLoginRoute,
   ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
   ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
+  SSlugRoute: SSlugRoute,
   ComeceSeuProjetoIndexRoute: ComeceSeuProjetoIndexRoute,
   ApiNexusChatRoute: ApiNexusChatRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,
