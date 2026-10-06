@@ -1454,6 +1454,108 @@ export type Database = {
           },
         ]
       }
+      project_site_versions: {
+        Row: {
+          design_system: Json
+          id: string
+          project_id: string
+          published_at: string
+          published_by: string
+          sections: Json
+          site_id: string
+          site_title: string | null
+          status: string
+          version_number: number
+        }
+        Insert: {
+          design_system: Json
+          id?: string
+          project_id: string
+          published_at?: string
+          published_by: string
+          sections: Json
+          site_id: string
+          site_title?: string | null
+          status?: string
+          version_number: number
+        }
+        Update: {
+          design_system?: Json
+          id?: string
+          project_id?: string
+          published_at?: string
+          published_by?: string
+          sections?: Json
+          site_id?: string
+          site_title?: string | null
+          status?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_site_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_site_versions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "project_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_sites: {
+        Row: {
+          created_at: string
+          created_by: string
+          current_version_id: string | null
+          id: string
+          project_id: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          current_version_id?: string | null
+          id?: string
+          project_id: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          current_version_id?: string | null
+          id?: string
+          project_id?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_sites_current_version_fk"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "project_site_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_sites_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_studio_data: {
         Row: {
           created_at: string | null
@@ -2415,6 +2517,16 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_published_site: {
+        Args: { p_slug: string }
+        Returns: {
+          design_system: Json
+          published_at: string
+          sections: Json
+          site_title: string
+          version_number: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2425,6 +2537,14 @@ export type Database = {
       is_meeting_participant: {
         Args: { _meeting_id: string; _user_id: string }
         Returns: boolean
+      }
+      publish_project_site: {
+        Args: { p_project_id: string; p_slug: string }
+        Returns: {
+          slug: string
+          version_id: string
+          version_number: number
+        }[]
       }
       set_client_token: { Args: { token: string }; Returns: undefined }
     }
