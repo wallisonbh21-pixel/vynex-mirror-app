@@ -14,7 +14,7 @@ function useReveal<T extends HTMLElement>() {
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setShown(true); io.disconnect(); } }, { threshold: 0.12 });
+    const io = new IntersectionObserver(([e]) => { if (e?.isIntersecting) { setShown(true); io.disconnect(); } }, { threshold: 0.12 });
     io.observe(node);
     return () => io.disconnect();
   }, []);
@@ -30,7 +30,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
   );
 }
 
-function CountUp({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
+function CountUp({ value, prefix = "", suffix = "" }: { value: number; prefix?: string | undefined; suffix?: string | undefined }) {
   const { ref, shown } = useReveal<HTMLSpanElement>();
   const [n, setN] = useState(0);
   useEffect(() => {
