@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import heroDevices from "@/assets/hero-devices.jpg.asset.json";
 
 const u = (id: string, w = 900) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=75`;
 const HERO_IMG = u("photo-1613490493576-7fde63acd811", 1200);
@@ -134,7 +135,9 @@ export function HeroBlock() {
         @keyframes snh-pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
         .snh-f1 { animation: snh-float 7s ease-in-out infinite; }
         .snh-f2 { animation: snh-float2 6s ease-in-out infinite .8s; }
-        @media (prefers-reduced-motion: reduce) { .snh-f1, .snh-f2 { animation: none; } }
+        @keyframes snh-dev { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+        .snh-dev { animation: snh-dev 9s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .snh-f1, .snh-f2, .snh-dev { animation: none; } }
       `}</style>
 
       {/* NAVBAR */}
@@ -187,9 +190,22 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[640px] pb-8 lg:max-w-none" aria-hidden>
-              <div className="snh-f1 w-[86%]"><Laptop /></div>
-              <div className="snh-f2 absolute bottom-0 right-0 w-[27%]"><Phone /></div>
+            <div className="relative mx-auto w-full max-w-[640px] lg:max-w-none" aria-hidden>
+              <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
+              <div className="snh-dev relative">
+                <img
+                  src={heroDevices.url}
+                  alt=""
+                  width={1091}
+                  height={518}
+                  className="block h-auto w-full select-none"
+                  style={{
+                    WebkitMaskImage: "radial-gradient(ellipse 72% 70% at 55% 52%, #000 55%, transparent 100%)",
+                    maskImage: "radial-gradient(ellipse 72% 70% at 55% 52%, #000 55%, transparent 100%)",
+                  }}
+                  draggable={false}
+                />
+              </div>
             </div>
           </div>
 
