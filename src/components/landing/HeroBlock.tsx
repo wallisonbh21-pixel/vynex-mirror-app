@@ -126,7 +126,7 @@ export function Phone() {
   );
 }
 
-const DEV_MASK = "radial-gradient(ellipse 66% 70% at 50% 50%, #000 70%, rgba(0,0,0,.6) 85%, transparent 100%)";
+const DEV_MASK = "radial-gradient(closest-side, #000 72%, rgba(0,0,0,.55) 88%, transparent 100%)";
 
 export function HeroDevices() {
   return (
@@ -139,7 +139,7 @@ export function HeroDevices() {
         width={1376}
         height={768}
         className="relative block h-auto w-full select-none object-contain"
-        style={{ mixBlendMode: "lighten", WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK }}
+        style={{ WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK }}
         draggable={false}
       />
     </div>
@@ -210,7 +210,7 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[720px] lg:-ml-[30%] lg:mr-0 lg:w-[124%] lg:max-w-none" aria-hidden>
+            <div className="relative mx-auto w-full max-w-[720px] lg:-ml-[18%] lg:mr-0 lg:w-[118%] lg:max-w-none" aria-hidden>
               <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
               <HeroDevices />
             </div>
