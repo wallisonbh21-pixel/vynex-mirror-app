@@ -5,6 +5,8 @@ import { IMOBILIARIA_DEFAULT_CONTENT, IMOBILIARIA_TEMPLATE_ID } from './../templ
 import { imobiliariaToStudioData } from './../templates/imobiliaria-premium/to-studio';
 import { IA_AUTOMACAO_DEFAULT_CONTENT, IA_AUTOMACAO_TEMPLATE_ID } from './../templates/ia-automacao/content';
 import { iaAutomacaoToStudioData } from './../templates/ia-automacao/to-studio';
+import { TECNOLOGIA_SAAS_DEFAULT_CONTENT, TECNOLOGIA_SAAS_TEMPLATE_ID } from './../templates/tecnologia-saas/content';
+import { tecnologiaSaasToStudioData } from './../templates/tecnologia-saas/to-studio';
 
 // Helper to create basic elements
 const createText = (type: StudioElement['type'], text: string, styles: any = {}): StudioElement => ({
@@ -213,6 +215,18 @@ export const NICHE_TEMPLATES: LibraryItem[] = [
     preview: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80',
     structure: iaAutomacaoToStudioData(IA_AUTOMACAO_DEFAULT_CONTENT),
     metadata: { forge_context: 'template_02_ia_automacao', preview_route: '/template/ia-automacao' },
+  },
+  {
+    id: TECNOLOGIA_SAAS_TEMPLATE_ID,
+    name: 'Tecnologia & SaaS Premium',
+    description: 'Template 03 oficial: empresas de tecnologia, SaaS, plataformas digitais e softwares B2B.',
+    category: 'Tecnologia',
+    niche: 'tecnologia-saas',
+    type: 'template',
+    tags: ['saas', 'tecnologia', 'software', 'b2b', 'oficial'],
+    preview: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80',
+    structure: tecnologiaSaasToStudioData(TECNOLOGIA_SAAS_DEFAULT_CONTENT),
+    metadata: { forge_context: 'template_03_tecnologia_saas', preview_route: '/template/tecnologia-saas' },
   },
   {
     id: 'tmpl_burger',

@@ -46,6 +46,7 @@ import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-p
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as TemplateIaAutomacaoRouteImport } from './routes/template.ia-automacao'
 import { Route as TemplateImobiliariaPremiumRouteImport } from './routes/template.imobiliaria-premium'
+import { Route as TemplateTecnologiaSaasRouteImport } from './routes/template.tecnologia-saas'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
 import { Route as AuthenticatedAdminCobrancasRouteImport } from './routes/_authenticated/admin/cobrancas'
@@ -269,6 +270,11 @@ const TemplateImobiliariaPremiumRoute =
     path: '/template/imobiliaria-premium',
     getParentRoute: () => rootRouteImport,
   } as any)
+const TemplateTecnologiaSaasRoute = TemplateTecnologiaSaasRouteImport.update({
+  id: '/template/tecnologia-saas',
+  path: '/template/tecnologia-saas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminClientesRoute =
   AuthenticatedAdminClientesRouteImport.update({
     id: '/clientes',
@@ -489,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/s/$slug': typeof SSlugRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
+  '/template/tecnologia-saas': typeof TemplateTecnologiaSaasRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -557,6 +564,7 @@ export interface FileRoutesByTo {
   '/s/$slug': typeof SSlugRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
+  '/template/tecnologia-saas': typeof TemplateTecnologiaSaasRoute
   '/comece-seu-projeto': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -628,6 +636,7 @@ export interface FileRoutesById {
   '/s/$slug': typeof SSlugRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
+  '/template/tecnologia-saas': typeof TemplateTecnologiaSaasRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -699,6 +708,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
+    | '/template/tecnologia-saas'
     | '/comece-seu-projeto/'
     | '/admin/clientes'
     | '/admin/clientes-login'
@@ -767,6 +777,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
+    | '/template/tecnologia-saas'
     | '/comece-seu-projeto'
     | '/admin/clientes'
     | '/admin/clientes-login'
@@ -837,6 +848,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
+    | '/template/tecnologia-saas'
     | '/comece-seu-projeto/'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/clientes-login'
@@ -884,6 +896,7 @@ export interface RootRouteChildren {
   SSlugRoute: typeof SSlugRoute
   TemplateIaAutomacaoRoute: typeof TemplateIaAutomacaoRoute
   TemplateImobiliariaPremiumRoute: typeof TemplateImobiliariaPremiumRoute
+  TemplateTecnologiaSaasRoute: typeof TemplateTecnologiaSaasRoute
   ComeceSeuProjetoIndexRoute: typeof ComeceSeuProjetoIndexRoute
   ApiNexusChatRoute: typeof ApiNexusChatRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
@@ -1149,6 +1162,13 @@ declare module '@tanstack/react-router' {
       path: '/template/imobiliaria-premium'
       fullPath: '/template/imobiliaria-premium'
       preLoaderRoute: typeof TemplateImobiliariaPremiumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/template/tecnologia-saas': {
+      id: '/template/tecnologia-saas'
+      path: '/template/tecnologia-saas'
+      fullPath: '/template/tecnologia-saas'
+      preLoaderRoute: typeof TemplateTecnologiaSaasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/clientes': {
@@ -1534,6 +1554,7 @@ const rootRouteChildren: RootRouteChildren = {
   SSlugRoute: SSlugRoute,
   TemplateIaAutomacaoRoute: TemplateIaAutomacaoRoute,
   TemplateImobiliariaPremiumRoute: TemplateImobiliariaPremiumRoute,
+  TemplateTecnologiaSaasRoute: TemplateTecnologiaSaasRoute,
   ComeceSeuProjetoIndexRoute: ComeceSeuProjetoIndexRoute,
   ApiNexusChatRoute: ApiNexusChatRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,
