@@ -61,7 +61,7 @@ export function TestimonialsSection({ items = DEMO_TESTIMONIALS, illustrative = 
   };
   return (
     <section className="relative py-16" aria-labelledby="depoimentos-titulo">
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-6 text-center">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
         <span className="rounded-full border border-[#6d5bff]/50 bg-[#1a1450]/60 px-4 py-1.5 text-sm font-medium text-[#e0dbff]">Depoimentos</span>
         <h2 id="depoimentos-titulo" className="text-3xl font-bold tracking-tight text-white md:text-5xl">Empresas que já cresceram com a <Grad>ScaleNexus</Grad></h2>
         <p className="max-w-4xl text-base text-[#e2e8f0] md:text-lg">Veja o que nossos clientes dizem sobre a experiência de ter um site profissional com a nossa equipe.</p>
