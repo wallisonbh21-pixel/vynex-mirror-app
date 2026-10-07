@@ -126,6 +126,24 @@ export function Phone() {
   );
 }
 
+const DEV_MASK = "linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 5%, #000 92%, transparent 100%)";
+
+export function HeroDevices() {
+  return (
+    <div className="snh-dev relative">
+      <img
+        src={heroDevices.url}
+        alt=""
+        width={923}
+        height={515}
+        className="block h-auto w-full select-none object-contain"
+        style={{ WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK, WebkitMaskComposite: "source-in", maskComposite: "intersect" }}
+        draggable={false}
+      />
+    </div>
+  );
+}
+
 export function HeroBlock() {
   return (
     <>
@@ -190,22 +208,9 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[640px] lg:max-w-none" aria-hidden>
+            <div className="relative mx-auto w-full max-w-[640px] lg:-mr-[4%] lg:w-[112%] lg:max-w-[700px] lg:justify-self-end" aria-hidden>
               <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
-              <div className="snh-dev relative">
-                <img
-                  src={heroDevices.url}
-                  alt=""
-                  width={1091}
-                  height={518}
-                  className="block h-auto w-full select-none"
-                  style={{
-                    WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 22%, #000 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 12%, #000 85%, transparent 100%)",
-                    maskComposite: "intersect", WebkitMaskComposite: "source-in", maskImage: "linear-gradient(to right, transparent 0%, #000 22%, #000 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 12%, #000 85%, transparent 100%)",
-                  }}
-                  draggable={false}
-                />
-              </div>
+              <HeroDevices />
             </div>
           </div>
 

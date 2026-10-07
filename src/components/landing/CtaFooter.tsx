@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Laptop, Phone, ScaleNexusLogo } from "./HeroBlock";
+import { HeroDevices, ScaleNexusLogo } from "./HeroBlock";
 
 const linkCls =
   "rounded-sm text-[#9fb0cc] transition-colors duration-200 hover:text-[#60a5fa] hover:drop-shadow-[0_0_6px_rgba(59,130,246,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]";
@@ -93,10 +93,9 @@ export function CtaFinal() {
             ))}
           </ul>
         </div>
-        <div className="relative mx-auto w-full max-w-[560px]" aria-hidden>
+        <div className="relative mx-auto w-full max-w-[620px]" aria-hidden>
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[70%] w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2563eb]/25 blur-3xl" />
-          <div className="relative w-[86%]"><Laptop /></div>
-          <div className="absolute -bottom-4 right-0 w-[26%]"><Phone /></div>
+          <HeroDevices />
         </div>
       </div>
     </section>
