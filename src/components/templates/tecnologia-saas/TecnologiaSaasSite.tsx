@@ -91,7 +91,7 @@ function HeroMock({ c, offset }: { c: TecnologiaSaasContent; offset: number }) {
         </div>
       </div>
       {/* janelas flutuantes */}
-      <div className="sx-float sx-card absolute -left-4 bottom-6 hidden w-52 rounded-xl p-3 sm:block">
+      <div className="sx-float sx-card absolute -bottom-14 -left-6 hidden w-52 rounded-xl p-3 sm:block">
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--sx-muted)]">Atividade recente</p>
         {m.activity.map((a) => <p key={a} className="flex items-center gap-2 py-1 text-[11px]"><span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--sx-a2)]" /><span className="truncate">{a}</span></p>)}
       </div>
