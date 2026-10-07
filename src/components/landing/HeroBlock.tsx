@@ -56,7 +56,7 @@ function Stat({ label, value, suffix = "" }: { label: string; value: number; suf
   );
 }
 
-function Laptop() {
+export function Laptop() {
   return (
     <div className="relative" style={{ transform: "perspective(1600px) rotateY(-16deg) rotateX(4deg) rotateZ(-2deg)", transformStyle: "preserve-3d" }}>
       <div className="rounded-[18px] border border-[#60a5fa]/30 bg-gradient-to-b from-[#2a2f45] to-[#0d1020] p-[7px] shadow-[0_0_0_1px_rgba(59,130,246,0.2),0_40px_90px_-20px_rgba(37,99,235,0.55),0_0_60px_-10px_rgba(59,130,246,0.5)]">
@@ -93,7 +93,7 @@ function Laptop() {
   );
 }
 
-function Phone() {
+export function Phone() {
   return (
     <div className="relative" style={{ transform: "perspective(1200px) rotateY(-10deg) rotateZ(3deg)" }}>
       <div className="pointer-events-none absolute -bottom-[10%] left-1/2 h-[22%] w-[150%] -translate-x-1/2 rounded-[50%] border border-[#3b82f6]/40 shadow-[0_0_40px_rgba(59,130,246,0.35)]" />
