@@ -302,7 +302,7 @@ export function TecnologiaSaasSite({ content: c }: { content: TecnologiaSaasCont
             {c.features.items.map((f, i) => {
               const lg = f.size === "lg";
               return (
-                <Reveal key={f.id} delay={(i % 4) * 80} className={lg ? "sm:col-span-2" : ""}>
+                <Reveal key={f.id} delay={(i % 4) * 80} className={lg ? (i === 0 ? "sm:col-span-2 lg:row-span-2" : "sm:col-span-2") : ""}>
                   <article className={`group relative h-full overflow-hidden rounded-2xl border border-[var(--sx-line)] p-6 transition-all duration-500 hover:-translate-y-1 hover:border-[color-mix(in_oklab,var(--sx-a2)_40%,transparent)] ${lg ? "bg-gradient-to-br from-[color-mix(in_oklab,var(--sx-a1)_12%,var(--sx-surface))] to-[var(--sx-surface)] sm:p-8" : "bg-[var(--sx-surface)]"}`}>
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--sx-line)] text-[var(--sx-a2)] transition-transform duration-500 group-hover:scale-110"><Ico icon={f.icon} /></span>
                     <h3 className={`sx-h mt-5 font-semibold ${lg ? "text-2xl" : "text-lg"}`}>{f.title}</h3>
@@ -352,9 +352,9 @@ export function TecnologiaSaasSite({ content: c }: { content: TecnologiaSaasCont
                   <p className="sx-h text-xl font-semibold">{activeTab.heading}</p>
                   <div className="mt-5 grid grid-cols-3 gap-3">
                     {activeTab.metrics.map((m) => (
-                      <div key={m.label} className="min-w-0 rounded-xl border border-[var(--sx-line)] bg-white/[0.02] p-3 sm:p-4">
+                      <div key={m.label} className="min-w-0 rounded-xl border border-[var(--sx-line)] bg-white/[0.02] px-2.5 py-3 sm:p-4">
                         <p className="truncate text-xs text-[var(--sx-muted)]">{m.label}</p>
-                        <p className="sx-h mt-1 truncate text-lg font-semibold sm:text-2xl">{m.value}</p>
+                        <p className="sx-h mt-1 whitespace-nowrap text-[15px] font-semibold sm:text-2xl">{m.value}</p>
                       </div>
                     ))}
                   </div>
@@ -454,7 +454,7 @@ export function TecnologiaSaasSite({ content: c }: { content: TecnologiaSaasCont
       <section id="sx-pricing" className="py-24">
         <div className={container}>
           <Head title={c.pricing.title} subtitle={c.pricing.subtitle} />
-          <div className="mx-auto mt-14 grid max-w-6xl items-stretch gap-5 lg:grid-cols-3">
+          <div className="mx-auto mt-14 grid max-w-xl items-stretch gap-5 lg:max-w-6xl lg:grid-cols-3">
             {c.pricing.plans.map((p, i) => (
               <Reveal key={p.id} delay={i * 120}>
                 <div className={`relative flex h-full flex-col rounded-2xl border p-7 transition-all duration-500 hover:-translate-y-1 ${p.highlighted ? "border-[var(--sx-a1)] bg-gradient-to-b from-[color-mix(in_oklab,var(--sx-a1)_16%,var(--sx-surface))] to-[var(--sx-surface)] shadow-[0_30px_80px_-30px_var(--sx-a1)]" : "border-[var(--sx-line)] bg-[var(--sx-surface)]"}`}>
@@ -486,7 +486,7 @@ export function TecnologiaSaasSite({ content: c }: { content: TecnologiaSaasCont
                   <p className="sx-h mt-6 text-xl leading-relaxed sm:text-2xl">“{tItems[slide].text}”</p>
                   <div className="mt-8 flex items-center gap-4">
                     <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--sx-a1)] to-[var(--sx-a2)] text-sm font-semibold text-[var(--sx-on)]">{tItems[slide].initials}</span>
-                    <div className="min-w-0"><p className="font-semibold">{tItems[slide].name}</p><p className="truncate text-sm text-[var(--sx-muted)]">{tItems[slide].role} · {tItems[slide].company}</p></div>
+                    <div className="min-w-0"><p className="font-semibold">{tItems[slide].name}</p><p className="text-sm text-[var(--sx-muted)]">{tItems[slide].role} · {tItems[slide].company}</p></div>
                   </div>
                 </div>
               ) : null}
@@ -544,8 +544,8 @@ export function TecnologiaSaasSite({ content: c }: { content: TecnologiaSaasCont
 
       {/* 16 FOOTER */}
       <footer id="sx-footer" className="border-t border-[var(--sx-line)] pb-10 pt-16">
-        <div className={`grid gap-10 sm:grid-cols-2 lg:grid-cols-6 ${container}`}>
-          <div className="sm:col-span-2">
+        <div className={`grid grid-cols-2 gap-10 lg:grid-cols-6 ${container}`}>
+          <div className="col-span-2">
             <p className="sx-h flex items-center gap-2 text-lg font-semibold"><Hexagon className="h-6 w-6 text-[var(--sx-a1)]" strokeWidth={2.2} />{c.brand.name}</p>
             <p className="mt-4 max-w-xs text-sm text-[var(--sx-muted)]">{c.footer.description}</p>
             <p className="mt-4 break-all text-sm text-[var(--sx-muted)]">{c.contact.email}</p>
