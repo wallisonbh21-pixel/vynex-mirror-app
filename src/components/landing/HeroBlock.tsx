@@ -208,7 +208,7 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[640px] lg:-mr-[4%] lg:w-[112%] lg:max-w-[700px] lg:justify-self-end" aria-hidden>
+            <div className="relative mx-auto w-full max-w-[640px] lg:w-[108%] lg:max-w-[700px] lg:justify-self-end" aria-hidden>
               <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
               <HeroDevices />
             </div>
