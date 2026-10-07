@@ -211,7 +211,7 @@ export function LandingPage() {
       `}</style>
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b border-[#141a2b] bg-[#05070f]/90 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-[#8296ff]/[0.13] bg-[#020817]/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#a855f7] to-[#3b82f6] text-sm font-black text-white">S</div>
@@ -225,13 +225,13 @@ export function LandingPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/auth"
-              className="hidden rounded-lg border border-white/70 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#05070f] sm:block"
+              className="hidden rounded-full border border-[#7e94ff]/40 bg-[#050d1f]/50 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#a78bfa] sm:block"
             >
               Login/Cadastro
             </Link>
             <Link
               to="/comece-seu-projeto"
-              className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-full bg-gradient-to-r from-[#7430ff] to-[#1d79ff] px-5 py-2.5 text-sm font-bold shadow-[0_0_28px_rgba(99,45,255,0.35)] text-white transition-opacity hover:opacity-90"
             >
               Criar meu site
             </Link>
@@ -278,6 +278,55 @@ export function LandingPage() {
 
       {/* ECOSSISTEMA */}
       <EcosystemStrip />
+
+      {/* MODELOS */}
+      <ModelsShowcase />
+
+      {/* DEPOIMENTOS */}
+      <section className="py-20">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
+          <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Depoimentos</span>
+          <h2 className="text-3xl font-bold md:text-4xl">Empresas que já cresceram com a <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">ScaleNexus</span></h2>
+          <p className="max-w-2xl text-sm text-[#94a3b8]">Veja o que nossos clientes dizem sobre a experiência de ter um site profissional com a nossa equipe.</p>
+          <p className="text-[11px] text-[#64748b]">Depoimentos ilustrativos — serão substituídos por relatos reais de clientes.</p>
+        </div>
+        <div className="sn-pause sn-fade mt-10 overflow-x-auto [scrollbar-width:none]">
+          <div className="sn-track" style={{ animationDuration: "70s" }}>
+            {[...DEMO_TESTIMONIALS, ...DEMO_TESTIMONIALS].map((t, i) => (
+              <div key={i} className="mr-5 w-[300px] shrink-0 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 backdrop-blur" aria-hidden={i >= DEMO_TESTIMONIALS.length}>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-[#7c3aed] to-[#3b82f6] text-sm font-bold text-white">{t.name.split(" ").map((w) => w[0]).join("")}</span>
+                  <span className="text-sm tracking-widest text-[#fbbf24]">★★★★★</span>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-[#cbd5e1]">“{t.text}”</p>
+                <div className="mt-4 border-t border-white/[0.06] pt-3">
+                  <p className="text-sm font-bold text-white">{t.name}</p>
+                  <p className="text-xs text-[#64748b]">{t.company} · {t.segment}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EMPRESAS */}
+      <section className="py-14">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
+          <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Nossos clientes</span>
+          <h2 className="text-3xl font-bold md:text-4xl">Empresas que confiam na <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">ScaleNexus</span></h2>
+          <p className="text-[11px] text-[#64748b]">Marcas ilustrativas — espaço preparado para logotipos de clientes reais.</p>
+        </div>
+        <div className="sn-pause sn-fade mt-10 overflow-hidden">
+          <div className="sn-track" style={{ animationDuration: "50s", animationDirection: "reverse" }}>
+            {[...DEMO_BRANDS, ...DEMO_BRANDS].map((b, i) => (
+              <div key={i} className="mr-14 shrink-0 text-center" aria-hidden={i >= DEMO_BRANDS.length}>
+                <p className="whitespace-nowrap text-xl font-semibold text-[#cbd5e1]/80">{b.n}</p>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-[#64748b]">{b.s}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* O QUE FAZEMOS */}
       <section id="o-que-fazemos" className="px-6 py-20">
@@ -335,55 +384,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* MODELOS */}
-      <ModelsShowcase />
-
-      {/* DEPOIMENTOS */}
-      <section className="py-20">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
-          <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Depoimentos</span>
-          <h2 className="text-3xl font-bold md:text-4xl">Empresas que já cresceram com a <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">ScaleNexus</span></h2>
-          <p className="max-w-2xl text-sm text-[#94a3b8]">Veja como é a experiência de ter um site profissional com a nossa equipe.</p>
-          <p className="text-[11px] text-[#64748b]">Depoimentos ilustrativos — serão substituídos por relatos reais de clientes.</p>
-        </div>
-        <div className="sn-pause sn-fade mt-10 overflow-x-auto [scrollbar-width:none]">
-          <div className="sn-track" style={{ animationDuration: "70s" }}>
-            {[...DEMO_TESTIMONIALS, ...DEMO_TESTIMONIALS].map((t, i) => (
-              <div key={i} className="mr-5 w-[300px] shrink-0 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 backdrop-blur" aria-hidden={i >= DEMO_TESTIMONIALS.length}>
-                <div className="flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-[#7c3aed] to-[#3b82f6] text-sm font-bold text-white">{t.name.split(" ").map((w) => w[0]).join("")}</span>
-                  <span className="text-sm tracking-widest text-[#fbbf24]">★★★★★</span>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-[#cbd5e1]">“{t.text}”</p>
-                <div className="mt-4 border-t border-white/[0.06] pt-3">
-                  <p className="text-sm font-bold text-white">{t.name}</p>
-                  <p className="text-xs text-[#64748b]">{t.company} · {t.segment}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* EMPRESAS */}
-      <section className="py-14">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
-          <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Nossos clientes</span>
-          <h2 className="text-3xl font-bold md:text-4xl">Empresas que confiam na <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">ScaleNexus</span></h2>
-          <p className="text-[11px] text-[#64748b]">Marcas ilustrativas — espaço preparado para logotipos de clientes reais.</p>
-        </div>
-        <div className="sn-pause sn-fade mt-10 overflow-hidden">
-          <div className="sn-track" style={{ animationDuration: "50s", animationDirection: "reverse" }}>
-            {[...DEMO_BRANDS, ...DEMO_BRANDS].map((b, i) => (
-              <div key={i} className="mr-14 shrink-0 text-center" aria-hidden={i >= DEMO_BRANDS.length}>
-                <p className="whitespace-nowrap text-xl font-semibold text-[#cbd5e1]/80">{b.n}</p>
-                <p className="text-[10px] uppercase tracking-[0.25em] text-[#64748b]">{b.s}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA FINAL */}
       <section className="relative overflow-hidden px-6 py-24">
         <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1440 400" preserveAspectRatio="none" aria-hidden>
@@ -417,6 +417,7 @@ export function LandingPage() {
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#64748b]">
               Agência de criação de sites e publicidade. Parte do Aurevion Group.
+              <span className="mt-3 block text-[11px] font-semibold tracking-[0.25em] text-[#a78bfa]">CONECTE • AUTOMATIZE • ESCALE</span>
             </p>
           </div>
           {[
@@ -435,7 +436,7 @@ export function LandingPage() {
           ))}
         </div>
         <p className="mx-auto mt-12 max-w-6xl border-t border-[#141a2b] pt-6 text-xs text-[#475569]">
-          © 2025 ScaleNexus. Todos os direitos reservados.
+          © {new Date().getFullYear()} ScaleNexus. Todos os direitos reservados.
         </p>
       </footer>
     </div>
