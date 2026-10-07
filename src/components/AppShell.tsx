@@ -205,6 +205,14 @@ export function AppShell({
     setMobileOpen(false);
   }, [pathname]);
 
+  // Cliente puro só usa o portal do cliente: qualquer área interna redireciona para /cliente.
+  const isPureCliente = isCliente && !isAdmin && !isCriador && !isVendedor;
+  useEffect(() => {
+    if (isPureCliente && !pathname.startsWith("/cliente")) {
+      navigate({ to: "/cliente", replace: true });
+    }
+  }, [isPureCliente, pathname, navigate]);
+
   const items: NavItem[] = isAdmin
     ? [
         ...NAV_VENDEDOR,
