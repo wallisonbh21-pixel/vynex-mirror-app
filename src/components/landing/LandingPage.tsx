@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { TEMPLATE_MODELS } from "./templates-data";
 import { TemplateSitePreview } from "./TemplateSitePreview";
+import { EcosystemStrip, ModelsShowcase } from "./ShowcaseSections";
 
 /* ---------------- helpers ---------------- */
 
@@ -258,28 +259,7 @@ export function LandingPage() {
       </section>
 
       {/* ECOSSISTEMA */}
-      <section className="px-6 py-16">
-        <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Ecossistema</p>
-        <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl font-bold text-white md:text-4xl">
-          Fazemos parte do Aurevion Group
-        </h2>
-        <div className="sn-pause sn-fade mt-10 overflow-hidden">
-          <div className="sn-track gap-4" style={{ animationDuration: "60s" }}>
-            {[...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS].map((b, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 rounded-full border bg-[#0f1424] px-6 py-3"
-                style={{ borderColor: `${b.color}55` }}
-              >
-                <span className="flex size-7 items-center justify-center rounded-full text-xs font-black" style={{ color: b.color, backgroundColor: `${b.color}22` }}>
-                  {b.initial}
-                </span>
-                <span className="whitespace-nowrap text-sm font-semibold text-[#e2e8f0]">{b.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <EcosystemStrip />
 
       {/* CARROSSEL NOMES */}
       <section className="px-6 py-10">
@@ -354,29 +334,7 @@ export function LandingPage() {
       </section>
 
       {/* MODELOS */}
-      <section id="modelos" className="py-20">
-        <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Modelos</p>
-        <h2 className="mx-auto mt-3 max-w-2xl px-6 text-center text-3xl font-bold md:text-4xl">
-          Escolha seu modelo e teste grátis
-        </h2>
-        <div className="sn-pause sn-fade mx-auto mt-12 overflow-hidden" style={{ maxWidth: 1400 }}>
-          <div className="sn-track" style={{ animationDuration: "70s", gap: "24px" }}>
-            {[...TEMPLATE_MODELS, ...TEMPLATE_MODELS].map((t, i) => (
-              <div
-                key={i}
-                className="shrink-0 overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424]"
-                style={{ width: 340, height: 440, marginRight: 24 }}
-              >
-                <div className="h-[340px] w-full"><TemplateSitePreview template={t} /></div>
-                <div className="p-5">
-                  <h3 className="text-base font-bold text-white">{t.name}</h3>
-                  <p className="mt-1 text-xs text-[#64748b]">Template pronto para personalizar</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ModelsShowcase />
 
       {/* TODOS OS TEMPLATES */}
       <section className="px-6 py-20">
