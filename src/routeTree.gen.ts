@@ -44,6 +44,7 @@ import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.prim
 import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
 import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
+import { Route as TemplateImobiliariaPremiumRouteImport } from './routes/template.imobiliaria-premium'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
 import { Route as AuthenticatedAdminCobrancasRouteImport } from './routes/_authenticated/admin/cobrancas'
@@ -256,6 +257,12 @@ const SSlugRoute = SSlugRouteImport.update({
   path: '/s/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplateImobiliariaPremiumRoute =
+  TemplateImobiliariaPremiumRouteImport.update({
+    id: '/template/imobiliaria-premium',
+    path: '/template/imobiliaria-premium',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminClientesRoute =
   AuthenticatedAdminClientesRouteImport.update({
     id: '/clientes',
@@ -474,6 +481,7 @@ export interface FileRoutesByFullPath {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -540,6 +548,7 @@ export interface FileRoutesByTo {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
   '/comece-seu-projeto': typeof ComeceSeuProjetoIndexRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -609,6 +618,7 @@ export interface FileRoutesById {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
   '/comece-seu-projeto/': typeof ComeceSeuProjetoIndexRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
@@ -678,6 +688,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/imobiliaria-premium'
     | '/comece-seu-projeto/'
     | '/admin/clientes'
     | '/admin/clientes-login'
@@ -744,6 +755,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/imobiliaria-premium'
     | '/comece-seu-projeto'
     | '/admin/clientes'
     | '/admin/clientes-login'
@@ -812,6 +824,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/imobiliaria-premium'
     | '/comece-seu-projeto/'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/clientes-login'
@@ -857,6 +870,7 @@ export interface RootRouteChildren {
   ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
   ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
   SSlugRoute: typeof SSlugRoute
+  TemplateImobiliariaPremiumRoute: typeof TemplateImobiliariaPremiumRoute
   ComeceSeuProjetoIndexRoute: typeof ComeceSeuProjetoIndexRoute
   ApiNexusChatRoute: typeof ApiNexusChatRoute
   ApiProspectingSearchRoute: typeof ApiProspectingSearchRoute
@@ -1108,6 +1122,13 @@ declare module '@tanstack/react-router' {
       path: '/s/$slug'
       fullPath: '/s/$slug'
       preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/template/imobiliaria-premium': {
+      id: '/template/imobiliaria-premium'
+      path: '/template/imobiliaria-premium'
+      fullPath: '/template/imobiliaria-premium'
+      preLoaderRoute: typeof TemplateImobiliariaPremiumRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/clientes': {
@@ -1491,6 +1512,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
   ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
   SSlugRoute: SSlugRoute,
+  TemplateImobiliariaPremiumRoute: TemplateImobiliariaPremiumRoute,
   ComeceSeuProjetoIndexRoute: ComeceSeuProjetoIndexRoute,
   ApiNexusChatRoute: ApiNexusChatRoute,
   ApiProspectingSearchRoute: ApiProspectingSearchRoute,

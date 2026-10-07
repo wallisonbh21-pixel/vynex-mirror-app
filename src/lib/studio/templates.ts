@@ -1,6 +1,8 @@
 import { StudioData, StudioSection, StudioElement } from '@/types/studio';
 import { generateId } from './utils';
 import { LibraryItem } from '@/types/studio-v2';
+import { IMOBILIARIA_DEFAULT_CONTENT, IMOBILIARIA_TEMPLATE_ID } from './../templates/imobiliaria-premium/content';
+import { imobiliariaToStudioData } from './../templates/imobiliaria-premium/to-studio';
 
 // Helper to create basic elements
 const createText = (type: StudioElement['type'], text: string, styles: any = {}): StudioElement => ({
@@ -186,6 +188,18 @@ export const SECTION_TEMPLATES: Record<string, LibraryItem> = {
 
 // FULL NICHE TEMPLATES
 export const NICHE_TEMPLATES: LibraryItem[] = [
+  {
+    id: IMOBILIARIA_TEMPLATE_ID,
+    name: 'Imobiliária Premium',
+    description: 'Template 01 oficial: imobiliárias, corretores e empreendimentos de alto padrão.',
+    category: 'Imóveis',
+    niche: 'imobiliaria',
+    type: 'template',
+    tags: ['imobiliaria', 'imoveis', 'premium', 'oficial'],
+    preview: IMOBILIARIA_DEFAULT_CONTENT.hero.image,
+    structure: imobiliariaToStudioData(IMOBILIARIA_DEFAULT_CONTENT),
+    metadata: { forge_context: 'template_01_imobiliaria_premium', preview_route: '/template/imobiliaria-premium' },
+  },
   {
     id: 'tmpl_burger',
     name: 'Hamburgueria Premium',
