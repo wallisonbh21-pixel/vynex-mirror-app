@@ -197,7 +197,7 @@ export function LandingPage() {
   return (
     <div
       className="min-h-screen w-full overflow-x-hidden text-white"
-      style={{ backgroundColor: "#05070f", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
+      style={{ backgroundColor: "#020817", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
     >
       <style>{`
         @keyframes sn-marquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
@@ -237,11 +237,11 @@ export function LandingPage() {
             <path key={k} d={`M0 ${260 + k * 18} C 360 ${120 + k * 30}, 720 ${380 - k * 20}, 1440 ${160 + k * 25}`} stroke="url(#snw)" strokeWidth={1.5} fill="none" opacity={0.5 - k * 0.08} />
           ))}
         </svg>
-        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse at 20% 80%, rgba(124,58,237,0.25), transparent 60%), radial-gradient(ellipse at 80% 30%, rgba(59,130,246,0.2), transparent 60%)" }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse at 20% 80%, rgba(124,58,237,0.15), transparent 60%), radial-gradient(ellipse at 80% 30%, rgba(59,130,246,0.2), transparent 60%)" }} />
         <div className="relative mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold text-white md:text-5xl">Pronto para levar seu negócio a outro nível?</h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-[#cbd5e1]">Escolha o modelo, fale com nossa equipe e receba seu site profissional.</p>
-          <Link to="/comece-seu-projeto" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-8 py-4 text-base font-bold text-white shadow-[0_20px_50px_-15px_rgba(124,58,237,0.9)] transition-transform hover:scale-105">
+          <Link to="/comece-seu-projeto" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-8 py-4 text-base font-bold text-white shadow-[0_20px_50px_-15px_rgba(37,99,235,0.6)] transition-transform hover:scale-105">
             Criar meu site agora →
           </Link>
           <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-[#94a3b8]">
@@ -260,7 +260,7 @@ export function LandingPage() {
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#64748b]">
               Agência de criação de sites e publicidade. Parte do Aurevion Group.
-              <span className="mt-3 block text-[11px] font-semibold tracking-[0.25em] text-[#a78bfa]">CONECTE • AUTOMATIZE • ESCALE</span>
+              <span className="mt-3 block text-[11px] font-semibold tracking-[0.25em] text-[#93c5fd]">CONECTE • AUTOMATIZE • ESCALE</span>
             </p>
           </div>
           {[

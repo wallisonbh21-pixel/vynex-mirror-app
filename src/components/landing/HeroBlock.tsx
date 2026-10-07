@@ -59,7 +59,7 @@ function Stat({ label, value, suffix = "" }: { label: string; value: number; suf
 function Laptop() {
   return (
     <div className="relative" style={{ transform: "perspective(1600px) rotateY(-16deg) rotateX(4deg) rotateZ(-2deg)", transformStyle: "preserve-3d" }}>
-      <div className="rounded-[18px] border border-[#8b8fff]/40 bg-gradient-to-b from-[#2a2f45] to-[#0d1020] p-[7px] shadow-[0_0_0_1px_rgba(139,92,246,0.25),0_40px_90px_-20px_rgba(124,58,237,0.65),0_0_60px_-10px_rgba(59,130,246,0.5)]">
+      <div className="rounded-[18px] border border-[#60a5fa]/30 bg-gradient-to-b from-[#2a2f45] to-[#0d1020] p-[7px] shadow-[0_0_0_1px_rgba(59,130,246,0.2),0_40px_90px_-20px_rgba(37,99,235,0.55),0_0_60px_-10px_rgba(59,130,246,0.5)]">
         <div className="relative aspect-[16/10] overflow-hidden rounded-[11px] bg-[#05070f]">
           <img src={HERO_IMG} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#05070f] via-[#05070f]/70 to-transparent" />
@@ -96,8 +96,8 @@ function Laptop() {
 function Phone() {
   return (
     <div className="relative" style={{ transform: "perspective(1200px) rotateY(-10deg) rotateZ(3deg)" }}>
-      <div className="pointer-events-none absolute -bottom-[10%] left-1/2 h-[22%] w-[150%] -translate-x-1/2 rounded-[50%] border-2 border-[#8b5cf6]/50 shadow-[0_0_40px_rgba(139,92,246,0.6)]" />
-      <div className="relative rounded-[28px] border-2 border-[#a78bfa]/60 bg-[#0b0d18] p-[5px] shadow-[0_0_0_1px_rgba(139,92,246,0.35),0_30px_60px_-15px_rgba(124,58,237,0.8),0_0_45px_-5px_rgba(168,85,247,0.6)]">
+      <div className="pointer-events-none absolute -bottom-[10%] left-1/2 h-[22%] w-[150%] -translate-x-1/2 rounded-[50%] border border-[#3b82f6]/40 shadow-[0_0_40px_rgba(59,130,246,0.35)]" />
+      <div className="relative rounded-[28px] border-2 border-[#3b82f6]/40 bg-[#0b0d18] p-[5px] shadow-[0_0_0_1px_rgba(59,130,246,0.25),0_30px_60px_-15px_rgba(37,99,235,0.6),0_0_40px_-8px_rgba(124,58,237,0.3)]">
         <div className="relative aspect-[9/19] overflow-hidden rounded-[23px] bg-[#05070f]">
           <div className="absolute inset-x-[8%] top-[2.5%] flex justify-between text-[clamp(4px,0.5vw,7px)] font-semibold text-white"><span>9:41</span><span>●●●</span></div>
           <div className="absolute left-[8%] top-[8%]"><ScaleNexusLogo className="size-3" /></div>
@@ -143,15 +143,15 @@ export function HeroBlock() {
             <span className="truncate text-xl font-bold tracking-tight text-white lg:text-[26px]">Scale<span className="text-[#c026d3]">Nexus</span></span>
           </Link>
           <nav className="hidden items-center gap-10 text-[15px] text-[#e2e8f0] lg:flex">
-            <a href="#modelos" className="transition-colors hover:text-[#c4b5fd]">Como funciona</a>
-            <a href="#ecossistema" className="transition-colors hover:text-[#c4b5fd]">O que fazemos</a>
-            <Link to="/modelos" className="transition-colors hover:text-[#c4b5fd]">Modelos</Link>
+            <a href="#modelos" className="transition-colors hover:text-[#93c5fd]">Como funciona</a>
+            <a href="#ecossistema" className="transition-colors hover:text-[#93c5fd]">O que fazemos</a>
+            <Link to="/modelos" className="transition-colors hover:text-[#93c5fd]">Modelos</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-3">
-            <Link to="/auth" className="hidden rounded-full border border-[#7e94ff]/35 bg-[#050d1f]/60 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-[#a78bfa] sm:block">
+            <Link to="/auth" className="hidden rounded-full border border-[#7e94ff]/35 bg-[#050d1f]/60 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-[#60a5fa] sm:block">
               Login/Cadastro
             </Link>
-            <Link to="/comece-seu-projeto" className="rounded-full bg-gradient-to-r from-[#6d28d9] via-[#4f46e5] to-[#2563eb] px-5 py-3 text-sm font-bold text-white shadow-[0_0_30px_rgba(79,70,229,0.55)] transition-opacity hover:opacity-90 sm:px-7">
+            <Link to="/comece-seu-projeto" className="rounded-full bg-gradient-to-r from-[#6d28d9] via-[#3b5bff] to-[#2563eb] px-5 py-3 text-sm font-bold text-white shadow-[0_0_24px_rgba(37,99,235,0.4)] transition-opacity hover:opacity-90 sm:px-7">
               Criar meu site
             </Link>
           </div>
@@ -160,7 +160,7 @@ export function HeroBlock() {
 
       {/* HERO */}
       <section className="relative overflow-hidden px-5 pb-10 pt-10 sm:px-8 lg:pt-14">
-        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 35%, rgba(124,58,237,0.28), transparent 70%), radial-gradient(ellipse 40% 40% at 90% 15%, rgba(59,130,246,0.25), transparent 70%), radial-gradient(ellipse 50% 40% at 20% 10%, rgba(76,29,149,0.18), transparent 70%)" }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 35%, rgba(124,58,237,0.13), transparent 70%), radial-gradient(ellipse 40% 40% at 90% 15%, rgba(59,130,246,0.25), transparent 70%), radial-gradient(ellipse 50% 40% at 20% 10%, rgba(8,24,47,0.5), transparent 70%)" }} />
         <div className="relative mx-auto max-w-[1440px]">
           <div className="grid items-center gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-4">
             <div className="text-center">
@@ -175,10 +175,10 @@ export function HeroBlock() {
                 Você escolhe o modelo, nossos especialistas e agentes de IA cuidam de todo o resto. Design, textos e publicação. Pronto para vender.
               </p>
               <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <Link to="/comece-seu-projeto" className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#6d28d9] to-[#7c3aed] px-10 py-4 text-base font-bold text-white shadow-[0_15px_45px_-10px_rgba(124,58,237,0.9)] transition-transform hover:scale-[1.03] sm:w-auto lg:text-lg">
+                <Link to="/comece-seu-projeto" className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#6d28d9] to-[#2563eb] px-10 py-4 text-base font-bold text-white shadow-[0_15px_45px_-10px_rgba(124,58,237,0.9)] transition-transform hover:scale-[1.03] sm:w-auto lg:text-lg">
                   Escolher meu modelo <span aria-hidden>→</span>
                 </Link>
-                <a href="#modelos" className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[#7e94ff]/35 bg-[#050d1f]/50 px-9 py-4 text-base font-bold text-white transition-colors hover:border-[#a78bfa] sm:w-auto lg:text-lg">
+                <a href="#modelos" className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[#7e94ff]/35 bg-[#050d1f]/50 px-9 py-4 text-base font-bold text-white transition-colors hover:border-[#60a5fa] sm:w-auto lg:text-lg">
                   <span className="flex size-8 items-center justify-center rounded-full border border-[#8b5cf6] text-[10px] text-[#a78bfa]" aria-hidden>▶</span>
                   Ver como funciona
                 </a>
