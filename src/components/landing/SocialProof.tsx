@@ -33,7 +33,7 @@ function Arrow({ dir, onClick, label, className = "" }: { dir: -1 | 1; onClick: 
       type="button"
       onClick={onClick}
       aria-label={label}
-      className={`absolute top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#5b5bff]/60 bg-[#070b1f]/90 text-white shadow-[0_0_22px_rgba(91,91,255,0.5)] backdrop-blur transition-colors hover:border-[#a78bfa] sm:size-12 ${dir < 0 ? "left-1 sm:left-3" : "right-1 sm:right-3"} ${className}`}
+      className={`absolute top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#3b82f6]/40 bg-[#061329]/90 text-white shadow-[0_0_18px_rgba(59,130,246,0.25)] backdrop-blur transition-colors hover:border-[#a78bfa] sm:size-12 ${dir < 0 ? "left-1 sm:left-3" : "right-1 sm:right-3"} ${className}`}
     >
       <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d={dir < 0 ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6"} /></svg>
     </button>
@@ -41,7 +41,7 @@ function Arrow({ dir, onClick, label, className = "" }: { dir: -1 | 1; onClick: 
 }
 
 const Grad = ({ children }: { children: ReactNode }) => (
-  <span className="bg-gradient-to-r from-[#a855f7] via-[#8b5cf6] to-[#3b82f6] bg-clip-text text-transparent">{children}</span>
+  <span className="bg-gradient-to-r from-[#a78bfa] via-[#60a5fa] to-[#3b82f6] bg-clip-text text-transparent">{children}</span>
 );
 
 export function TestimonialsSection({ items = DEMO_TESTIMONIALS, illustrative = true }: { items?: Testimonial[]; illustrative?: boolean }) {
@@ -62,7 +62,7 @@ export function TestimonialsSection({ items = DEMO_TESTIMONIALS, illustrative = 
   return (
     <section className="relative py-16" aria-labelledby="depoimentos-titulo">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
-        <span className="rounded-full border border-[#6d5bff]/50 bg-[#1a1450]/60 px-4 py-1.5 text-sm font-medium text-[#e0dbff]">Depoimentos</span>
+        <span className="rounded-full border border-[#3b82f6]/35 bg-[#071a3a]/60 px-4 py-1.5 text-sm font-medium text-[#cfe0ff]">Depoimentos</span>
         <h2 id="depoimentos-titulo" className="text-3xl font-bold tracking-tight text-white md:text-5xl">Empresas que já cresceram com a <Grad>ScaleNexus</Grad></h2>
         <p className="max-w-4xl text-base text-[#e2e8f0] md:text-lg">Veja o que nossos clientes dizem sobre a experiência de ter um site profissional com a nossa equipe.</p>
         {illustrative && <p className="text-xs text-[#94a3b8] md:text-sm">Depoimentos ilustrativos — serão substituídos por relatos reais de clientes.</p>}
@@ -79,9 +79,9 @@ export function TestimonialsSection({ items = DEMO_TESTIMONIALS, illustrative = 
           {items.map((t) => (
             <article
               key={t.name}
-              className="flex w-[85%] shrink-0 snap-start gap-4 rounded-[20px] border border-[#3b4bff]/30 bg-gradient-to-br from-[#0b1433]/80 to-[#060a1c]/80 p-5 shadow-[0_0_30px_-14px_rgba(91,91,255,0.6),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-[#7c5cff]/60 sm:w-[calc(50%-10px)] sm:p-6 lg:w-[calc(33.333%-14px)] xl:w-[calc(25%-15px)]"
+              className="flex w-[85%] shrink-0 snap-start gap-4 rounded-[20px] border border-[#3b82f6]/20 bg-gradient-to-br from-[#0b1433]/80 to-[#060a1c]/80 p-5 shadow-[0_0_30px_-16px_rgba(59,130,246,0.45),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-[#7c5cff]/60 sm:w-[calc(50%-10px)] sm:p-6 lg:w-[calc(33.333%-14px)] xl:w-[calc(25%-15px)]"
             >
-              <img src={t.avatar} alt="" loading="lazy" className="size-16 shrink-0 rounded-full border-2 border-[#8b5cf6]/70 object-cover shadow-[0_0_18px_rgba(139,92,246,0.5)] sm:size-20" />
+              <img src={t.avatar} alt="" loading="lazy" className="size-16 shrink-0 rounded-full border-2 border-[#3b82f6]/50 object-cover shadow-[0_0_14px_rgba(59,130,246,0.3)] sm:size-20" />
               <div className="flex min-w-0 flex-1 flex-col">
                 <p className="text-lg leading-none tracking-wider text-[#fbbf24]" aria-label="5 de 5 estrelas">★★★★★</p>
                 <p className="mt-3 flex-1 text-[15px] leading-relaxed text-[#e2e8f0]">“{t.text}”</p>
@@ -141,9 +141,9 @@ export function ClientsSection({ items = DEMO_BRANDS, illustrative = true }: { i
   return (
     <section className="relative overflow-hidden py-16" aria-labelledby="clientes-titulo">
       <div className="pointer-events-none absolute inset-0" aria-hidden style={{ background: "radial-gradient(ellipse 50% 60% at 0% 60%, rgba(124,58,237,0.18), transparent 70%), radial-gradient(ellipse 45% 60% at 100% 40%, rgba(37,99,235,0.2), transparent 70%)" }} />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5b5bff]/50 to-transparent" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3b82f6]/40 to-transparent" aria-hidden />
       <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-3 px-6 text-center">
-        <span className="rounded-full border border-[#6d5bff]/50 bg-[#1a1450]/60 px-4 py-1 text-sm font-medium text-[#e0dbff]">Nossos clientes</span>
+        <span className="rounded-full border border-[#3b82f6]/35 bg-[#071a3a]/60 px-4 py-1 text-sm font-medium text-[#cfe0ff]">Nossos clientes</span>
         <h2 id="clientes-titulo" className="text-3xl font-bold tracking-tight text-white md:text-[42px]">Empresas que confiam na <Grad>ScaleNexus</Grad></h2>
         {illustrative && <p className="text-xs text-[#cbd5e1] md:text-sm">Marcas ilustrativas — espaço preparado para logotipos de clientes reais.</p>}
       </div>

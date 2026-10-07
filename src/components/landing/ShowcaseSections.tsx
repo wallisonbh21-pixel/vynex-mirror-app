@@ -35,7 +35,7 @@ export function EcosystemStrip() {
   return (
     <section className="px-4 py-16 sm:px-6">
       <style>{CSS}</style>
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 rounded-3xl border border-[#8b5cf6]/25 bg-gradient-to-r from-[#8b5cf6]/[0.06] via-white/[0.02] to-[#3b82f6]/[0.06] p-4 backdrop-blur md:flex-row">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 rounded-3xl border border-[#3b82f6]/20 bg-gradient-to-r from-[#3b82f6]/[0.05] via-white/[0.02] to-[#3b82f6]/[0.06] p-4 backdrop-blur md:flex-row">
       <p className="shrink-0 text-center leading-tight md:pl-3 md:text-left">
         <span className="block text-[11px] text-[#94a3b8]">Parte do ecossistema</span>
         <span className="block text-sm font-bold tracking-wide text-white">AUREVION GROUP</span>
@@ -98,11 +98,11 @@ function ModelCard({ model, onPreview }: { model: ShowcaseModel; onPreview: () =
         <h3 className="text-lg font-bold text-white">{model.name}</h3>
         <p className="mt-1.5 min-h-[40px] flex-1 text-[13px] leading-relaxed text-[#b4bfd3]">{CARD_COPY[model.name] ?? model.description}</p>
         <div className="mt-4 grid gap-2.5">
-          <button type="button" onClick={onPreview} className="flex items-center justify-center gap-2 rounded-full border border-[#3b5bff]/40 bg-[#050a1c] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/70 hover:bg-white/5">
+          <button type="button" onClick={onPreview} className="flex items-center justify-center gap-2 rounded-full border border-[#3b5bff]/40 bg-[#050a1c] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#60a5fa] hover:border-[#8b5cf6]/70 hover:bg-white/5">
             <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
             Pré-visualizar
           </button>
-          <Link to="/comece-seu-projeto" className="rounded-full bg-gradient-to-r from-[#6d28d9] via-[#5b3bf0] to-[#3b5bff] px-4 py-2.5 text-center text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(109,40,217,0.8)] transition-opacity hover:opacity-90">
+          <Link to="/comece-seu-projeto" className="rounded-full bg-gradient-to-r from-[#6d28d9] via-[#3b5bff] to-[#2563eb] px-4 py-2.5 text-center text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.6)] transition-opacity hover:opacity-90">
             Escolher modelo →
           </Link>
         </div>
@@ -154,16 +154,16 @@ export function ModelsShowcase() {
   return (
     <section id="modelos" className="relative overflow-hidden py-20">
       <style>{CSS}</style>
-      <div className="pointer-events-none absolute inset-x-0 top-10 mx-auto h-72 max-w-4xl rounded-full bg-[#8b5cf6]/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-10 mx-auto h-72 max-w-4xl rounded-full bg-[#2563eb]/10 blur-3xl" />
       <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center">
-        <span className="rounded-full border border-[#6d5bff]/50 bg-[#1a1450]/60 px-4 py-1.5 text-sm font-medium text-[#e0dbff]">Modelos profissionais</span>
+        <span className="rounded-full border border-[#3b82f6]/35 bg-[#071a3a]/60 px-4 py-1.5 text-sm font-medium text-[#cfe0ff]">Modelos profissionais</span>
         <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
           Escolha o <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">modelo</span> para começar seu site
         </h2>
         <p className="max-w-4xl text-base text-[#cbd5e1] md:text-lg">
           Sites modernos, prontos para o seu segmento. Escolha o estilo, personalize e comece a vender.
         </p>
-        <Link to="/modelos" className="inline-flex items-center gap-2 rounded-full border border-[#7c5cff]/70 bg-[#0b0f2a]/70 px-6 py-2.5 shadow-[0_0_24px_-6px_rgba(124,92,255,0.7)] text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
+        <Link to="/modelos" className="inline-flex items-center gap-2 rounded-full border border-[#3b82f6]/45 bg-[#061329]/70 px-6 py-2.5 shadow-[0_0_20px_-8px_rgba(59,130,246,0.5)] text-sm font-semibold text-white transition-colors hover:border-[#60a5fa] hover:border-[#8b5cf6]/60 hover:bg-white/5">
           Ver todos os modelos →
         </Link>
       </div>
