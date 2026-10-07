@@ -120,7 +120,7 @@ export function ModelsShowcase() {
   const cardStep = () => {
     const el = trackRef.current;
     const first = el?.children[0] as HTMLElement | undefined;
-    return first ? first.offsetWidth + 20 : 320;
+    return first ? first.offsetWidth + 16 : 320;
   };
   const scrollBy = (dir: number) => trackRef.current?.scrollBy({ left: dir * cardStep(), behavior: "smooth" });
   const goTo = (i: number) => trackRef.current?.scrollTo({ left: i * cardStep(), behavior: "smooth" });
@@ -167,7 +167,7 @@ export function ModelsShowcase() {
           Ver todos os modelos →
         </Link>
       </div>
-      <div className="relative mx-auto mt-10 max-w-[1920px] px-4 sm:px-14">
+      <div className="relative mx-auto mt-10 max-w-[1920px] px-4 sm:px-14 2xl:px-4">
         <button type="button" onClick={() => scrollBy(-1)} aria-label="Modelos anteriores" className="absolute left-1 top-[42%] z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#3b5bff]/50 bg-[#070b1f]/90 text-white shadow-[0_0_20px_rgba(59,91,255,0.45)] backdrop-blur transition-colors hover:border-[#a78bfa] sm:left-2 sm:size-12">
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="m15 18-6-6 6-6" /></svg>
         </button>
@@ -183,7 +183,7 @@ export function ModelsShowcase() {
           onPointerUp={onUp}
           onPointerLeave={onUp}
           onClickCapture={(e) => { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); drag.current.moved = false; } }}
-          className="snx-models mx-auto flex w-fit max-w-full snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-1 pb-6 pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="snx-models mx-auto flex w-fit max-w-full snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-1 pb-6 pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {models.map((m) => (
             <ModelCard key={m.id} model={m} onPreview={() => setPreview(m)} />
