@@ -162,12 +162,12 @@ export function HeroBlock() {
       <section className="relative overflow-hidden px-5 pb-10 pt-10 sm:px-8 lg:pt-14">
         <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 35%, rgba(124,58,237,0.28), transparent 70%), radial-gradient(ellipse 40% 40% at 90% 15%, rgba(59,130,246,0.25), transparent 70%), radial-gradient(ellipse 50% 40% at 20% 10%, rgba(76,29,149,0.18), transparent 70%)" }} />
         <div className="relative mx-auto max-w-[1440px]">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.12fr_1fr] lg:gap-6">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-4">
             <div className="text-center">
               <span className="inline-flex rounded-full border border-[#3b82f6]/40 bg-[#0b1a3a]/50 px-5 py-2 text-sm font-medium text-[#38bdf8] lg:text-base">
                 Agência de criação de sites e publicidade
               </span>
-              <h1 className="mt-6 text-[34px] font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[56px] xl:text-[64px]">
+              <h1 className="mt-6 text-[34px] font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[44px] xl:text-[54px] 2xl:text-[60px]">
                 Criamos o Site Profissional<br className="hidden sm:block" /> da Sua Empresa em{" "}
                 <span className="bg-gradient-to-r from-[#a855f7] to-[#7c3aed] bg-clip-text text-transparent">48h</span>
               </h1>
@@ -192,7 +192,7 @@ export function HeroBlock() {
           </div>
 
           {/* PAINEL */}
-          <div className="relative z-10 mt-8 max-w-[1260px] rounded-[22px] border border-[#2a3a66]/60 bg-[#060d22]/75 p-5 shadow-[0_0_50px_-15px_rgba(59,130,246,0.45),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl sm:p-7 lg:-mt-24 lg:w-[73%]">
+          <div className="relative z-10 mt-8 max-w-[1260px] rounded-[22px] border border-[#2a3a66]/60 bg-[#060d22]/75 p-5 shadow-[0_0_50px_-15px_rgba(59,130,246,0.45),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl sm:p-7 lg:-mt-4 lg:w-[73%]">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-base font-bold uppercase text-[#38bdf8] lg:text-lg">Sites em produção hoje</p>
               <span className="flex items-center gap-2 text-xs text-[#e2e8f0] sm:text-sm">
