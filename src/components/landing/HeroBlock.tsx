@@ -200,8 +200,8 @@ export function HeroBlock() {
                   height={518}
                   className="block h-auto w-full select-none"
                   style={{
-                    WebkitMaskImage: "radial-gradient(ellipse 72% 70% at 55% 52%, #000 55%, transparent 100%)",
-                    maskImage: "radial-gradient(ellipse 72% 70% at 55% 52%, #000 55%, transparent 100%)",
+                    WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 22%, #000 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 12%, #000 85%, transparent 100%)",
+                    maskComposite: "intersect", WebkitMaskComposite: "source-in", maskImage: "linear-gradient(to right, transparent 0%, #000 22%, #000 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 12%, #000 85%, transparent 100%)",
                   }}
                   draggable={false}
                 />
