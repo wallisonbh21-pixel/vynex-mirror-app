@@ -303,11 +303,11 @@ export function TecnologiaSaasSite({ content: c }: { content: TecnologiaSaasCont
               const lg = f.size === "lg";
               return (
                 <Reveal key={f.id} delay={(i % 4) * 80} className={lg ? (i === 0 ? "sm:col-span-2 lg:row-span-2" : "sm:col-span-2") : ""}>
-                  <article className={`group relative h-full overflow-hidden rounded-2xl border border-[var(--sx-line)] p-6 transition-all duration-500 hover:-translate-y-1 hover:border-[color-mix(in_oklab,var(--sx-a2)_40%,transparent)] ${lg ? "bg-gradient-to-br from-[color-mix(in_oklab,var(--sx-a1)_12%,var(--sx-surface))] to-[var(--sx-surface)] sm:p-8" : "bg-[var(--sx-surface)]"}`}>
+                  <article className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--sx-line)] p-6 transition-all duration-500 hover:-translate-y-1 hover:border-[color-mix(in_oklab,var(--sx-a2)_40%,transparent)] ${lg ? "bg-gradient-to-br from-[color-mix(in_oklab,var(--sx-a1)_12%,var(--sx-surface))] to-[var(--sx-surface)] sm:p-8" : "bg-[var(--sx-surface)]"}`}>
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--sx-line)] text-[var(--sx-a2)] transition-transform duration-500 group-hover:scale-110"><Ico icon={f.icon} /></span>
                     <h3 className={`sx-h mt-5 font-semibold ${lg ? "text-2xl" : "text-lg"}`}>{f.title}</h3>
                     <p className={`mt-2 text-sm leading-relaxed text-[var(--sx-muted)] ${lg ? "max-w-md" : ""}`}>{f.text}</p>
-                    {lg ? <div className="mt-6 opacity-80 transition-opacity group-hover:opacity-100"><Spark data={i === 0 ? [20, 28, 26, 38, 44, 52, 60] : [60, 52, 48, 36, 30, 22, 14]} className="h-12 w-full" /></div> : null}
+                    {lg ? <div className="mt-auto pt-6 opacity-80 transition-opacity group-hover:opacity-100"><Spark data={i === 0 ? [20, 28, 26, 38, 44, 52, 60] : [60, 52, 48, 36, 30, 22, 14]} className={i === 0 ? "h-12 w-full lg:h-32" : "h-12 w-full"} /></div> : null}
                   </article>
                 </Reveal>
               );
