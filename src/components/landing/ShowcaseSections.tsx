@@ -35,11 +35,12 @@ export function EcosystemStrip() {
   return (
     <section className="px-4 py-16 sm:px-6">
       <style>{CSS}</style>
-      <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Ecossistema</p>
-      <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl font-bold text-white md:text-4xl">
-        Fazemos parte do Aurevion Group
-      </h2>
-      <div className="snx-viewport snx-fade mx-auto mt-10 max-w-6xl py-3">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 rounded-3xl border border-[#8b5cf6]/25 bg-gradient-to-r from-[#8b5cf6]/[0.06] via-white/[0.02] to-[#3b82f6]/[0.06] p-4 backdrop-blur md:flex-row">
+      <p className="shrink-0 text-center leading-tight md:pl-3 md:text-left">
+        <span className="block text-[11px] text-[#94a3b8]">Parte do ecossistema</span>
+        <span className="block text-sm font-bold tracking-wide text-white">AUREVION GROUP</span>
+      </p>
+      <div className="snx-viewport snx-fade w-full min-w-0 py-1">
         <div className="snx-track" style={{ animationDuration: "45s" }}>
           {[0, 1].map((dup) => (
             <div key={dup} className="flex shrink-0 gap-3 pr-3" aria-hidden={dup === 1}>
@@ -64,75 +65,80 @@ export function EcosystemStrip() {
           ))}
         </div>
       </div>
+      </div>
     </section>
   );
 }
 
-function ModelCard({ model, active, onTap }: { model: ShowcaseModel; active: boolean; onTap: () => void }) {
+function ModelCard({ model, onPreview }: { model: ShowcaseModel; onPreview: () => void }) {
   return (
     <article
-      data-active={active}
       data-model-id={model.id}
-      onClick={onTap}
-      className="snx-card group w-[280px] shrink-0 cursor-pointer overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0b0f1a] sm:w-[340px] lg:w-[380px]"
+      className="snx-card group flex w-[85%] shrink-0 snap-center flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0b0f1a]/80 backdrop-blur sm:w-auto"
     >
-      <div className="h-[221px] overflow-hidden sm:h-[268px] lg:h-[300px]">
-        {/* Prévia desenhada em 380×300 e reduzida proporcionalmente em telas menores. */}
+      <button type="button" onClick={onPreview} className="block h-[236px] overflow-hidden text-left sm:h-[268px] lg:h-[300px]" aria-label={`Pré-visualizar ${model.name}`}>
         <div className="snx-scale h-[300px] w-[380px] origin-top-left">
           <div className="snx-shot h-full w-full origin-top"><ShowcasePreview model={model} /></div>
         </div>
-      </div>
-      <div className="border-t border-white/[0.06] bg-gradient-to-b from-[#0b0f1a] to-[#070a12] px-5 py-4">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="truncate text-base font-bold text-white">{model.name}</h3>
-          <span className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[10px] text-[#94a3b8]">{model.category}</span>
+      </button>
+      <div className="flex flex-1 flex-col border-t border-white/[0.06] bg-gradient-to-b from-[#0b0f1a] to-[#070a12] px-5 py-5">
+        <h3 className="text-lg font-bold text-white">{model.name}</h3>
+        <p className="mt-1 line-clamp-2 flex-1 text-sm text-[#94a3b8]">{model.description}</p>
+        <div className="mt-4 grid gap-2">
+          <button type="button" onClick={onPreview} className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
+            Pré-visualizar
+          </button>
+          <Link to="/comece-seu-projeto" className="rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-4 py-2.5 text-center text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(124,58,237,0.7)] transition-opacity hover:opacity-90">
+            Escolher modelo →
+          </Link>
         </div>
-        <p className="mt-1 line-clamp-2 text-sm text-[#94a3b8]">{model.description}</p>
       </div>
     </article>
   );
 }
 
 export function ModelsShowcase() {
-  const [active, setActive] = useState<string | null>(null);
+  const [preview, setPreview] = useState<ShowcaseModel | null>(null);
   const models = FEATURED_SHOWCASE_MODELS;
   return (
     <section id="modelos" className="relative overflow-hidden py-20">
       <style>{CSS}</style>
       <div className="pointer-events-none absolute inset-x-0 top-10 mx-auto h-72 max-w-4xl rounded-full bg-[#8b5cf6]/10 blur-3xl" />
-      <div className="relative px-6 text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Modelos</p>
-        <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold text-white md:text-4xl">
-          Escolha o modelo para começar seu site
+      <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center">
+        <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Modelos profissionais</span>
+        <h2 className="max-w-2xl text-3xl font-bold text-white md:text-4xl">
+          Escolha o <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">modelo</span> para começar seu site
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-base text-[#94a3b8]">
-          Escolha uma estrutura profissional e personalize tudo para o seu negócio.
+        <p className="max-w-xl text-base text-[#94a3b8]">
+          Sites modernos, prontos para o seu segmento. Escolha o estilo, personalize e comece a vender.
         </p>
-      </div>
-      <div
-        className="snx-viewport snx-fade relative mx-auto mt-12 max-w-[1440px] py-6"
-        data-paused={active !== null}
-      >
-        <div className="snx-track" style={{ animationDuration: "60s" }}>
-          {[0, 1].map((dup) => (
-            <div key={dup} className="flex shrink-0 gap-6 pr-6" aria-hidden={dup === 1}>
-              {models.map((m) => (
-                <ModelCard
-                  key={`${dup}-${m.id}`}
-                  model={m}
-                  active={active === `${dup}-${m.id}`}
-                  onTap={() => setActive((cur) => (cur === `${dup}-${m.id}` ? null : `${dup}-${m.id}`))}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="relative mt-6 text-center">
         <Link to="/modelos" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
           Ver todos os modelos →
         </Link>
       </div>
+      <div className="relative mx-auto mt-12 flex max-w-6xl snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-6 pt-3 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-3">
+        {models.map((m) => (
+          <ModelCard key={m.id} model={m} onPreview={() => setPreview(m)} />
+        ))}
+      </div>
+      {preview && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" onClick={() => setPreview(null)} role="dialog" aria-modal="true" aria-label={`Prévia ${preview.name}`}>
+          <div className="w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#0b0f1a]" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+              <p className="font-semibold text-white">{preview.name}</p>
+              <button type="button" onClick={() => setPreview(null)} className="rounded-lg px-3 py-1 text-sm text-[#94a3b8] hover:bg-white/5 hover:text-white">Fechar</button>
+            </div>
+            <div className="mx-auto aspect-[380/300] w-full max-w-[760px] overflow-hidden">
+              <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(var(--s))", ["--s" as string]: "min(2, calc((100vw - 2rem) / 380px))" } as React.CSSProperties}>
+                <ShowcasePreview model={preview} />
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 px-5 py-4">
+              <Link to="/comece-seu-projeto" className="rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-5 py-2.5 text-sm font-bold text-white">Escolher modelo →</Link>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
