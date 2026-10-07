@@ -83,14 +83,14 @@ function ModelCard({ model, onPreview }: { model: ShowcaseModel; onPreview: () =
   return (
     <article
       data-model-id={model.id}
-      className="snx-card group flex w-[78vw] max-w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-[#3b5bff]/35 bg-gradient-to-b from-[#0a1230] to-[#060a1c] shadow-[0_0_30px_-12px_rgba(59,91,255,0.55)] sm:w-[300px]"
+      className="snx-card group flex w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-[#3b5bff]/35 bg-gradient-to-b from-[#0a1230] to-[#060a1c] shadow-[0_0_30px_-12px_rgba(59,91,255,0.55)]"
     >
       <div className="flex items-center justify-between px-4 pb-2 pt-3" aria-hidden>
         <span className="flex gap-1"><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /></span>
         <span className="flex gap-1"><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /></span>
       </div>
-      <button type="button" onClick={onPreview} className="mx-2 block aspect-[380/300] overflow-hidden rounded-xl text-left [container-type:inline-size]" aria-label={`Pré-visualizar ${model.name}`}>
-        <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(calc(100cqw / 380px))" }}>
+      <button type="button" onClick={onPreview} className="mx-2 block h-[224px] w-[284px] overflow-hidden rounded-xl text-left" aria-label={`Pré-visualizar ${model.name}`}>
+        <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(0.7474)" }}>
           <div className="snx-shot h-full w-full origin-top"><ShowcasePreview model={model} /></div>
         </div>
       </button>
@@ -156,11 +156,11 @@ export function ModelsShowcase() {
       <style>{CSS}</style>
       <div className="pointer-events-none absolute inset-x-0 top-10 mx-auto h-72 max-w-4xl rounded-full bg-[#8b5cf6]/10 blur-3xl" />
       <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center">
-        <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Modelos profissionais</span>
-        <h2 className="max-w-2xl text-3xl font-bold text-white md:text-4xl">
+        <span className="rounded-full border border-[#6d5bff]/50 bg-[#1a1450]/60 px-4 py-1.5 text-sm font-medium text-[#e0dbff]">Modelos profissionais</span>
+        <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
           Escolha o <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">modelo</span> para começar seu site
         </h2>
-        <p className="max-w-xl text-base text-[#94a3b8]">
+        <p className="max-w-2xl text-base text-[#cbd5e1] md:text-lg">
           Sites modernos, prontos para o seu segmento. Escolha o estilo, personalize e comece a vender.
         </p>
         <Link to="/modelos" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
