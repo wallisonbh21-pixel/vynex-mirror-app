@@ -3,6 +3,8 @@ import { generateId } from './utils';
 import { LibraryItem } from '@/types/studio-v2';
 import { IMOBILIARIA_DEFAULT_CONTENT, IMOBILIARIA_TEMPLATE_ID } from './../templates/imobiliaria-premium/content';
 import { imobiliariaToStudioData } from './../templates/imobiliaria-premium/to-studio';
+import { IA_AUTOMACAO_DEFAULT_CONTENT, IA_AUTOMACAO_TEMPLATE_ID } from './../templates/ia-automacao/content';
+import { iaAutomacaoToStudioData } from './../templates/ia-automacao/to-studio';
 
 // Helper to create basic elements
 const createText = (type: StudioElement['type'], text: string, styles: any = {}): StudioElement => ({
@@ -199,6 +201,18 @@ export const NICHE_TEMPLATES: LibraryItem[] = [
     preview: IMOBILIARIA_DEFAULT_CONTENT.hero.image,
     structure: imobiliariaToStudioData(IMOBILIARIA_DEFAULT_CONTENT),
     metadata: { forge_context: 'template_01_imobiliaria_premium', preview_route: '/template/imobiliaria-premium' },
+  },
+  {
+    id: IA_AUTOMACAO_TEMPLATE_ID,
+    name: 'IA & Automação Empresarial',
+    description: 'Template 02 oficial: empresas de inteligência artificial, agentes de IA e automação.',
+    category: 'Tecnologia',
+    niche: 'ia-automacao',
+    type: 'template',
+    tags: ['ia', 'automacao', 'agentes', 'saas', 'oficial'],
+    preview: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80',
+    structure: iaAutomacaoToStudioData(IA_AUTOMACAO_DEFAULT_CONTENT),
+    metadata: { forge_context: 'template_02_ia_automacao', preview_route: '/template/ia-automacao' },
   },
   {
     id: 'tmpl_burger',
