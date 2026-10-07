@@ -28,7 +28,7 @@ function useCount(target: number, ms = 1400) {
     if (!el) return;
     let raf = 0;
     const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
+      if (!e?.isIntersecting) return;
       io.disconnect();
       const t0 = performance.now();
       const step = (t: number) => {
