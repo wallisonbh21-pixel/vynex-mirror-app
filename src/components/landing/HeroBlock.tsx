@@ -126,7 +126,7 @@ export function Phone() {
   );
 }
 
-const DEV_MASK = "linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 5%, #000 92%, transparent 100%)";
+const DEV_MASK = "linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 8%, #000 90%, transparent 100%)";
 
 export function HeroDevices() {
   return (
@@ -134,8 +134,8 @@ export function HeroDevices() {
       <img
         src={heroDevices.url}
         alt=""
-        width={923}
-        height={515}
+        width={1376}
+        height={768}
         className="block h-auto w-full select-none object-contain"
         style={{ WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK, WebkitMaskComposite: "source-in", maskComposite: "intersect" }}
         draggable={false}
@@ -208,7 +208,7 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[640px] lg:-mr-[4%] lg:w-[112%] lg:max-w-[700px] lg:justify-self-end" aria-hidden>
+            <div className="relative mx-auto w-full max-w-[640px] lg:w-[108%] lg:max-w-[700px] lg:justify-self-end" aria-hidden>
               <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
               <HeroDevices />
             </div>
