@@ -49,12 +49,6 @@ function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
   );
 }
 
-const BRANDS = [
-  { label: "ScaleNexus", initial: "S", color: "#a855f7" },
-  { label: "Valtrion AI", initial: "V", color: "#3b82f6" },
-  { label: "NexusBuild AI", initial: "N", color: "#22c55e" },
-  { label: "Aurevion Group", initial: "A", color: "#eab308" },
-];
 
 const CLIENT_NAMES = [
   "Studio Kai", "Nova Vita", "Dominar", "Lumen Co.", "Vertigo",
