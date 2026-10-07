@@ -163,7 +163,7 @@ export function ModelsShowcase() {
         <p className="max-w-2xl text-base text-[#cbd5e1] md:text-lg">
           Sites modernos, prontos para o seu segmento. Escolha o estilo, personalize e comece a vender.
         </p>
-        <Link to="/modelos" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
+        <Link to="/modelos" className="inline-flex items-center gap-2 rounded-full border border-[#7c5cff]/70 bg-[#0b0f2a]/70 px-6 py-2.5 shadow-[0_0_24px_-6px_rgba(124,92,255,0.7)] text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
           Ver todos os modelos →
         </Link>
       </div>
