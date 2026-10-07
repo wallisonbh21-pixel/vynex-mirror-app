@@ -59,7 +59,7 @@ function Stat({ label, value, suffix = "" }: { label: string; value: number; suf
 function Laptop() {
   return (
     <div className="relative" style={{ transform: "perspective(1600px) rotateY(-16deg) rotateX(4deg) rotateZ(-2deg)", transformStyle: "preserve-3d" }}>
-      <div className="rounded-[18px] border border-[#60a5fa]/30 bg-gradient-to-b from-[#2a2f45] to-[#0d1020] p-[7px] shadow-[0_0_0_1px_rgba(59,130,246,0.2),0_40px_90px_-20px_rgba(124,58,237,0.65),0_0_60px_-10px_rgba(59,130,246,0.5)]">
+      <div className="rounded-[18px] border border-[#60a5fa]/30 bg-gradient-to-b from-[#2a2f45] to-[#0d1020] p-[7px] shadow-[0_0_0_1px_rgba(59,130,246,0.2),0_40px_90px_-20px_rgba(37,99,235,0.55),0_0_60px_-10px_rgba(59,130,246,0.5)]">
         <div className="relative aspect-[16/10] overflow-hidden rounded-[11px] bg-[#05070f]">
           <img src={HERO_IMG} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#05070f] via-[#05070f]/70 to-transparent" />
@@ -160,7 +160,7 @@ export function HeroBlock() {
 
       {/* HERO */}
       <section className="relative overflow-hidden px-5 pb-10 pt-10 sm:px-8 lg:pt-14">
-        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 35%, rgba(124,58,237,0.13), transparent 70%), radial-gradient(ellipse 40% 40% at 90% 15%, rgba(59,130,246,0.25), transparent 70%), radial-gradient(ellipse 50% 40% at 20% 10%, rgba(76,29,149,0.18), transparent 70%)" }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 35%, rgba(124,58,237,0.13), transparent 70%), radial-gradient(ellipse 40% 40% at 90% 15%, rgba(59,130,246,0.25), transparent 70%), radial-gradient(ellipse 50% 40% at 20% 10%, rgba(8,24,47,0.5), transparent 70%)" }} />
         <div className="relative mx-auto max-w-[1440px]">
           <div className="grid items-center gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-4">
             <div className="text-center">
