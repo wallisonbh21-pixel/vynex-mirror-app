@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { TEMPLATE_MODELS } from "./templates-data";
-import { TemplateSitePreview } from "./TemplateSitePreview";
+import { FEATURED_SHOWCASE_MODELS } from "@/lib/showcase/models";
+import { ShowcasePreview } from "./ShowcasePreview";
 import { EcosystemStrip, ModelsShowcase } from "./ShowcaseSections";
 
 /* ---------------- helpers ---------------- */
@@ -50,10 +50,52 @@ function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
 }
 
 
-const CLIENT_NAMES = [
-  "Studio Kai", "Nova Vita", "Dominar", "Lumen Co.", "Vertigo",
-  "Northwave", "Southwave", "Aero Labs", "Bright & Co.",
+/* Conteúdo demonstrativo — substituir por depoimentos e marcas reais quando cadastrados. */
+const DEMO_TESTIMONIALS = [
+  { name: "Mariana Souza", company: "Imobiliária (exemplo)", segment: "Imobiliário", text: "O site ficou incrível! Superou todas as nossas expectativas." },
+  { name: "Carlos Menezes", company: "Restaurante (exemplo)", segment: "Gastronomia", text: "Atendimento excelente e entrega muito rápida. Recomendo demais!" },
+  { name: "Camila Rocha", company: "Loja de moda (exemplo)", segment: "Varejo", text: "Nosso site novo deixou a loja com cara de marca grande." },
+  { name: "Ricardo Alves", company: "Clínica (exemplo)", segment: "Saúde", text: "Profissionais competentes e criativos. Resultado impecável!" },
+  { name: "Juliana Martins", company: "Hotel (exemplo)", segment: "Hotelaria", text: "O site ficou moderno, rápido e fácil de usar. Ótimo investimento!" },
 ];
+
+const DEMO_BRANDS = [
+  { n: "Vista", s: "Imóveis" }, { n: "Sabor & Arte", s: "Restaurante" }, { n: "Bella Moda", s: "Boutique" },
+  { n: "TechVision", s: "Tecnologia" }, { n: "Clínica Vita", s: "Saúde" }, { n: "Solaris", s: "Hotéis" },
+  { n: "Nexo", s: "Consultoria" }, { n: "TopCar", s: "Automóveis" },
+];
+
+function HeroDevices() {
+  const model = FEATURED_SHOWCASE_MODELS[0];
+  if (!model) return null;
+  return (
+    <div className="relative mx-auto w-full max-w-[560px] [perspective:1400px]" style={{ animation: "sn-float 7s ease-in-out infinite" }}>
+      <div className="pointer-events-none absolute -inset-10 rounded-full bg-[#7c3aed]/20 blur-3xl" />
+      {/* Notebook */}
+      <div className="relative [transform:rotateY(-14deg)_rotateX(6deg)]">
+        <div className="rounded-t-2xl border border-white/10 bg-[#0b0f1a] p-2 shadow-[0_40px_80px_-30px_rgba(124,58,237,0.6)]">
+          <div className="relative aspect-[380/240] overflow-hidden rounded-lg">
+            <div className="absolute left-0 top-0 h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(var(--hs))", ["--hs" as string]: "min(1.4, calc((100vw - 4rem) / 380px))" } as React.CSSProperties}>
+              <ShowcasePreview model={model} />
+            </div>
+          </div>
+        </div>
+        <div className="mx-auto h-3 w-[108%] -translate-x-[3.7%] rounded-b-2xl bg-gradient-to-b from-[#1e2435] to-[#0b0f1a]" />
+      </div>
+      {/* Celular */}
+      <div className="absolute -bottom-6 -right-2 w-[28%] rounded-[22px] border border-white/15 bg-[#0b0f1a] p-1.5 shadow-[0_30px_60px_-20px_rgba(59,130,246,0.6)] sm:-right-6">
+        <div className="relative aspect-[9/18] overflow-hidden rounded-[16px]">
+          <img src={model.heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#05070f] via-[#05070f]/40 to-transparent" />
+          <div className="absolute inset-x-2 bottom-3">
+            <p className="text-[10px] font-semibold italic leading-tight text-white">Sua empresa em outro nível</p>
+            <span className="mt-1.5 inline-block rounded-full bg-[#7c3aed] px-2 py-0.5 text-[7px] font-bold text-white">Fale conosco</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SERVICES = [
   { t: "Criação completa do site", d: "Do layout ao lançamento, sem você precisar escrever uma linha." },
@@ -177,8 +219,8 @@ export function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-[#141a2b] bg-[#05070f]/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-[#a855f7]/15 text-sm font-black text-[#a855f7]">S</div>
-            <span className="text-lg font-bold tracking-tight">ScaleNexus</span>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#a855f7] to-[#3b82f6] text-sm font-black text-white">S</div>
+            <span className="text-lg font-bold tracking-tight">Scale<span className="text-[#a78bfa]">Nexus</span></span>
           </div>
           <nav className="hidden items-center gap-8 text-sm text-[#94a3b8] md:flex">
             <a href="#como-funciona" className="transition-colors hover:text-white">Como funciona</a>
@@ -194,7 +236,7 @@ export function LandingPage() {
             </Link>
             <Link
               to="/comece-seu-projeto"
-              className="rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Criar meu site
             </Link>
@@ -203,73 +245,44 @@ export function LandingPage() {
       </header>
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-6 pt-20 pb-6 text-center">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[520px]"
-          style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.18), transparent 70%)" }}
-        />
-        <motion.div
-          className="relative mx-auto max-w-4xl"
-          initial={{ y: 24, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-        >
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#1f2937] bg-[#0f1424] px-4 py-1.5 text-xs font-medium text-[#94a3b8]">
-            <span className="size-1.5 rounded-full bg-[#3b82f6]" style={{ animation: "sn-pulse 1.6s ease-in-out infinite" }} />
-            Agência de criação de sites e publicidade
-          </span>
-          <h1
-            className="mt-7 text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl"
-            style={{ animation: "floatY 7s ease-in-out infinite" }}
-          >
-            Criamos o Site Profissional
-            <br />
-            da Sua Empresa em <span className="text-[#60a5fa]">48h</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#94a3b8]">
-            Você escolhe o modelo, nossos especialistas e agentes de IA cuidam de todo o resto.
-            Design, textos e publicação. Pronto para vender.
-          </p>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              to="/modelos"
-              className="rounded-xl bg-[#3b82f6] px-7 py-3.5 text-sm font-bold text-white transition-transform hover:scale-105"
-            >
-              Escolher meu modelo
-            </Link>
-            <a
-              href="#como-funciona"
-              className="rounded-xl border border-[#1f2937] bg-[#0f1424] px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:border-[#3b82f6]/60"
-            >
-              Ver como funciona
-            </a>
-          </div>
-        </motion.div>
+      <section className="relative overflow-hidden px-6 pt-16 pb-10 lg:pt-20">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[620px]" style={{ background: "radial-gradient(ellipse at 30% 0%, rgba(124,58,237,0.22), transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.18), transparent 60%)" }} />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+          <motion.div className="text-center lg:text-left" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease: "easeOut" }}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-4 py-1.5 text-xs font-medium text-[#c4b5fd]">
+              <span className="size-1.5 rounded-full bg-[#a78bfa]" style={{ animation: "sn-pulse 1.6s ease-in-out infinite" }} />
+              Agência de criação de sites e publicidade
+            </span>
+            <h1 className="mt-7 text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl">
+              Criamos o Site Profissional da Sua Empresa em{" "}
+              <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">48h</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-[#94a3b8] lg:mx-0">
+              Você escolhe o modelo, nossos especialistas e agentes de IA cuidam de todo o resto.
+              Design, textos e publicação. Pronto para vender.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <Link to="/modelos" className="rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-7 py-3.5 text-sm font-bold text-white shadow-[0_15px_40px_-12px_rgba(124,58,237,0.8)] transition-transform hover:scale-105">
+                Escolher meu modelo →
+              </Link>
+              <a href="#como-funciona" className="rounded-xl border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:border-[#8b5cf6]/60">
+                Ver como funciona
+              </a>
+            </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.15 }} className="px-2 pb-8">
+            <HeroDevices />
+          </motion.div>
+        </div>
       </section>
 
       {/* DASHBOARD */}
-      <section className="px-6 pt-10 pb-20">
+      <section className="px-6 pt-4 pb-6">
         <ProductionDashboard />
       </section>
 
       {/* ECOSSISTEMA */}
       <EcosystemStrip />
-
-      {/* CARROSSEL NOMES */}
-      <section className="px-6 py-10">
-        <p className="text-center text-base text-[#94a3b8]">
-          Mais de 200+ empresas já tiveram o site criado pela ScaleNexus
-        </p>
-        <div className="sn-pause sn-fade mt-6 overflow-hidden">
-          <div className="sn-track" style={{ animationDuration: "120s", animationDirection: "reverse", gap: "40px" }}>
-            {[...CLIENT_NAMES, ...CLIENT_NAMES, ...CLIENT_NAMES, ...CLIENT_NAMES].map((n, i) => (
-              <span key={i} className="whitespace-nowrap text-lg font-semibold text-[#475569]" style={{ marginRight: 40 }}>
-                {n}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* O QUE FAZEMOS */}
       <section id="o-que-fazemos" className="px-6 py-20">
@@ -330,27 +343,26 @@ export function LandingPage() {
       {/* MODELOS */}
       <ModelsShowcase />
 
-      {/* TODOS OS TEMPLATES */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl font-bold md:text-4xl">Todos os templates</h2>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {TEMPLATE_MODELS.slice(0, 9).map((t) => (
-              <div key={t.name} className="overflow-hidden rounded-2xl border border-[#1f2937] bg-[#0f1424]">
-                <div className="h-48 w-full"><TemplateSitePreview template={t} compact /></div>
-                <div className="space-y-3 p-5">
-                  <h3 className="text-base font-bold text-white">{t.name}</h3>
-                  <input
-                    type="text"
-                    placeholder="Nome da sua empresa"
-                    className="w-full rounded-lg border border-[#1f2937] bg-[#0b1020] px-3 py-2 text-sm text-white placeholder:text-[#475569] focus:border-[#3b82f6] focus:outline-none"
-                  />
-                  <Link
-                    to="/comece-seu-projeto"
-                    className="block w-full rounded-lg bg-[#3b82f6] px-3 py-2 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                  >
-                    Ver como meu site vai ficar →
-                  </Link>
+      {/* DEPOIMENTOS */}
+      <section className="py-20">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
+          <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Depoimentos</span>
+          <h2 className="text-3xl font-bold md:text-4xl">Empresas que já cresceram com a <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">ScaleNexus</span></h2>
+          <p className="max-w-2xl text-sm text-[#94a3b8]">Veja como é a experiência de ter um site profissional com a nossa equipe.</p>
+          <p className="text-[11px] text-[#64748b]">Depoimentos ilustrativos — serão substituídos por relatos reais de clientes.</p>
+        </div>
+        <div className="sn-pause sn-fade mt-10 overflow-x-auto [scrollbar-width:none]">
+          <div className="sn-track" style={{ animationDuration: "70s" }}>
+            {[...DEMO_TESTIMONIALS, ...DEMO_TESTIMONIALS].map((t, i) => (
+              <div key={i} className="mr-5 w-[300px] shrink-0 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 backdrop-blur" aria-hidden={i >= DEMO_TESTIMONIALS.length}>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-[#7c3aed] to-[#3b82f6] text-sm font-bold text-white">{t.name.split(" ").map((w) => w[0]).join("")}</span>
+                  <span className="text-sm tracking-widest text-[#fbbf24]">★★★★★</span>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-[#cbd5e1]">“{t.text}”</p>
+                <div className="mt-4 border-t border-white/[0.06] pt-3">
+                  <p className="text-sm font-bold text-white">{t.name}</p>
+                  <p className="text-xs text-[#64748b]">{t.company} · {t.segment}</p>
                 </div>
               </div>
             ))}
@@ -358,23 +370,19 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* DEPOIMENTOS */}
-      <section className="py-20">
-        <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Depoimentos</p>
-        <h2 className="mt-3 px-6 text-center text-3xl font-bold md:text-4xl">Empresas que já estão no ar</h2>
-        <div className="sn-pause sn-fade mt-12 overflow-hidden">
-          <div className="sn-track" style={{ animationDuration: "80s", gap: "24px" }}>
-            {[...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-              <div
-                key={i}
-                className="w-[380px] shrink-0 rounded-2xl border border-[#1f2937] bg-[#0f1424] p-6"
-                style={{ marginRight: 24 }}
-              >
-                <p className="text-sm leading-relaxed text-[#cbd5e1]">“{t.text}”</p>
-                <div className="mt-5">
-                  <p className="text-sm font-bold text-white">{t.name}</p>
-                  <p className="text-xs text-[#64748b]">{t.role}</p>
-                </div>
+      {/* EMPRESAS */}
+      <section className="py-14">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center">
+          <span className="rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3 py-1 text-xs font-semibold text-[#c4b5fd]">Nossos clientes</span>
+          <h2 className="text-3xl font-bold md:text-4xl">Empresas que confiam na <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">ScaleNexus</span></h2>
+          <p className="text-[11px] text-[#64748b]">Marcas ilustrativas — espaço preparado para logotipos de clientes reais.</p>
+        </div>
+        <div className="sn-pause sn-fade mt-10 overflow-hidden">
+          <div className="sn-track" style={{ animationDuration: "50s", animationDirection: "reverse" }}>
+            {[...DEMO_BRANDS, ...DEMO_BRANDS].map((b, i) => (
+              <div key={i} className="mr-14 shrink-0 text-center" aria-hidden={i >= DEMO_BRANDS.length}>
+                <p className="whitespace-nowrap text-xl font-semibold text-[#cbd5e1]/80">{b.n}</p>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-[#64748b]">{b.s}</p>
               </div>
             ))}
           </div>
@@ -382,21 +390,25 @@ export function LandingPage() {
       </section>
 
       {/* CTA FINAL */}
-      <section className="px-6 py-20">
-        <div
-          className="mx-auto max-w-5xl rounded-3xl p-12 text-center md:p-16"
-          style={{ background: "linear-gradient(135deg, #3b82f6 0%, #0f172a 100%)", borderRadius: 24 }}
-        >
-          <h2 className="text-3xl font-bold text-white md:text-4xl">Pronto para ter o site da sua empresa?</h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
-            Escolha um modelo e nossa equipe entrega em 48 horas
-          </p>
-          <Link
-            to="/comece-seu-projeto"
-            className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-base font-bold text-[#05070f] transition-transform hover:scale-105"
-          >
-            Quero meu site em 48h
+      <section className="relative overflow-hidden px-6 py-24">
+        <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1440 400" preserveAspectRatio="none" aria-hidden>
+          <defs>
+            <linearGradient id="snw" x1="0" x2="1"><stop offset="0" stopColor="#7c3aed" /><stop offset="1" stopColor="#3b82f6" /></linearGradient>
+          </defs>
+          {[0, 1, 2, 3, 4].map((k) => (
+            <path key={k} d={`M0 ${260 + k * 18} C 360 ${120 + k * 30}, 720 ${380 - k * 20}, 1440 ${160 + k * 25}`} stroke="url(#snw)" strokeWidth={1.5} fill="none" opacity={0.5 - k * 0.08} />
+          ))}
+        </svg>
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse at 20% 80%, rgba(124,58,237,0.25), transparent 60%), radial-gradient(ellipse at 80% 30%, rgba(59,130,246,0.2), transparent 60%)" }} />
+        <div className="relative mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl font-bold text-white md:text-5xl">Pronto para levar seu negócio a outro nível?</h2>
+          <p className="mx-auto mt-4 max-w-xl text-base text-[#cbd5e1]">Escolha o modelo, fale com nossa equipe e receba seu site profissional.</p>
+          <Link to="/comece-seu-projeto" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-8 py-4 text-base font-bold text-white shadow-[0_20px_50px_-15px_rgba(124,58,237,0.9)] transition-transform hover:scale-105">
+            Criar meu site agora →
           </Link>
+          <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-[#94a3b8]">
+            <span>Entrega em até 48 horas</span><span>Design profissional</span><span>Suporte especializado</span>
+          </div>
         </div>
       </section>
 
@@ -405,7 +417,7 @@ export function LandingPage() {
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-[#a855f7]/15 text-sm font-black text-[#a855f7]">S</div>
+              <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#a855f7] to-[#3b82f6] text-sm font-black text-white">S</div>
               <span className="text-lg font-bold">ScaleNexus</span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#64748b]">

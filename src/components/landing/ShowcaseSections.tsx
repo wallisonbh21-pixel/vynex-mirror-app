@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import { FEATURED_SHOWCASE_MODELS, type ShowcaseModel } from "@/lib/showcase/models";
 import { ShowcasePreview } from "./ShowcasePreview";
@@ -129,7 +129,7 @@ export function ModelsShowcase() {
               <button type="button" onClick={() => setPreview(null)} className="rounded-lg px-3 py-1 text-sm text-[#94a3b8] hover:bg-white/5 hover:text-white">Fechar</button>
             </div>
             <div className="mx-auto aspect-[380/300] w-full max-w-[760px] overflow-hidden">
-              <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(var(--s))", ["--s" as string]: "min(2, calc((100vw - 2rem) / 380px))" } as React.CSSProperties}>
+              <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(var(--s))", ["--s" as string]: "min(2, calc((100vw - 2rem) / 380px))" } as CSSProperties}>
                 <ShowcasePreview model={preview} />
               </div>
             </div>
