@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { FEATURED_SHOWCASE_MODELS, type ShowcaseModel } from "@/lib/showcase/models";
 import { ShowcasePreview } from "./ShowcasePreview";
@@ -74,21 +74,21 @@ function ModelCard({ model, onPreview }: { model: ShowcaseModel; onPreview: () =
   return (
     <article
       data-model-id={model.id}
-      className="snx-card group flex w-[85%] shrink-0 snap-center flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0b0f1a]/80 backdrop-blur sm:w-auto"
+      className="snx-card group flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b0f1a]/80 backdrop-blur"
     >
-      <button type="button" onClick={onPreview} className="block h-[236px] overflow-hidden text-left sm:h-[268px] lg:h-[300px]" aria-label={`Pré-visualizar ${model.name}`}>
-        <div className="snx-scale h-[300px] w-[380px] origin-top-left">
+      <button type="button" onClick={onPreview} className="block h-[221px] overflow-hidden text-left" aria-label={`Pré-visualizar ${model.name}`}>
+        <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(0.7368)" }}>
           <div className="snx-shot h-full w-full origin-top"><ShowcasePreview model={model} /></div>
         </div>
       </button>
-      <div className="flex flex-1 flex-col border-t border-white/[0.06] bg-gradient-to-b from-[#0b0f1a] to-[#070a12] px-5 py-5">
-        <h3 className="text-lg font-bold text-white">{model.name}</h3>
-        <p className="mt-1 line-clamp-2 flex-1 text-sm text-[#94a3b8]">{model.description}</p>
-        <div className="mt-4 grid gap-2">
-          <button type="button" onClick={onPreview} className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
+      <div className="flex flex-1 flex-col border-t border-white/[0.06] bg-gradient-to-b from-[#0b0f1a] to-[#070a12] px-4 py-4">
+        <h3 className="text-base font-bold text-white">{model.name}</h3>
+        <p className="mt-1 line-clamp-2 flex-1 text-xs leading-relaxed text-[#94a3b8]">{model.description}</p>
+        <div className="mt-3 grid gap-2">
+          <button type="button" onClick={onPreview} className="rounded-lg border border-white/15 px-4 py-2 text-xs font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
             Pré-visualizar
           </button>
-          <Link to="/comece-seu-projeto" className="rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-4 py-2.5 text-center text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(124,58,237,0.7)] transition-opacity hover:opacity-90">
+          <Link to="/comece-seu-projeto" className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-4 py-2 text-center text-xs font-bold text-white shadow-[0_10px_30px_-10px_rgba(124,58,237,0.7)] transition-opacity hover:opacity-90">
             Escolher modelo →
           </Link>
         </div>
@@ -100,6 +100,29 @@ function ModelCard({ model, onPreview }: { model: ShowcaseModel; onPreview: () =
 export function ModelsShowcase() {
   const [preview, setPreview] = useState<ShowcaseModel | null>(null);
   const models = FEATURED_SHOWCASE_MODELS;
+  const trackRef = useRef<HTMLDivElement>(null);
+  const drag = useRef({ active: false, startX: 0, startLeft: 0, moved: false });
+  const scrollBy = (dir: number) => trackRef.current?.scrollBy({ left: dir * 296 * 2, behavior: "smooth" });
+  const onDown = (e: RPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse" || !trackRef.current) return;
+    drag.current = { active: true, startX: e.clientX, startLeft: trackRef.current.scrollLeft, moved: false };
+  };
+  const onMove = (e: RPointerEvent<HTMLDivElement>) => {
+    const el = trackRef.current;
+    if (!drag.current.active || !el) return;
+    const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 5) {
+      drag.current.moved = true;
+      el.style.scrollSnapType = "none";
+      el.style.scrollBehavior = "auto";
+    }
+    el.scrollLeft = drag.current.startLeft - dx;
+  };
+  const onUp = () => {
+    const el = trackRef.current;
+    drag.current.active = false;
+    if (el) { el.style.scrollSnapType = ""; el.style.scrollBehavior = ""; }
+  };
   return (
     <section id="modelos" className="relative overflow-hidden py-20">
       <style>{CSS}</style>
@@ -116,10 +139,26 @@ export function ModelsShowcase() {
           Ver todos os modelos →
         </Link>
       </div>
-      <div className="relative mx-auto mt-12 flex max-w-6xl snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-6 pt-3 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-3">
-        {models.map((m) => (
-          <ModelCard key={m.id} model={m} onPreview={() => setPreview(m)} />
-        ))}
+      <div className="relative mx-auto mt-10 max-w-7xl px-4 sm:px-6">
+        <button type="button" onClick={() => scrollBy(-1)} aria-label="Modelos anteriores" className="absolute left-1 top-[110px] z-10 hidden size-10 items-center justify-center rounded-full border border-white/15 bg-[#0b0f1a]/90 text-white shadow-lg backdrop-blur transition-colors hover:border-[#8b5cf6]/60 sm:flex">←</button>
+        <button type="button" onClick={() => scrollBy(1)} aria-label="Próximos modelos" className="absolute right-1 top-[110px] z-10 hidden size-10 items-center justify-center rounded-full border border-white/15 bg-[#0b0f1a]/90 text-white shadow-lg backdrop-blur transition-colors hover:border-[#8b5cf6]/60 sm:flex">→</button>
+        <div
+          ref={trackRef}
+          data-testid="models-carousel"
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerLeave={onUp}
+          onClickCapture={(e) => { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); drag.current.moved = false; } }}
+          className="snx-models flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-1 pb-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {models.map((m) => (
+            <ModelCard key={m.id} model={m} onPreview={() => setPreview(m)} />
+          ))}
+        </div>
+        <div className="mt-2 flex justify-center gap-1.5 sm:hidden" aria-hidden>
+          {models.map((m) => <span key={m.id} className="size-1.5 rounded-full bg-white/25" />)}
+        </div>
       </div>
       {preview && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" onClick={() => setPreview(null)} role="dialog" aria-modal="true" aria-label={`Prévia ${preview.name}`}>

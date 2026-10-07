@@ -218,8 +218,6 @@ export function LandingPage() {
             <span className="text-lg font-bold tracking-tight">Scale<span className="text-[#a78bfa]">Nexus</span></span>
           </div>
           <nav className="hidden items-center gap-8 text-sm text-[#94a3b8] md:flex">
-            <a href="#como-funciona" className="transition-colors hover:text-white">Como funciona</a>
-            <a href="#o-que-fazemos" className="transition-colors hover:text-white">O que fazemos</a>
             <Link to="/modelos" className="transition-colors hover:text-white">Modelos</Link>
           </nav>
           <div className="flex items-center gap-3">
@@ -260,7 +258,7 @@ export function LandingPage() {
               <Link to="/modelos" className="rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-7 py-3.5 text-sm font-bold text-white shadow-[0_15px_40px_-12px_rgba(124,58,237,0.8)] transition-transform hover:scale-105">
                 Escolher meu modelo →
               </Link>
-              <a href="#como-funciona" className="rounded-xl border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:border-[#8b5cf6]/60">
+              <a href="#modelos" className="rounded-xl border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:border-[#8b5cf6]/60">
                 Ver como funciona
               </a>
             </div>
@@ -328,61 +326,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* O QUE FAZEMOS */}
-      <section id="o-que-fazemos" className="px-6 py-20">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">O que fazemos</p>
-          <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl font-bold md:text-4xl">
-            Uma agência completa cuidando do seu site
-          </h2>
-          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {SERVICES.map((s) => (
-              <div key={s.t} className="rounded-[20px] border border-[#1f2937] bg-[#0f1424] p-6 transition-colors hover:border-[#3b82f6]/50">
-                <h3 className="mb-2 text-lg font-bold text-white">{s.t}</h3>
-                <p className="text-sm leading-relaxed text-[#94a3b8]">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* COMO FUNCIONA */}
-      <section id="como-funciona" className="relative px-6 py-24">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[#60a5fa]">Como funciona</p>
-          <h2 className="mx-auto mt-3 max-w-3xl text-center text-4xl font-bold md:text-5xl">
-            Três passos até o seu site no ar
-          </h2>
-          <div className="relative mt-16">
-            <div
-              className="absolute left-0 right-0 top-1/2 hidden h-px lg:block"
-              style={{ background: "linear-gradient(to right, transparent, #3b82f6, transparent)" }}
-            />
-            <div className="relative grid gap-8 lg:grid-cols-3">
-              {STEPS.map((s) => (
-                <div key={s.n} className="relative">
-                  <div
-                    className="pointer-events-none absolute -inset-5 rounded-[32px] blur-2xl"
-                    style={{ background: "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.22), transparent 70%)" }}
-                  />
-                  <div
-                    className="relative flex h-[340px] flex-col justify-between rounded-3xl border border-[#1f2937] bg-[#0f1424] p-8"
-                    style={{ boxShadow: "0 20px 60px rgba(59,130,246,0.25)" }}
-                  >
-                    <span className="font-black leading-none text-[#3b82f6]" style={{ fontSize: 72, opacity: 0.3 }}>
-                      {s.n}
-                    </span>
-                    <div>
-                      <h3 className="mb-3 text-2xl font-bold text-white">{s.t}</h3>
-                      <p className="text-sm leading-relaxed text-[#94a3b8]">{s.d}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA FINAL */}
       <section className="relative overflow-hidden px-6 py-24">
