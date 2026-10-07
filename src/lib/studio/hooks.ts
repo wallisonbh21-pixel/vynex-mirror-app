@@ -90,7 +90,7 @@ export function useSaveStudioData() {
           design_system: data.design_system as any,
           sections: data.sections as any,
           updated_at: new Date().toISOString()
-        });
+        }, { onConflict: 'project_id' });
       
       if (error) throw error;
       return data;
