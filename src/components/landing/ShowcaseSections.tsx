@@ -70,25 +70,39 @@ export function EcosystemStrip() {
   );
 }
 
+const CARD_COPY: Record<string, string> = {
+  "Imobiliária Premium": "Sites modernos para imobiliárias e corretores de imóveis.",
+  "IA & Automação": "Sites para empresas de tecnologia e soluções com IA.",
+  "Tecnologia & SaaS": "Sites para startups, SaaS e empresas de tecnologia.",
+  "Loja Premium": "Sites para lojas, e-commerce e varejo.",
+  "Hotel & Resort": "Sites para hotéis, pousadas e resorts.",
+  "Restaurante Premium": "Sites para restaurantes, bares e gastronomia.",
+};
+
 function ModelCard({ model, onPreview }: { model: ShowcaseModel; onPreview: () => void }) {
   return (
     <article
       data-model-id={model.id}
-      className="snx-card group flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b0f1a]/80 backdrop-blur"
+      className="snx-card group flex w-[78vw] max-w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-[#3b5bff]/35 bg-gradient-to-b from-[#0a1230] to-[#060a1c] shadow-[0_0_30px_-12px_rgba(59,91,255,0.55)] sm:w-[300px]"
     >
-      <button type="button" onClick={onPreview} className="block h-[221px] overflow-hidden text-left" aria-label={`Pré-visualizar ${model.name}`}>
-        <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(0.7368)" }}>
+      <div className="flex items-center justify-between px-4 pb-2 pt-3" aria-hidden>
+        <span className="flex gap-1"><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /></span>
+        <span className="flex gap-1"><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /><i className="size-1.5 rounded-full bg-white/40" /></span>
+      </div>
+      <button type="button" onClick={onPreview} className="mx-2 block aspect-[380/300] overflow-hidden rounded-xl text-left [container-type:inline-size]" aria-label={`Pré-visualizar ${model.name}`}>
+        <div className="h-[300px] w-[380px] origin-top-left" style={{ transform: "scale(calc(100cqw / 380px))" }}>
           <div className="snx-shot h-full w-full origin-top"><ShowcasePreview model={model} /></div>
         </div>
       </button>
-      <div className="flex flex-1 flex-col border-t border-white/[0.06] bg-gradient-to-b from-[#0b0f1a] to-[#070a12] px-4 py-4">
-        <h3 className="text-base font-bold text-white">{model.name}</h3>
-        <p className="mt-1 line-clamp-2 flex-1 text-xs leading-relaxed text-[#94a3b8]">{model.description}</p>
-        <div className="mt-3 grid gap-2">
-          <button type="button" onClick={onPreview} className="rounded-lg border border-white/15 px-4 py-2 text-xs font-semibold text-white transition-colors hover:border-[#8b5cf6]/60 hover:bg-white/5">
+      <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
+        <h3 className="text-lg font-bold text-white">{model.name}</h3>
+        <p className="mt-1.5 min-h-[40px] flex-1 text-[13px] leading-relaxed text-[#b4bfd3]">{CARD_COPY[model.name] ?? model.description}</p>
+        <div className="mt-4 grid gap-2.5">
+          <button type="button" onClick={onPreview} className="flex items-center justify-center gap-2 rounded-full border border-[#3b5bff]/40 bg-[#050a1c] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#8b5cf6]/70 hover:bg-white/5">
+            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
             Pré-visualizar
           </button>
-          <Link to="/comece-seu-projeto" className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-4 py-2 text-center text-xs font-bold text-white shadow-[0_10px_30px_-10px_rgba(124,58,237,0.7)] transition-opacity hover:opacity-90">
+          <Link to="/comece-seu-projeto" className="rounded-full bg-gradient-to-r from-[#6d28d9] via-[#5b3bf0] to-[#3b5bff] px-4 py-2.5 text-center text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(109,40,217,0.8)] transition-opacity hover:opacity-90">
             Escolher modelo →
           </Link>
         </div>
@@ -102,7 +116,21 @@ export function ModelsShowcase() {
   const models = FEATURED_SHOWCASE_MODELS;
   const trackRef = useRef<HTMLDivElement>(null);
   const drag = useRef({ active: false, startX: 0, startLeft: 0, moved: false });
-  const scrollBy = (dir: number) => trackRef.current?.scrollBy({ left: dir * 296 * 2, behavior: "smooth" });
+  const [active, setActive] = useState(0);
+  const cardStep = () => {
+    const el = trackRef.current;
+    const first = el?.children[0] as HTMLElement | undefined;
+    return first ? first.offsetWidth + 20 : 320;
+  };
+  const scrollBy = (dir: number) => trackRef.current?.scrollBy({ left: dir * cardStep(), behavior: "smooth" });
+  const goTo = (i: number) => trackRef.current?.scrollTo({ left: i * cardStep(), behavior: "smooth" });
+  const onScroll = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const i = el.scrollLeft >= max - 4 ? models.length - 1 : Math.round(el.scrollLeft / cardStep());
+    setActive(Math.min(models.length - 1, Math.max(0, i)));
+  };
   const onDown = (e: RPointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== "mouse" || !trackRef.current) return;
     drag.current = { active: true, startX: e.clientX, startLeft: trackRef.current.scrollLeft, moved: false };
@@ -139,25 +167,39 @@ export function ModelsShowcase() {
           Ver todos os modelos →
         </Link>
       </div>
-      <div className="relative mx-auto mt-10 max-w-7xl px-4 sm:px-6">
-        <button type="button" onClick={() => scrollBy(-1)} aria-label="Modelos anteriores" className="absolute left-1 top-[110px] z-10 hidden size-10 items-center justify-center rounded-full border border-white/15 bg-[#0b0f1a]/90 text-white shadow-lg backdrop-blur transition-colors hover:border-[#8b5cf6]/60 sm:flex">←</button>
-        <button type="button" onClick={() => scrollBy(1)} aria-label="Próximos modelos" className="absolute right-1 top-[110px] z-10 hidden size-10 items-center justify-center rounded-full border border-white/15 bg-[#0b0f1a]/90 text-white shadow-lg backdrop-blur transition-colors hover:border-[#8b5cf6]/60 sm:flex">→</button>
+      <div className="relative mx-auto mt-10 max-w-[1920px] px-4 sm:px-14">
+        <button type="button" onClick={() => scrollBy(-1)} aria-label="Modelos anteriores" className="absolute left-1 top-[42%] z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#3b5bff]/50 bg-[#070b1f]/90 text-white shadow-[0_0_20px_rgba(59,91,255,0.45)] backdrop-blur transition-colors hover:border-[#a78bfa] sm:left-2 sm:size-12">
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <button type="button" onClick={() => scrollBy(1)} aria-label="Próximos modelos" className="absolute right-1 top-[42%] z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#3b5bff]/50 bg-[#070b1f]/90 text-white shadow-[0_0_20px_rgba(59,91,255,0.45)] backdrop-blur transition-colors hover:border-[#a78bfa] sm:right-2 sm:size-12">
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="m9 18 6-6-6-6" /></svg>
+        </button>
         <div
           ref={trackRef}
           data-testid="models-carousel"
+          onScroll={onScroll}
           onPointerDown={onDown}
           onPointerMove={onMove}
           onPointerUp={onUp}
           onPointerLeave={onUp}
           onClickCapture={(e) => { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); drag.current.moved = false; } }}
-          className="snx-models flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-1 pb-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="snx-models mx-auto flex w-fit max-w-full snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-1 pb-6 pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {models.map((m) => (
             <ModelCard key={m.id} model={m} onPreview={() => setPreview(m)} />
           ))}
         </div>
-        <div className="mt-2 flex justify-center gap-1.5 sm:hidden" aria-hidden>
-          {models.map((m) => <span key={m.id} className="size-1.5 rounded-full bg-white/25" />)}
+        <div className="mt-4 flex justify-center gap-2.5">
+          {models.map((m, i) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`Ir para ${m.name}`}
+              aria-current={active === i}
+              className={`size-2.5 rounded-full transition-all ${active === i ? "scale-125 bg-[#8b5cf6] shadow-[0_0_10px_rgba(139,92,246,0.8)]" : "bg-[#3b4a7a] hover:bg-[#5b6aa0]"}`}
+            />
+          ))}
         </div>
       </div>
       {preview && (
