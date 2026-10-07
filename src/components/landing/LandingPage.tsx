@@ -112,11 +112,6 @@ const STEPS = [
   { n: "03", t: "Receba em 48h", d: "Seu site publicado, responsivo e pronto para receber clientes em dois dias." },
 ];
 
-const TESTIMONIALS = [
-  { name: "Diego Albuquerque", role: "Imobiliária Nova Vita", text: "Em dois dias o site estava no ar e já recebemos contatos na mesma semana." },
-  { name: "Rafael Menezes", role: "Hamburgueria Brasa", text: "O time entendeu a marca melhor que a gente. Ficou exatamente do jeito que queríamos." },
-  { name: "Camila Duarte", role: "Studio Kai", text: "Processo simples, sem enrolação. Enviei a marca e recebi tudo pronto." },
-];
 
 const WEEK_BARS = [40, 65, 50, 85, 70, 95, 60];
 
