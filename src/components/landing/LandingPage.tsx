@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FEATURED_SHOWCASE_MODELS } from "@/lib/showcase/models";
 import { ShowcasePreview } from "./ShowcasePreview";
 import { EcosystemStrip, ModelsShowcase } from "./ShowcaseSections";
+import { HeroBlock } from "./HeroBlock";
 
 /* ---------------- helpers ---------------- */
 
@@ -210,72 +211,10 @@ export function LandingPage() {
         .sn-bar { background: linear-gradient(90deg, #3b82f6 0%, #93c5fd 50%, #3b82f6 100%); background-size: 200% 100%; animation: sn-shimmer 2.4s linear infinite; }
       `}</style>
 
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b border-[#8296ff]/[0.13] bg-[#020817]/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#a855f7] to-[#3b82f6] text-sm font-black text-white">S</div>
-            <span className="text-lg font-bold tracking-tight">Scale<span className="text-[#a78bfa]">Nexus</span></span>
-          </div>
-          <nav className="hidden items-center gap-8 text-sm text-[#94a3b8] md:flex">
-            <Link to="/modelos" className="transition-colors hover:text-white">Modelos</Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/auth"
-              className="hidden rounded-full border border-[#7e94ff]/40 bg-[#050d1f]/50 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#a78bfa] sm:block"
-            >
-              Login/Cadastro
-            </Link>
-            <Link
-              to="/comece-seu-projeto"
-              className="rounded-full bg-gradient-to-r from-[#7430ff] to-[#1d79ff] px-5 py-2.5 text-sm font-bold shadow-[0_0_28px_rgba(99,45,255,0.35)] text-white transition-opacity hover:opacity-90"
-            >
-              Criar meu site
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* HERO */}
-      <section className="relative overflow-hidden px-6 pt-16 pb-10 lg:pt-20">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[620px]" style={{ background: "radial-gradient(ellipse at 30% 0%, rgba(124,58,237,0.22), transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.18), transparent 60%)" }} />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
-          <motion.div className="text-center lg:text-left" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease: "easeOut" }}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-4 py-1.5 text-xs font-medium text-[#c4b5fd]">
-              <span className="size-1.5 rounded-full bg-[#a78bfa]" style={{ animation: "sn-pulse 1.6s ease-in-out infinite" }} />
-              Agência de criação de sites e publicidade
-            </span>
-            <h1 className="mt-7 text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl">
-              Criamos o Site Profissional da Sua Empresa em{" "}
-              <span className="bg-gradient-to-r from-[#a78bfa] to-[#60a5fa] bg-clip-text text-transparent">48h</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-[#94a3b8] lg:mx-0">
-              Você escolhe o modelo, nossos especialistas e agentes de IA cuidam de todo o resto.
-              Design, textos e publicação. Pronto para vender.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-              <Link to="/modelos" className="rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-7 py-3.5 text-sm font-bold text-white shadow-[0_15px_40px_-12px_rgba(124,58,237,0.8)] transition-transform hover:scale-105">
-                Escolher meu modelo →
-              </Link>
-              <a href="#modelos" className="rounded-xl border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:border-[#8b5cf6]/60">
-                Ver como funciona
-              </a>
-            </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.15 }} className="px-2 pb-8">
-            <HeroDevices />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* DASHBOARD */}
-      <section className="px-6 pt-4 pb-6">
-        <ProductionDashboard />
-      </section>
+      <HeroBlock />
 
       {/* ECOSSISTEMA */}
-      <EcosystemStrip />
+      <div id="ecossistema" className="scroll-mt-24"><EcosystemStrip /></div>
 
       {/* MODELOS */}
       <ModelsShowcase />
