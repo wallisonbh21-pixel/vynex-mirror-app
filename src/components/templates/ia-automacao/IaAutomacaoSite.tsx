@@ -194,7 +194,7 @@ export function IaAutomacaoSite({ content: c }: { content: IaAutomacaoContent })
           <div className="absolute right-[10%] top-[30%] h-64 w-64 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--ia-violet)_14%,transparent),transparent_70%)]" />
         </div>
         <div className="ia-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,#000_30%,transparent_75%)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr]">
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] [&>*]:min-w-0">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-[var(--ia-line)] bg-white/[0.03] px-3.5 py-1.5 text-xs text-[var(--ia-a2)]"><span className="h-1.5 w-1.5 rounded-full bg-[var(--ia-a2)]" />{c.hero.eyebrow}</span>
             <h1 className="ia-h mt-6 text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">{c.hero.title}</h1>
