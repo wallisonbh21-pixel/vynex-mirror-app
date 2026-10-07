@@ -8,7 +8,7 @@ import type { ImobiliariaContent, ImobiliariaSectionKey, Property } from "@/lib/
  * permitindo que o NexusBuild gere sites de clientes trocando apenas os dados.
  */
 
-function useReveal<T extends HTMLElement>() {
+export function useReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [shown, setShown] = useState(false);
   useEffect(() => {
@@ -21,7 +21,7 @@ function useReveal<T extends HTMLElement>() {
   return { ref, shown };
 }
 
-function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
+export function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
   const { ref, shown } = useReveal<HTMLDivElement>();
   return (
     <div ref={ref} className={`transition-all duration-[900ms] ease-out motion-reduce:transition-none ${shown ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
@@ -30,7 +30,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
   );
 }
 
-function CountUp({ value, prefix = "", suffix = "" }: { value: number; prefix?: string | undefined; suffix?: string | undefined }) {
+export function CountUp({ value, prefix = "", suffix = "" }: { value: number; prefix?: string | undefined; suffix?: string | undefined }) {
   const { ref, shown } = useReveal<HTMLSpanElement>();
   const [n, setN] = useState(0);
   useEffect(() => {
