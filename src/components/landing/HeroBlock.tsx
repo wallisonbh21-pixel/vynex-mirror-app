@@ -139,7 +139,7 @@ export function HeroDevices() {
         width={1376}
         height={768}
         className="relative block h-auto w-full select-none object-contain"
-        style={{ WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK }}
+        style={{ mixBlendMode: "lighten", WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK }}
         draggable={false}
       />
     </div>
@@ -210,7 +210,7 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[720px] lg:-mr-[14%] lg:w-[138%] lg:max-w-[880px] lg:justify-self-end" aria-hidden>
+            <div className="relative mx-auto w-full max-w-[720px] lg:-mr-[2%] lg:w-[120%] lg:max-w-[800px] lg:justify-self-end" aria-hidden>
               <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
               <HeroDevices />
             </div>
