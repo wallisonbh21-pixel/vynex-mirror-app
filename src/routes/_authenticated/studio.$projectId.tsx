@@ -1,4 +1,7 @@
-import { createFileRoute, Link, useParams } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams, redirect } from '@tanstack/react-router';
+import { supabase } from '@/integrations/supabase/client';
+import { getCurrentRoles } from '@/lib/guard';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { 
   ArrowLeft, 
@@ -42,6 +45,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
+  beforeLoad: async ({ params }) => {
+    const roles = await getCurrentRoles();
+    if (roles.includes('admin')) return;
+    const fallback = roles.includes('cliente') && !roles.includes('vendedor') ? '/cliente' : '/painel';
+    if (!roles.includes('criador')) throw redirect({ to: fallback, replace: true });
+    const { data: userData } = await supabase.auth.getUser();
+    const { data: project } = await supabase
+      .from('projects')
+      .select('creator_id')
+      .eq('id', params.projectId)
+      .maybeSingle();
+    if (!project || project.creator_id !== userData.user?.id) {
+      throw redirect({ to: '/meus-projetos', replace: true });
+    }
+  },
   component: ScaleNexusStudioPage,
   head: () => ({
     meta: [{ title: 'ScaleNexus Studio — Editor Visual' }],
@@ -58,6 +76,7 @@ function ScaleNexusStudioPage() {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [history, setHistory] = useState<StudioData[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -629,12 +648,7 @@ function ScaleNexusStudioPage() {
                           sections.push(newSec);
                           updateData({ ...data, sections });
                        }}
-                       onDeleteSection={(id) => {
-                          if (!data) return;
-                          const sections = data.sections.filter(s => s.id !== id);
-                          updateData({ ...data, sections });
-                          if (selectedSectionId === id) setSelectedSectionId(null);
-                       }}
+                       onDeleteSection={(id) => setPendingDeleteId(id)}
 
                      />
                    );
@@ -706,6 +720,29 @@ function ScaleNexusStudioPage() {
             <span>Viewport: {viewport.toUpperCase()}</span>
          </div>
       </footer>
+      <AlertDialog open={!!pendingDeleteId} onOpenChange={(o) => { if (!o) setPendingDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir seção?</AlertDialogTitle>
+            <AlertDialogDescription>Esta seção será removida do rascunho do site.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const id = pendingDeleteId;
+                setPendingDeleteId(null);
+                if (!data || !id) return;
+                const sections = data.sections.filter(s => s.id !== id);
+                updateData({ ...data, sections });
+                if (selectedSectionId === id) setSelectedSectionId(null);
+              }}
+            >
+              Excluir seção
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
