@@ -126,18 +126,20 @@ export function Phone() {
   );
 }
 
-const DEV_MASK = "linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 8%, #000 90%, transparent 100%)";
+const DEV_MASK = "radial-gradient(closest-side, #000 72%, rgba(0,0,0,.55) 88%, transparent 100%)";
 
 export function HeroDevices() {
   return (
     <div className="snh-dev relative">
+      <div className="pointer-events-none absolute inset-x-[10%] bottom-[2%] top-[20%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),rgba(29,78,216,0.12)_50%,transparent_75%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-[15%] -bottom-[4%] h-[14%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.45),transparent_70%)] blur-2xl" />
       <img
         src={heroDevices.url}
         alt=""
         width={1376}
         height={768}
-        className="block h-auto w-full select-none object-contain"
-        style={{ WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK, WebkitMaskComposite: "source-in", maskComposite: "intersect" }}
+        className="relative block h-auto w-full select-none object-contain"
+        style={{ WebkitMaskImage: DEV_MASK, maskImage: DEV_MASK }}
         draggable={false}
       />
     </div>
@@ -153,7 +155,7 @@ export function HeroBlock() {
         @keyframes snh-pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
         .snh-f1 { animation: snh-float 7s ease-in-out infinite; }
         .snh-f2 { animation: snh-float2 6s ease-in-out infinite .8s; }
-        @keyframes snh-dev { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+        @keyframes snh-dev { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
         .snh-dev { animation: snh-dev 9s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) { .snh-f1, .snh-f2, .snh-dev { animation: none; } }
       `}</style>
@@ -208,7 +210,7 @@ export function HeroBlock() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[640px] lg:w-[108%] lg:max-w-[700px] lg:justify-self-end" aria-hidden>
+            <div className="relative mx-auto w-full max-w-[720px] lg:-ml-[18%] lg:mr-0 lg:w-[118%] lg:max-w-none" aria-hidden>
               <div className="pointer-events-none absolute inset-[8%] -z-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),transparent_70%)] blur-3xl" />
               <HeroDevices />
             </div>
