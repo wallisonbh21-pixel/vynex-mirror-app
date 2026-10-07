@@ -5,6 +5,7 @@ import { FEATURED_SHOWCASE_MODELS } from "@/lib/showcase/models";
 import { ShowcasePreview } from "./ShowcasePreview";
 import { EcosystemStrip, ModelsShowcase } from "./ShowcaseSections";
 import { HeroBlock } from "./HeroBlock";
+import { CtaFinal, SiteFooter } from "./CtaFooter";
 import { TestimonialsSection, ClientsSection } from "./SocialProof";
 
 /* ---------------- helpers ---------------- */
@@ -227,61 +228,8 @@ export function LandingPage() {
       <ClientsSection />
 
 
-      {/* CTA FINAL */}
-      <section className="relative overflow-hidden px-6 py-24">
-        <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1440 400" preserveAspectRatio="none" aria-hidden>
-          <defs>
-            <linearGradient id="snw" x1="0" x2="1"><stop offset="0" stopColor="#7c3aed" /><stop offset="1" stopColor="#3b82f6" /></linearGradient>
-          </defs>
-          {[0, 1, 2, 3, 4].map((k) => (
-            <path key={k} d={`M0 ${260 + k * 18} C 360 ${120 + k * 30}, 720 ${380 - k * 20}, 1440 ${160 + k * 25}`} stroke="url(#snw)" strokeWidth={1.5} fill="none" opacity={0.5 - k * 0.08} />
-          ))}
-        </svg>
-        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse at 20% 80%, rgba(124,58,237,0.15), transparent 60%), radial-gradient(ellipse at 80% 30%, rgba(59,130,246,0.2), transparent 60%)" }} />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold text-white md:text-5xl">Pronto para levar seu negócio a outro nível?</h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-[#cbd5e1]">Escolha o modelo, fale com nossa equipe e receba seu site profissional.</p>
-          <Link to="/comece-seu-projeto" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] px-8 py-4 text-base font-bold text-white shadow-[0_20px_50px_-15px_rgba(37,99,235,0.6)] transition-transform hover:scale-105">
-            Criar meu site agora →
-          </Link>
-          <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-[#94a3b8]">
-            <span>Entrega em até 48 horas</span><span>Design profissional</span><span>Suporte especializado</span>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-[#141a2b] px-6 py-14">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#a855f7] to-[#3b82f6] text-sm font-black text-white">S</div>
-              <span className="text-lg font-bold">ScaleNexus</span>
-            </div>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#64748b]">
-              Agência de criação de sites e publicidade. Parte do Aurevion Group.
-              <span className="mt-3 block text-[11px] font-semibold tracking-[0.25em] text-[#93c5fd]">CONECTE • AUTOMATIZE • ESCALE</span>
-            </p>
-          </div>
-          {[
-            { t: "Serviços", items: ["Criação de sites", "Publicidade", "Identidade visual", "Manutenção"] },
-            { t: "Empresa", items: ["Sobre", "Aurevion Group", "Contato", "Trabalhe conosco"] },
-            { t: "Redes", items: ["Instagram", "LinkedIn", "YouTube", "WhatsApp"] },
-          ].map((col) => (
-            <div key={col.t}>
-              <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{col.t}</h4>
-              <ul className="space-y-2 text-sm text-[#64748b]">
-                {col.items.map((it) => (
-                  <li key={it} className="transition-colors hover:text-[#94a3b8]">{it}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <p className="mx-auto mt-12 max-w-6xl border-t border-[#141a2b] pt-6 text-xs text-[#475569]">
-          © {new Date().getFullYear()} ScaleNexus. Todos os direitos reservados.
-        </p>
-      </footer>
+      <CtaFinal />
+      <SiteFooter />
     </div>
   );
 }
