@@ -24,6 +24,9 @@ const CSS = `
   .snx-card:hover, .snx-card[data-active="true"] { transform: translateY(-8px) scale(1.02); border-color: rgba(139,92,246,.45); box-shadow: 0 30px 60px -25px rgba(59,130,246,.35), 0 0 0 1px rgba(139,92,246,.15); }
   .snx-card .snx-shot { transition: transform .8s cubic-bezier(.2,.7,.2,1); }
   .snx-card:hover .snx-shot, .snx-card[data-active="true"] .snx-shot { transform: scale(1.03); }
+  .snx-scale { transform: scale(.737); }
+  @media (min-width: 640px) { .snx-scale { transform: scale(.895); } }
+  @media (min-width: 1024px) { .snx-scale { transform: none; } }
   @media (prefers-reduced-motion: reduce) { .snx-track, .sn-orb, .sn-floaty { animation: none; } }
 `;
 
@@ -73,8 +76,11 @@ function ModelCard({ model, active, onTap }: { model: ShowcaseModel; active: boo
       onClick={onTap}
       className="snx-card group w-[280px] shrink-0 cursor-pointer overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0b0f1a] sm:w-[340px] lg:w-[380px]"
     >
-      <div className="h-[230px] overflow-hidden sm:h-[270px] lg:h-[300px]">
-        <div className="snx-shot h-full w-full origin-top"><ShowcasePreview model={model} /></div>
+      <div className="h-[221px] overflow-hidden sm:h-[268px] lg:h-[300px]">
+        {/* Prévia desenhada em 380×300 e reduzida proporcionalmente em telas menores. */}
+        <div className="snx-scale h-[300px] w-[380px] origin-top-left">
+          <div className="snx-shot h-full w-full origin-top"><ShowcasePreview model={model} /></div>
+        </div>
       </div>
       <div className="border-t border-white/[0.06] bg-gradient-to-b from-[#0b0f1a] to-[#070a12] px-5 py-4">
         <div className="flex items-center justify-between gap-3">
