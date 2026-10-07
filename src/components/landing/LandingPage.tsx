@@ -198,7 +198,7 @@ export function LandingPage() {
   return (
     <div
       className="min-h-screen w-full overflow-x-hidden text-white"
-      style={{ backgroundColor: "#020817", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
+      style={{ backgroundColor: "#020817", backgroundImage: "radial-gradient(ellipse 40% 25% at 0% 38%, rgba(29,78,216,0.10), transparent 70%), radial-gradient(ellipse 40% 25% at 100% 55%, rgba(37,99,235,0.10), transparent 70%), radial-gradient(ellipse 45% 20% at 0% 78%, rgba(29,78,216,0.08), transparent 70%), linear-gradient(180deg,#020817 0%,#031025 35%,#020817 60%,#031025 85%,#020817 100%)", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
     >
       <style>{`
         @keyframes sn-marquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
