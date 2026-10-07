@@ -192,7 +192,7 @@ export function HeroBlock() {
           </div>
 
           {/* PAINEL */}
-          <div className="relative z-10 mt-8 max-w-[1260px] rounded-[22px] border border-[#2a3a66]/60 bg-[#060d22]/75 p-5 shadow-[0_0_50px_-15px_rgba(59,130,246,0.45),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl sm:p-7 lg:-mt-4 lg:w-[73%]">
+          <div className="relative z-10 mt-8 max-w-[1260px] rounded-[22px] border border-[#2a3a66]/60 bg-[#060d22]/75 p-5 shadow-[0_0_50px_-15px_rgba(59,130,246,0.45),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl sm:p-7 lg:mt-6 lg:w-[73%]">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-base font-bold uppercase text-[#38bdf8] lg:text-lg">Sites em produção hoje</p>
               <span className="flex items-center gap-2 text-xs text-[#e2e8f0] sm:text-sm">
