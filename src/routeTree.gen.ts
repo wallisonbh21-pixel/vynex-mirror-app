@@ -51,6 +51,7 @@ import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminClientesLoginRouteImport } from './routes/_authenticated/admin/clientes-login'
 import { Route as AuthenticatedAdminCobrancasRouteImport } from './routes/_authenticated/admin/cobrancas'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes'
+import { Route as AuthenticatedAdminModelosRouteImport } from './routes/_authenticated/admin/modelos'
 import { Route as AuthenticatedAdminSaquesRouteImport } from './routes/_authenticated/admin/saques'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedBriefingProjectIdRouteImport } from './routes/_authenticated/briefing.$projectId'
@@ -299,6 +300,12 @@ const AuthenticatedAdminConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminModelosRoute =
+  AuthenticatedAdminModelosRouteImport.update({
+    id: '/modelos',
+    path: '/modelos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSaquesRoute =
   AuthenticatedAdminSaquesRouteImport.update({
     id: '/saques',
@@ -501,6 +508,7 @@ export interface FileRoutesByFullPath {
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/admin/cobrancas': typeof AuthenticatedAdminCobrancasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/modelos': typeof AuthenticatedAdminModelosRoute
   '/admin/saques': typeof AuthenticatedAdminSaquesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -570,6 +578,7 @@ export interface FileRoutesByTo {
   '/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/admin/cobrancas': typeof AuthenticatedAdminCobrancasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/modelos': typeof AuthenticatedAdminModelosRoute
   '/admin/saques': typeof AuthenticatedAdminSaquesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -642,6 +651,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/clientes-login': typeof AuthenticatedAdminClientesLoginRoute
   '/_authenticated/admin/cobrancas': typeof AuthenticatedAdminCobrancasRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/modelos': typeof AuthenticatedAdminModelosRoute
   '/_authenticated/admin/saques': typeof AuthenticatedAdminSaquesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/briefing/$projectId': typeof AuthenticatedBriefingProjectIdRoute
@@ -714,6 +724,7 @@ export interface FileRouteTypes {
     | '/admin/clientes-login'
     | '/admin/cobrancas'
     | '/admin/configuracoes'
+    | '/admin/modelos'
     | '/admin/saques'
     | '/admin/usuarios'
     | '/briefing/$projectId'
@@ -783,6 +794,7 @@ export interface FileRouteTypes {
     | '/admin/clientes-login'
     | '/admin/cobrancas'
     | '/admin/configuracoes'
+    | '/admin/modelos'
     | '/admin/saques'
     | '/admin/usuarios'
     | '/briefing/$projectId'
@@ -854,6 +866,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes-login'
     | '/_authenticated/admin/cobrancas'
     | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/modelos'
     | '/_authenticated/admin/saques'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/briefing/$projectId'
@@ -1199,6 +1212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/modelos': {
+      id: '/_authenticated/admin/modelos'
+      path: '/modelos'
+      fullPath: '/admin/modelos'
+      preLoaderRoute: typeof AuthenticatedAdminModelosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/saques': {
       id: '/_authenticated/admin/saques'
       path: '/saques'
@@ -1435,6 +1455,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClientesLoginRoute: typeof AuthenticatedAdminClientesLoginRoute
   AuthenticatedAdminCobrancasRoute: typeof AuthenticatedAdminCobrancasRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminModelosRoute: typeof AuthenticatedAdminModelosRoute
   AuthenticatedAdminSaquesRoute: typeof AuthenticatedAdminSaquesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
 }
@@ -1444,6 +1465,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesLoginRoute: AuthenticatedAdminClientesLoginRoute,
   AuthenticatedAdminCobrancasRoute: AuthenticatedAdminCobrancasRoute,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminModelosRoute: AuthenticatedAdminModelosRoute,
   AuthenticatedAdminSaquesRoute: AuthenticatedAdminSaquesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
 }

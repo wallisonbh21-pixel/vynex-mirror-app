@@ -1832,6 +1832,9 @@ export type Database = {
           site_type: string | null
           status: string
           submitted_at: string | null
+          template_id: string | null
+          template_selected_at: string | null
+          template_selected_by: string | null
           title: string
           updated_at: string
           value: number
@@ -1860,6 +1863,9 @@ export type Database = {
           site_type?: string | null
           status?: string
           submitted_at?: string | null
+          template_id?: string | null
+          template_selected_at?: string | null
+          template_selected_by?: string | null
           title: string
           updated_at?: string
           value?: number
@@ -1888,6 +1894,9 @@ export type Database = {
           site_type?: string | null
           status?: string
           submitted_at?: string | null
+          template_id?: string | null
+          template_selected_at?: string | null
+          template_selected_by?: string | null
           title?: string
           updated_at?: string
           value?: number
@@ -2197,6 +2206,39 @@ export type Database = {
         }
         Relationships: []
       }
+      site_template_settings: {
+        Row: {
+          available_for_clients: boolean
+          available_for_creators: boolean
+          display_order: number
+          featured: boolean
+          status: string
+          template_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          available_for_clients?: boolean
+          available_for_creators?: boolean
+          display_order?: number
+          featured?: boolean
+          status?: string
+          template_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          available_for_clients?: boolean
+          available_for_creators?: boolean
+          display_order?: number
+          featured?: boolean
+          status?: string
+          template_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       studio_favorites: {
         Row: {
           created_at: string | null
@@ -2452,6 +2494,9 @@ export type Database = {
           site_type: string | null
           status: string
           submitted_at: string | null
+          template_id: string | null
+          template_selected_at: string | null
+          template_selected_by: string | null
           title: string
           updated_at: string
           value: number

@@ -247,6 +247,7 @@ export function AppShell({
             { to: "/admin/cobrancas", label: "Cobranças de clientes", icon: Wallet },
           ],
         },
+        { to: "/admin/modelos", label: "Biblioteca de modelos", icon: Layers },
         { 
           to: "/admin/configuracoes", 
           label: "Configurações", 

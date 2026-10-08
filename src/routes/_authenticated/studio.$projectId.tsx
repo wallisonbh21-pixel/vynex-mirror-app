@@ -560,6 +560,7 @@ function ScaleNexusStudioPage() {
               updateData(templateData as StudioData);
             }}
             hasContent={data.sections.length > 0}
+            projectId={projectId}
 
             onUpdateDesignSystem={handleUpdateDesignSystem}
             designSystem={data.design_system}
