@@ -190,7 +190,7 @@ export function LibraryPanel({
           {activeTab === 'elements' && <ElementsTab items={filteredItems as any[]} onAddElement={onAddElement} />}
           {activeTab === 'sections' && <SectionsTab items={filteredItems as any[]} onAddSection={onAddSection} onFavorite={handleFavoriteToggle} favorites={favorites} />}
           {activeTab === 'templates' && projectId && <CentralLibrary projectId={projectId} onApplyTemplate={onApplyTemplate} hasContent={hasContent} />}
-          {activeTab === 'templates' && <TemplatesTab items={(filteredItems as any[]).filter((t) => !t.metadata?.preview_route)} onApplyTemplate={onApplyTemplate} onFavorite={handleFavoriteToggle} favorites={favorites} hasContent={hasContent} />}
+          {activeTab === 'templates' && <TemplatesTab items={(filteredItems as any[]).filter((t) => !t.metadata?.['preview_route'])} onApplyTemplate={onApplyTemplate} onFavorite={handleFavoriteToggle} favorites={favorites} hasContent={hasContent} />}
           {activeTab === 'styles' && <StylesTab onUpdateDesignSystem={onUpdateDesignSystem} designSystem={designSystem} />}
           {activeTab === 'favorites' && <FavoritesTab items={filteredItems as any} onAddSection={onAddSection} onApplyTemplate={onApplyTemplate} hasContent={hasContent} />}
         </div>

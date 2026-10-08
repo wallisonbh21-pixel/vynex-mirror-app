@@ -39,7 +39,7 @@ export type LibraryModel = {
   settings: TemplateSettings;
 };
 
-export const OFFICIAL_TEMPLATES = NICHE_TEMPLATES.filter((t) => t.metadata?.preview_route);
+export const OFFICIAL_TEMPLATES = NICHE_TEMPLATES.filter((t) => t.metadata?.['preview_route']);
 
 export function getLibraryItem(templateId: string | null | undefined) {
   return OFFICIAL_TEMPLATES.find((t) => t.id === templateId);
@@ -68,7 +68,7 @@ export function useTemplateLibrary() {
         category: LIBRARY_CATEGORY[item.id] ?? item.category,
         description: item.description ?? "",
         preview: item.preview,
-        previewRoute: String(item.metadata?.preview_route),
+        previewRoute: String(item.metadata?.['preview_route']),
         settings: map.get(item.id) ?? DEFAULT_SETTINGS(item.id, i),
       })).sort((a, b) => a.settings.display_order - b.settings.display_order);
     },
