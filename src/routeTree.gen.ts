@@ -44,6 +44,7 @@ import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.prim
 import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
 import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
+import { Route as TemplateEducacaoInclusivaRouteImport } from './routes/template.educacao-inclusiva'
 import { Route as TemplateIaAutomacaoRouteImport } from './routes/template.ia-automacao'
 import { Route as TemplateImobiliariaPremiumRouteImport } from './routes/template.imobiliaria-premium'
 import { Route as TemplateTecnologiaSaasRouteImport } from './routes/template.tecnologia-saas'
@@ -260,6 +261,12 @@ const SSlugRoute = SSlugRouteImport.update({
   path: '/s/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplateEducacaoInclusivaRoute =
+  TemplateEducacaoInclusivaRouteImport.update({
+    id: '/template/educacao-inclusiva',
+    path: '/template/educacao-inclusiva',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TemplateIaAutomacaoRoute = TemplateIaAutomacaoRouteImport.update({
   id: '/template/ia-automacao',
   path: '/template/ia-automacao',
@@ -500,6 +507,7 @@ export interface FileRoutesByFullPath {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/educacao-inclusiva': typeof TemplateEducacaoInclusivaRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
   '/template/tecnologia-saas': typeof TemplateTecnologiaSaasRoute
@@ -570,6 +578,7 @@ export interface FileRoutesByTo {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/educacao-inclusiva': typeof TemplateEducacaoInclusivaRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
   '/template/tecnologia-saas': typeof TemplateTecnologiaSaasRoute
@@ -643,6 +652,7 @@ export interface FileRoutesById {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/educacao-inclusiva': typeof TemplateEducacaoInclusivaRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
   '/template/tecnologia-saas': typeof TemplateTecnologiaSaasRoute
@@ -716,6 +726,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/educacao-inclusiva'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
     | '/template/tecnologia-saas'
@@ -786,6 +797,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/educacao-inclusiva'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
     | '/template/tecnologia-saas'
@@ -858,6 +870,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/educacao-inclusiva'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
     | '/template/tecnologia-saas'
@@ -907,6 +920,7 @@ export interface RootRouteChildren {
   ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
   ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
   SSlugRoute: typeof SSlugRoute
+  TemplateEducacaoInclusivaRoute: typeof TemplateEducacaoInclusivaRoute
   TemplateIaAutomacaoRoute: typeof TemplateIaAutomacaoRoute
   TemplateImobiliariaPremiumRoute: typeof TemplateImobiliariaPremiumRoute
   TemplateTecnologiaSaasRoute: typeof TemplateTecnologiaSaasRoute
@@ -1161,6 +1175,13 @@ declare module '@tanstack/react-router' {
       path: '/s/$slug'
       fullPath: '/s/$slug'
       preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/template/educacao-inclusiva': {
+      id: '/template/educacao-inclusiva'
+      path: '/template/educacao-inclusiva'
+      fullPath: '/template/educacao-inclusiva'
+      preLoaderRoute: typeof TemplateEducacaoInclusivaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/template/ia-automacao': {
@@ -1574,6 +1595,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
   ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
   SSlugRoute: SSlugRoute,
+  TemplateEducacaoInclusivaRoute: TemplateEducacaoInclusivaRoute,
   TemplateIaAutomacaoRoute: TemplateIaAutomacaoRoute,
   TemplateImobiliariaPremiumRoute: TemplateImobiliariaPremiumRoute,
   TemplateTecnologiaSaasRoute: TemplateTecnologiaSaasRoute,
