@@ -27,6 +27,7 @@ import { StudioTab, LibraryItem } from '@/types/studio-v2';
 import { StudioElement, StudioSection, StudioDesignSystem, StudioData } from '@/types/studio';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { LIBRARY_REGISTRY } from '@/lib/studio/templates';
+import { CentralLibrary } from '@/components/studio/CentralLibrary';
 import { useStudioFavorites, useToggleFavorite } from '@/lib/studio/hooks';
 import { toast } from 'sonner';
 import { 
@@ -45,6 +46,7 @@ interface LibraryPanelProps {
   onUpdateDesignSystem: (updates: Partial<StudioDesignSystem>) => void;
   designSystem: StudioDesignSystem;
   hasContent: boolean;
+  projectId?: string;
 }
 
 export function LibraryPanel({ 
@@ -53,7 +55,8 @@ export function LibraryPanel({
   onApplyTemplate,
   onUpdateDesignSystem,
   designSystem,
-  hasContent
+  hasContent,
+  projectId
 }: LibraryPanelProps) {
   const [activeTab, setActiveTab] = useState<StudioTab>('elements');
   const [searchQuery, setSearchQuery] = useState('');
@@ -186,7 +189,8 @@ export function LibraryPanel({
         <div className="p-4">
           {activeTab === 'elements' && <ElementsTab items={filteredItems as any[]} onAddElement={onAddElement} />}
           {activeTab === 'sections' && <SectionsTab items={filteredItems as any[]} onAddSection={onAddSection} onFavorite={handleFavoriteToggle} favorites={favorites} />}
-          {activeTab === 'templates' && <TemplatesTab items={filteredItems as any[]} onApplyTemplate={onApplyTemplate} onFavorite={handleFavoriteToggle} favorites={favorites} hasContent={hasContent} />}
+          {activeTab === 'templates' && projectId && <CentralLibrary projectId={projectId} onApplyTemplate={onApplyTemplate} hasContent={hasContent} />}
+          {activeTab === 'templates' && <TemplatesTab items={(filteredItems as any[]).filter((t) => !t.metadata?.preview_route)} onApplyTemplate={onApplyTemplate} onFavorite={handleFavoriteToggle} favorites={favorites} hasContent={hasContent} />}
           {activeTab === 'styles' && <StylesTab onUpdateDesignSystem={onUpdateDesignSystem} designSystem={designSystem} />}
           {activeTab === 'favorites' && <FavoritesTab items={filteredItems as any} onAddSection={onAddSection} onApplyTemplate={onApplyTemplate} hasContent={hasContent} />}
         </div>
