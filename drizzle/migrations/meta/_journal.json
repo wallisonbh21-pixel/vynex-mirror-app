@@ -8,6 +8,13 @@
       "when": 1791417745509,
       "tag": "0000_site_template_library",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791730305812,
+      "tag": "0001_template04_settings",
+      "breakpoints": true
     }
   ]
 }
