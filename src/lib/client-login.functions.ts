@@ -32,16 +32,16 @@ export const sendNotification = createServerFn({ method: "POST" })
     return { success: true };
   });
 
+/** Último acesso do cliente via função segura do banco (sem chave administrativa).
+ * Recebe o ID do cliente; o banco deriva o usuário e confere papel/permissão. */
 export const getClienteAccessLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => z.object({ userId: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ clientId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(data.userId);
-    if (error) throw error;
-    
-    return {
-      last_sign_in_at: user?.last_sign_in_at || null,
-      created_at: user?.created_at || null
-    };
+    const { data: result, error } = await context.supabase.rpc("sn_client_last_access", {
+      p_client_id: data.clientId,
+    });
+    if (error) throw new Error(error.code === "42501" ? "Acesso negado." : "Não foi possível consultar o último acesso.");
+    const r = (result ?? {}) as { last_sign_in_at?: string | null; created_at?: string | null };
+    return { last_sign_in_at: r.last_sign_in_at ?? null, created_at: r.created_at ?? null };
   });
