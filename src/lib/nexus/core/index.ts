@@ -10,6 +10,7 @@
  * personalidade deve ser duplicada em componentes, ferramentas ou rotas.
  */
 export { NEXUS_IDENTITY } from "./identity";
+export { NEXUS_SITE_LANGUAGE, findEnglishWords } from "./language";
 export { NEXUS_PERSONALITY } from "./personality";
 export { NEXUS_PRINCIPLES } from "./principles";
 export { NEXUS_HIERARCHY } from "./hierarchy";
