@@ -15,6 +15,13 @@
       "when": 1791730305812,
       "tag": "0001_template04_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791737214585,
+      "tag": "0002_secure_rpc_replace_service_role",
+      "breakpoints": true
     }
   ]
 }

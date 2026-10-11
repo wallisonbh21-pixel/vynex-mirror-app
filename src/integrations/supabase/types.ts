@@ -2592,6 +2592,68 @@ export type Database = {
         }[]
       }
       set_client_token: { Args: { token: string }; Returns: undefined }
+      sn_admin_referral_stats: { Args: never; Returns: Json }
+      sn_approval_view: { Args: { p_token: string }; Returns: Json }
+      sn_client_approval_action: {
+        Args: { p_action: string; p_message?: string; p_token: string }
+        Returns: Json
+      }
+      sn_delete_client: { Args: { p_client_id: string }; Returns: Json }
+      sn_get_referral_token: { Args: never; Returns: Json }
+      sn_referral_leads: { Args: never; Returns: Json }
+      sn_referral_metrics: { Args: never; Returns: Json }
+      sn_register_client: {
+        Args: {
+          p_company?: string
+          p_contact_email: string
+          p_contact_name?: string
+          p_contact_phone?: string
+          p_notes?: string
+        }
+        Returns: {
+          city: string | null
+          company: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          contract_id: string | null
+          created_at: string
+          id: string
+          lead_id: string | null
+          monthly_fee: number
+          niche: string | null
+          notes: string | null
+          owner_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "clients"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      sn_release_to_client: {
+        Args: { p_project_id: string; p_whatsapp_message?: string }
+        Returns: Json
+      }
+      sn_submit_public_lead: {
+        Args: {
+          p_city: string
+          p_company: string
+          p_details?: Json
+          p_email: string
+          p_name: string
+          p_referral_token?: string
+          p_segment: string
+          p_service_id: string
+          p_state: string
+          p_whatsapp: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "vendedor" | "criador" | "diretor" | "rh" | "cliente"
