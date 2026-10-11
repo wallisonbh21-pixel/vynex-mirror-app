@@ -9,6 +9,8 @@ import { TECNOLOGIA_SAAS_DEFAULT_CONTENT, TECNOLOGIA_SAAS_TEMPLATE_ID } from './
 import { tecnologiaSaasToStudioData } from './../templates/tecnologia-saas/to-studio';
 import { EDUCACAO_DEFAULT_CONTENT, EDUCACAO_TEMPLATE_ID } from './../templates/educacao-inclusiva/content';
 import { educacaoToStudioData } from './../templates/educacao-inclusiva/to-studio';
+import { ADVOCACIA_DEFAULT_CONTENT, ADVOCACIA_TEMPLATE_ID } from './../templates/advocacia-empresarial/content';
+import { advocaciaToStudioData } from './../templates/advocacia-empresarial/to-studio';
 
 // Helper to create basic elements
 const createText = (type: StudioElement['type'], text: string, styles: any = {}): StudioElement => ({
@@ -241,6 +243,18 @@ export const NICHE_TEMPLATES: LibraryItem[] = [
     preview: EDUCACAO_DEFAULT_CONTENT.hero.imageUrl,
     structure: educacaoToStudioData(EDUCACAO_DEFAULT_CONTENT),
     metadata: { forge_context: 'template_04_educacao_inclusiva', preview_route: '/template/educacao-inclusiva' },
+  },
+  {
+    id: ADVOCACIA_TEMPLATE_ID,
+    name: 'Advocacia Empresarial Premium',
+    description: 'Template 05 oficial: escritórios de advocacia empresarial, consultiva e contenciosa.',
+    category: 'Jurídico',
+    niche: 'advocacia-empresarial',
+    type: 'template',
+    tags: ['advocacia', 'juridico', 'empresarial', 'oficial'],
+    preview: ADVOCACIA_DEFAULT_CONTENT.hero.imageUrl,
+    structure: advocaciaToStudioData(ADVOCACIA_DEFAULT_CONTENT),
+    metadata: { forge_context: 'template_05_advocacia_empresarial', preview_route: '/template/advocacia-empresarial' },
   },
   {
     id: 'tmpl_burger',
