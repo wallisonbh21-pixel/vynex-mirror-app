@@ -107,7 +107,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
 
     // 7. Email Dispatch
     auditData.email_send_attempt = true;
-    const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
+    const siteUrl = (process.env['SITE_URL'] || '') /* PENDENTE: definir SITE_URL com o domínio oficial */;
     
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
@@ -222,7 +222,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       .eq("user_id", targetUser.id)
       .maybeSingle();
 
-    const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
+    const siteUrl = (process.env['SITE_URL'] || '') /* PENDENTE: definir SITE_URL com o domínio oficial */;
     const contactName = client?.contact_name || (targetUser.user_metadata as any)?.full_name || "Clientee";
 
     // Scenario: Reuse Auth + Redefinition email
