@@ -140,7 +140,7 @@ export function AdvocaciaEmpresarialSite({ content: c }: { content: AdvocaciaCon
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Navegação principal">
             {c.nav.map((n) => <a key={n.href} href={n.href} className="adv-link text-sm text-white/80 hover:text-white">{n.label}</a>)}
           </nav>
-          <a href="#contato" className="adv-btn hidden border text-white hover:bg-white hover:text-[color:var(--navy)] lg:inline-flex" style={{ borderColor: "var(--gold)", minHeight: 42 }}>Consulta institucional</a>
+          <span className="hidden lg:block"><a href="#contato" className="adv-btn border text-white hover:bg-white hover:text-[color:var(--navy)]" style={{ borderColor: "var(--gold)", minHeight: 42 }}>Consulta institucional</a></span>
           <button type="button" className="grid size-11 place-items-center text-white lg:hidden" aria-label={menu ? "Fechar menu" : "Abrir menu"} aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
             {menu ? <X /> : <Menu />}
           </button>
