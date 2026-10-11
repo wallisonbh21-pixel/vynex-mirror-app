@@ -80,16 +80,16 @@ export const Route = createRootRouteWithContext<{ queryCliente: QueryClient }>()
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Projeto" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Projeto" },
+      { title: "ScaleNexus | Plataforma de Criação de Sites" },
+      { name: "description", content: "Crie o site profissional da sua empresa com modelos premium, design sob medida e entrega ágil. ScaleNexus: conecte, automatize e escale." },
+      { name: "author", content: "ScaleNexus" },
+      { property: "og:title", content: "ScaleNexus | Plataforma de Criação de Sites" },
+      { property: "og:description", content: "Crie o site profissional da sua empresa com modelos premium, design sob medida e entrega ágil. ScaleNexus: conecte, automatize e escale." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

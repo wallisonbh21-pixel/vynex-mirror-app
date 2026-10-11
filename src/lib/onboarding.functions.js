@@ -93,7 +93,7 @@ export const createClientPortalAccount = createServerFn({ method: "POST" })
     auditData.role_created = true;
     // 7. Email Dispatch
     auditData.email_send_attempt = true;
-    const siteUrl = process.env['SITE_URL'] || 'https://project--qldgixjihbbommenpfuf.lovable.app';
+    const siteUrl = (process.env['SITE_URL'] || '') /* PENDENTE: definir SITE_URL com o domínio oficial */;
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
         <h2 style="color: #0F172A;">Olá, ${client.contact_name || data.username}! 👋</h2>
