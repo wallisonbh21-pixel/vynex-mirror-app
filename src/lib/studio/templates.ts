@@ -68,7 +68,7 @@ export const SECTION_TEMPLATES: Record<string, LibraryItem> = {
       styles: { paddingTop: '6rem', paddingBottom: '6rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' },
       elements: [
         createText('title', 'Inovação em Cada Detalhe', { fontSize: '3.5rem', textAlign: 'left' }),
-        createImage('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80', 'Office')
+        createImage('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80', 'Escritório moderno')
       ]
     } as StudioSection
   },

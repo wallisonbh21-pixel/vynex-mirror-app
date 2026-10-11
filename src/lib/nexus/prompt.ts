@@ -21,6 +21,7 @@ import {
   NEXUS_REASONING,
   NEXUS_SAFETY,
   NEXUS_SELF_REVIEW,
+  NEXUS_SITE_LANGUAGE,
   NEXUS_TOOL_RULES,
   NEXUS_VISUAL_CONTEXT_RULES,
   effortBlock,
@@ -79,6 +80,7 @@ export function buildSystemPrompt(ctx: NexusPromptContext): string {
     NEXUS_TOOL_RULES,
     // 5. Operação real do ScaleNexus
     NEXUS_BUILD_FLOW,
+    NEXUS_SITE_LANGUAGE,
     NEXUS_REAL_LIMITS,
   ];
 
