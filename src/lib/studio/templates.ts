@@ -7,6 +7,8 @@ import { IA_AUTOMACAO_DEFAULT_CONTENT, IA_AUTOMACAO_TEMPLATE_ID } from './../tem
 import { iaAutomacaoToStudioData } from './../templates/ia-automacao/to-studio';
 import { TECNOLOGIA_SAAS_DEFAULT_CONTENT, TECNOLOGIA_SAAS_TEMPLATE_ID } from './../templates/tecnologia-saas/content';
 import { tecnologiaSaasToStudioData } from './../templates/tecnologia-saas/to-studio';
+import { EDUCACAO_DEFAULT_CONTENT, EDUCACAO_TEMPLATE_ID } from './../templates/educacao-inclusiva/content';
+import { educacaoToStudioData } from './../templates/educacao-inclusiva/to-studio';
 
 // Helper to create basic elements
 const createText = (type: StudioElement['type'], text: string, styles: any = {}): StudioElement => ({
@@ -227,6 +229,18 @@ export const NICHE_TEMPLATES: LibraryItem[] = [
     preview: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80',
     structure: tecnologiaSaasToStudioData(TECNOLOGIA_SAAS_DEFAULT_CONTENT),
     metadata: { forge_context: 'template_03_tecnologia_saas', preview_route: '/template/tecnologia-saas' },
+  },
+  {
+    id: EDUCACAO_TEMPLATE_ID,
+    name: 'Educação Inclusiva & Apoio Educacional',
+    description: 'Template 04 oficial: professoras e profissionais de apoio educacional e educação inclusiva.',
+    category: 'Educação',
+    niche: 'educacao-inclusiva',
+    type: 'template',
+    tags: ['educacao', 'inclusiva', 'professora', 'apoio', 'oficial'],
+    preview: EDUCACAO_DEFAULT_CONTENT.hero.imageUrl,
+    structure: educacaoToStudioData(EDUCACAO_DEFAULT_CONTENT),
+    metadata: { forge_context: 'template_04_educacao_inclusiva', preview_route: '/template/educacao-inclusiva' },
   },
   {
     id: 'tmpl_burger',
