@@ -234,8 +234,8 @@ export const Route = createFileRoute("/api/prospecting/search")({
           // 2. ALWAYS VALIDATE ROLES
           // Lê os papéis com a sessão do próprio usuário (RLS "roles read" permite ler os próprios papéis).
           const { createClient } = await import("@supabase/supabase-js");
-          const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY!;
-          const userDb = createClient(process.env.SUPABASE_URL!, pubKey, {
+          const pubKey = process.env['SUPABASE_PUBLISHABLE_KEY']!;
+          const userDb = createClient(process.env['SUPABASE_URL']!, pubKey, {
             auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
             global: {
               headers: { Authorization: `Bearer ${token}` },
