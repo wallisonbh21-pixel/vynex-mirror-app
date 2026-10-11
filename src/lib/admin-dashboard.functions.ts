@@ -1,8 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// Exige login + papel admin; lê com a sessão do usuário (RLS de admin), sem chave administrativa.
 export const getAdminDashboardData = createServerFn({ method: "GET" })
-  .handler(async () => {
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const supabaseAdmin = context.supabase as any;
+    const { data: myRoles } = await context.supabase
+      .from("user_roles").select("role").eq("user_id", context.userId);
+    if (!myRoles?.some((r: any) => r.role === "admin")) {
+      throw new Error("Acesso restrito a administradores.");
+    }
     // 1. Receita e MRR (Contratos Ativos)
     const { data: contracts } = await supabaseAdmin
       .from("contracts")
