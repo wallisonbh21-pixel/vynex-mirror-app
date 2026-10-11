@@ -29,6 +29,13 @@
       "when": 1791737286403,
       "tag": "0003_release_whatsapp_placeholders",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791738207288,
+      "tag": "0004_sn_client_last_access",
+      "breakpoints": true
     }
   ]
 }
