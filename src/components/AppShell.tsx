@@ -137,8 +137,8 @@ const NAV_CRIADOR: NavItem[] = [
     label: "Recursos", 
     icon: Library,
     submenu: [
-      { to: "/studio-new", label: "Biblioteca", icon: Box },
-      { to: "/studio-new", label: "Templates", icon: Layout },
+      { to: "/biblioteca-modelos", label: "Biblioteca", icon: Box },
+      { to: "/biblioteca-modelos", label: "Templates", icon: Layout },
     ]
   },
   { 
