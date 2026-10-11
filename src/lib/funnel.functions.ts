@@ -2,173 +2,37 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 export const leadFormSchema = z.object({
-  name: z.string().min(2),
-  company: z.string().optional(),
-  email: z.string().email(),
-  whatsapp: z.string().min(10),
-  city: z.string(),
-  state: z.string(),
-  segment: z.string(),
+  name: z.string().min(2).max(200),
+  company: z.string().max(200).optional(),
+  email: z.string().email().max(255),
+  whatsapp: z.string().min(10).max(30),
+  city: z.string().max(120),
+  state: z.string().max(60),
+  segment: z.string().max(120),
   serviceId: z.string().uuid(),
-  referralToken: z.string().optional(),
+  referralToken: z.string().max(200).optional(),
   details: z.record(z.string(), z.any()).optional(),
 });
 
-const DEFAULT_ADMIN_ID = "ce4c32ee-583a-456c-8f0b-a516188d196b";
-
+// Público, sem chave administrativa: uma função segura do banco valida, limita abuso e grava tudo numa transação.
 export const submitLeadForm = createServerFn({ method: "POST" })
   .validator((data: unknown) => leadFormSchema.parse(data))
   .handler(async ({ data }) => {
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-      const email = data.email.toLowerCase().trim();
-      const whatsapp = data.whatsapp.replace(/\D/g, "");
-
-      // 1. Validar Serviço (serviceId)
-      const { data: service, error: serviceFetchError } = await supabaseAdmin
-        .from("services_catalog")
-        .select("id, name, is_active")
-        .eq("id", data.serviceId)
-        .maybeSingle();
-      
-      if (serviceFetchError) {
-        console.error("Erro ao buscar serviço:", serviceFetchError);
-        throw new Error("Erro de comunicação ao validar o serviço escolhido.");
-      }
-
-      if (!service) {
-        throw new Error("O serviço selecionado não foi encontrado no nosso catálogo.");
-      }
-
-      if (!service.is_active) {
-        throw new Error(`O serviço "${service.name}" não está disponível no momento.`);
-      }
-
-      // 2. Verificar Duplicidade
-      const { data: existingLead } = await supabaseAdmin
-        .from("leads")
-        .select("id, name")
-        .or(`email.eq.${email},whatsapp.eq.${whatsapp}`)
-        .maybeSingle();
-
-      if (existingLead) {
-        await supabaseAdmin.from("lead_activities").insert({
-          lead_id: existingLead.id,
-          user_id: "00000000-0000-0000-0000-000000000000",
-          type: "status",
-          description: `Novo interesse recebido via Funil. Serviço: ${service.name}.`,
-          happened_at: new Date().toISOString(),
-        } as any);
-
-        return { success: true, message: "Interesse registrado com sucesso.", isNew: false };
-      }
-
-      // 3. Processar Referral Token
-      let originatorId = null;
-      let referralTokenId = null;
-      let source = "direto";
-      let displaySource = "ScaleNexus / Direto";
-
-      if (data.referralToken) {
-        const { data: tokenData, error: tokenError } = await supabaseAdmin
-          .from("referral_tokens")
-          .select("id, seller_id, is_active, is_institutional")
-          .eq("token", data.referralToken)
-          .maybeSingle();
-
-        if (tokenError) {
-          console.error("Erro ao validar token:", tokenError);
-          throw new Error("Erro técnico ao processar sua indicação.");
-        }
-
-        if (tokenData) {
-          if (!tokenData.is_active) {
-            throw new Error("Este link de indicação não está mais ativo.");
-          }
-
-          referralTokenId = tokenData.id;
-          originatorId = tokenData.seller_id;
-          
-          if (tokenData.is_institutional) {
-            source = "indicacao_institucional";
-            displaySource = "ScaleNexus / Institucional";
-          } else {
-            source = "indicacao";
-            displaySource = "Indicação de Vendedor";
-          }
-        }
-      }
-
-      // 4. Criar Lead
-      console.log(`[ATA006] Tentando criar lead. Owner: ${originatorId || DEFAULT_ADMIN_ID}`);
-      const leadInsertResult = await supabaseAdmin
-        .from("leads")
-        .insert({
-          name: data.name,
-          company: data.company || null,
-          estimated_value: 0,
-          closed_value: 0,
-          email: email,
-          whatsapp: whatsapp,
-          city: data.city,
-          state: data.state,
-          niche: data.segment,
-          status: "novo",
-          source: source,
-          owner_id: originatorId || DEFAULT_ADMIN_ID, 
-          notes: `Origem: ${displaySource}\nInteresse inicial: ${data.details?.['objective'] || data.details?.['needs'] || ''}\nServiço Escolhido: ${service.name} (ID: ${service.id})\nDados do Briefing: ${JSON.stringify(data.details || {})}`,
-        } as any)
-        .select("id");
-      
-      const { data: leadData, error: leadError } = leadInsertResult;
-      
-      if (leadError || !leadData || leadData.length === 0) {
-        console.error("[ATA006] Erro ao criar lead:", leadError);
-        throw new Error(leadError ? `Falha ao salvar o lead no banco: [${leadError.code}] ${leadError.message}` : "Erro de persistência: O lead não foi gerado.");
-      }
-
-      const newLeadId = leadData[0]?.id;
-      if (!newLeadId) {
-        throw new Error("Erro de persistência: O ID do lead não foi retornado.");
-      }
-      console.log(`[ATA006] Lead criado com ID: ${newLeadId}`);
-
-      // 5. Criar Atribuição Comercial
-      console.log(`[ATA006] Tentando criar atribuição para lead ${newLeadId}`);
-      const { error: attrError } = await supabaseAdmin.from("lead_attribution").insert({
-        lead_id: newLeadId,
-        originator_id: originatorId, 
-        current_responsible_id: (source === "indicacao" && originatorId) ? originatorId : DEFAULT_ADMIN_ID,
-        referral_token_id: referralTokenId,
-      } as any);
-
-      if (attrError) {
-        console.error("[ATA006] Erro ao criar atribuição:", attrError);
-        // Interromper conforme ATA#006
-        throw new Error(`Falha ao salvar atribuição: [${attrError.code}] ${attrError.message}`);
-      }
-
-      // 6. Atividade Inicial
-      const { error: activityError } = await supabaseAdmin.from("lead_activities").insert({
-        lead_id: newLeadId,
-        user_id: originatorId || DEFAULT_ADMIN_ID,
-        type: "status",
-        description: `Lead criado via formulário público. Origem: ${displaySource}.`,
-        happened_at: new Date().toISOString(),
-      } as any);
-      
-      if (activityError) {
-        console.warn("[ATA006] Erro ao criar atividade (não crítico):", activityError);
-      }
-      
-      return { success: true, message: "Lead criado com sucesso.", isNew: true, leadId: newLeadId };
-
-    } catch (error: any) {
-      console.error("Erro no processamento do Funil:", error);
-      return { 
-        success: false, 
-        message: error.message || "Ocorreu um erro inesperado ao processar sua solicitação." 
-      };
+    const { publicDb, safeDbMessage } = await import("@/lib/public-db.server");
+    const { data: result, error } = await publicDb().rpc("sn_submit_public_lead", {
+      p_name: data.name,
+      p_company: data.company ?? "",
+      p_email: data.email,
+      p_whatsapp: data.whatsapp,
+      p_city: data.city,
+      p_state: data.state,
+      p_segment: data.segment,
+      p_service_id: data.serviceId,
+      p_referral_token: data.referralToken ?? undefined,
+      p_details: (data.details ?? {}) as never,
+    });
+    if (error) {
+      return { success: false, message: safeDbMessage(error, "Ocorreu um erro inesperado ao processar sua solicitação.") };
     }
+    return result as { success: boolean; message: string; isNew: boolean; leadId?: string };
   });
