@@ -45,6 +45,7 @@ import { Route as ClientePrimeiroAcessoRouteImport } from './routes/cliente.prim
 import { Route as ClienteRecuperarSenhaRouteImport } from './routes/cliente.recuperar-senha'
 import { Route as ComeceSeuProjetoIndexRouteImport } from './routes/comece-seu-projeto/index'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
+import { Route as TemplateAdvocaciaEmpresarialRouteImport } from './routes/template.advocacia-empresarial'
 import { Route as TemplateEducacaoInclusivaRouteImport } from './routes/template.educacao-inclusiva'
 import { Route as TemplateIaAutomacaoRouteImport } from './routes/template.ia-automacao'
 import { Route as TemplateImobiliariaPremiumRouteImport } from './routes/template.imobiliaria-premium'
@@ -268,6 +269,12 @@ const SSlugRoute = SSlugRouteImport.update({
   path: '/s/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplateAdvocaciaEmpresarialRoute =
+  TemplateAdvocaciaEmpresarialRouteImport.update({
+    id: '/template/advocacia-empresarial',
+    path: '/template/advocacia-empresarial',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TemplateEducacaoInclusivaRoute =
   TemplateEducacaoInclusivaRouteImport.update({
     id: '/template/educacao-inclusiva',
@@ -515,6 +522,7 @@ export interface FileRoutesByFullPath {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/advocacia-empresarial': typeof TemplateAdvocaciaEmpresarialRoute
   '/template/educacao-inclusiva': typeof TemplateEducacaoInclusivaRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
@@ -587,6 +595,7 @@ export interface FileRoutesByTo {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/advocacia-empresarial': typeof TemplateAdvocaciaEmpresarialRoute
   '/template/educacao-inclusiva': typeof TemplateEducacaoInclusivaRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
@@ -662,6 +671,7 @@ export interface FileRoutesById {
   '/cliente/primeiro-acesso': typeof ClientePrimeiroAcessoRoute
   '/cliente/recuperar-senha': typeof ClienteRecuperarSenhaRoute
   '/s/$slug': typeof SSlugRoute
+  '/template/advocacia-empresarial': typeof TemplateAdvocaciaEmpresarialRoute
   '/template/educacao-inclusiva': typeof TemplateEducacaoInclusivaRoute
   '/template/ia-automacao': typeof TemplateIaAutomacaoRoute
   '/template/imobiliaria-premium': typeof TemplateImobiliariaPremiumRoute
@@ -737,6 +747,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/advocacia-empresarial'
     | '/template/educacao-inclusiva'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
@@ -809,6 +820,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/advocacia-empresarial'
     | '/template/educacao-inclusiva'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
@@ -883,6 +895,7 @@ export interface FileRouteTypes {
     | '/cliente/primeiro-acesso'
     | '/cliente/recuperar-senha'
     | '/s/$slug'
+    | '/template/advocacia-empresarial'
     | '/template/educacao-inclusiva'
     | '/template/ia-automacao'
     | '/template/imobiliaria-premium'
@@ -933,6 +946,7 @@ export interface RootRouteChildren {
   ClientePrimeiroAcessoRoute: typeof ClientePrimeiroAcessoRoute
   ClienteRecuperarSenhaRoute: typeof ClienteRecuperarSenhaRoute
   SSlugRoute: typeof SSlugRoute
+  TemplateAdvocaciaEmpresarialRoute: typeof TemplateAdvocaciaEmpresarialRoute
   TemplateEducacaoInclusivaRoute: typeof TemplateEducacaoInclusivaRoute
   TemplateIaAutomacaoRoute: typeof TemplateIaAutomacaoRoute
   TemplateImobiliariaPremiumRoute: typeof TemplateImobiliariaPremiumRoute
@@ -1195,6 +1209,13 @@ declare module '@tanstack/react-router' {
       path: '/s/$slug'
       fullPath: '/s/$slug'
       preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/template/advocacia-empresarial': {
+      id: '/template/advocacia-empresarial'
+      path: '/template/advocacia-empresarial'
+      fullPath: '/template/advocacia-empresarial'
+      preLoaderRoute: typeof TemplateAdvocaciaEmpresarialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/template/educacao-inclusiva': {
@@ -1617,6 +1638,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientePrimeiroAcessoRoute: ClientePrimeiroAcessoRoute,
   ClienteRecuperarSenhaRoute: ClienteRecuperarSenhaRoute,
   SSlugRoute: SSlugRoute,
+  TemplateAdvocaciaEmpresarialRoute: TemplateAdvocaciaEmpresarialRoute,
   TemplateEducacaoInclusivaRoute: TemplateEducacaoInclusivaRoute,
   TemplateIaAutomacaoRoute: TemplateIaAutomacaoRoute,
   TemplateImobiliariaPremiumRoute: TemplateImobiliariaPremiumRoute,
