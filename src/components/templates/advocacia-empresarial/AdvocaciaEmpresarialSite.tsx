@@ -65,11 +65,11 @@ export function AdvocaciaEmpresarialSite({ content: c }: { content: AdvocaciaCon
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (form.nome.trim().length < 3) e.nome = "Informe seu nome completo.";
-    if (form.empresa.trim().length < 2) e.empresa = "Informe o nome da empresa.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) e.email = "Informe um e-mail válido.";
-    if (form.telefone && form.telefone.replace(/\D/g, "").length < 10) e.telefone = "Telefone incompleto. Ex.: (11) 99999-9999";
-    if (form.demanda.trim().length < 20) e.demanda = "Descreva brevemente a demanda (mínimo de 20 caracteres).";
+    if (form.nome.trim().length < 3) e["nome"] = "Informe seu nome completo.";
+    if (form.empresa.trim().length < 2) e["empresa"] = "Informe o nome da empresa.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) e["email"] = "Informe um e-mail válido.";
+    if (form.telefone && form.telefone.replace(/\D/g, "").length < 10) e["telefone"] = "Telefone incompleto. Ex.: (11) 99999-9999";
+    if (form.demanda.trim().length < 20) e["demanda"] = "Descreva brevemente a demanda (mínimo de 20 caracteres).";
     return e;
   };
 
