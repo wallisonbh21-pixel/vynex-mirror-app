@@ -22,6 +22,13 @@
       "when": 1791737214585,
       "tag": "0002_secure_rpc_replace_service_role",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791737286403,
+      "tag": "0003_release_whatsapp_placeholders",
+      "breakpoints": true
     }
   ]
 }
