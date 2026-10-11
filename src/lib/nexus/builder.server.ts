@@ -11,6 +11,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { SECTION_TEMPLATES } from "@/lib/studio/templates";
 import type { StudioDesignSystem, StudioSection } from "@/types/studio";
 import type { NexusBuildOperation } from "./build-plan";
+import { findEnglishWords } from "./core/language";
 
 const DEFAULT_DESIGN_SYSTEM: StudioDesignSystem = {
   colors: {
@@ -190,8 +191,20 @@ export async function executeBuildOperations(
     duplicated.add(s.id);
   }
 
+  // Verificação de idioma (pt-BR): sinaliza possíveis textos em inglês visíveis.
+  const language_warnings: string[] = [];
+  for (const s of after.sections) {
+    for (const el of s.elements ?? []) {
+      const text = (el.content as any)?.text;
+      if (typeof text !== "string") continue;
+      const hits = findEnglishWords(text);
+      if (hits.length) language_warnings.push(`Seção ${s.id}: possível texto em inglês ("${text.slice(0, 60)}") — revisar.`);
+    }
+  }
+
   return {
     applied,
+    language_warnings,
     failed: entries.length - applied,
     entries,
     sections: after.sections.map((s) => ({ id: s.id, type: s.type, order: s.order })),
