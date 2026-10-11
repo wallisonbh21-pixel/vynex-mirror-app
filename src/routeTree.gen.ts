@@ -16,6 +16,7 @@ import { Route as ModelosRouteImport } from './routes/modelos'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
+import { Route as AuthenticatedBibliotecaModelosRouteImport } from './routes/_authenticated/biblioteca-modelos'
 import { Route as AuthenticatedCentralVisualRouteImport } from './routes/_authenticated/central-visual'
 import { Route as AuthenticatedClienteRouteRouteImport } from './routes/_authenticated/cliente/route'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
@@ -115,6 +116,12 @@ const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
   path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBibliotecaModelosRoute =
+  AuthenticatedBibliotecaModelosRouteImport.update({
+    id: '/biblioteca-modelos',
+    path: '/biblioteca-modelos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentralVisualRoute =
   AuthenticatedCentralVisualRouteImport.update({
     id: '/central-visual',
@@ -481,6 +488,7 @@ export interface FileRoutesByFullPath {
   '/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/biblioteca-modelos': typeof AuthenticatedBibliotecaModelosRoute
   '/central-visual': typeof AuthenticatedCentralVisualRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
@@ -552,6 +560,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/biblioteca-modelos': typeof AuthenticatedBibliotecaModelosRoute
   '/central-visual': typeof AuthenticatedCentralVisualRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/comissoes': typeof AuthenticatedComissoesRoute
@@ -626,6 +635,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente': typeof AuthenticatedClienteRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
+  '/_authenticated/biblioteca-modelos': typeof AuthenticatedBibliotecaModelosRoute
   '/_authenticated/central-visual': typeof AuthenticatedCentralVisualRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/comissoes': typeof AuthenticatedComissoesRoute
@@ -700,6 +710,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/admin'
     | '/aprovacoes'
+    | '/biblioteca-modelos'
     | '/central-visual'
     | '/clientes'
     | '/comissoes'
@@ -771,6 +782,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/admin'
     | '/aprovacoes'
+    | '/biblioteca-modelos'
     | '/central-visual'
     | '/clientes'
     | '/comissoes'
@@ -844,6 +856,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente'
     | '/_authenticated/admin'
     | '/_authenticated/aprovacoes'
+    | '/_authenticated/biblioteca-modelos'
     | '/_authenticated/central-visual'
     | '/_authenticated/clientes'
     | '/_authenticated/comissoes'
@@ -979,6 +992,13 @@ declare module '@tanstack/react-router' {
       path: '/aprovacoes'
       fullPath: '/aprovacoes'
       preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/biblioteca-modelos': {
+      id: '/_authenticated/biblioteca-modelos'
+      path: '/biblioteca-modelos'
+      fullPath: '/biblioteca-modelos'
+      preLoaderRoute: typeof AuthenticatedBibliotecaModelosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/central-visual': {
@@ -1511,6 +1531,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClienteRouteRoute: typeof AuthenticatedClienteRouteRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
+  AuthenticatedBibliotecaModelosRoute: typeof AuthenticatedBibliotecaModelosRoute
   AuthenticatedCentralVisualRoute: typeof AuthenticatedCentralVisualRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedComissoesRoute: typeof AuthenticatedComissoesRoute
@@ -1547,6 +1568,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClienteRouteRoute: AuthenticatedClienteRouteRouteWithChildren,
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
+  AuthenticatedBibliotecaModelosRoute: AuthenticatedBibliotecaModelosRoute,
   AuthenticatedCentralVisualRoute: AuthenticatedCentralVisualRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedComissoesRoute: AuthenticatedComissoesRoute,
