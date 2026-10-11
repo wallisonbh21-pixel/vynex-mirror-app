@@ -5,7 +5,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const searchSchema = z.object({
   niche: z.string(),
@@ -233,7 +232,21 @@ export const Route = createFileRoute("/api/prospecting/search")({
           }
 
           // 2. ALWAYS VALIDATE ROLES
-          const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", authUser.id);
+          // Lê os papéis com a sessão do próprio usuário (RLS "roles read" permite ler os próprios papéis).
+          const { createClient } = await import("@supabase/supabase-js");
+          const pubKey = process.env['SUPABASE_PUBLISHABLE_KEY']!;
+          const userDb = createClient(process.env['SUPABASE_URL']!, pubKey, {
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+            global: {
+              headers: { Authorization: `Bearer ${token}` },
+              fetch: (input, init) => {
+                const h = new Headers(init?.headers);
+                h.set("apikey", pubKey);
+                return fetch(input, { ...init, headers: h });
+              },
+            },
+          });
+          const { data: roles } = await userDb.from("user_roles").select("role").eq("user_id", authUser.id);
           const userRoles = roles?.map(r => r.role) || [];
 
           if (!userRoles.includes("admin") && !userRoles.includes("vendedor") && !userRoles.includes("diretor")) {
