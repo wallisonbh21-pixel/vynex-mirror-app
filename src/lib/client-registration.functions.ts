@@ -10,49 +10,19 @@ const registerClienteSchema = z.object({
   notes: z.string().optional().nullable().transform(val => val ?? ""),
 });
 
+// Sem chave administrativa: a função segura do banco valida papel (admin/vendedor) e define o dono.
 export const registerNewCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => registerClienteSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { userId: actorId, supabase: userSupabase } = context;
-
-    if (!actorId) throw new Error("Não autorizado.");
-
-    // Determine actor role
-    const { data: roles } = await userSupabase.from("user_roles").select("role").eq("user_id", actorId);
-    const isAdmin = roles?.some((r: any) => r.role === 'admin' || r.role === 'diretor');
-    const isVendedor = roles?.some((r: any) => r.role === 'vendedor');
-
-    if (!isAdmin && !isVendedor) {
-      throw new Error("Você não tem permissão para cadastrar clientes.");
-    }
-
-    // Create the commercial client record
-    const { data: newCliente, error: clientError } = await supabaseAdmin
-      .from("clients")
-      .insert({
-        contact_name: data.contact_name,
-        contact_email: data.contact_email,
-        contact_phone: data.contact_phone,
-        company: data.company,
-        notes: data.notes,
-        owner_id: actorId,
-        status: "ativo"
-      } as any)
-      .select()
-      .single();
-
-    if (clientError || !newCliente) {
-      console.error("[DEBUG] client_creation_failed", clientError);
-      throw new Error(`Erro ao salvar o registro do cliente: ${clientError?.message || "Registro não criado"}`);
-    }
-
-    console.log("[DEBUG] client_created", { clientId: newCliente.id, email: data.contact_email });
-
-    return { 
-      success: true, 
-      client: newCliente,
-      message: "Clientee cadastrado com sucesso." 
-    };
+    const { safeDbMessage } = await import("@/lib/public-db.server");
+    const { data: newCliente, error } = await context.supabase.rpc("sn_register_client", {
+      p_contact_email: data.contact_email,
+      p_contact_name: data.contact_name,
+      p_contact_phone: data.contact_phone,
+      p_company: data.company,
+      p_notes: data.notes,
+    });
+    if (error || !newCliente) throw new Error(safeDbMessage(error, "Erro ao salvar o registro do cliente."));
+    return { success: true, client: newCliente, message: "Cliente cadastrado com sucesso." };
   });
