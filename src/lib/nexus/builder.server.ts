@@ -80,6 +80,7 @@ export interface ExecutionReport {
   failed: number;
   entries: ExecutionEntry[];
   sections: { id: string; type: string; order: number }[];
+  language_warnings?: string[];
   post_validation: { ok: boolean; problems: string[] };
 }
 
