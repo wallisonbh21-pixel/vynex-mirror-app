@@ -2598,6 +2598,7 @@ export type Database = {
         Args: { p_action: string; p_message?: string; p_token: string }
         Returns: Json
       }
+      sn_client_last_access: { Args: { p_client_id: string }; Returns: Json }
       sn_delete_client: { Args: { p_client_id: string }; Returns: Json }
       sn_get_referral_token: { Args: never; Returns: Json }
       sn_referral_leads: { Args: never; Returns: Json }
