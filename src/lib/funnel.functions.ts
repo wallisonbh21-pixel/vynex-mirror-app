@@ -28,7 +28,7 @@ export const submitLeadForm = createServerFn({ method: "POST" })
       p_state: data.state,
       p_segment: data.segment,
       p_service_id: data.serviceId,
-      p_referral_token: data.referralToken ?? undefined,
+      ...(data.referralToken ? { p_referral_token: data.referralToken } : {}),
       p_details: (data.details ?? {}) as never,
     });
     if (error) {

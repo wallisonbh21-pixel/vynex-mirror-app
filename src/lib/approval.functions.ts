@@ -29,7 +29,7 @@ type ActionResult = { ok: true } | { ok: false; error: string };
 async function clientAction(token: string, action: "approve" | "changes", message?: string): Promise<ActionResult> {
   const { publicDb } = await import("@/lib/public-db.server");
   const { data: r, error } = await publicDb().rpc("sn_client_approval_action", {
-    p_token: token, p_action: action, p_message: message ?? undefined,
+    p_token: token, p_action: action, ...(message ? { p_message: message } : {}),
   });
   if (error || !r) return { ok: false, error: "Não foi possível registrar sua resposta." };
   return r as unknown as ActionResult;
