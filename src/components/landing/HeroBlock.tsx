@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import heroDevices from "@/assets/hero-devices.jpg.asset.json";
 
 const u = (id: string, w = 900) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=75`;
 const HERO_IMG = u("photo-1613490493576-7fde63acd811", 1200);
@@ -134,7 +133,7 @@ export function HeroDevices() {
       <div className="pointer-events-none absolute inset-x-[10%] bottom-[2%] top-[20%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.35),rgba(29,78,216,0.12)_50%,transparent_75%)] blur-3xl" />
       <div className="pointer-events-none absolute inset-x-[15%] -bottom-[4%] h-[14%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.45),transparent_70%)] blur-2xl" />
       <img
-        src={heroDevices.url}
+        src="/hero-devices.jpg"
         alt=""
         width={1376}
         height={768}
