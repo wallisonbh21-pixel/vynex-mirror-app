@@ -1,10 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { getBackendEnv } from "@/lib/backend-env.server";
 
 /** Cliente com chave pública (anon), sem sessão. Usado só para chamar funções seguras do banco. */
 export function publicDb() {
-  const url = process.env["SUPABASE_URL"]!;
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  const { url, key } = getBackendEnv();
   return createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     global: {
