@@ -41,9 +41,10 @@ export const Route = createFileRoute("/api/nexus/chat")({
           return new Response("Unauthorized", { status: 401 });
         }
 
-        const SUPABASE_URL = process.env["SUPABASE_URL"];
-        const SUPABASE_PUBLISHABLE_KEY = process.env["SUPABASE_PUBLISHABLE_KEY"];
+        const { getBackendEnv } = await import("@/lib/backend-env.server");
+        const { url: SUPABASE_URL, key: SUPABASE_PUBLISHABLE_KEY } = getBackendEnv();
         if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+          console.error("[nexus/chat] backend env ausente");
           return new Response("Backend indisponível", { status: 500 });
         }
 
