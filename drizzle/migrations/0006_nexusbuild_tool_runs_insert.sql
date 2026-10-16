@@ -1,0 +1,2 @@
+GRANT SELECT, INSERT ON public.nexusbuild_tool_runs TO authenticated;
+CREATE POLICY "Usuario autorizado registra suas ferramentas" ON public.nexusbuild_tool_runs FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid() AND public.can_use_nexusbuild(auth.uid()));
