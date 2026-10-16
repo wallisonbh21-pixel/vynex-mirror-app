@@ -10,7 +10,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SECTION_TEMPLATES } from "@/lib/studio/templates";
 import type { StudioDesignSystem, StudioSection } from "@/types/studio";
-import type { NexusBuildOperation } from "./build-plan";
+import { findOfficialTemplate, type NexusBuildOperation } from "./build-plan";
 import { findEnglishWords } from "./core/language";
 
 const DEFAULT_DESIGN_SYSTEM: StudioDesignSystem = {
@@ -73,6 +73,8 @@ export interface ExecutionEntry {
   type: string;
   status: "APLICADA" | "FALHOU";
   detail: string;
+  /** Identificadores reais das seções criadas por esta operação (para preencher conteúdo em seguida). */
+  section_ids?: string[];
 }
 
 export interface ExecutionReport {
@@ -97,6 +99,22 @@ export async function executeBuildOperations(
   for (const op of operations) {
     try {
       switch (op.type) {
+        case "APPLY_TEMPLATE": {
+          const tpl = findOfficialTemplate(op.params.template_id);
+          if (!tpl) throw new Error("Modelo não encontrado na biblioteca.");
+          const data = JSON.parse(JSON.stringify(tpl.structure)) as { sections: StudioSection[]; design_system: StudioDesignSystem };
+          if (!Array.isArray(data.sections) || data.sections.length === 0) throw new Error("Este modelo ainda não tem seções prontas para aplicar.");
+          sections = data.sections.map((sec) => ({ ...sec, id: sec.id || newId(), elements: (sec.elements ?? []).map((el) => ({ ...el, id: el.id || newId() })) }));
+          designSystem = { ...designSystem, ...data.design_system };
+          const { error: tplError } = await supabase.from("projects").update({ template_id: tpl.id } as never).eq("id", projectId);
+          entries.push({
+            type: op.type,
+            status: "APLICADA",
+            detail: `Modelo "${tpl.name}" aplicado com ${sections.length} seções.${tplError ? " (O vínculo do modelo ao projeto não foi alterado: " + (tplError.message.includes("TEMPLATE_LOCKED") ? "projeto já em produção" : tplError.message) + ".)" : ""}`,
+            section_ids: sections.map((s) => s.id),
+          });
+          break;
+        }
         case "ADD_SECTION": {
           const template = SECTION_TEMPLATES[op.params.template];
           const structure = JSON.parse(JSON.stringify((template as any).structure)) as StudioSection;
@@ -110,7 +128,7 @@ export async function executeBuildOperations(
             ? Math.min(Math.max(0, op.params.position), sections.length)
             : sections.length;
           sections.splice(position, 0, structure);
-          entries.push({ type: op.type, status: "APLICADA", detail: `Seção "${(template as any).name}" inserida na posição ${position + 1}.` });
+          entries.push({ type: op.type, status: "APLICADA", detail: `Seção "${(template as any).name}" inserida na posição ${position + 1} com id ${structure.id}.`, section_ids: [structure.id] });
           break;
         }
         case "UPDATE_SECTION": {

@@ -528,12 +528,12 @@ export const NEXUS_TOOLS: NexusTool[] = [
             properties: {
               type: {
                 type: "string",
-                enum: ["ADD_SECTION", "UPDATE_SECTION", "REORDER_SECTIONS", "UPDATE_DESIGN_SYSTEM", "REMOVE_SECTION"],
+                enum: ["APPLY_TEMPLATE", "ADD_SECTION", "UPDATE_SECTION", "REORDER_SECTIONS", "UPDATE_DESIGN_SYSTEM", "REMOVE_SECTION"],
               },
               params: {
                 type: "object",
                 description:
-                  "ADD_SECTION: { template, position?, texts?: {title,subtitle,paragraph,button}, styles? } | UPDATE_SECTION: { section_id, texts?, styles? } | REORDER_SECTIONS: { section_ids[] } | UPDATE_DESIGN_SYSTEM: { colors?, typography?, buttons?, cards? } | REMOVE_SECTION: { section_id }",
+                  "APPLY_TEMPLATE: { template_id } (modelo oficial completo, ex.: tpl-scalenexus-motors para concessionárias/revendas/motos; substitui as seções) | ADD_SECTION: { template, position?, texts?: {title,subtitle,paragraph,button}, styles? } | UPDATE_SECTION: { section_id, texts?, styles? } | REORDER_SECTIONS: { section_ids[] } | UPDATE_DESIGN_SYSTEM: { colors?, typography?, buttons?, cards? } | REMOVE_SECTION: { section_id }",
               },
             },
             required: ["type", "params"],

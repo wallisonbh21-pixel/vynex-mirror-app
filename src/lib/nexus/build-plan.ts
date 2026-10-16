@@ -10,14 +10,22 @@
  * Este arquivo é puro (sem acesso a banco) para poder ser usado no servidor
  * e em testes sem efeitos colaterais.
  */
-import { SECTION_TEMPLATES } from "@/lib/studio/templates";
+import { NICHE_TEMPLATES, SECTION_TEMPLATES } from "@/lib/studio/templates";
+
+/** Modelos oficiais completos que a IA pode aplicar (mesma fonte da Biblioteca Central). */
+export const OFFICIAL_SITE_TEMPLATES = NICHE_TEMPLATES.filter((t) => t.metadata?.["preview_route"]);
+export const findOfficialTemplate = (id: string) => OFFICIAL_SITE_TEMPLATES.find((t) => t.id === id);
+export function availableSiteTemplates() {
+  return OFFICIAL_SITE_TEMPLATES.map((t) => ({ template_id: t.id, name: t.name, niche: t.niche, tags: t.tags }));
+}
 
 export type NexusBuildOperationType =
   | "ADD_SECTION"
   | "UPDATE_SECTION"
   | "REORDER_SECTIONS"
   | "UPDATE_DESIGN_SYSTEM"
-  | "REMOVE_SECTION";
+  | "REMOVE_SECTION"
+  | "APPLY_TEMPLATE";
 
 /** Operações previstas na arquitetura, ainda NÃO executáveis neste modelo de dados. */
 export const UNSUPPORTED_OPERATIONS: Record<string, string> = {
@@ -101,6 +109,7 @@ export function validateBuildPlan(rawOperations: unknown, currentSectionCount: n
   }
 
   let projectedSections = currentSectionCount;
+  let replacesExisting = false;
 
   rawOperations.forEach((raw: any, index) => {
     const type = String(raw?.type ?? "").toUpperCase();
@@ -112,6 +121,17 @@ export function validateBuildPlan(rawOperations: unknown, currentSectionCount: n
     }
 
     switch (type) {
+      case "APPLY_TEMPLATE": {
+        const tpl = findOfficialTemplate(String(params.template_id ?? ""));
+        if (!tpl) {
+          issues.push({ index, type, message: `Modelo "${params.template_id}" não existe. Use um de: ${OFFICIAL_SITE_TEMPLATES.map((t) => t.id).join(", ")}.` });
+          return;
+        }
+        if (currentSectionCount > 0) replacesExisting = true;
+        projectedSections = ((tpl.structure as any).sections ?? []).length;
+        operations.push({ type, params: { template_id: tpl.id } });
+        return;
+      }
       case "ADD_SECTION": {
         const template = String(params.template ?? "");
         if (!SECTION_TEMPLATES[template]) {
@@ -180,7 +200,7 @@ export function validateBuildPlan(rawOperations: unknown, currentSectionCount: n
     valid: issues.length === 0 && operations.length > 0,
     operations,
     issues,
-    destructive: operations.some((op) => DESTRUCTIVE_OPERATIONS.includes(op.type)),
+    destructive: replacesExisting || operations.some((op) => DESTRUCTIVE_OPERATIONS.includes(op.type)),
   };
 }
 
@@ -194,6 +214,8 @@ export function describeOperation(op: NexusBuildOperation): string {
       return "Reordenar as seções do site";
     case "UPDATE_DESIGN_SYSTEM":
       return "Atualizar o sistema visual (cores, tipografia, botões, cards)";
+    case "APPLY_TEMPLATE":
+      return `Aplicar o modelo "${findOfficialTemplate(op.params.template_id)?.name ?? op.params.template_id}" (substitui as seções atuais)`;
     case "REMOVE_SECTION":
       return `Remover a seção ${op.params.section_id} (ação destrutiva)`;
     default:
