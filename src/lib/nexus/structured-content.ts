@@ -51,7 +51,10 @@ export function validateItemsParams(params: any): string[] {
   if (typeof params?.demo !== "boolean") errors.push("demo é obrigatório (true quando o conteúdo não veio do cliente).");
   items.forEach((it: any, i: number) => {
     const p = `items[${i}]`;
-    if (!it || typeof it !== "object") return errors.push(`${p} inválido.`);
+    if (!it || typeof it !== "object") {
+      errors.push(`${p} inválido.`);
+      return;
+    }
     if (params.kind === "gallery") {
       if (!isUrl(it.image_url)) errors.push(`${p}.image_url deve ser uma URL https.`);
       if (!optStr(it.title, 120)) errors.push(`${p}.title muito longo.`);
@@ -60,7 +63,7 @@ export function validateItemsParams(params: any): string[] {
     if (params.kind === "testimonials" && (!str(it.text, 600) || !str(it.author, 80)))
       errors.push(`${p}: depoimento exige text e author fornecidos pelo cliente.`);
     if (!optStr(it.text, 800)) errors.push(`${p}.text muito longo (até 800).`);
-    if (!optUrl(it.image_url)) errors.push(`${p}.image_url deve ser https.`);
+    if (params.kind !== "gallery" && !optUrl(it.image_url)) errors.push(`${p}.image_url deve ser https.`);
     if (!optStr(it.image_alt, 160)) errors.push(`${p}.image_alt muito longo.`);
     if (it.price !== undefined && it.price !== null && !(typeof it.price === "number" && it.price >= 0 && it.price < 1e9))
       errors.push(`${p}.price deve ser número >= 0 ou null.`);

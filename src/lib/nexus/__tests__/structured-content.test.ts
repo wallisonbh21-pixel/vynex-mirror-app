@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { validateBuildPlan } from "../build-plan";
 import { applyItems, applyVehicles, validateItemsParams, DEMO_LABEL } from "../structured-content";
 import { motorsToStudioData } from "@/lib/templates/scalenexus-motors/to-studio";
