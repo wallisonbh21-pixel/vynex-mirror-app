@@ -40,6 +40,8 @@ export interface StudioElement {
     tablet?: Record<string, any>;
     mobile?: Record<string, any>;
   };
+  /** Efeitos visuais opcionais (ver src/lib/studio/effects.ts). */
+  effects?: Record<string, any>;
 }
 
 export interface StudioSection {
@@ -48,6 +50,7 @@ export interface StudioSection {
   elements: StudioElement[];
   styles: Record<string, any>;
   order: number;
+  effects?: Record<string, any>;
 }
 
 export interface StudioData {
