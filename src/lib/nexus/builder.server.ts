@@ -12,6 +12,7 @@ import { SECTION_TEMPLATES } from "@/lib/studio/templates";
 import type { StudioDesignSystem, StudioSection } from "@/types/studio";
 import { findOfficialTemplate, type NexusBuildOperation } from "./build-plan";
 import { findEnglishWords } from "./core/language";
+import { applyItems, applyVehicles } from "./structured-content";
 
 const DEFAULT_DESIGN_SYSTEM: StudioDesignSystem = {
   colors: {
@@ -137,6 +138,19 @@ export async function executeBuildOperations(
           applyTexts(section, op.params.texts);
           if (op.params.styles) section.styles = { ...(section.styles ?? {}), ...op.params.styles };
           entries.push({ type: op.type, status: "APLICADA", detail: `Seção ${section.id} atualizada.` });
+          break;
+        }
+        case "SET_ITEMS": {
+          const section = sections.find((s) => s.id === op.params.section_id);
+          if (!section) throw new Error("Seção não encontrada no projeto.");
+          const count = applyItems(section, op.params);
+          entries.push({ type: op.type, status: "APLICADA", detail: `Seção ${section.id}: ${op.params.items.length} item(ns) ${op.params.kind} gravados (${count} elementos).`, section_ids: [section.id] });
+          break;
+        }
+        case "SET_VEHICLES": {
+          sections = applyVehicles(sections, op.params.vehicles, op.params.whatsapp);
+          const ids = sections.filter((s) => s.id.startsWith("mot_vehicle_")).map((s) => s.id);
+          entries.push({ type: op.type, status: "APLICADA", detail: `Estoque atualizado com ${ids.length} veículo(s).`, section_ids: ids });
           break;
         }
         case "REORDER_SECTIONS": {

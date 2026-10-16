@@ -50,11 +50,11 @@ export interface NexusPromptContext {
 }
 
 const OBJECTIVE_LABELS: Record<string, string> = {
-  CRIAR_SITE: "MODE: website_creation — o objetivo desta conversa é criar um site. Fluxo obrigatório até a entrega: 1) colete e resuma as informações; 2) peça UMA confirmação cobrindo criação + montagem; 3) create_project (confirmed=true); 4) website_builder com APPLY_TEMPLATE do modelo oficial adequado (ou ADD_SECTION) e, na mesma ou na chamada seguinte, UPDATE_SECTION com os section_id reais retornados; 5) peça confirmação para publicar e chame publish_site (confirmed=true); 6) entregue o site_url e o studio_url devolvidos. Não encerre a conversa sem entregar o link ou explicar exatamente qual etapa falhou. Se o projeto já existir (projeto ativo), não crie outro: continue dele.",
+  CRIAR_SITE: "MODE: website_creation — o objetivo desta conversa é criar um site. Fluxo obrigatório até a entrega: 1) colete e resuma as informações; 2) peça UMA confirmação cobrindo criação + montagem; 3) create_project (confirmed=true); 4) website_builder com APPLY_TEMPLATE do modelo oficial adequado (ou ADD_SECTION) e, na mesma ou na chamada seguinte, UPDATE_SECTION com os section_id reais retornados, SET_ITEMS para listas/FAQ/galerias/produtos e SET_VEHICLES para o estoque do ScaleNexus Motors (demo=true quando os dados não vieram do cliente; nunca invente depoimentos, preços ou dados comerciais como reais); 5) peça confirmação para publicar e chame publish_site (confirmed=true); 6) entregue o site_url e o studio_url devolvidos. Não encerre a conversa sem entregar o link ou explicar exatamente qual etapa falhou. Se o projeto já existir (projeto ativo), não crie outro: continue dele.",
   CRIAR_APLICATIVO:
     "MODE: app_planning — o objetivo desta conversa é um aplicativo. O App Builder ainda não existe: conduza o levantamento e o planejamento e deixe isso claro.",
   CRIAR_COM_TEMPLATE:
-    "MODE: template_start — o usuário escolheu um modelo como ponto de partida. Use list_section_templates para ver os modelos oficiais (site_templates) e aplique o escolhido com APPLY_TEMPLATE; depois preencha o conteúdo com UPDATE_SECTION usando os section_id reais retornados. Para concessionárias, revendas de carros ou lojas de motos, use tpl-scalenexus-motors.",
+    "MODE: template_start — o usuário escolheu um modelo como ponto de partida. Use list_section_templates para ver os modelos oficiais (site_templates) e aplique o escolhido com APPLY_TEMPLATE; depois preencha o conteúdo com UPDATE_SECTION, SET_ITEMS e (no ScaleNexus Motors) SET_VEHICLES usando os section_id reais retornados. Para concessionárias, revendas de carros ou lojas de motos, use tpl-scalenexus-motors.",
 };
 
 export function buildSystemPrompt(ctx: NexusPromptContext): string {

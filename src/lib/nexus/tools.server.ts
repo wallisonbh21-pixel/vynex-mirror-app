@@ -538,7 +538,7 @@ export const NEXUS_TOOLS: NexusTool[] = [
     name: "website_builder",
     category: "WRITE",
     description:
-      "Executa a construção real do site do projeto no Studio do ScaleNexus, aplicando operações estruturadas. Operações suportadas hoje: ADD_SECTION, UPDATE_SECTION, REORDER_SECTIONS, UPDATE_DESIGN_SYSTEM e REMOVE_SECTION (destrutiva). Chame primeiro com confirmed=false para validar e mostrar o plano; execute apenas com confirmed=true após confirmação do usuário. Use list_section_templates para conhecer as seções disponíveis.",
+      "Executa a construção real do site do projeto no Studio do ScaleNexus, aplicando operações estruturadas. Operações suportadas hoje: APPLY_TEMPLATE, ADD_SECTION, UPDATE_SECTION, SET_ITEMS (listas, FAQ, galeria, produtos), SET_VEHICLES (estoque do ScaleNexus Motors), REORDER_SECTIONS, UPDATE_DESIGN_SYSTEM e REMOVE_SECTION (destrutiva). Chame primeiro com confirmed=false para validar e mostrar o plano; execute apenas com confirmed=true após confirmação do usuário. Use list_section_templates para conhecer as seções disponíveis.",
     parameters: {
       type: "object",
       properties: {
@@ -551,12 +551,12 @@ export const NEXUS_TOOLS: NexusTool[] = [
             properties: {
               type: {
                 type: "string",
-                enum: ["APPLY_TEMPLATE", "ADD_SECTION", "UPDATE_SECTION", "REORDER_SECTIONS", "UPDATE_DESIGN_SYSTEM", "REMOVE_SECTION"],
+                enum: ["APPLY_TEMPLATE", "ADD_SECTION", "UPDATE_SECTION", "SET_ITEMS", "SET_VEHICLES", "REORDER_SECTIONS", "UPDATE_DESIGN_SYSTEM", "REMOVE_SECTION"],
               },
               params: {
                 type: "object",
                 description:
-                  "APPLY_TEMPLATE: { template_id } (modelo oficial completo, ex.: tpl-scalenexus-motors para concessionárias/revendas/motos; substitui as seções) | ADD_SECTION: { template, position?, texts?: {title,subtitle,paragraph,button}, styles? } | UPDATE_SECTION: { section_id, texts?, styles? } | REORDER_SECTIONS: { section_ids[] } | UPDATE_DESIGN_SYSTEM: { colors?, typography?, buttons?, cards? } | REMOVE_SECTION: { section_id }",
+                  "APPLY_TEMPLATE: { template_id } (modelo oficial completo, ex.: tpl-scalenexus-motors para concessionárias/revendas/motos; substitui as seções) | ADD_SECTION: { template, position?, texts?: {title,subtitle,paragraph,button}, styles? } | UPDATE_SECTION: { section_id, texts?, styles? } | SET_ITEMS: { section_id, kind: list|faq|gallery|products|testimonials, demo: boolean, items: [{ title, text?, image_url? (https), image_alt?, price? (número ou null), button_text?, button_href? , author? }] } (substitui contêineres vazios e itens anteriores; testimonials só com depoimentos reais e demo=false) | SET_VEHICLES: { whatsapp?, vehicles: [{ id, brand, model, version?, year, price (número ou null=Consulte), mileage_km?, fuel: flex|gasolina|diesel|eletrico|hibrido, transmission: manual|automatico|cvt, type?: carro|moto|utilitario, color?, photos?: [https], description?, equipment?: [], availability?, featured?, offer?, demo: boolean }] } (só projetos com o modelo ScaleNexus Motors; substitui todo o estoque) | REORDER_SECTIONS: { section_ids[] } | UPDATE_DESIGN_SYSTEM: { colors?, typography?, buttons?, cards? } | REMOVE_SECTION: { section_id }",
               },
             },
             required: ["type", "params"],
