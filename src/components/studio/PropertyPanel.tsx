@@ -140,7 +140,28 @@ export function PropertyPanel({
           <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase">{section.id}</span>
         </div>
 
+        <Tabs defaultValue="style">
+          <TabsList className="w-full bg-slate-900 border-slate-800">
+            <TabsTrigger value="style" className="flex-1 text-[10px] uppercase">Estilo</TabsTrigger>
+            <TabsTrigger value="effects" className="flex-1 text-[10px] uppercase">Efeitos visuais</TabsTrigger>
+          </TabsList>
+          <TabsContent value="effects" className="pt-4">
+            <EffectsPanel effects={section.effects} onChange={(fx) => onUpdateSection(section.id, { effects: fx })} />
+          </TabsContent>
+          <TabsContent value="style" className="pt-4">
         <div className="space-y-4">
+           {projectId && (
+             <ImageControls
+               projectId={projectId}
+               label="Imagem de fundo"
+               url={section.styles['backgroundImage']}
+               removed={section.styles['backgroundRemoved'] === true}
+               originalUrl={section.styles['originalBackgroundImage']}
+               onChange={({ url, removed, originalUrl }) =>
+                 onUpdateSection(section.id, { styles: { ...section.styles, backgroundImage: url, backgroundRemoved: removed, originalBackgroundImage: originalUrl } })
+               }
+             />
+           )}
            <div className="space-y-2">
               <Label className="text-xs text-slate-400">Cor de Fundo</Label>
               <div className="flex gap-2">
