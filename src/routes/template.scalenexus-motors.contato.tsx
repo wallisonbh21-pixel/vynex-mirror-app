@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MotorsContact } from "@/components/templates/scalenexus-motors/MotorsSite";
 import { MOTORS_DEFAULT_CONTENT } from "@/lib/templates/scalenexus-motors/content";
-import { motorsHead } from "./template.scalenexus-motors.index";
+import { motorsHead } from "@/lib/templates/scalenexus-motors/head";
 
 export const Route = createFileRoute("/template/scalenexus-motors/contato")({
   validateSearch: (s: Record<string, unknown>): { tipo?: "contato" | "avaliacao" } => ({ tipo: s.tipo === "avaliacao" ? "avaliacao" : s.tipo === "contato" ? "contato" : undefined }),

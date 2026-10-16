@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MotorsStock } from "@/components/templates/scalenexus-motors/MotorsSite";
 import { MOTORS_DEFAULT_CONTENT } from "@/lib/templates/scalenexus-motors/content";
-import { motorsHead } from "./template.scalenexus-motors.index";
+import { motorsHead } from "@/lib/templates/scalenexus-motors/head";
 
 type Search = { brand?: string; type?: string; priceMax?: number };
 
