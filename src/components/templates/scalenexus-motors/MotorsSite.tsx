@@ -21,7 +21,7 @@ const card = "rounded-2xl border border-[color:var(--m-line)] bg-[color:var(--m-
 const btn = "inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-transform duration-150 hover:-translate-y-0.5";
 const accentBtn: CSSProperties = { background: "var(--m-accent)", color: "#fff" };
 
-export function VehiclePhoto({ src, alt, className = "" }: { src?: string; alt: string; className?: string }) {
+export function VehiclePhoto({ src, alt, className = "" }: { src?: string | undefined; alt: string; className?: string }) {
   const [broken, setBroken] = useState(false);
   if (!src || broken)
     return (
@@ -369,7 +369,8 @@ export function MotorsContact({ content: c, kind }: { content: MotorsContent; ki
 
 type FormState = "idle" | "sending" | "success" | "error" | "unconfigured";
 
-export function validateLead(kind: "contato" | "avaliacao", d: Record<string, string>) {
+export type LeadData = Partial<Record<"name" | "phone" | "email" | "vehicle" | "year" | "km" | "message" | "website", string>>;
+export function validateLead(kind: "contato" | "avaliacao", d: LeadData) {
   const e: Record<string, string> = {};
   if ((d.name ?? "").trim().length < 2) e.name = "Informe seu nome.";
   if ((d.phone ?? "").replace(/\D/g, "").length < 10) e.phone = "Informe um telefone com DDD.";
@@ -388,7 +389,8 @@ function LeadForm({ c, kind, vehicle }: { c: MotorsContent; kind: "contato" | "a
   const onSubmit = async (ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     if (state === "sending") return; // evita envio duplicado
-    const data = Object.fromEntries(new FormData(ev.currentTarget)) as Record<string, string>;
+    const form = ev.currentTarget;
+    const data = Object.fromEntries(new FormData(form)) as LeadData;
     if (data.website) return; // honeypot
     const errs = validateLead(kind, data);
     setErrors(errs);
@@ -399,7 +401,7 @@ function LeadForm({ c, kind, vehicle }: { c: MotorsContent; kind: "contato" | "a
       const res = await fetch(c.contact.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, vehicleId: vehicle?.id ?? null, ...data }) });
       if (!res.ok) throw new Error(String(res.status));
       setState("success");
-      ev.currentTarget?.reset?.();
+      form.reset();
     } catch { setState("error"); }
   };
   const field = (name: string, label: string, type = "text", required = true) => (

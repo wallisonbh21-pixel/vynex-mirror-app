@@ -3,7 +3,7 @@ import { MotorsStock } from "@/components/templates/scalenexus-motors/MotorsSite
 import { MOTORS_DEFAULT_CONTENT } from "@/lib/templates/scalenexus-motors/content";
 import { motorsHead } from "@/lib/templates/scalenexus-motors/head";
 
-type Search = { brand?: string; type?: string; priceMax?: number };
+type Search = { brand?: string | undefined; type?: string | undefined; priceMax?: number | undefined };
 
 export const Route = createFileRoute("/template/scalenexus-motors/estoque")({
   validateSearch: (s: Record<string, unknown>): Search => ({

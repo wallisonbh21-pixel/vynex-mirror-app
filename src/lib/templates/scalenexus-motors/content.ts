@@ -144,10 +144,10 @@ export const LABELS = {
 };
 
 export type VehicleFilters = {
-  q?: string; brand?: string; model?: string; type?: string; fuel?: string; transmission?: string;
-  yearMin?: number; yearMax?: number; priceMin?: number; priceMax?: number; kmMax?: number;
-  sort?: "relevancia" | "preco-asc" | "preco-desc" | "ano-desc" | "ano-asc";
-  includeSold?: boolean;
+  q?: string | undefined; brand?: string | undefined; model?: string | undefined; type?: string | undefined; fuel?: string | undefined; transmission?: string | undefined;
+  yearMin?: number | undefined; yearMax?: number | undefined; priceMin?: number | undefined; priceMax?: number | undefined; kmMax?: number | undefined;
+  sort?: "relevancia" | "preco-asc" | "preco-desc" | "ano-desc" | "ano-asc" | undefined;
+  includeSold?: boolean | undefined;
 };
 
 export function filterVehicles(list: Vehicle[], f: VehicleFilters): Vehicle[] {
