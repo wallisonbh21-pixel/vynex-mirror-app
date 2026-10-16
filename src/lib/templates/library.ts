@@ -12,6 +12,7 @@ export const LIBRARY_CATEGORY: Record<string, string> = {
   "tpl-imobiliaria-premium": "Imobiliária",
   "tpl-ia-automacao": "Tecnologia / IA",
   "tpl-tecnologia-saas": "Tecnologia / SaaS",
+  "tpl-scalenexus-motors": "Automotivo",
 };
 
 /** Status em que o modelo ainda pode ser escolhido/alterado. Espelha o trigger do banco. */

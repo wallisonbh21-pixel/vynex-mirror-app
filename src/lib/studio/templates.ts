@@ -11,6 +11,8 @@ import { EDUCACAO_DEFAULT_CONTENT, EDUCACAO_TEMPLATE_ID } from './../templates/e
 import { educacaoToStudioData } from './../templates/educacao-inclusiva/to-studio';
 import { ADVOCACIA_DEFAULT_CONTENT, ADVOCACIA_TEMPLATE_ID } from './../templates/advocacia-empresarial/content';
 import { advocaciaToStudioData } from './../templates/advocacia-empresarial/to-studio';
+import { MOTORS_DEFAULT_CONTENT, MOTORS_TEMPLATE_ID } from './../templates/scalenexus-motors/content';
+import { motorsToStudioData } from './../templates/scalenexus-motors/to-studio';
 
 // Helper to create basic elements
 const createText = (type: StudioElement['type'], text: string, styles: any = {}): StudioElement => ({
@@ -255,6 +257,18 @@ export const NICHE_TEMPLATES: LibraryItem[] = [
     preview: ADVOCACIA_DEFAULT_CONTENT.hero.imageUrl,
     structure: advocaciaToStudioData(ADVOCACIA_DEFAULT_CONTENT),
     metadata: { forge_context: 'template_05_advocacia_empresarial', preview_route: '/template/advocacia-empresarial' },
+  },
+  {
+    id: MOTORS_TEMPLATE_ID,
+    name: 'ScaleNexus Motors',
+    description: 'Template 06 oficial: concessionárias, revendas de automóveis e lojas de motos, com estoque, filtros e detalhes do veículo.',
+    category: 'Automotivo',
+    niche: 'concessionaria',
+    type: 'template',
+    tags: ['concessionaria', 'carros', 'motos', 'seminovos', 'revenda', 'automotivo', 'oficial'],
+    preview: MOTORS_DEFAULT_CONTENT.hero.imageUrl,
+    structure: motorsToStudioData(MOTORS_DEFAULT_CONTENT),
+    metadata: { forge_context: 'template_06_scalenexus_motors', preview_route: '/template/scalenexus-motors' },
   },
   {
     id: 'tmpl_burger',
