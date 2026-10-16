@@ -24,7 +24,7 @@ const bodySchema = z.object({
   web_research_requested: z.boolean().optional().default(false),
 });
 
-const MAX_TOOL_ROUNDS = 5;
+const MAX_TOOL_ROUNDS = 10;
 const HISTORY_LIMIT = 24;
 
 function sse(payload: unknown) {
@@ -141,11 +141,14 @@ export const Route = createFileRoute("/api/nexus/chat")({
         const toolsUsed: string[] = [];
         const sourcesUsed: Array<{ title: string; url: string; domain: string; consulted_at: string }> = [];
         const visualsCreated: Array<Record<string, unknown>> = [];
+        let publishedSite: Record<string, unknown> | null = null;
+        const origin = request.headers.get("origin") || new URL(request.url).origin;
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
             const send = (payload: unknown) => controller.enqueue(encoder.encode(sse(payload)));
             let full = "";
+            let exhausted = true;
 
             try {
               for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
@@ -160,6 +163,7 @@ export const Route = createFileRoute("/api/nexus/chat")({
                         ? "Créditos de IA esgotados no espaço de trabalho."
                         : `Falha ao falar com o modelo (status ${status}).`;
                   send({ type: "error", message });
+                  exhausted = false;
                   break;
                 }
 
@@ -203,7 +207,10 @@ export const Route = createFileRoute("/api/nexus/chat")({
                 }
 
                 const pending = Object.values(calls).filter((c) => c.name);
-                if (pending.length === 0) break;
+                if (pending.length === 0) {
+                  exhausted = false;
+                  break;
+                }
 
                 messages.push({
                   role: "assistant",
@@ -224,7 +231,10 @@ export const Route = createFileRoute("/api/nexus/chat")({
                   try {
                     if (!tool) {
                       status = "INDISPONIVEL";
-                      result = { unavailable: true, message: "Essa capacidade ainda não está disponível." };
+                      result = {
+                        unavailable: true,
+                        message: `A ferramenta "${call.name}" não existe. Use somente: ${NEXUS_TOOLS.map((t) => t.name).join(", ")}.`,
+                      };
                     } else {
                       const args = call.args ? JSON.parse(call.args) : {};
                       result = await tool.run(args, {
@@ -232,7 +242,13 @@ export const Route = createFileRoute("/api/nexus/chat")({
                         userId: user.id,
                         roles,
                         conversationId: body.conversation_id,
+                        origin,
                       });
+                      const site = (result as any)?.published === true ? (result as any).site : null;
+                      if (site) {
+                        publishedSite = site;
+                        send({ type: "site", site });
+                      }
                       toolsUsed.push(call.name);
                       const resultSources = (result as any)?.sources;
                       if (Array.isArray(resultSources)) {
@@ -279,7 +295,14 @@ export const Route = createFileRoute("/api/nexus/chat")({
                 }
               }
 
-              if (full.trim()) {
+              if (exhausted) {
+                const note =
+                  "\n\n**AGUARDANDO**\n\nAs etapas executadas até aqui já estão salvas. Ainda faltam etapas para concluir; responda \"continuar\" para eu seguir de onde parei, sem duplicar nada.";
+                full += note;
+                send({ type: "delta", text: note });
+              }
+
+              if (full.trim() || publishedSite) {
                 await supabase.from("nexusbuild_messages").insert({
                   conversation_id: body.conversation_id,
                   user_id: user.id,
@@ -291,6 +314,7 @@ export const Route = createFileRoute("/api/nexus/chat")({
                     tools: toolsUsed,
                     sources: sourcesUsed,
                     visuals: visualsCreated,
+                    site: publishedSite,
                   },
                 });
                 await supabase

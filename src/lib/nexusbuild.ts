@@ -193,6 +193,7 @@ export function useNexusChat(conversationId: string | null) {
               setToolActivity("imagem gerada");
               void client.invalidateQueries({ queryKey: ["visual-assets"] });
             }
+            if (event.type === "site") setToolActivity("site publicado");
             if (event.type === "error") failure = event.message;
           }
         }
