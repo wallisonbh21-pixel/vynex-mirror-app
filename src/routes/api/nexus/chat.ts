@@ -330,7 +330,7 @@ export const Route = createFileRoute("/api/nexus/chat")({
                 type: "error",
                 message:
                   error instanceof Error && error.message === "NEXUS_NO_MODEL_KEY"
-                    ? "O modelo de IA não está configurado neste ambiente."
+                    ? "A NEXUSBUILD AI está indisponível neste ambiente (chave LOVABLE_API_KEY não configurada no servidor). Você ainda pode usar os modelos: em Modelos, clique em \"Editar site\" para editar e publicar manualmente."
                     : "Ocorreu uma falha ao gerar a resposta.",
               });
             } finally {

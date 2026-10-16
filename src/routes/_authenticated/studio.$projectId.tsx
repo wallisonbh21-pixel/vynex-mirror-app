@@ -45,6 +45,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 export const Route = createFileRoute('/_authenticated/studio/$projectId')({
+  validateSearch: (search: Record<string, unknown>): { publicar?: boolean } =>
+    search.publicar === true || search.publicar === '1' || search.publicar === 1 ? { publicar: true } : {},
   beforeLoad: async ({ params }) => {
     const roles = await getCurrentRoles();
     if (roles.includes('admin')) return;
@@ -68,6 +70,7 @@ export const Route = createFileRoute('/_authenticated/studio/$projectId')({
 
 function ScaleNexusStudioPage() {
   const { projectId } = useParams({ from: '/_authenticated/studio/$projectId' });
+  const { publicar } = Route.useSearch();
   const { data: initialData, isLoading } = useStudioData(projectId);
   const saveMutation = useSaveStudioData();
   
@@ -528,6 +531,7 @@ function ScaleNexusStudioPage() {
           <PublishSiteButton
             projectId={projectId}
             defaultName={(briefing as any)?.company_name || 'meu-site'}
+            autoOpen={publicar && !!data}
             onSaveBeforePublish={async () => {
               if (!data) throw new Error('Nada para publicar');
               await saveMutation.mutateAsync({ projectId, data });
