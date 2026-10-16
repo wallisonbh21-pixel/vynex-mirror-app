@@ -2467,6 +2467,7 @@ export type Database = {
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
+      can_edit_project_site: { Args: { _project_id: string }; Returns: boolean }
       can_use_nexusbuild: { Args: { _user_id: string }; Returns: boolean }
       claim_project: {
         Args: { _project_id: string }

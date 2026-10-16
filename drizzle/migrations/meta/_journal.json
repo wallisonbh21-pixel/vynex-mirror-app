@@ -50,6 +50,13 @@
       "when": 1792175995293,
       "tag": "0006_nexusbuild_tool_runs_insert",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792183681822,
+      "tag": "0007_site_images_policies",
+      "breakpoints": true
     }
   ]
 }
