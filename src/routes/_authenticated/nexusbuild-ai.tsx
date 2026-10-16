@@ -181,12 +181,12 @@ function NexusBuildPage() {
           ) : view === "templates" ? (
             <NexusTemplates
               pending={chat.pending || createConversation.isPending}
-              onUse={(template, category) =>
+              onUse={(tpl) =>
                 startFlow(
-                  `Template: ${template}`,
+                  `Template: ${tpl.name}`,
                   "CRIAR_COM_TEMPLATE",
-                  templateFlowPrompt(template, category),
-                  template,
+                  templateFlowPrompt(tpl.name, tpl.category, tpl.id),
+                  tpl.id,
                 )
               }
             />

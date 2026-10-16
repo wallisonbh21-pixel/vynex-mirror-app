@@ -70,11 +70,12 @@ export function appFlowPrompt() {
   ].join(" ");
 }
 
-export function templateFlowPrompt(template: string, category: string) {
+export function templateFlowPrompt(template: string, category: string, templateId?: string) {
   return [
-    `OBJETIVO DESTA CONVERSA: criar um projeto usando o template "${template}" (categoria ${category}).`,
-    "Ainda não há template real cadastrado no ScaleNexus: trate isso como ponto de partida",
-    "estrutural, confirme com o usuário o que ele espera desse modelo e levante apenas as",
-    "informações indispensáveis antes de planejar.",
+    `OBJETIVO DESTA CONVERSA: criar um site usando o modelo oficial "${template}" (categoria ${category})${templateId ? `, template_id ${templateId}` : ""}.`,
+    templateId
+      ? `Use exatamente este template_id em APPLY_TEMPLATE (não troque de modelo sem eu pedir). Mantenha a estrutura, as seções e o visual do modelo; personalize apenas os textos com os dados do meu negócio.`
+      : "Trate o modelo como ponto de partida estrutural.",
+    "Levante apenas as informações indispensáveis (nome do negócio, cidade, contato, diferenciais) antes de criar.",
   ].join(" ");
 }
