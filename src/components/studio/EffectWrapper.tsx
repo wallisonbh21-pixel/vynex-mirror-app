@@ -23,7 +23,7 @@ export function EffectWrapper({
   return <ActiveEffects effects={effects} inline={inline} className={className}>{children}</ActiveEffects>;
 }
 
-function ActiveEffects({ effects, inline, className, children }: { effects: unknown; inline?: boolean; className?: string; children: React.ReactNode }) {
+function ActiveEffects({ effects, inline, className, children }: { effects: unknown; inline?: boolean | undefined; className?: string | undefined; children: React.ReactNode }) {
   const layers = effectLayers(effects);
   const outerRef = useRef<HTMLDivElement>(null);
   const midRef = useRef<HTMLDivElement>(null);
