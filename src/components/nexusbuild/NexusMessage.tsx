@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Copy, ExternalLink, Sparkles, User } from "lucide-react";
+import { Check, Copy, ExternalLink, Globe, PencilRuler, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NexusMessage as NexusMessageType } from "@/lib/nexusbuild";
 import { VisualAssetCard, type VisualAsset } from "@/components/visual/VisualAssetCard";
@@ -23,6 +23,9 @@ export function NexusMessageBubble({
         (source) => typeof source?.url === "string" && /^https?:\/\//i.test(source.url),
       )
     : [];
+  const site = (message.metadata?.["site"] ?? null) as
+    | { site_name?: string; site_path?: string; studio_path?: string; status?: string; version_number?: number }
+    | null;
   const visuals = Array.isArray(message.metadata?.["visuals"])
     ? (message.metadata["visuals"] as VisualAsset[]).filter((asset) => Boolean(asset?.id && asset?.project_id))
     : [];
@@ -75,6 +78,37 @@ export function NexusMessageBubble({
                     <span className="truncate">{source.title || source.domain || source.url}</span>
                   </a>
                 ))}
+              </div>
+            </div>
+          )}
+          {!isUser && site?.site_path && (
+            <div className="mt-4 rounded-xl border border-primary/40 bg-primary/10 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                {site.status === "PUBLICADO" ? "Site publicado" : "Publicação gravada (verificação pendente)"}
+                {site.version_number ? ` · versão ${site.version_number}` : ""}
+              </p>
+              <p className="mt-1 text-base font-semibold text-foreground">{site.site_name}</p>
+              <p className="mt-0.5 break-all text-xs text-muted-foreground">
+                {typeof window !== "undefined" ? window.location.origin : ""}
+                {site.site_path}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={site.site_path}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
+                >
+                  <Globe className="size-3.5" /> Abrir site publicado
+                </a>
+                {site.studio_path && (
+                  <a
+                    href={site.studio_path}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                  >
+                    <PencilRuler className="size-3.5" /> Editar no Studio
+                  </a>
+                )}
               </div>
             </div>
           )}

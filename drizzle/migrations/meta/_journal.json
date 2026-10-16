@@ -43,6 +43,13 @@
       "when": 1792082758564,
       "tag": "0005_clients_restrict_vendedor_view",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792175995293,
+      "tag": "0006_nexusbuild_tool_runs_insert",
+      "breakpoints": true
     }
   ]
 }

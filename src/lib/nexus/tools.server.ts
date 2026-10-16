@@ -33,6 +33,8 @@ export interface NexusToolRuntime {
   userId: string;
   roles: string[];
   conversationId: string;
+  /** Origem pública da requisição (ex.: https://scalenexus.com.br), usada para montar links reais. */
+  origin?: string;
 }
 
 export interface NexusTool {
@@ -47,13 +49,11 @@ export interface NexusTool {
 export const NEXUS_UNAVAILABLE_TOOLS = [
   { name: "app_builder", reason: "construção de aplicativos ainda não foi liberada" },
   { name: "document_generator", reason: "geração de arquivos pela IA ainda não foi liberada" },
-  { name: "deployment_assistant", reason: "assistente de publicação ainda não foi liberado" },
   {
     name: "website_builder (páginas múltiplas, navegação, formulários, gráficos, animações e integrações)",
     reason:
       "o construtor atual monta apenas a página única do Studio, por seções da biblioteca; páginas extras, navegação, formulários, gráficos, animações e integrações ainda não são executáveis",
   },
-  { name: "template_engine", reason: "ainda não há template real cadastrado para gerar projeto automaticamente" },
   {
     name: "image_editing (edição pixel a pixel, recorte, upscale e remoção de fundo)",
     reason:
@@ -439,6 +439,28 @@ export const NEXUS_TOOLS: NexusTool[] = [
         };
       }
 
+      // Retentativa segura: se esta conversa já criou um projeto com o mesmo nome, reutiliza.
+      const { data: existing } = await rt.supabase
+        .from("nexusbuild_build_operations")
+        .select("project_id, projects!inner(id,title,status,site_type)")
+        .eq("conversation_id", rt.conversationId)
+        .eq("operation_type", "CREATE_PROJECT")
+        .eq("status", "OK")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      const reuse = (existing ?? []).find(
+        (row: any) => row.projects && String(row.projects.title).trim().toLowerCase() === title.toLowerCase(),
+      ) as any;
+      if (reuse) {
+        await setActiveProject(rt.supabase, rt.conversationId, reuse.project_id).catch(() => undefined);
+        return {
+          project_id: reuse.project_id,
+          project: reuse.projects,
+          reused: true,
+          message: "Este projeto já havia sido criado nesta conversa; nenhum duplicado foi gerado. Continue a partir dele.",
+        };
+      }
+
       const startedAt = Date.now();
       const { data: project, error } = await rt.supabase
         .from("projects")
@@ -606,6 +628,103 @@ export const NEXUS_TOOLS: NexusTool[] = [
     },
   },
   {
+    name: "publish_site",
+    category: "WRITE",
+    description:
+      "Publica o site do projeto como versão imutável (snapshot do Studio) e devolve o endereço público real. Pode ser chamado de novo para publicar nova versão (mantém o mesmo endereço). Chame primeiro sem confirmed para mostrar o resumo; publique só com confirmed=true após confirmação explícita. Nunca invente a URL: use site_url retornado.",
+    parameters: {
+      type: "object",
+      properties: {
+        project_id: { type: "string" },
+        slug: { type: "string", description: "Endereço desejado (letras minúsculas, números e hífens). Opcional." },
+        confirmed: { type: "boolean" },
+      },
+      required: ["project_id"],
+      additionalProperties: false,
+    },
+    run: async (args, rt) => {
+      const projectId = String(args.project_id ?? "");
+      const bundle = await loadProjectBundle(projectId, rt);
+      const title = String((bundle.project as any).title ?? "site");
+      const state = await loadStudioState(rt.supabase, projectId);
+      const origin = (rt.origin ?? "").replace(/\/$/, "");
+      const studioUrl = `${origin}/studio/${projectId}`;
+      if (state.sections.length === 0) {
+        return {
+          published: false,
+          saved: false,
+          error: "O projeto ainda não tem seções salvas. Monte o site com website_builder antes de publicar.",
+        };
+      }
+      const { data: existingSite } = await rt.supabase
+        .from("project_sites")
+        .select("slug,status")
+        .eq("project_id", projectId)
+        .maybeSingle();
+      const base = slugifySite(String(args.slug ?? "") || (existingSite as any)?.slug || title) || "site";
+
+      if (args.confirmed !== true) {
+        return {
+          published: false,
+          requires_confirmation: true,
+          preview: {
+            site_name: title,
+            sections: state.sections.length,
+            address: `${origin}/s/${(existingSite as any)?.slug ?? base}`,
+            new_version_of_existing_site: Boolean(existingSite),
+          },
+          message: "Nada foi publicado. Apresente este resumo e chame novamente com confirmed=true após a confirmação.",
+        };
+      }
+
+      const candidates = (existingSite as any)?.slug
+        ? [(existingSite as any).slug]
+        : [base, `${base}-${projectId.slice(0, 4)}`, `${base}-${projectId.slice(0, 8)}`];
+      let lastError = "";
+      for (const slug of candidates) {
+        const { data, error } = await rt.supabase.rpc("publish_project_site" as never, { p_project_id: projectId, p_slug: slug } as never);
+        if (error) {
+          lastError = error.message;
+          if (error.message.includes("já está em uso")) continue;
+          break;
+        }
+        const row = (Array.isArray(data) ? data[0] : data) as { slug: string; version_number: number } | null;
+        if (!row?.slug) {
+          lastError = "A publicação não retornou o endereço.";
+          break;
+        }
+        // Confirma que a versão pública é realmente recuperável.
+        const { data: check } = await rt.supabase.rpc("get_published_site" as never, { p_slug: row.slug } as never);
+        const ok = Array.isArray(check) ? check.length > 0 : Boolean(check);
+        const site = {
+          site_name: title,
+          project_id: projectId,
+          site_url: `${origin}/s/${row.slug}`,
+          site_path: `/s/${row.slug}`,
+          studio_url: studioUrl,
+          studio_path: `/studio/${projectId}`,
+          version_number: row.version_number,
+          status: ok ? "PUBLICADO" : "PUBLICADO_SEM_CONFIRMACAO",
+        };
+        return {
+          published: true,
+          verified: ok,
+          site,
+          message: ok
+            ? "Site publicado e verificado. Entregue ao usuário exatamente site_url e studio_url."
+            : "A publicação foi gravada, mas a leitura pública não confirmou. Informe isso ao usuário.",
+        };
+      }
+      return {
+        published: false,
+        saved: true,
+        studio_url: studioUrl,
+        error: lastError || "Falha desconhecida na publicação.",
+        message: "O site continua salvo no Studio. Informe o motivo e ofereça tentar publicar novamente.",
+      };
+    },
+  },
+  {
     name: "list_section_templates",
     category: "READ",
     description:
@@ -730,6 +849,16 @@ export const NEXUS_TOOLS: NexusTool[] = [
     },
   },
 ];
+
+function slugifySite(input: string) {
+  return input
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 50);
+}
 
 export function toolSchemas(): NexusToolSchema[] {
   return NEXUS_TOOLS.map((t) => ({
