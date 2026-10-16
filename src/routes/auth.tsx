@@ -32,6 +32,10 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { trocar?: boolean } =>
+    search['trocar'] === true || search['trocar'] === "1" || search['trocar'] === "true"
+      ? { trocar: true }
+      : {},
   component: AuthPage,
 });
 
@@ -46,6 +50,7 @@ type RpcCliente = {
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { trocar } = Route.useSearch();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,11 +59,33 @@ function AuthPage() {
   const [adminExists, setAdminExists] = useState(true);
   const [mode, setMode] = useState<"login" | "recover">("login");
 
+  // Sessão válida sem pedido de troca: entra direto no painel do papel correto.
+  // Com ?trocar=1: encerra a sessão atual e mostra o formulário vazio.
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/painel", replace: true });
-    });
-  }, [navigate]);
+    let active = true;
+    (async () => {
+      if (trocar) {
+        await supabase.auth.signOut();
+        return;
+      }
+      const { data } = await supabase.auth.getUser();
+      if (active && data.user) await redirectByRole(data.user.id, !!data.user.user_metadata?.['must_change_password']);
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trocar]);
+
+  async function redirectByRole(userId: string, mustChange: boolean) {
+    if (mustChange) {
+      navigate({ to: "/reset-password", replace: true });
+      return;
+    }
+    const { data: rolesData } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const roles = rolesData?.map((r) => r.role) ?? [];
+    navigate({ to: roles.includes("cliente") && roles.length === 1 ? "/cliente" : "/painel", replace: true });
+  }
 
   // Cadastro público de administrador só existe enquanto não houver nenhum.
   useEffect(() => {
@@ -83,26 +110,8 @@ function AuthPage() {
       return;
     }
     
-    // Identificar o papel e redirecionar
     const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user?.user_metadata?.['must_change_password']) {
-      navigate({ to: "/reset-password", replace: true });
-      return;
-    }
-
-    const { data: rolesData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user?.id || "");
-      
-    const roles = rolesData?.map(r => r.role) || [];
-    
-    const state = (window.history.state as any);
-    const from = state?.usr?.from || (roles.includes("cliente") ? "/cliente" : "/painel");
-    
-    navigate({ to: from, replace: true });
-
+    if (user) await redirectByRole(user.id, !!user.user_metadata?.['must_change_password']);
   }
 
 
@@ -161,6 +170,7 @@ function AuthPage() {
   async function signInWithGoogle() {
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
+      extraParams: { prompt: "select_account" },
     });
     if (result.error) {
       toast.error("Não foi possível entrar com o Google.");
