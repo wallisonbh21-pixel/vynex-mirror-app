@@ -10,6 +10,7 @@ import {
   Layers,
   LayoutDashboard,
   LogOut,
+  Repeat,
   Menu,
   BellRing,
   CircleDollarSign,
@@ -297,6 +298,13 @@ export function AppShell({
     navigate({ to: "/auth", replace: true });
   }
 
+  async function switchAccount() {
+    await queryCliente.cancelQueries();
+    queryCliente.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", search: { trocar: true }, replace: true });
+  }
+
   const sidebar = (
     <SidebarContent
       items={items}
@@ -307,6 +315,7 @@ export function AppShell({
       avatarUrl={avatarUrl ?? null}
       initials={initials}
       onSignOut={signOut}
+      onSwitchAccount={switchAccount}
     />
   );
 
@@ -466,6 +475,14 @@ function SidebarContent({
           onClick={onSignOut}
         >
           <LogOut className="size-4 mr-2" /> Sair da conta
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start text-xs font-semibold"
+          onClick={onSwitchAccount}
+        >
+          <Repeat className="size-4 mr-2" /> Trocar de conta
         </Button>
       </div>
     </>
