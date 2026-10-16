@@ -11,6 +11,7 @@
  * e em testes sem efeitos colaterais.
  */
 import { NICHE_TEMPLATES, SECTION_TEMPLATES } from "@/lib/studio/templates";
+import { validateItemsParams, validateVehicles } from "./structured-content";
 
 /** Modelos oficiais completos que a IA pode aplicar (mesma fonte da Biblioteca Central). */
 export const OFFICIAL_SITE_TEMPLATES = NICHE_TEMPLATES.filter((t) => t.metadata?.["preview_route"]);
@@ -25,7 +26,9 @@ export type NexusBuildOperationType =
   | "REORDER_SECTIONS"
   | "UPDATE_DESIGN_SYSTEM"
   | "REMOVE_SECTION"
-  | "APPLY_TEMPLATE";
+  | "APPLY_TEMPLATE"
+  | "SET_ITEMS"
+  | "SET_VEHICLES";
 
 /** Operações previstas na arquitetura, ainda NÃO executáveis neste modelo de dados. */
 export const UNSUPPORTED_OPERATIONS: Record<string, string> = {
@@ -164,6 +167,25 @@ export function validateBuildPlan(rawOperations: unknown, currentSectionCount: n
         operations.push({ type, params });
         return;
       }
+      case "SET_ITEMS": {
+        const errs = validateItemsParams(params);
+        if (errs.length) {
+          errs.slice(0, 8).forEach((message) => issues.push({ index, type, message }));
+          return;
+        }
+        operations.push({ type, params });
+        return;
+      }
+      case "SET_VEHICLES": {
+        const { vehicles, errors } = validateVehicles(params.vehicles);
+        if (params.whatsapp !== undefined && !/^\d{10,13}$/.test(String(params.whatsapp))) errors.push("whatsapp deve ter só dígitos com DDI+DDD (ex.: 5511999999999).");
+        if (errors.length) {
+          errors.slice(0, 10).forEach((message) => issues.push({ index, type, message }));
+          return;
+        }
+        operations.push({ type, params: { vehicles, whatsapp: params.whatsapp } });
+        return;
+      }
       case "REORDER_SECTIONS": {
         if (!Array.isArray(params.section_ids) || params.section_ids.some((id: unknown) => typeof id !== "string")) {
           issues.push({ index, type, message: "section_ids deve ser uma lista de identificadores de seção." });
@@ -216,6 +238,10 @@ export function describeOperation(op: NexusBuildOperation): string {
       return "Atualizar o sistema visual (cores, tipografia, botões, cards)";
     case "APPLY_TEMPLATE":
       return `Aplicar o modelo "${findOfficialTemplate(op.params.template_id)?.name ?? op.params.template_id}" (substitui as seções atuais)`;
+    case "SET_ITEMS":
+      return `Preencher ${op.params.items.length} item(ns) (${op.params.kind}) na seção ${op.params.section_id}${op.params.demo ? " — demonstrativo" : ""}`;
+    case "SET_VEHICLES":
+      return `Substituir o estoque por ${op.params.vehicles.length} veículo(s) (${op.params.vehicles.filter((v: any) => v.demo).length} demonstrativo(s))`;
     case "REMOVE_SECTION":
       return `Remover a seção ${op.params.section_id} (ação destrutiva)`;
     default:
