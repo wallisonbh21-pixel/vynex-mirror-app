@@ -375,6 +375,7 @@ function SidebarContent({
   avatarUrl,
   initials,
   onSignOut,
+  onSwitchAccount,
 }: {
   items: NavItem[];
   pathname: string;
@@ -384,6 +385,7 @@ function SidebarContent({
   avatarUrl: string | null;
   initials: string;
   onSignOut: () => void;
+  onSwitchAccount: () => void;
 }) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
