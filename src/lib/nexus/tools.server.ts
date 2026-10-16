@@ -16,6 +16,7 @@ import type { NexusToolSchema } from "./provider.server";
 import { inspectWebsite, searchWeb } from "./web-research.server";
 import {
   availableSectionTemplates,
+  availableSiteTemplates,
   describeOperation,
   validateBuildPlan,
   MAX_OPERATIONS_PER_CALL,
@@ -584,7 +585,7 @@ export const NEXUS_TOOLS: NexusTool[] = [
           next_step:
             report.failed > 0
               ? "Informe ao usuário exatamente quais operações falharam e por quê. Não afirme que tudo foi concluído."
-              : "Use project_analysis para revisar o resultado e propor melhorias.",
+              : "Para preencher conteúdo, use UPDATE_SECTION com os section_id reais retornados em entries[].section_ids / sections[].id (nunca invente ids). Depois use project_analysis para revisar.",
         };
       } finally {
         const rows = (report?.entries ?? [{ type: "BUILD", status: "FALHOU" as const, detail: "Execução interrompida." }]).map(
@@ -608,9 +609,9 @@ export const NEXUS_TOOLS: NexusTool[] = [
     name: "list_section_templates",
     category: "READ",
     description:
-      "Lista as seções realmente disponíveis na biblioteca do Studio para uso em ADD_SECTION. Use antes de montar um plano de construção.",
+      "Lista as seções disponíveis para ADD_SECTION e os modelos oficiais completos (site_templates) para APPLY_TEMPLATE. Use antes de montar um plano de construção.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
-    run: async () => ({ templates: availableSectionTemplates() }),
+    run: async () => ({ templates: availableSectionTemplates(), site_templates: availableSiteTemplates() }),
   },
   {
     name: "visual_assets_list",
