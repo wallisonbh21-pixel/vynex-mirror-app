@@ -85,6 +85,7 @@ import { Route as ComeceSeuProjetoRefTokenRouteImport } from './routes/comece-se
 import { Route as TemplateScalenexusMotorsIndexRouteImport } from './routes/template.scalenexus-motors.index'
 import { Route as TemplateScalenexusMotorsContatoRouteImport } from './routes/template.scalenexus-motors.contato'
 import { Route as TemplateScalenexusMotorsEstoqueRouteImport } from './routes/template.scalenexus-motors.estoque'
+import { Route as ApiPublicSiteImageSplatRouteImport } from './routes/api/public/site-image.$'
 import { Route as TemplateScalenexusMotorsVeiculoVehicleIdRouteImport } from './routes/template.scalenexus-motors.veiculo.$vehicleId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -508,6 +509,11 @@ const TemplateScalenexusMotorsEstoqueRoute =
     path: '/template/scalenexus-motors/estoque',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSiteImageSplatRoute = ApiPublicSiteImageSplatRouteImport.update({
+  id: '/api/public/site-image/$',
+  path: '/api/public/site-image/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemplateScalenexusMotorsVeiculoVehicleIdRoute =
   TemplateScalenexusMotorsVeiculoVehicleIdRouteImport.update({
     id: '/template/scalenexus-motors/veiculo/$vehicleId',
@@ -591,6 +597,7 @@ export interface FileRoutesByFullPath {
   '/leads/': typeof AuthenticatedLeadsIndexRoute
   '/reunioes/': typeof AuthenticatedReunioesIndexRoute
   '/template/scalenexus-motors/': typeof TemplateScalenexusMotorsIndexRoute
+  '/api/public/site-image/$': typeof ApiPublicSiteImageSplatRoute
   '/template/scalenexus-motors/veiculo/$vehicleId': typeof TemplateScalenexusMotorsVeiculoVehicleIdRoute
 }
 export interface FileRoutesByTo {
@@ -668,6 +675,7 @@ export interface FileRoutesByTo {
   '/leads': typeof AuthenticatedLeadsIndexRoute
   '/reunioes': typeof AuthenticatedReunioesIndexRoute
   '/template/scalenexus-motors': typeof TemplateScalenexusMotorsIndexRoute
+  '/api/public/site-image/$': typeof ApiPublicSiteImageSplatRoute
   '/template/scalenexus-motors/veiculo/$vehicleId': typeof TemplateScalenexusMotorsVeiculoVehicleIdRoute
 }
 export interface FileRoutesById {
@@ -748,6 +756,7 @@ export interface FileRoutesById {
   '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
   '/_authenticated/reunioes/': typeof AuthenticatedReunioesIndexRoute
   '/template/scalenexus-motors/': typeof TemplateScalenexusMotorsIndexRoute
+  '/api/public/site-image/$': typeof ApiPublicSiteImageSplatRoute
   '/template/scalenexus-motors/veiculo/$vehicleId': typeof TemplateScalenexusMotorsVeiculoVehicleIdRoute
 }
 export interface FileRouteTypes {
@@ -828,6 +837,7 @@ export interface FileRouteTypes {
     | '/leads/'
     | '/reunioes/'
     | '/template/scalenexus-motors/'
+    | '/api/public/site-image/$'
     | '/template/scalenexus-motors/veiculo/$vehicleId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -905,6 +915,7 @@ export interface FileRouteTypes {
     | '/leads'
     | '/reunioes'
     | '/template/scalenexus-motors'
+    | '/api/public/site-image/$'
     | '/template/scalenexus-motors/veiculo/$vehicleId'
   id:
     | '__root__'
@@ -984,6 +995,7 @@ export interface FileRouteTypes {
     | '/_authenticated/leads/'
     | '/_authenticated/reunioes/'
     | '/template/scalenexus-motors/'
+    | '/api/public/site-image/$'
     | '/template/scalenexus-motors/veiculo/$vehicleId'
   fileRoutesById: FileRoutesById
 }
@@ -1010,6 +1022,7 @@ export interface RootRouteChildren {
   TemplateScalenexusMotorsContatoRoute: typeof TemplateScalenexusMotorsContatoRoute
   TemplateScalenexusMotorsEstoqueRoute: typeof TemplateScalenexusMotorsEstoqueRoute
   TemplateScalenexusMotorsIndexRoute: typeof TemplateScalenexusMotorsIndexRoute
+  ApiPublicSiteImageSplatRoute: typeof ApiPublicSiteImageSplatRoute
   TemplateScalenexusMotorsVeiculoVehicleIdRoute: typeof TemplateScalenexusMotorsVeiculoVehicleIdRoute
 }
 
@@ -1547,6 +1560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplateScalenexusMotorsEstoqueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/site-image/$': {
+      id: '/api/public/site-image/$'
+      path: '/api/public/site-image/$'
+      fullPath: '/api/public/site-image/$'
+      preLoaderRoute: typeof ApiPublicSiteImageSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/template/scalenexus-motors/veiculo/$vehicleId': {
       id: '/template/scalenexus-motors/veiculo/$vehicleId'
       path: '/template/scalenexus-motors/veiculo/$vehicleId'
@@ -1734,6 +1754,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplateScalenexusMotorsContatoRoute: TemplateScalenexusMotorsContatoRoute,
   TemplateScalenexusMotorsEstoqueRoute: TemplateScalenexusMotorsEstoqueRoute,
   TemplateScalenexusMotorsIndexRoute: TemplateScalenexusMotorsIndexRoute,
+  ApiPublicSiteImageSplatRoute: ApiPublicSiteImageSplatRoute,
   TemplateScalenexusMotorsVeiculoVehicleIdRoute:
     TemplateScalenexusMotorsVeiculoVehicleIdRoute,
 }
