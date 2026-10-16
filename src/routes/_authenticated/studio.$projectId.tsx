@@ -688,6 +688,7 @@ function ScaleNexusStudioPage() {
                  section={selectedSection}
                  designSystem={data.design_system}
                  onUpdateElement={handleUpdateElement}
+                 projectId={projectId}
                  onUpdateSection={handleUpdateSection}
                  onUpdateDesignSystem={handleUpdateDesignSystem}
                />
