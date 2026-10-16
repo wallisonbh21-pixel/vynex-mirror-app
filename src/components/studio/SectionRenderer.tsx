@@ -1,6 +1,8 @@
 import React from 'react';
 import { StudioSection, StudioDesignSystem } from '@/types/studio';
 import { ElementRenderer } from './ElementRenderer';
+import { EffectWrapper } from './EffectWrapper';
+import { isSafeImageUrl } from '@/lib/studio/site-images';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ChevronUp, ChevronDown, Copy, Trash2 } from 'lucide-react';
@@ -43,7 +45,7 @@ export function SectionRenderer({
         backgroundColor: styles['backgroundColor'] || designSystem.colors.background,
         paddingTop: styles['paddingTop'] || '4rem',
         paddingBottom: styles['paddingBottom'] || '4rem',
-        backgroundImage: styles['backgroundImage'] ? `url(${styles['backgroundImage']})` : 'none',
+        backgroundImage: isSafeImageUrl(styles['backgroundImage']) ? `url("${styles['backgroundImage']}")` : 'none',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         color: styles['backgroundColor'] === '#0f172a' ? '#ffffff' : designSystem.colors.text
@@ -81,6 +83,7 @@ export function SectionRenderer({
       </div>
       )}
 
+      <EffectWrapper effects={section.effects}>
       <div className={cn(
         "container mx-auto px-4",
         styles['layout'] === 'centered' && "text-center flex flex-col items-center"
@@ -104,6 +107,7 @@ export function SectionRenderer({
           </div>
         )}
       </div>
+      </EffectWrapper>
     </div>
   );
 }

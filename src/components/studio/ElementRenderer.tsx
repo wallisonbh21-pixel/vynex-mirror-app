@@ -1,6 +1,8 @@
 import React from 'react';
 import { StudioElement, StudioDesignSystem } from '@/types/studio';
 import { cn } from '@/lib/utils';
+import { isSafeImageUrl } from '@/lib/studio/site-images';
+import { EffectWrapper } from './EffectWrapper';
 
 interface ElementRendererProps {
   element: StudioElement;
@@ -10,7 +12,17 @@ interface ElementRendererProps {
   readOnly?: boolean | undefined;
 }
 
-export function ElementRenderer({ element, designSystem, isSelected, onSelect, readOnly }: ElementRendererProps) {
+export function ElementRenderer(props: ElementRendererProps) {
+  const { type, effects } = props.element;
+  const inline = type === 'button' || type === 'whatsapp';
+  return (
+    <EffectWrapper effects={effects} inline={inline}>
+      <BaseElement {...props} />
+    </EffectWrapper>
+  );
+}
+
+function BaseElement({ element, designSystem, isSelected, onSelect, readOnly }: ElementRendererProps) {
   const { type, content, styles } = element;
 
   const handleClick = (e: React.MouseEvent) => {
@@ -108,12 +120,35 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect, r
         </button>
       );
 
-    case 'image':
+    case 'image': {
+      const removed = content.removed === true;
+      if (removed) {
+        // Estado vazio: no site publicado some ou vira espaço neutro; no Studio fica visível para edição.
+        if (readOnly && content.emptyMode !== 'placeholder') return null;
+        return (
+          <div
+            className={cn(commonClasses, "w-full flex items-center justify-center text-center")}
+            style={{
+              aspectRatio: '16 / 9',
+              maxWidth: styles['maxWidth'] || '100%',
+              borderRadius: styles['borderRadius'] || '12px',
+              background: `linear-gradient(135deg, ${designSystem.colors.surface}, ${designSystem.colors.background})`,
+              border: readOnly ? 'none' : `2px dashed ${designSystem.colors.border}`,
+              color: designSystem.colors.textSecondary,
+            }}
+            onClick={handleClick}
+          >
+            {!readOnly && <span className="text-xs px-3">Imagem removida — selecione para enviar outra ou restaurar</span>}
+          </div>
+        );
+      }
+      const safe = isSafeImageUrl(content.url) ? content.url : undefined;
       return (
         <div className={commonClasses} onClick={handleClick}>
           <img 
-            src={content.url || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80'} 
+            src={safe || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80'} 
             alt={content.alt || ''} 
+            loading="lazy"
             className="w-full h-auto object-cover"
             style={{
               borderRadius: styles['borderRadius'] || '0px',
@@ -122,6 +157,7 @@ export function ElementRenderer({ element, designSystem, isSelected, onSelect, r
           />
         </div>
       );
+    }
 
     case 'whatsapp':
       return (

@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { ImageControls } from './ImageControls';
+import { EffectsPanel } from './EffectsPanel';
 
 interface PropertyPanelProps {
   element: StudioElement | null;
@@ -13,6 +15,7 @@ interface PropertyPanelProps {
   onUpdateElement: (id: string, updates: Partial<StudioElement>) => void;
   onUpdateSection: (id: string, updates: Partial<StudioSection>) => void;
   onUpdateDesignSystem: (updates: Partial<StudioDesignSystem>) => void;
+  projectId?: string;
 }
 
 export function PropertyPanel({ 
@@ -21,7 +24,8 @@ export function PropertyPanel({
   designSystem, 
   onUpdateElement, 
   onUpdateSection, 
-  onUpdateDesignSystem 
+  onUpdateDesignSystem,
+  projectId,
 }: PropertyPanelProps) {
 
   if (element) {
@@ -36,7 +40,13 @@ export function PropertyPanel({
           <TabsList className="w-full bg-slate-900 border-slate-800">
             <TabsTrigger value="content" className="flex-1 text-[10px] uppercase">Conteúdo</TabsTrigger>
             <TabsTrigger value="style" className="flex-1 text-[10px] uppercase">Estilo</TabsTrigger>
+            <TabsTrigger value="effects" className="flex-1 text-[10px] uppercase">Efeitos</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="effects" className="pt-4">
+            <p className="text-xs font-semibold text-slate-300 mb-2">Efeitos visuais</p>
+            <EffectsPanel effects={element.effects} onChange={(fx) => onUpdateElement(element.id, { effects: fx })} />
+          </TabsContent>
 
           <TabsContent value="content" className="space-y-4 pt-4">
             {['title', 'subtitle', 'paragraph', 'button', 'whatsapp'].includes(element.type) && (
@@ -50,14 +60,27 @@ export function PropertyPanel({
               </div>
             )}
             
+            {element.type === 'image' && projectId && (
+              <ImageControls
+                projectId={projectId}
+                label="Imagem"
+                url={element.content.url}
+                removed={element.content.removed === true}
+                originalUrl={element.content.originalUrl}
+                emptyMode={element.content.emptyMode}
+                onEmptyModeChange={(mode) => onUpdateElement(element.id, { content: { ...element.content, emptyMode: mode } })}
+                onChange={({ url, removed, originalUrl }) =>
+                  onUpdateElement(element.id, { content: { ...element.content, url, removed, originalUrl } })
+                }
+              />
+            )}
             {element.type === 'image' && (
               <div className="space-y-2">
-                <Label className="text-xs text-slate-400">URL da Imagem</Label>
-                <Input 
-                  value={element.content.url || ''} 
-                  onChange={(e) => onUpdateElement(element.id, { content: { ...element.content, url: e.target.value } })}
+                <Label className="text-xs text-slate-400">Texto alternativo (acessibilidade)</Label>
+                <Input
+                  value={element.content.alt || ''}
+                  onChange={(e) => onUpdateElement(element.id, { content: { ...element.content, alt: e.target.value } })}
                   className="bg-slate-900 border-slate-800 text-slate-200"
-                  placeholder="https://..."
                 />
               </div>
             )}
@@ -140,7 +163,28 @@ export function PropertyPanel({
           <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase">{section.id}</span>
         </div>
 
+        <Tabs defaultValue="style">
+          <TabsList className="w-full bg-slate-900 border-slate-800">
+            <TabsTrigger value="style" className="flex-1 text-[10px] uppercase">Estilo</TabsTrigger>
+            <TabsTrigger value="effects" className="flex-1 text-[10px] uppercase">Efeitos visuais</TabsTrigger>
+          </TabsList>
+          <TabsContent value="effects" className="pt-4">
+            <EffectsPanel effects={section.effects} onChange={(fx) => onUpdateSection(section.id, { effects: fx })} />
+          </TabsContent>
+          <TabsContent value="style" className="pt-4">
         <div className="space-y-4">
+           {projectId && (
+             <ImageControls
+               projectId={projectId}
+               label="Imagem de fundo"
+               url={section.styles['backgroundImage']}
+               removed={section.styles['backgroundRemoved'] === true}
+               originalUrl={section.styles['originalBackgroundImage']}
+               onChange={({ url, removed, originalUrl }) =>
+                 onUpdateSection(section.id, { styles: { ...section.styles, backgroundImage: url, backgroundRemoved: removed, originalBackgroundImage: originalUrl } })
+               }
+             />
+           )}
            <div className="space-y-2">
               <Label className="text-xs text-slate-400">Cor de Fundo</Label>
               <div className="flex gap-2">
@@ -181,6 +225,8 @@ export function PropertyPanel({
               />
            </div>
         </div>
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }

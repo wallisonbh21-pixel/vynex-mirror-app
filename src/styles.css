@@ -341,3 +341,27 @@
     transform: none;
   }
 }
+
+/* ===== Efeitos visuais do Studio (opcionais, por elemento/seção) ===== */
+@keyframes fx-float-kf { 0%,100% { transform: translateY(0); } 50% { transform: translateY(calc(-1 * var(--fx-float-dist, 8px))); } }
+@keyframes fx-loop-kf { 0%,100% { transform: scale(1); } 50% { transform: scale(var(--fx-loop-scale, 1.02)); } }
+.fx-float { animation: fx-float-kf var(--fx-float-dur, 5s) ease-in-out infinite; }
+.fx-loop { animation: fx-loop-kf var(--fx-loop-dur, 4s) ease-in-out infinite; }
+.fx-float.fx-loop { animation: fx-float-kf var(--fx-float-dur, 5s) ease-in-out infinite, fx-loop-kf var(--fx-loop-dur, 4s) ease-in-out infinite; }
+.fx-zoom { overflow: hidden; }
+.fx-zoom > * { transition: transform var(--fx-zoom-dur, .5s) ease; }
+.fx-zoom:hover > *, .fx-zoom:active > *, .fx-zoom:focus-within > * { transform: scale(var(--fx-zoom, 1.06)); }
+.fx-glow { transition: filter var(--fx-glow-dur, .4s) ease; }
+.fx-glow:hover, .fx-glow:active, .fx-glow:focus-within { filter: brightness(var(--fx-glow, 1.06)) drop-shadow(0 0 var(--fx-glow-size, 12px) rgba(255,255,255,.35)); }
+.fx-glass { backdrop-filter: blur(var(--fx-glass-blur, 10px)); -webkit-backdrop-filter: blur(var(--fx-glass-blur, 10px)); background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: 16px; padding: 1rem; }
+.fx-parallax { will-change: transform; }
+.fx-reveal { opacity: 0; transform: translateY(var(--fx-rev-dist, 40px)); transition: opacity var(--fx-rev-dur, .8s) ease, transform var(--fx-rev-dur, .8s) ease; }
+.fx-slide { opacity: 0; translate: var(--fx-slide-x, -60px) 0; transition: opacity var(--fx-slide-dur, .8s) ease, translate var(--fx-slide-dur, .8s) ease; }
+.fx-fade { opacity: 0; transition: opacity var(--fx-fade-dur, 1.2s) ease var(--fx-fade-delay, 0s); }
+.fx-reveal.fx-in, .fx-slide.fx-in, .fx-fade.fx-in { opacity: 1; transform: none; translate: 0 0; }
+@media (prefers-reduced-motion: reduce) {
+  .fx-float, .fx-loop { animation: none !important; }
+  .fx-reveal, .fx-slide, .fx-fade { opacity: 1 !important; transform: none !important; translate: 0 0 !important; transition: none !important; }
+  .fx-zoom > *, .fx-glow { transition: none !important; }
+  .fx-parallax { transform: none !important; }
+}
