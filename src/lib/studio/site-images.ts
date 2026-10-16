@@ -50,10 +50,12 @@ export function siteImageUrl(path: string) {
   return `${SITE_IMAGE_ROUTE}${path}`;
 }
 
-/** Só aceitamos imagens https ou as enviadas para o próprio projeto. */
+/** Aceita http(s), imagens enviadas ao projeto e caminhos do próprio site; bloqueia javascript:, data: etc. */
 export function isSafeImageUrl(url: string | null | undefined): boolean {
-  if (!url) return false;
+  if (!url || typeof url !== "string") return false;
   const u = url.trim();
+  if (/["'()\\\s]/.test(u)) return false;
   if (u.startsWith(SITE_IMAGE_ROUTE)) return SITE_IMAGE_PATH_RE.test(u.slice(SITE_IMAGE_ROUTE.length));
-  return /^https:\/\//i.test(u);
+  if (u.startsWith("/") && !u.startsWith("//")) return true;
+  return /^https?:\/\//i.test(u);
 }
