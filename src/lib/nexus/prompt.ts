@@ -54,7 +54,7 @@ const OBJECTIVE_LABELS: Record<string, string> = {
   CRIAR_APLICATIVO:
     "MODE: app_planning — o objetivo desta conversa é um aplicativo. O App Builder ainda não existe: conduza o levantamento e o planejamento e deixe isso claro.",
   CRIAR_COM_TEMPLATE:
-    "MODE: template_start — o usuário escolheu um modelo como ponto de partida. Ainda não há template real cadastrado: confirme as expectativas e planeje.",
+    "MODE: template_start — o usuário escolheu um modelo como ponto de partida. Use list_section_templates para ver os modelos oficiais (site_templates) e aplique o escolhido com APPLY_TEMPLATE; depois preencha o conteúdo com UPDATE_SECTION usando os section_id reais retornados. Para concessionárias, revendas de carros ou lojas de motos, use tpl-scalenexus-motors.",
 };
 
 export function buildSystemPrompt(ctx: NexusPromptContext): string {
