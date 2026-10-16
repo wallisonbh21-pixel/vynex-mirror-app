@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Star } from "lucide-react";
+import { useState } from "react";
+import { Eye, Globe, Loader2, PencilLine, Star } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { openTemplateProject } from "@/lib/templates/start-project";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { requireCriadorOuAdmin } from "@/lib/guard";
@@ -19,12 +23,25 @@ export const Route = createFileRoute("/_authenticated/biblioteca-modelos")({
 /** Visualização somente leitura da biblioteca central (mesma fonte do Admin e do Studio). */
 function BibliotecaCriador() {
   const { data = [], isLoading } = useTemplateLibrary();
+  const navigate = useNavigate();
+  const [opening, setOpening] = useState<string | null>(null);
+  const openManual = async (id: string, publish: boolean) => {
+    setOpening(id);
+    try {
+      const { projectId } = await openTemplateProject(id);
+      await navigate({ to: "/studio/$projectId", params: { projectId }, search: publish ? { publicar: true } : {} });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível abrir o modelo.");
+    } finally {
+      setOpening(null);
+    }
+  };
   const models = data
     .filter((m) => m.settings.status === "ativo" && m.settings.available_for_creators)
     .sort((a, b) => a.settings.display_order - b.settings.display_order);
 
   return (
-    <AppShell title="Modelos de sites" description="Veja os modelos disponíveis. Para usar um modelo, abra o Studio do projeto e vá em Templates.">
+    <AppShell title="Modelos de sites" description="Visualize, edite e publique um modelo oficial — sem depender da IA.">
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Carregando…</p>
       ) : models.length === 0 ? (
@@ -41,9 +58,17 @@ function BibliotecaCriador() {
                 </div>
                 <p className="text-xs text-muted-foreground">{m.category}</p>
                 <p className="flex-1 text-sm text-muted-foreground">{m.description}</p>
-                <Button asChild size="sm" variant="outline" className="gap-2">
-                  <a href={m.previewRoute} target="_blank" rel="noreferrer"><Eye className="size-3" /> Ver prévia</a>
-                </Button>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button asChild size="sm" variant="outline" className="gap-1">
+                    <a href={m.previewRoute} target="_blank" rel="noreferrer"><Eye className="size-3" /> Visualizar</a>
+                  </Button>
+                  <Button size="sm" className="gap-1" disabled={opening !== null} onClick={() => openManual(m.id, false)}>
+                    {opening === m.id ? <Loader2 className="size-3 animate-spin" /> : <PencilLine className="size-3" />} Editar site
+                  </Button>
+                  <Button size="sm" variant="secondary" className="gap-1" disabled={opening !== null} onClick={() => openManual(m.id, true)}>
+                    <Globe className="size-3" /> Publicar site
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

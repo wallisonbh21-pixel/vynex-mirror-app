@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Eye, LayoutGrid, Loader2, Monitor, Search, Smartphone, Sparkles } from "lucide-react";
+import { ArrowLeft, Eye, Globe, LayoutGrid, Loader2, Monitor, PencilLine, Search, Smartphone, Sparkles } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { openTemplateProject } from "@/lib/templates/start-project";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -79,9 +82,11 @@ function PreviewDialog({
   onClose,
   onUse,
   pending,
+  onEdit,
 }: {
   model: LibraryModel | null;
   onClose: () => void;
+  onEdit?: (m: LibraryModel) => void;
   onUse: (m: LibraryModel) => void;
   pending: boolean;
 }) {
@@ -121,8 +126,13 @@ function PreviewDialog({
                     </button>
                   ))}
                 </div>
+                {onEdit && (
+                  <Button size="sm" variant="outline" onClick={() => onEdit(model)}>
+                    <PencilLine className="mr-1 size-4" /> Editar site
+                  </Button>
+                )}
                 <Button size="sm" disabled={pending} onClick={() => onUse(model)}>
-                  <Sparkles className="mr-1 size-4" /> Usar este template
+                  <Sparkles className="mr-1 size-4" /> Usar com IA
                 </Button>
               </div>
             </div>
@@ -173,6 +183,22 @@ export function NexusTemplates({
     const matchQ = !q || `${m.name} ${m.category} ${m.description}`.toLowerCase().includes(q);
     return matchQ && (category === "Todos" || m.category === category);
   });
+
+  const navigate = useNavigate();
+  const [opening, setOpening] = useState<string | null>(null);
+  /** Fluxo manual, sem IA: cria/reabre o projeto do modelo e abre o Studio. */
+  const openManual = async (m: LibraryModel, publish: boolean) => {
+    setOpening(m.id);
+    try {
+      const { projectId, created } = await openTemplateProject(m.id);
+      toast.success(created ? "Projeto criado a partir do modelo." : "Abrindo seu projeto deste modelo.");
+      await navigate({ to: "/studio/$projectId", params: { projectId }, search: publish ? { publicar: true } : {} });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível abrir o modelo.");
+    } finally {
+      setOpening(null);
+    }
+  };
 
   const use = (m: LibraryModel) => {
     setPreviewing(null);
@@ -258,21 +284,27 @@ export function NexusTemplates({
                 </span>
                 <h3 className="text-sm font-semibold">{m.name}</h3>
                 <p className="line-clamp-2 text-xs text-muted-foreground">{m.description}</p>
-                <div className="mt-auto flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => setPreviewing(m)}>
+                <div className="mt-auto grid grid-cols-3 gap-2 pt-2">
+                  <Button variant="outline" size="sm" onClick={() => setPreviewing(m)}>
                     <Eye className="mr-1 size-4" /> Visualizar
                   </Button>
-                  <Button size="sm" className="flex-1" disabled={pending} onClick={() => use(m)}>
-                    Usar este template
+                  <Button size="sm" disabled={opening !== null} onClick={() => openManual(m, false)}>
+                    {opening === m.id ? <Loader2 className="mr-1 size-4 animate-spin" /> : <PencilLine className="mr-1 size-4" />} Editar site
+                  </Button>
+                  <Button variant="secondary" size="sm" disabled={opening !== null} onClick={() => openManual(m, true)}>
+                    <Globe className="mr-1 size-4" /> Publicar site
                   </Button>
                 </div>
+                <Button variant="ghost" size="sm" className="text-xs" disabled={pending} onClick={() => use(m)}>
+                  <Sparkles className="mr-1 size-3" /> Personalizar com a NEXUSBUILD AI
+                </Button>
               </div>
             </article>
           ))}
         </div>
       )}
 
-      <PreviewDialog model={previewing} onClose={() => setPreviewing(null)} onUse={use} pending={pending} />
+      <PreviewDialog model={previewing} onClose={() => setPreviewing(null)} onUse={use} onEdit={(m) => { setPreviewing(null); void openManual(m, false); }} pending={pending} />
     </div>
   );
 }
