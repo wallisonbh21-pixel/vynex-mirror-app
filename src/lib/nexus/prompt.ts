@@ -89,7 +89,7 @@ export function buildSystemPrompt(ctx: NexusPromptContext): string {
   const objective = ctx.conversationObjective ? OBJECTIVE_LABELS[ctx.conversationObjective] : null;
   if (objective) {
     parts.push(
-      `OBJETIVO DESTA CONVERSA\n${objective}${ctx.conversationTemplate ? `\nModelo escolhido: ${ctx.conversationTemplate}.` : ""}`,
+      `OBJETIVO DESTA CONVERSA\n${objective}${ctx.conversationTemplate ? `\nModelo escolhido (template_id real): ${ctx.conversationTemplate}. Aplique com APPLY_TEMPLATE usando exatamente esse id, preserve a estrutura e personalize só o conteúdo. Depois siga o fluxo até publish_site e entregue o link.` : ""}`,
     );
   }
 
