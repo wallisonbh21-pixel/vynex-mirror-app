@@ -7,9 +7,9 @@ type Search = { brand?: string | undefined; type?: string | undefined; priceMax?
 
 export const Route = createFileRoute("/template/scalenexus-motors/estoque")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    brand: typeof s.brand === "string" && s.brand ? s.brand : undefined,
-    type: typeof s.type === "string" && s.type ? s.type : undefined,
-    priceMax: Number(s.priceMax) > 0 ? Number(s.priceMax) : undefined,
+    brand: typeof s["brand"] === "string" && s["brand"] ? s["brand"] : undefined,
+    type: typeof s["type"] === "string" && s["type"] ? s["type"] : undefined,
+    priceMax: Number(s["priceMax"]) > 0 ? Number(s["priceMax"]) : undefined,
   }),
   head: () => motorsHead("Estoque de veículos — ScaleNexus Motors", "Estoque com filtros por marca, modelo, tipo, ano, preço, quilometragem, combustível e câmbio."),
   component: StockPage,

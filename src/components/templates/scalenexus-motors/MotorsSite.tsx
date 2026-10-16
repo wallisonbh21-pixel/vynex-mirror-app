@@ -372,13 +372,13 @@ type FormState = "idle" | "sending" | "success" | "error" | "unconfigured";
 export type LeadData = Partial<Record<"name" | "phone" | "email" | "vehicle" | "year" | "km" | "message" | "website", string>>;
 export function validateLead(kind: "contato" | "avaliacao", d: LeadData) {
   const e: Record<string, string> = {};
-  if ((d.name ?? "").trim().length < 2) e.name = "Informe seu nome.";
-  if ((d.phone ?? "").replace(/\D/g, "").length < 10) e.phone = "Informe um telefone com DDD.";
-  if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e.email = "E-mail inválido.";
+  if ((d.name ?? "").trim().length < 2) e["name"] = "Informe seu nome.";
+  if ((d.phone ?? "").replace(/\D/g, "").length < 10) e["phone"] = "Informe um telefone com DDD.";
+  if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e["email"] = "E-mail inválido.";
   if (kind === "avaliacao") {
-    if ((d.vehicle ?? "").trim().length < 2) e.vehicle = "Informe marca e modelo.";
+    if ((d.vehicle ?? "").trim().length < 2) e["vehicle"] = "Informe marca e modelo.";
     const y = Number(d.year);
-    if (!y || y < 1950 || y > new Date().getFullYear() + 1) e.year = "Ano inválido.";
+    if (!y || y < 1950 || y > new Date().getFullYear() + 1) e["year"] = "Ano inválido.";
   }
   return e;
 }
